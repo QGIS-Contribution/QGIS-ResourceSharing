@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/QgsSymbologySharing" >
-        <file>icon.png</file>
-    </qresource>
-</RCC>

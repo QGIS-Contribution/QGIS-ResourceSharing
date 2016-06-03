@@ -24,18 +24,91 @@
 import os
 
 from PyQt4 import QtGui, uic
+from PyQt4.Qt import QSize
+from PyQt4.QtGui import QIcon, QListWidgetItem
+from PyQt4.QtCore import Qt, SIGNAL
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'qgs_symbology_sharing_dialog_base.ui'))
+from utilities import resources_path
+
+FORM_CLASS, _ = uic.loadUiType(
+    resources_path('ui', 'qgs_symbology_sharing_dialog_base.ui'))
 
 
 class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
+    TAB_ALL = 0
+    TAB_INSTALLED = 1
+    TAB_SETTINGS = 2
+
     def __init__(self, parent=None):
         """Constructor."""
+        # import pydevd
+        # pydevd.settrace('localhost', port=8080, stdoutToServer = True,
+        #                 stderrToServer = True)
         super(QgsSymbologySharingDialog, self).__init__(parent)
-        # Set up the user interface from Designer.
-        # After setupUI you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+
+        # Mock plugin manager dialog
+        self.resize(796, 594)
+        self.setMinimumSize(QSize(790, 0))
+        self.setModal(True)
+
+        # Set QListWidgetItem
+        # All
+        icon_all = QIcon()
+        icon_all.addFile(
+            resources_path('img', 'plugin.svg'),
+            QSize(),
+            QIcon.Normal,
+            QIcon.Off)
+        item_all = QListWidgetItem()
+        item_all.setIcon(icon_all)
+        item_all.setText(self.tr('All'))
+
+        # Installed
+        icon_installed = QIcon()
+        icon_installed.addFile(
+            resources_path('img', 'plugin-installed.svg'),
+            QSize(),
+            QIcon.Normal,
+            QIcon.Off)
+        item_installed = QListWidgetItem()
+        item_installed.setIcon(icon_installed)
+        item_installed.setText(self.tr('Installed'))
+        item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+        # Settings
+        icon_settings = QIcon()
+        icon_settings.addFile(
+            resources_path('img', 'settings.svg'),
+            QSize(),
+            QIcon.Normal,
+            QIcon.Off)
+        item_settings = QListWidgetItem()
+        item_settings.setIcon(icon_settings)
+        item_settings.setText(self.tr('Settings'))
+        item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+        # Add the list widget item to the widget
+        self.menu_list_widget.addItem(item_all)
+        self.menu_list_widget.addItem(item_installed)
+        self.menu_list_widget.addItem(item_settings)
+
+        # Connect list widget to stack widget
+        self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
+
+    def set_current_tab(self, index):
+        """Set stacked widget based on active tab.
+
+        :param index: The index of the active list widget item.
+        :type index: int
+        """
+        if index == (self.menu_list_widget.count() - 1):
+            # Switch to settings tab
+            self.stacked_menu_widget.setCurrentIndex(1)
+        else:
+            # Switch to plugins tab
+            self.stacked_menu_widget.setCurrentIndex(0)
+
+
+
+

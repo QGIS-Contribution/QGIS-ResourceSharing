@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>ManageRepositoryDialog</class>
+ <widget class="QDialog" name="ManageRepositoryDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -63,5 +63,38 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>ManageRepositoryDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>224</x>
+     <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>ManageRepositoryDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>224</x>
+     <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

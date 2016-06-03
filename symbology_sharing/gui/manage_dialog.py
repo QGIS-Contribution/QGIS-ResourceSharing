@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- QgsSymbologySharing
+ ManageRepositoryDialog
                                  A QGIS plugin
  Download colllections shared by other users
                              -------------------
         begin                : 2016-05-29
+        git sha              : $Format:%H$
         copyright            : (C) 2016 by Akbar Gumbira
         email                : akbargumbira@gmail.com
-        git sha              : $Format:%H$
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,17 +19,30 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- This script initializes the plugin, making it known to QGIS.
 """
 
+from PyQt4 import QtGui, uic
 
-# noinspection PyPep8Naming
-def classFactory(iface):  # pylint: disable=invalid-name
-    """Load QgsSymbologySharing class from file QgsSymbologySharing.
+from ..utilities import ui_path
 
-    :param iface: A QGIS interface instance.
-    :type iface: QgsInterface
-    """
-    #
-    from symbology_sharing.plugin import Plugin
-    return Plugin(iface)
+FORM_CLASS, _ = uic.loadUiType(ui_path('manage_repository.ui'))
+
+
+class ManageRepositoryDialog(QtGui.QDialog, FORM_CLASS):
+    def __init__(self, parent=None):
+        """Constructor."""
+        super(ManageRepositoryDialog, self).__init__(parent)
+        self.setupUi(self)
+        self.line_edit_url.setText('http://')
+        self.line_edit_name.textChanged.connect(self.form_changed)
+        self.line_edit_url.textChanged.connect(self.form_changed)
+
+    def form_changed(self):
+        """Slot for when the form changed."""
+        is_enabled = (len(self.line_edit_name.text()) > 0 and
+                      len(self.line_edit_url.text()) > 0)
+        self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(is_enabled)
+
+
+
+

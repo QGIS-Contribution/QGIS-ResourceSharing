@@ -25,11 +25,11 @@ import os.path
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QAction, QIcon
 
-from qgs_symbology_sharing_dialog import QgsSymbologySharingDialog
+from gui.qgs_symbology_sharing_dialog import QgsSymbologySharingDialog
 from utilities import resources_path
 
 
-class QgsSymbologySharing:
+class Plugin:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -59,7 +59,7 @@ class QgsSymbologySharing:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = QgsSymbologySharingDialog()
+        self.dlg = QgsSymbologySharingDialog(iface=self.iface)
 
         # Declare instance attributes
         self.actions = []

@@ -21,17 +21,16 @@
  ***************************************************************************/
 """
 
-import os
-
 from PyQt4 import QtGui, uic
+
 from PyQt4.Qt import QSize
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QIcon, QListWidgetItem
-from PyQt4.QtCore import Qt, SIGNAL
 
-from utilities import resources_path
+from manage_dialog import ManageRepositoryDialog
+from ..utilities import resources_path, ui_path
 
-FORM_CLASS, _ = uic.loadUiType(
-    resources_path('ui', 'qgs_symbology_sharing_dialog_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(ui_path('qgs_symbology_sharing_dialog_base.ui'))
 
 
 class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
@@ -39,13 +38,18 @@ class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
 
-    def __init__(self, parent=None):
-        """Constructor."""
-        # import pydevd
-        # pydevd.settrace('localhost', port=8080, stdoutToServer = True,
-        #                 stderrToServer = True)
+    def __init__(self, parent=None, iface=None):
+        """Constructor.
+
+        :param parent: Optional widget to use as parent
+        :type parent: QWidget
+
+        :param iface: An instance of QGisInterface
+        :type iface: QGisInterface
+        """
         super(QgsSymbologySharingDialog, self).__init__(parent)
         self.setupUi(self)
+        self.iface = iface
 
         # Mock plugin manager dialog
         self.resize(796, 594)
@@ -96,6 +100,10 @@ class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Connect list widget to stack widget
         self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
 
+        # Slots
+        self.button_add.clicked.connect(self.add_repository)
+        self.button_edit.clicked.connect(self.edit_repository)
+
     def set_current_tab(self, index):
         """Set stacked widget based on active tab.
 
@@ -109,6 +117,16 @@ class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             # Switch to plugins tab
             self.stacked_menu_widget.setCurrentIndex(0)
 
+    def add_repository(self):
+        """Open add repository dialog."""
+        dlg = ManageRepositoryDialog(self)
+        if not dlg.exec_():
+            return
 
+    def edit_repository(self):
+        """Open edit repository dialog."""
+        dlg = ManageRepositoryDialog(self   )
+        if not dlg.exec_():
+            return
 
 

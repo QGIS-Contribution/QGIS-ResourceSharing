@@ -16,8 +16,7 @@ import unittest
 
 from PyQt4.QtGui import QDialogButtonBox, QDialog
 
-from qgs_symbology_sharing_dialog import QgsSymbologySharingDialog
-
+from symbology_sharing.gui.qgs_symbology_sharing_dialog import QgsSymbologySharingDialog
 from utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
 

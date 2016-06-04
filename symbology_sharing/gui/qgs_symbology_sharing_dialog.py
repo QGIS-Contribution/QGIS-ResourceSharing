@@ -208,6 +208,15 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         if not repo_name:
             return
+        # Check if it's the official repository
+        settings = QSettings()
+        settings.beginGroup(repo_settings_group())
+        if settings.value(repo_name + '/url') == self.repository_manager.OFFICIAL_REPO[1]:
+            self.message_bar.pushMessage(
+                self.tr(
+                    'You can not remove the official repository!'),
+                QgsMessageBar.WARNING, 5)
+            return
 
         warning = self.tr('Are you sure you want to remove the following '
                           'repository?') + '\n' + repo_name
@@ -219,8 +228,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 QMessageBox.No) == QMessageBox.No:
             return
 
-        settings = QSettings()
-        settings.beginGroup(repo_settings_group())
         settings.remove(repo_name)
 
         # Refresh tree repository

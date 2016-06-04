@@ -36,3 +36,7 @@ def ui_path(*args):
 
     return path
 
+
+def repo_settings_group():
+    """Get the settings group for Symbology Sharing Dialog."""
+    return '/SymbologySharing/repository'

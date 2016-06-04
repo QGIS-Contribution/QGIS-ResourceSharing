@@ -22,18 +22,19 @@
 """
 
 from PyQt4 import QtGui, uic
-
 from PyQt4.Qt import QSize
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QIcon, QListWidgetItem
+from PyQt4.QtCore import Qt, QSettings
+from PyQt4.QtGui import QIcon, QListWidgetItem, QTreeWidgetItem, QSizePolicy
+from qgis.gui import QgsMessageBar
 
 from manage_dialog import ManageRepositoryDialog
-from ..utilities import resources_path, ui_path
+from ..repository_manager import RepositoryManager
+from ..utilities import resources_path, ui_path, repo_settings_group
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('qgs_symbology_sharing_dialog_base.ui'))
 
 
-class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
+class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     TAB_ALL = 0
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
@@ -47,9 +48,15 @@ class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         :param iface: An instance of QGisInterface
         :type iface: QGisInterface
         """
-        super(QgsSymbologySharingDialog, self).__init__(parent)
+        super(SymbologySharingDialog, self).__init__(parent)
         self.setupUi(self)
         self.iface = iface
+        self.repository_manager = RepositoryManager()
+
+        # Init the message bar
+        self.message_bar = QgsMessageBar(self)
+        self.message_bar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.vlayoutRightColumn.insertWidget(0, self.message_bar)
 
         # Mock plugin manager dialog
         self.resize(796, 594)
@@ -104,6 +111,9 @@ class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.button_add.clicked.connect(self.add_repository)
         self.button_edit.clicked.connect(self.edit_repository)
 
+        # Populate tree repositories with registered repositories
+        self.populate_tree_repositories()
+
     def set_current_tab(self, index):
         """Set stacked widget based on active tab.
 
@@ -123,10 +133,48 @@ class QgsSymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         if not dlg.exec_():
             return
 
+        repo_name = dlg.line_edit_name.text()
+        repo_url = dlg.line_edit_url.text().strip()
+
+        settings = QSettings()
+        settings.beginGroup(repo_settings_group())
+        settings.setValue(repo_name + '/url', repo_url)
+
+        # Refresh tree repository
+        self.refresh_tree_repositories()
+
     def edit_repository(self):
         """Open edit repository dialog."""
-        dlg = ManageRepositoryDialog(self   )
+        selected_item = self.tree_repositories.currentItem()
+        if selected_item:
+            repo_name = selected_item.text(0)
+
+        if not repo_name:
+            return
+
+        dlg = ManageRepositoryDialog(self)
+        dlg.line_edit_name.setText(repo_name)
+        dlg.line_edit_url.setText(
+            self.repository_manager.repositories[repo_name]['url'])
         if not dlg.exec_():
             return
 
+    def refresh_tree_repositories(self):
+        """Refresh tree repositories using new repositories data."""
+        self.repository_manager.load()
+        self.populate_tree_repositories()
 
+    def populate_tree_repositories(self):
+        """Populate dictionary repositories to the tree widget."""
+        # Clear the current tree widget
+        self.tree_repositories.clear()
+
+        # Export the updated ones from the repository manager
+        for repo_name in self.repository_manager.repositories:
+            url = self.repository_manager.repositories[repo_name]['url']
+            item = QTreeWidgetItem(self.tree_repositories)
+            item.setText(0, repo_name)
+            item.setText(1, url)
+        self.tree_repositories.resizeColumnToContents(0)
+        self.tree_repositories.resizeColumnToContents(1)
+        self.tree_repositories.sortItems(1, Qt.AscendingOrder)

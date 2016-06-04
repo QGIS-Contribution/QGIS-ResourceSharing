@@ -25,7 +25,7 @@ import os.path
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QAction, QIcon
 
-from gui.qgs_symbology_sharing_dialog import QgsSymbologySharingDialog
+from gui.qgs_symbology_sharing_dialog import SymbologySharingDialog
 from utilities import resources_path
 
 
@@ -59,7 +59,7 @@ class Plugin:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = QgsSymbologySharingDialog(iface=self.iface)
+        self.dlg = SymbologySharingDialog(iface=self.iface)
 
         # Declare instance attributes
         self.actions = []

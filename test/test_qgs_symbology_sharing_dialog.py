@@ -16,7 +16,7 @@ import unittest
 
 from PyQt4.QtGui import QDialogButtonBox, QDialog
 
-from symbology_sharing.gui.qgs_symbology_sharing_dialog import QgsSymbologySharingDialog
+from symbology_sharing.gui.qgs_symbology_sharing_dialog import SymbologySharingDialog
 from utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
 
@@ -26,7 +26,7 @@ class QgsSymbologySharingDialogTest(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test."""
-        self.dialog = QgsSymbologySharingDialog(None)
+        self.dialog = SymbologySharingDialog(None)
 
     def tearDown(self):
         """Runs after each test."""

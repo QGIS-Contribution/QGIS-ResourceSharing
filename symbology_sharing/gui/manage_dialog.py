@@ -24,6 +24,7 @@
 from PyQt4 import QtGui, uic
 
 from ..utilities import ui_path
+from ..repository_manager import RepositoryManager
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('manage_repository.ui'))
 

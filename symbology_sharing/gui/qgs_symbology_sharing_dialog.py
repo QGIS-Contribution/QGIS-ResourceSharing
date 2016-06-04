@@ -24,7 +24,13 @@
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
 from PyQt4.QtCore import Qt, QSettings
-from PyQt4.QtGui import QIcon, QListWidgetItem, QTreeWidgetItem, QSizePolicy
+from PyQt4.QtGui import (
+    QIcon,
+    QListWidgetItem,
+    QTreeWidgetItem,
+    QSizePolicy,
+    QMessageBox
+)
 from qgis.gui import QgsMessageBar
 
 from manage_dialog import ManageRepositoryDialog
@@ -62,6 +68,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.resize(796, 594)
         self.setMinimumSize(QSize(790, 0))
         self.setModal(True)
+        self.button_edit.setEnabled(False)
+        self.button_delete.setEnabled(False)
 
         # Set QListWidgetItem
         # All
@@ -74,7 +82,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         item_all = QListWidgetItem()
         item_all.setIcon(icon_all)
         item_all.setText(self.tr('All'))
-
         # Installed
         icon_installed = QIcon()
         icon_installed.addFile(
@@ -86,7 +93,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         item_installed.setIcon(icon_installed)
         item_installed.setText(self.tr('Installed'))
         item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-
         # Settings
         icon_settings = QIcon()
         icon_settings.addFile(
@@ -104,12 +110,11 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.menu_list_widget.addItem(item_installed)
         self.menu_list_widget.addItem(item_settings)
 
-        # Connect list widget to stack widget
-        self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
-
         # Slots
         self.button_add.clicked.connect(self.add_repository)
         self.button_edit.clicked.connect(self.edit_repository)
+        self.button_delete.clicked.connect(self.delete_repository)
+        self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
 
         # Populate tree repositories with registered repositories
         self.populate_tree_repositories()
@@ -133,8 +138,18 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         if not dlg.exec_():
             return
 
+        for repo in self.repository_manager.repositories.values():
+            if dlg.line_edit_url.text().strip() == repo['url']:
+                self.message_bar.pushMessage(
+                    self.tr(
+                        'Unable to add another repository with the same URL!'),
+                    QgsMessageBar.WARNING, 5)
+                return
+
         repo_name = dlg.line_edit_name.text()
         repo_url = dlg.line_edit_url.text().strip()
+        if repo_name in self.repository_manager.repositories:
+            repo_name += '(2)'
 
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
@@ -142,6 +157,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Refresh tree repository
         self.refresh_tree_repositories()
+        self.set_enabled_edit_delete_button(False)
 
     def edit_repository(self):
         """Open edit repository dialog."""
@@ -156,8 +172,60 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         dlg.line_edit_name.setText(repo_name)
         dlg.line_edit_url.setText(
             self.repository_manager.repositories[repo_name]['url'])
+
         if not dlg.exec_():
             return
+
+        # Check if the changed URL is already there in the repo
+        new_url = dlg.line_edit_url.text().strip()
+        old_url = self.repository_manager.repositories[repo_name]['url']
+        for repo in self.repository_manager.repositories.values():
+            if new_url == repo['url'] and (old_url != new_url):
+                self.message_bar.pushMessage(
+                    self.tr(
+                        'Unable to add another repository with the same URL!'),
+                    QgsMessageBar.WARNING, 5)
+                return
+
+        # Delete old repo and create a new entry
+        settings = QSettings()
+        settings.beginGroup(repo_settings_group())
+        settings.remove(repo_name)
+        new_name = dlg.line_edit_name.text()
+        if new_name in self.repository_manager.repositories and new_name != repo_name:
+            new_name += '(2)'
+        settings.setValue(new_name + '/url', new_url)
+
+        # Refresh tree repository
+        self.refresh_tree_repositories()
+        self.set_enabled_edit_delete_button(False)
+
+    def delete_repository(self):
+        """Delete a repository in the tree widget."""
+        selected_item = self.tree_repositories.currentItem()
+        if selected_item:
+            repo_name = selected_item.text(0)
+
+        if not repo_name:
+            return
+
+        warning = self.tr('Are you sure you want to remove the following '
+                          'repository?') + '\n' + repo_name
+        if QMessageBox.warning(
+                self,
+                self.tr("QGIS Symbology Sharing"),
+                warning,
+                QMessageBox.Yes,
+                QMessageBox.No) == QMessageBox.No:
+            return
+
+        settings = QSettings()
+        settings.beginGroup(repo_settings_group())
+        settings.remove(repo_name)
+
+        # Refresh tree repository
+        self.refresh_tree_repositories()
+        self.set_enabled_edit_delete_button(False)
 
     def refresh_tree_repositories(self):
         """Refresh tree repositories using new repositories data."""
@@ -178,3 +246,17 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.tree_repositories.resizeColumnToContents(0)
         self.tree_repositories.resizeColumnToContents(1)
         self.tree_repositories.sortItems(1, Qt.AscendingOrder)
+
+    def on_tree_repositories_itemSelectionChanged(self):
+        """Slot for when the itemSelectionChanged signal emitted."""
+        # Activate edit and delete button
+        self.set_enabled_edit_delete_button(True)
+
+    def set_enabled_edit_delete_button(self, is_enabled):
+        """Disable edit and delete button.
+
+        :param is_enabled: Boolean is enabled or not.
+        :type is_enabled: bool
+        """
+        self.button_edit.setEnabled(is_enabled)
+        self.button_delete.setEnabled(is_enabled)

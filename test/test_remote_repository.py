@@ -1,10 +1,15 @@
 # coding=utf-8
-import unittest
+from qgis.testing import start_app, unittest
+import nose2
 
 from symbology_sharing.remote_repository import RemoteRepository
 
 
 class TestRemoteRepository(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        start_app()
+
     def setUp(self):
         self.valid_https = 'https://github.com/anitagraser/QGIS-style-repo-dummy.git'
 
@@ -27,3 +32,6 @@ class TestRemoteRepository(unittest.TestCase):
 
         expected_metadata_url = 'https://raw.githubusercontent.com/anitagraser/QGIS-style-repo-dummy/master/metadata.ini'
         self.assertEqual(remote_repo.metadata_url, expected_metadata_url)
+
+if __name__ == '__main__':
+    nose2.main()

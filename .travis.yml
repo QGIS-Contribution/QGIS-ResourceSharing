@@ -1,10 +1,13 @@
 language: python
 
+sudo: required
+dist: trusty
+
 before_install:
   - sudo apt-get -qq -y update
 
 env:
-  - QGIS_REPO=http://qgis.org/debian-ltr
+#  - QGIS_REPO=http://qgis.org/debian-ltr (testing module is not there)
   - QGIS_REPO=http://qgis.org/debian-nightly-release
 
 install:

@@ -4,7 +4,7 @@ from PyQt4.QtNetwork import QNetworkRequest
 
 from qgis.core import QgsNetworkAccessManager
 
-from lib.giturlparse import parse, validate
+from ext_libs.giturlparse import parse, validate
 
 
 class RemoteRepository(QObject):

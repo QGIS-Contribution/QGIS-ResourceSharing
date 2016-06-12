@@ -15,11 +15,14 @@ install:
   - sudo add-apt-repository ${QGIS_REPO}
   - sudo apt-get update
   - sudo apt-get install -y --force-yes qgis python-qgis xvfb
-  - sudo pip install nose2
+  - sudo pip install nose2 cov-core python-coveralls
 
 script:
   - export PATH=/usr/bin:$PATH
-  - xvfb-run nose2
+  - xvfb-run nose2 --with-coverage
+
+after_success:
+  - coveralls
 
 notifications:
   webhooks:

@@ -1,1 +1,0 @@
-QGIS Symbology Sharing

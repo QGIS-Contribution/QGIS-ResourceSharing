@@ -36,7 +36,6 @@ from qgis.gui import QgsMessageBar
 
 from manage_dialog import ManageRepositoryDialog
 from ..repository_manager import RepositoryManager
-from ..remote_repository import RemoteRepository
 from ..utilities import resources_path, ui_path, repo_settings_group
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('qgs_symbology_sharing_dialog_base.ui'))
@@ -164,18 +163,14 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         settings.setValue(repo_name + '/url', repo_url)
 
         # Fetch metadata
-        #TODO: Wrap RemoteRepository class into RepositoryManager
-        # This dialod will only need to call RepositoryManager.
-        # RepositoryManager will take care of the rest
-        remote_repository = RemoteRepository(repo_url)
-        remote_repository.fetch_metadata(self.progress_dialog)
+        metadata = self.repository_manager.fetch_metadata(repo_url, self.progress_dialog)
 
         # Show metadata
         #TODO: Process this instead of showing it on message box :)
         QMessageBox.information(
             self,
             self.tr("Test"),
-            remote_repository.metadata.data())
+            metadata.data())
 
         # Refresh tree repository
         self.refresh_tree_repositories()

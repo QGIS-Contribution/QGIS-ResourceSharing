@@ -2,6 +2,7 @@
 from PyQt4.QtCore import QObject, QSettings
 
 from .utilities import repo_settings_group
+from .handler import GithubHandler, BitBucketHandler
 
 
 class RepositoryManager(QObject):
@@ -9,6 +10,7 @@ class RepositoryManager(QObject):
     OFFICIAL_REPO = (
         'QGIS Official Repository',
         'https://github.com/anitagraser/QGIS-style-repo-dummy.git')
+    HANDLERS = [GithubHandler, BitBucketHandler]
 
     def __init__(self):
         """Constructor."""
@@ -47,3 +49,23 @@ class RepositoryManager(QObject):
             self._repositories[repo_name]['url'] = settings.value(
                 repo_name + '/url', '', type=unicode)
         settings.endGroup()
+
+    def fetch_metadata(self, url, progress_dialog=None):
+        """Fetch metadata given the URL.
+
+        :param url: The URL of the repository
+        :type url: str
+
+        :param progress_dialog: Progress dialog (optional)
+        :type progress_dialog: QProgressDialog
+        """
+        # Get the right handler for the given URL
+        repo_handler = None
+        for handler in self.HANDLERS:
+            handler_instance = handler(url)
+            if handler_instance.can_handle():
+                repo_handler = handler_instance
+                break
+
+        repo_handler.fetch_metadata(progress_dialog)
+        return repo_handler.metadata

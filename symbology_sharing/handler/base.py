@@ -1,7 +1,5 @@
 # coding=utf-8
-import abc
-
-from PyQt4.QtCore import QObject, QSettings, QCoreApplication, QUrl
+from PyQt4.QtCore import QObject, QCoreApplication, QUrl
 from PyQt4.QtNetwork import QNetworkRequest
 
 from qgis.core import QgsNetworkAccessManager

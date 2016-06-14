@@ -81,9 +81,6 @@ class BaseRepositoryHandler(QObject):
         return self._git_repository
 
     def fetch_metadata(self, progress_dialog):
-        import pydevd
-        pydevd.settrace('localhost', port=8080, stdoutToServer=True,
-                        stderrToServer=True)
         self._progress_dialog = progress_dialog
         # Set up progress dialog
         self._progress_dialog.show()

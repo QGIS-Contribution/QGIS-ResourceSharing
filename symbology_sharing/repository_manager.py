@@ -67,5 +67,5 @@ class RepositoryManager(QObject):
                 repo_handler = handler_instance
                 break
 
-        repo_handler.fetch_metadata(progress_dialog)
-        return repo_handler.metadata
+        status, description = repo_handler.fetch_metadata(progress_dialog)
+        return status, description

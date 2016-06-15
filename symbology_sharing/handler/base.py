@@ -1,6 +1,6 @@
 # coding=utf-8
 from PyQt4.QtCore import QObject, QCoreApplication, QUrl
-from PyQt4.QtNetwork import QNetworkRequest
+from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
 
 from qgis.core import QgsNetworkAccessManager
 
@@ -80,30 +80,50 @@ class BaseRepositoryHandler(QObject):
     def git_repository(self):
         return self._git_repository
 
-    def fetch_metadata(self, progress_dialog):
-        self._progress_dialog = progress_dialog
-        # Set up progress dialog
-        self._progress_dialog.show()
-        # Just use infinite progress bar here
-        self._progress_dialog.setMaximum(0)
-        self._progress_dialog.setMinimum(0)
-        self._progress_dialog.setValue(0)
-        self._progress_dialog.setLabelText(
-            self.tr("Fetching repository's metadata"))
+    def fetch_metadata(self, progress_dialog=None):
+        """Fetch metadata file from the repository.
+
+        :param progress_dialog: Progress dialog (optional)
+        :type progress_dialog: QProgressDialog
+        """
+        if progress_dialog is not None:
+            self._progress_dialog = progress_dialog
+            # Set up progress dialog
+            self._progress_dialog.show()
+            # Just use infinite progress bar here
+            self._progress_dialog.setMaximum(0)
+            self._progress_dialog.setMinimum(0)
+            self._progress_dialog.setValue(0)
+            self._progress_dialog.setLabelText(
+                self.tr("Fetching repository's metadata"))
 
         # Fetch the metadata
         request = QNetworkRequest(QUrl(self.metadata_url))
         self._reply = self._network_manager.get(request)
-        self._reply.finished.connect(self.read_metadata)
+        self._reply.finished.connect(self.fetch_metadata_finished)
         self._network_manager.requestTimedOut.connect(self.request_timeout)
 
         while not self._reply.isFinished():
             # noinspection PyArgumentList
             QCoreApplication.processEvents()
 
-    def read_metadata(self):
-        self._metadata = self._reply.readAll()
-        self._progress_dialog.hide()
+        # Finished
+        if self._reply.error() != QNetworkReply.NoError:
+            status = False
+            description = self._reply.errorString()
+        else:
+            status = True
+            self._metadata = self._reply.readAll().data()
+            description = self.metadata
+
+        self._reply.deleteLater()
+
+        return status, description
+
+    def fetch_metadata_finished(self):
+        """Slot for when fetching metadata finished."""
+        if self._progress_dialog:
+            self._progress_dialog.hide()
 
     def request_timeout(self):
         if self._progress_dialog:

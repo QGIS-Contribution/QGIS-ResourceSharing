@@ -150,7 +150,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add another repository with the same URL!'),
-                    QgsMessageBar.WARNING, 5)
+                    QgsMessageBar.CRITICAL, 5)
                 return
 
         repo_name = dlg.line_edit_name.text()
@@ -160,17 +160,28 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
-        settings.setValue(repo_name + '/url', repo_url)
 
         # Fetch metadata
-        metadata = self.repository_manager.fetch_metadata(repo_url, self.progress_dialog)
-
-        # Show metadata
-        #TODO: Process this instead of showing it on message box :)
-        QMessageBox.information(
-            self,
-            self.tr("Test"),
-            metadata.data())
+        try:
+            status, description = self.repository_manager.fetch_metadata(
+                repo_url, self.progress_dialog)
+            if status:
+                # TODO: Process this instead of showing it on message box :)
+                QMessageBox.information(
+                    self,
+                    self.tr("Test"),
+                    description)
+                # Add the repo
+                settings.setValue(repo_name + '/url', repo_url)
+            else:
+                self.message_bar.pushMessage(
+                    self.tr(
+                        'Unable to add repository: %s') % description,
+                    QgsMessageBar.CRITICAL, 5)
+        except Exception, e:
+            self.message_bar.pushMessage(
+                self.tr('%s') % e,
+                QgsMessageBar.CRITICAL, 5)
 
         # Refresh tree repository
         self.refresh_tree_repositories()
@@ -201,7 +212,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add another repository with the same URL!'),
-                    QgsMessageBar.WARNING, 5)
+                    QgsMessageBar.CRITICAL, 5)
                 return
 
         # Delete old repo and create a new entry

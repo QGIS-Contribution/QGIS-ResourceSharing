@@ -1,5 +1,5 @@
 # coding=utf-8
-from PyQt4.QtCore import QObject, QCoreApplication, QUrl
+from PyQt4.QtCore import QCoreApplication, QUrl
 from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
 
 from qgis.core import QgsNetworkAccessManager
@@ -14,8 +14,7 @@ class RemoteGitHandler(BaseHandler):
 
     def __init__(self, url=None):
         """Constructor."""
-        BaseHandler.__init__(self)
-        self._metadata = None
+        BaseHandler.__init__(self, url)
         self._git_platform = None
         self._git_host = None
         self._git_owner = None
@@ -31,20 +30,7 @@ class RemoteGitHandler(BaseHandler):
     def can_handle(self):
         return False
 
-    @property
-    def metadata(self):
-        return self._metadata
-
-    @property
-    def url(self):
-        """The URL to the repository from QSettings.
-
-        Example:
-        - https://github.com/anitagraser/QGIS-style-repo-dummy.git
-        """
-        return self._url
-
-    @url.setter
+    @BaseHandler.url.setter
     def url(self, url):
         """Setter to the repository's URL."""
         if validate(url):

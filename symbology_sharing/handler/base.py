@@ -7,6 +7,7 @@ __date__ = '15/03/15'
 
 
 class HandlerMeta(type):
+    """Handler meta class definition."""
     def __init__(cls, name, bases, dct):
         if not hasattr(cls, 'registry'):
             # This is the base class.  Create an empty registry
@@ -28,9 +29,13 @@ class BaseHandler(object):
     METADATA_FILE = 'metadata.ini'
     IS_DISABLED = False
 
-    def __init__(self):
+    def __init__(self, url):
         """Constructor of the base class."""
         self._url = None
+        self._metadata = None
+
+        # Call proper setters here
+        self.url = url
 
     def can_handle(self):
         """Checking if handler can handle this URL."""
@@ -50,6 +55,10 @@ class BaseHandler(object):
     def url(self, url):
         """Setter to the repository's URL."""
         self._url = url
+
+    @property
+    def metadata(self):
+        return self._metadata
 
     def fetch_metadata(self):
         """Fetch the content of the metadata."""

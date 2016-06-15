@@ -2,7 +2,7 @@
 from PyQt4.QtCore import QObject, QSettings
 
 from .utilities import repo_settings_group
-from .handler import GithubHandler, BitBucketHandler
+from .handler import BaseHandler, GithubHandler, BitBucketHandler
 
 
 class RepositoryManager(QObject):
@@ -10,7 +10,7 @@ class RepositoryManager(QObject):
     OFFICIAL_REPO = (
         'QGIS Official Repository',
         'https://github.com/anitagraser/QGIS-style-repo-dummy.git')
-    HANDLERS = [GithubHandler, BitBucketHandler]
+    # HANDLERS = [GithubHandler, BitBucketHandler]
 
     def __init__(self):
         """Constructor."""
@@ -61,11 +61,13 @@ class RepositoryManager(QObject):
         """
         # Get the right handler for the given URL
         repo_handler = None
-        for handler in self.HANDLERS:
+        for handler in BaseHandler.registry.values():
             handler_instance = handler(url)
             if handler_instance.can_handle():
                 repo_handler = handler_instance
                 break
+
+        # TODO: Raise exception when there's no handler available
 
         status, description = repo_handler.fetch_metadata(progress_dialog)
         return status, description

@@ -1,11 +1,13 @@
 # coding=utf-8
-from base import BaseRepositoryHandler
+from remote_git_handler import RemoteGitHandler
 
 
-class GithubHandler(BaseRepositoryHandler):
+class GithubHandler(RemoteGitHandler):
     """Handler class for Github Repository."""
+    IS_DISABLED = False
+
     def __init__(self, url=None):
-        BaseRepositoryHandler.__init__(self, url)
+        RemoteGitHandler.__init__(self, url)
 
     def can_handle(self):
         if self.git_platform == 'github':

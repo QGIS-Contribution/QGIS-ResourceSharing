@@ -1,11 +1,13 @@
 # coding=utf-8
-from base import BaseRepositoryHandler
+from remote_git_handler import RemoteGitHandler
 
 
-class BitBucketHandler(BaseRepositoryHandler):
+class BitBucketHandler(RemoteGitHandler):
     """Handler class for Bitbucket Repository."""
+    IS_DISABLED = False
+
     def __init__(self, url=None):
-        BaseRepositoryHandler.__init__(self, url)
+        RemoteGitHandler.__init__(self, url)
 
     def can_handle(self):
         if self.git_platform == 'bitbucket':

@@ -15,7 +15,6 @@ class RemoteGitHandler(BaseHandler):
     def __init__(self, url=None):
         """Constructor."""
         BaseHandler.__init__(self)
-        self._url = None
         self._metadata = None
         self._git_platform = None
         self._git_host = None
@@ -23,18 +22,13 @@ class RemoteGitHandler(BaseHandler):
         self._git_repository = None
         self._network_manager = QgsNetworkAccessManager.instance()
         self._reply = None
-        self._progress_dialog = None
-        self._handler_class = None
+        self._network_finished = False
+        self._network_timeout = False
 
         # Call proper setters here
         self.url = url
 
     def can_handle(self):
-        """Checking if handler can handle this URL.
-
-        :param url: The URL of the repositoy.
-        :type url: str
-        """
         return False
 
     @property
@@ -81,22 +75,8 @@ class RemoteGitHandler(BaseHandler):
     def git_repository(self):
         return self._git_repository
 
-    def fetch_metadata(self, progress_dialog=None):
-        """Fetch metadata file from the repository.
-
-        :param progress_dialog: Progress dialog (optional)
-        :type progress_dialog: QProgressDialog
-        """
-        if progress_dialog is not None:
-            self._progress_dialog = progress_dialog
-            # Set up progress dialog
-            self._progress_dialog.show()
-            # Just use infinite progress bar here
-            self._progress_dialog.setMaximum(0)
-            self._progress_dialog.setMinimum(0)
-            self._progress_dialog.setValue(0)
-            self._progress_dialog.setLabelText("Fetching repository's metadata")
-
+    def fetch_metadata(self):
+        """Fetch metadata file from the repository."""
         # Fetch the metadata
         request = QNetworkRequest(QUrl(self.metadata_url))
         self._reply = self._network_manager.get(request)
@@ -122,10 +102,8 @@ class RemoteGitHandler(BaseHandler):
 
     def fetch_metadata_finished(self):
         """Slot for when fetching metadata finished."""
-        if self._progress_dialog:
-            self._progress_dialog.hide()
+        self._network_finished = True
 
     def request_timeout(self):
-        if self._progress_dialog:
-            self._progress_dialog.hide()
+        self._network_timeout = True
 

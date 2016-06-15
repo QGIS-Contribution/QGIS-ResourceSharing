@@ -50,7 +50,7 @@ class RepositoryManager(QObject):
                 repo_name + '/url', '', type=unicode)
         settings.endGroup()
 
-    def fetch_metadata(self, url, progress_dialog=None):
+    def fetch_metadata(self, url):
         """Fetch metadata given the URL.
 
         :param url: The URL of the repository
@@ -68,6 +68,5 @@ class RepositoryManager(QObject):
                 break
 
         # TODO: Raise exception when there's no handler available
-
-        status, description = repo_handler.fetch_metadata(progress_dialog)
+        status, description = repo_handler.fetch_metadata()
         return status, description

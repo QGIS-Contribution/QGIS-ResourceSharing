@@ -162,9 +162,16 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         settings.beginGroup(repo_settings_group())
 
         # Fetch metadata
+        if self.progress_dialog is not None:
+            self.progress_dialog.show()
+            # Just use infinite progress bar here
+            self.progress_dialog.setMaximum(0)
+            self.progress_dialog.setMinimum(0)
+            self.progress_dialog.setValue(0)
+            self.progress_dialog.setLabelText("Fetching repository's metadata")
+
         try:
-            status, description = self.repository_manager.fetch_metadata(
-                repo_url, self.progress_dialog)
+            status, description = self.repository_manager.fetch_metadata(repo_url)
             if status:
                 # TODO: Process this instead of showing it on message box :)
                 QMessageBox.information(
@@ -182,6 +189,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self.message_bar.pushMessage(
                 self.tr('%s') % e,
                 QgsMessageBar.CRITICAL, 5)
+        finally:
+            self.progress_dialog.hide()
 
         # Refresh tree repository
         self.refresh_tree_repositories()

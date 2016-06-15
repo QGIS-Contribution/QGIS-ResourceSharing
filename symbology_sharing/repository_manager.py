@@ -55,9 +55,6 @@ class RepositoryManager(QObject):
 
         :param url: The URL of the repository
         :type url: str
-
-        :param progress_dialog: Progress dialog (optional)
-        :type progress_dialog: QProgressDialog
         """
         # Get the right handler for the given URL
         repo_handler = None
@@ -66,7 +63,7 @@ class RepositoryManager(QObject):
             if handler_instance.can_handle():
                 repo_handler = handler_instance
                 break
-
-        # TODO: Raise exception when there's no handler available
+        if repo_handler is None:
+            raise Exception('There is no handler available for the given URL!')
         status, description = repo_handler.fetch_metadata()
         return status, description

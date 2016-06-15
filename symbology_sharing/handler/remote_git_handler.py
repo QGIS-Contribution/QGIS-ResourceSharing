@@ -35,15 +35,11 @@ class RemoteGitHandler(BaseHandler):
         """Setter to the repository's URL."""
         if validate(url):
             self._url = url
-        else:
-            message = 'Error: URL is not a valid GIT URL.'
-            raise Exception(message)
-
-        git_parse = parse(url)
-        self._git_platform = git_parse.platform
-        self._git_host = git_parse.host
-        self._git_owner = git_parse.owner
-        self._git_repository = git_parse.repo
+            git_parse = parse(url)
+            self._git_platform = git_parse.platform
+            self._git_host = git_parse.host
+            self._git_owner = git_parse.owner
+            self._git_repository = git_parse.repo
 
     @property
     def git_platform(self):

@@ -2,7 +2,7 @@
 from PyQt4.QtCore import QObject, QSettings
 
 from .utilities import repo_settings_group
-from .handler import BaseHandler, GithubHandler, BitBucketHandler
+from .handler import BaseHandler
 
 
 class RepositoryManager(QObject):
@@ -10,7 +10,6 @@ class RepositoryManager(QObject):
     OFFICIAL_REPO = (
         'QGIS Official Repository',
         'https://github.com/anitagraser/QGIS-style-repo-dummy.git')
-    # HANDLERS = [GithubHandler, BitBucketHandler]
 
     def __init__(self):
         """Constructor."""

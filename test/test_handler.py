@@ -2,7 +2,25 @@
 from qgis.testing import start_app, unittest
 import nose2
 
-from symbology_sharing.handler import GithubHandler, BitBucketHandler
+from symbology_sharing.handler import (
+    BaseHandler,
+    GithubHandler,
+    BitBucketHandler)
+from utilities import test_data_path
+
+
+class TestBaseHandler(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        start_app()
+
+    def test_parse_metadata(self):
+        """Testing parsing the metadata."""
+        handler = BaseHandler()
+
+        # metadata_path = test_data_path('metadata.ini')
+        # collection = handler.parse_metadata(metadata_path)
+        # print collection
 
 
 class TestRepositoryHandler(unittest.TestCase):

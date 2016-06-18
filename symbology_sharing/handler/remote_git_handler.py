@@ -1,5 +1,5 @@
 # coding=utf-8
-from PyQt4.QtCore import QCoreApplication, QUrl
+from PyQt4.QtCore import QCoreApplication, QUrl, QTemporaryFile
 from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
 
 from qgis.core import QgsNetworkAccessManager
@@ -75,7 +75,7 @@ class RemoteGitHandler(BaseHandler):
             description = self._reply.errorString()
         else:
             status = True
-            self._metadata = self._reply.readAll().data()
+            self.metadata = self._reply.readAll()
             description = self.metadata
 
         self._reply.deleteLater()

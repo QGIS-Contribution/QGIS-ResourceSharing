@@ -6,6 +6,11 @@ __revision__ = '$Format:%H$'
 __date__ = '15/03/15'
 
 
+import ConfigParser
+
+from PyQt4.QtCore import QTemporaryFile
+
+
 class HandlerMeta(type):
     """Handler meta class definition."""
     def __init__(cls, name, bases, dct):
@@ -29,7 +34,7 @@ class BaseHandler(object):
     METADATA_FILE = 'metadata.ini'
     IS_DISABLED = False
 
-    def __init__(self, url):
+    def __init__(self, url=None):
         """Constructor of the base class."""
         self._url = None
         self._metadata = None
@@ -58,8 +63,45 @@ class BaseHandler(object):
 
     @property
     def metadata(self):
+        """Metadata content."""
         return self._metadata
+
+    @metadata.setter
+    def metadata(self, metadata):
+        self._metadata = metadata
 
     def fetch_metadata(self):
         """Fetch the content of the metadata."""
         raise NotImplementedError
+
+    def parse_metadata(self):
+        """Parse str metadata to collection dict."""
+        metadata_file = QTemporaryFile()
+        if metadata_file.open():
+            metadata_file.write(self.metadata)
+
+        collections = []
+        parser = ConfigParser.ConfigParser()
+        parser.read(metadata_file)
+        author = parser.get('general', 'author')
+        email = parser.get('general', 'email')
+        collections_str = parser.get('general', 'collections')
+        collection_list = [
+            collection.strip() for collection in collections_str.split(',')]
+        # Read all the collections
+        for collection in collection_list:
+            collection_dict = {
+                'author': author,
+                'author_email': email,
+                'repository_url': self.url,
+                'name': parser.get(collection, 'name'),
+                'tags': parser.get(collection, 'tags'),
+                'description': parser.get(collection, 'description'),
+                'qgis_min_version': parser.get(collection, 'qgis_minimum_version'),
+                'qgis_max_version': parser.get(collection, 'qgis_maximum_version')
+            }
+            collections.append(collection_dict)
+
+        return collections
+
+

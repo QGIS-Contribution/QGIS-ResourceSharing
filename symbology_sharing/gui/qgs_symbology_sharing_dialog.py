@@ -174,10 +174,10 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             status, description = self.repository_manager.fetch_metadata(repo_url)
             if status:
                 # TODO: Process this instead of showing it on message box :)
-                QMessageBox.information(
-                    self,
-                    self.tr("Test"),
-                    description)
+                # QMessageBox.information(
+                #     self,
+                #     self.tr("Test"),
+                #     author)
                 # Add the repo
                 settings.setValue(repo_name + '/url', repo_url)
             else:

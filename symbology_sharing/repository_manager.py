@@ -66,3 +66,7 @@ class RepositoryManager(QObject):
             raise Exception('There is no handler available for the given URL!')
         status, description = repo_handler.fetch_metadata()
         return status, description
+
+    def add_collections(self):
+        """Add parsed collections."""
+        pass

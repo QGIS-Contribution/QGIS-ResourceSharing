@@ -76,13 +76,15 @@ class BaseHandler(object):
 
     def parse_metadata(self):
         """Parse str metadata to collection dict."""
+        collections = []
         metadata_file = QTemporaryFile()
         if metadata_file.open():
             metadata_file.write(self.metadata)
+            metadata_file.close()
 
-        collections = []
+        # TODO: Add colection only if the version is ok with user's QGIS
         parser = ConfigParser.ConfigParser()
-        parser.read(metadata_file)
+        parser.read(metadata_file.fileName())
         author = parser.get('general', 'author')
         email = parser.get('general', 'email')
         collections_str = parser.get('general', 'collections')

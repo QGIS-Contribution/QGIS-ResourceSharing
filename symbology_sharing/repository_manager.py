@@ -15,6 +15,7 @@ class RepositoryManager(QObject):
         """Constructor."""
         QObject.__init__(self)
         self._repositories = {}
+        self._collections = {}
         self.load()
 
     @property
@@ -25,6 +26,10 @@ class RepositoryManager(QObject):
         :rtype: dict
         """
         return self._repositories
+
+    @property
+    def collections(self):
+        return self._collections
 
     def load(self):
         """Load repositories registered in settings."""
@@ -49,24 +54,75 @@ class RepositoryManager(QObject):
                 repo_name + '/url', '', type=unicode)
         settings.endGroup()
 
-    def fetch_metadata(self, url):
-        """Fetch metadata given the URL.
+    def add_repository(self, repo_name, url):
+        """Add repository to settings and add the collections.
 
         :param url: The URL of the repository
         :type url: str
         """
-        # Get the right handler for the given URL
+        repo_handler = self.get_handler(url)
+        if repo_handler is None:
+            raise Exception('There is no handler available for the given URL!')
+
+        # Fetch metadata
+        status, description = repo_handler.fetch_metadata()
+        if status:
+            # Parse metadata
+            collections = repo_handler.parse_metadata()
+            self.collections[repo_name] = collections
+            # Add to QSettings
+            settings = QSettings()
+            settings.beginGroup(repo_settings_group())
+            settings.setValue(repo_name + '/url', url)
+            settings.endGroup()
+        return status, description
+
+    def edit_repository(self, old_repo_name, new_repo_name, new_url):
+        """Edit repository and update the collections."""
+        # Fetch the metadata from the new url
+        repo_handler = self.get_handler(new_url)
+        if repo_handler is None:
+            raise Exception('There is no handler available for the given URL!')
+        status, description = repo_handler.fetch_metadata()
+
+        if status:
+            # Parse metadata
+            collections = repo_handler.parse_metadata()
+            # Remove old repo collections
+            self.collections.pop(old_repo_name, None)
+            # Add collections with the new repo name
+            self.collections[new_repo_name] = collections
+            # Update QSettings
+            settings = QSettings()
+            settings.beginGroup(repo_settings_group())
+            settings.remove(old_repo_name)
+            settings.setValue(new_repo_name + '/url', new_url)
+            settings.endGroup()
+        return status, description
+
+    def remove_repository(self, old_repo_name):
+        """Remove repository and all the collections of that repository."""
+        # Remove collections
+        self.collections.pop(old_repo_name, None)
+        # Remove repo from QSettings
+        settings = QSettings()
+        settings.beginGroup(repo_settings_group())
+        settings.remove(old_repo_name)
+        settings.endGroup()
+
+    def get_handler(self, url):
+        """Get the right handler instance for given URL.
+
+        :param url: The url of the repository
+        :type url: str
+
+        :return: The handler instance. None if no handler found.
+        :rtype: BaseHandler, None
+        """
         repo_handler = None
         for handler in BaseHandler.registry.values():
             handler_instance = handler(url)
             if handler_instance.can_handle():
                 repo_handler = handler_instance
                 break
-        if repo_handler is None:
-            raise Exception('There is no handler available for the given URL!')
-        status, description = repo_handler.fetch_metadata()
-        return status, description
-
-    def add_collections(self):
-        """Add parsed collections."""
-        pass
+        return repo_handler

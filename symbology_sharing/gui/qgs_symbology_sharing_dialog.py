@@ -158,10 +158,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         if repo_name in self.repository_manager.repositories:
             repo_name += '(2)'
 
-        settings = QSettings()
-        settings.beginGroup(repo_settings_group())
-
-        # Fetch metadata
         if self.progress_dialog is not None:
             self.progress_dialog.show()
             # Just use infinite progress bar here
@@ -170,16 +166,15 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self.progress_dialog.setValue(0)
             self.progress_dialog.setLabelText("Fetching repository's metadata")
 
+        # Add repository
         try:
-            status, description = self.repository_manager.fetch_metadata(repo_url)
+            status, description = self.repository_manager.add_repository(
+                repo_name, repo_url)
             if status:
-                # TODO: Process this instead of showing it on message box :)
-                # QMessageBox.information(
-                #     self,
-                #     self.tr("Test"),
-                #     author)
-                # Add the repo
-                settings.setValue(repo_name + '/url', repo_url)
+                self.message_bar.pushMessage(
+                    self.tr(
+                        'Repository is sucessfully added'),
+                    QgsMessageBar.SUCCESS, 5)
             else:
                 self.message_bar.pushMessage(
                     self.tr(
@@ -224,14 +219,38 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                     QgsMessageBar.CRITICAL, 5)
                 return
 
-        # Delete old repo and create a new entry
-        settings = QSettings()
-        settings.beginGroup(repo_settings_group())
-        settings.remove(repo_name)
         new_name = dlg.line_edit_name.text()
         if new_name in self.repository_manager.repositories and new_name != repo_name:
             new_name += '(2)'
-        settings.setValue(new_name + '/url', new_url)
+
+        if self.progress_dialog is not None:
+            self.progress_dialog.show()
+            # Just use infinite progress bar here
+            self.progress_dialog.setMaximum(0)
+            self.progress_dialog.setMinimum(0)
+            self.progress_dialog.setValue(0)
+            self.progress_dialog.setLabelText("Fetching repository's metadata")
+
+        # Edit repository
+        try:
+            status, description = self.repository_manager.edit_repository(
+                repo_name, new_name, new_url)
+            if status:
+                self.message_bar.pushMessage(
+                    self.tr(
+                        'Repository is sucessfully updated'),
+                    QgsMessageBar.SUCCESS, 5)
+            else:
+                self.message_bar.pushMessage(
+                    self.tr(
+                        'Unable to add repository: %s') % description,
+                    QgsMessageBar.CRITICAL, 5)
+        except Exception, e:
+            self.message_bar.pushMessage(
+                self.tr('%s') % e,
+                QgsMessageBar.CRITICAL, 5)
+        finally:
+            self.progress_dialog.hide()
 
         # Refresh tree repository
         self.refresh_tree_repositories()
@@ -265,7 +284,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 QMessageBox.No) == QMessageBox.No:
             return
 
-        settings.remove(repo_name)
+        # Remove repository
+        self.repository_manager.remove_repository(repo_name)
 
         # Refresh tree repository
         self.refresh_tree_repositories()

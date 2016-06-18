@@ -70,13 +70,13 @@ class RemoteGitHandler(BaseHandler):
             QCoreApplication.processEvents()
 
         # Finished
+        description = None
         if self._reply.error() != QNetworkReply.NoError:
             status = False
             description = self._reply.errorString()
         else:
             status = True
             self.metadata = self._reply.readAll()
-            description = self.metadata
 
         self._reply.deleteLater()
 

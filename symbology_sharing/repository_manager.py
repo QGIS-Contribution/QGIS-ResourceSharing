@@ -3,6 +3,7 @@ from PyQt4.QtCore import QObject, QSettings
 
 from .utilities import repo_settings_group
 from .handler import BaseHandler
+from collections_manager import CollectionsManager
 
 
 class RepositoryManager(QObject):
@@ -15,7 +16,7 @@ class RepositoryManager(QObject):
         """Constructor."""
         QObject.__init__(self)
         self._repositories = {}
-        self._collections = {}
+        self._collections_manager = CollectionsManager()
         self.load()
 
     @property
@@ -26,10 +27,6 @@ class RepositoryManager(QObject):
         :rtype: dict
         """
         return self._repositories
-
-    @property
-    def collections(self):
-        return self._collections
 
     def load(self):
         """Load repositories registered in settings."""
@@ -69,7 +66,8 @@ class RepositoryManager(QObject):
         if status:
             # Parse metadata
             collections = repo_handler.parse_metadata()
-            self.collections[repo_name] = collections
+            self._collections_manager.add_repo_collection(
+                repo_name, collections)
             # Add to QSettings
             settings = QSettings()
             settings.beginGroup(repo_settings_group())
@@ -89,9 +87,10 @@ class RepositoryManager(QObject):
             # Parse metadata
             collections = repo_handler.parse_metadata()
             # Remove old repo collections
-            self.collections.pop(old_repo_name, None)
+            self._collections_manager.remove_repo_collection(old_repo_name)
             # Add collections with the new repo name
-            self.collections[new_repo_name] = collections
+            self._collections_manager.add_repo_collection(
+                new_repo_name, collections)
             # Update QSettings
             settings = QSettings()
             settings.beginGroup(repo_settings_group())
@@ -103,7 +102,7 @@ class RepositoryManager(QObject):
     def remove_repository(self, old_repo_name):
         """Remove repository and all the collections of that repository."""
         # Remove collections
-        self.collections.pop(old_repo_name, None)
+        self._collections_manager.remove_repo_collection(old_repo_name)
         # Remove repo from QSettings
         settings = QSettings()
         settings.beginGroup(repo_settings_group())

@@ -139,6 +139,10 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             # Switch to plugins tab
             self.stacked_menu_widget.setCurrentIndex(0)
 
+    def reload_collections(self):
+        """Reload collections in the tab."""
+        pass
+
     def add_repository(self):
         """Open add repository dialog."""
         dlg = ManageRepositoryDialog(self)

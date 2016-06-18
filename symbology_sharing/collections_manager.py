@@ -62,6 +62,10 @@ class CollectionsManager(object):
         """
         self.repo_collections[name] = collections
 
+    def remove_repo_collection(self, name):
+        """Remove a repo collection by name from repo collections."""
+        self.repo_collections.pop(name, None)
+
     def rebuild_collections(self):
         """Rebuild collections from repo collections."""
         self._collections = {}

@@ -61,10 +61,12 @@ class CollectionsManager(object):
         :type collections: list
         """
         self.repo_collections[name] = collections
+        self.rebuild_collections()
 
     def remove_repo_collection(self, name):
         """Remove a repo collection by name from repo collections."""
         self.repo_collections.pop(name, None)
+        self.rebuild_collections()
 
     def rebuild_collections(self):
         """Rebuild collections from repo collections."""

@@ -28,6 +28,11 @@ class RepositoryManager(QObject):
         """
         return self._repositories
 
+    @property
+    def collections(self):
+        """Get all the collections registered."""
+        return self._collections_manager.collections
+
     def load(self):
         """Load repositories registered in settings."""
         self._repositories = {}

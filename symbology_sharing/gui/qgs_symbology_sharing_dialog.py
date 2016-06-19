@@ -30,7 +30,9 @@ from PyQt4.QtGui import (
     QTreeWidgetItem,
     QSizePolicy,
     QMessageBox,
-    QProgressDialog
+    QProgressDialog,
+    QStandardItemModel,
+    QStandardItem
 )
 from qgis.gui import QgsMessageBar
 
@@ -59,6 +61,9 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.iface = iface
         self.repository_manager = RepositoryManager()
+        # Collections list view
+        self.collections_model = QStandardItemModel(0, 1)
+        self.list_view_collections.setModel(self.collections_model)
 
         # Init the message bar
         self.message_bar = QgsMessageBar(self)
@@ -123,8 +128,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         title = self.tr('Symbology Sharing')
         self.progress_dialog.setWindowTitle(title)
 
-        # Populate tree repositories with registered repositories
-        self.populate_tree_repositories()
+        # Load repositories registered and collections available
+        self.reload_data()
 
     def set_current_tab(self, index):
         """Set stacked widget based on active tab.
@@ -138,10 +143,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         else:
             # Switch to plugins tab
             self.stacked_menu_widget.setCurrentIndex(0)
-
-    def reload_collections(self):
-        """Reload collections in the tab."""
-        pass
 
     def add_repository(self):
         """Open add repository dialog."""
@@ -191,9 +192,12 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         finally:
             self.progress_dialog.hide()
 
-        # Refresh tree repository
-        self.refresh_tree_repositories()
-        self.set_enabled_edit_delete_button(False)
+        # Reload data and widget
+        self.reload_data()
+
+        # Deactivate edit and delete button
+        self.button_edit.setEnabled(False)
+        self.button_delete.setEnabled(False)
 
     def edit_repository(self):
         """Open edit repository dialog."""
@@ -256,9 +260,12 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         finally:
             self.progress_dialog.hide()
 
-        # Refresh tree repository
-        self.refresh_tree_repositories()
-        self.set_enabled_edit_delete_button(False)
+        # Reload data and widget
+        self.reload_data()
+
+        # Deactivate edit and delete button
+        self.button_edit.setEnabled(False)
+        self.button_delete.setEnabled(False)
 
     def delete_repository(self):
         """Delete a repository in the tree widget."""
@@ -291,16 +298,24 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Remove repository
         self.repository_manager.remove_repository(repo_name)
 
-        # Refresh tree repository
-        self.refresh_tree_repositories()
-        self.set_enabled_edit_delete_button(False)
+        # Reload data and widget
+        self.reload_data()
 
-    def refresh_tree_repositories(self):
+        # Deactivate edit and delete button
+        self.button_edit.setEnabled(False)
+        self.button_delete.setEnabled(False)
+
+    def reload_data(self):
+        """Reload repositories and collections and update widgets related."""
+        self.reload_repositories_widget()
+        self.reload_collections_model()
+
+    def reload_repositories_widget(self):
         """Refresh tree repositories using new repositories data."""
         self.repository_manager.load()
-        self.populate_tree_repositories()
+        self.populate_repositories_widget()
 
-    def populate_tree_repositories(self):
+    def populate_repositories_widget(self):
         """Populate dictionary repositories to the tree widget."""
         # Clear the current tree widget
         self.tree_repositories.clear()
@@ -315,16 +330,17 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.tree_repositories.resizeColumnToContents(1)
         self.tree_repositories.sortItems(1, Qt.AscendingOrder)
 
+    def reload_collections_model(self):
+        """Reload collections model with new collections object."""
+        self.collections_model.clear()
+        for id in self.repository_manager.collections:
+            collection_name = self.repository_manager.collections[id]['name']
+            item = QStandardItem(collection_name)
+            item.setEditable(False)
+            self.collections_model.appendRow(item)
+
     def on_tree_repositories_itemSelectionChanged(self):
         """Slot for when the itemSelectionChanged signal emitted."""
         # Activate edit and delete button
-        self.set_enabled_edit_delete_button(True)
-
-    def set_enabled_edit_delete_button(self, is_enabled):
-        """Disable edit and delete button.
-
-        :param is_enabled: Boolean is enabled or not.
-        :type is_enabled: bool
-        """
-        self.button_edit.setEnabled(is_enabled)
-        self.button_delete.setEnabled(is_enabled)
+        self.button_edit.setEnabled(True)
+        self.button_delete.setEnabled(True)

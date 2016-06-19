@@ -47,8 +47,11 @@ class RepositoryManager(QObject):
 
         for repo_name in settings.childGroups():
             self._repositories[repo_name] = {}
-            self._repositories[repo_name]['url'] = settings.value(
+            url = settings.value(
                 repo_name + '/url', '', type=unicode)
+            self._repositories[repo_name]['url'] = url
+            # Fetch all collections
+            self.add_repository(repo_name, url)
         settings.endGroup()
 
     def add_repository(self, repo_name, url):

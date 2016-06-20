@@ -129,6 +129,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.progress_dialog.setWindowTitle(title)
 
         # Load repositories registered and collections available
+        self.repository_manager.collections_manager.load()
         self.reload_data()
 
     def set_current_tab(self, index):
@@ -344,3 +345,9 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Activate edit and delete button
         self.button_edit.setEnabled(True)
         self.button_delete.setEnabled(True)
+
+    def reject(self):
+        """Slot when the dialog is closed."""
+        # Serialize collections to settings
+        self.repository_manager.collections_manager.serialize()
+        self.done(1)

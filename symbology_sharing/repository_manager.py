@@ -17,7 +17,10 @@ class RepositoryManager(QObject):
         QObject.__init__(self)
         self._repositories = {}
         self._collections_manager = CollectionsManager()
+        # Load repositories from settings
         self.load()
+        # Load collections from settings
+        self._collections_manager.load()
 
     @property
     def repositories(self):
@@ -27,6 +30,10 @@ class RepositoryManager(QObject):
         :rtype: dict
         """
         return self._repositories
+
+    @property
+    def collections_manager(self):
+        return self._collections_manager
 
     @property
     def collections(self):
@@ -55,12 +62,10 @@ class RepositoryManager(QObject):
             url = settings.value(
                 repo_name + '/url', '', type=unicode)
             self._repositories[repo_name]['url'] = url
-            # Fetch all collections
-            self.add_repository(repo_name, url)
         settings.endGroup()
 
     def add_repository(self, repo_name, url):
-        """Add repository to settings and add the collections.
+        """Add repository to settings and add the collections from that repo.
 
         :param url: The URL of the repository
         :type url: str

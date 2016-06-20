@@ -1,6 +1,10 @@
 # coding=utf-8
 import hashlib
 
+from PyQt4.QtCore import QSettings
+
+from symbology_sharing.utilities import repo_settings_group
+
 
 class CollectionsManager(object):
     def __init__(self):
@@ -84,5 +88,17 @@ class CollectionsManager(object):
         hex_dig = hash_object.hexdigest()
         return hex_dig
 
+    def serialize(self):
+        """Save repo collections to settings."""
+        settings = QSettings()
+        settings.beginGroup(repo_settings_group())
+        settings.setValue('repo_collections', self.repo_collections)
+        settings.endGroup()
 
-
+    def load(self):
+        """Load repo collections from settings and rebuild collections."""
+        settings = QSettings()
+        settings.beginGroup(repo_settings_group())
+        repo_collections = settings.value('repo_collections', {})
+        self._repo_collections = repo_collections
+        self.rebuild_collections()

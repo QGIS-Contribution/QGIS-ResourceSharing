@@ -48,6 +48,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
 
+
     def __init__(self, parent=None, iface=None):
         """Constructor.
 
@@ -112,12 +113,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.menu_list_widget.addItem(item_installed)
         self.menu_list_widget.addItem(item_settings)
 
-        # Slots
-        self.button_add.clicked.connect(self.add_repository)
-        self.button_edit.clicked.connect(self.edit_repository)
-        self.button_delete.clicked.connect(self.delete_repository)
-        self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
-
         # Creating progress dialog for downloading stuffs
         self.progress_dialog = QProgressDialog(self)
         self.progress_dialog.setAutoClose(False)
@@ -129,6 +124,14 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Collections list view
         self.collections_model = QStandardItemModel(0, 1)
         self.list_view_collections.setModel(self.collections_model)
+
+        # Slots
+        self.button_add.clicked.connect(self.add_repository)
+        self.button_edit.clicked.connect(self.edit_repository)
+        self.button_delete.clicked.connect(self.delete_repository)
+        self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
+        self.list_view_collections.selectionModel().currentChanged.connect(
+            self.on_list_view_collections_clicked)
 
         # Populate repositories widget and collections list view
         self.populate_repositories_widget()
@@ -330,6 +333,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             collection_name = self.repository_manager.collections[id]['name']
             item = QStandardItem(collection_name)
             item.setEditable(False)
+            item.setData(id)
             self.collections_model.appendRow(item)
 
     def on_tree_repositories_itemSelectionChanged(self):
@@ -337,6 +341,15 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Activate edit and delete button
         self.button_edit.setEnabled(True)
         self.button_delete.setEnabled(True)
+
+    def on_list_view_collections_clicked(self, index):
+        collection_item = self.collections_model.itemFromIndex(index)
+        self.show_collection_metadata(collection_item.data())
+
+    def show_collection_metadata(self, id):
+        """Show the collection metadata given the id."""
+        html = self.repository_manager.collections_manager.html(id)
+        self.web_view_details.setHtml(html)
 
     def reject(self):
         """Slot when the dialog is closed."""

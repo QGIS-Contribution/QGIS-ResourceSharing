@@ -128,7 +128,6 @@ class RepositoryManager(QObject):
         # Serialize collections every time sucessfully remove a repo
         self._collections_manager.serialize()
 
-
     def get_handler(self, url):
         """Get the right handler instance for given URL.
 

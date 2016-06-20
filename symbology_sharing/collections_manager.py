@@ -102,3 +102,30 @@ class CollectionsManager(object):
         repo_collections = settings.value('repo_collections', {})
         self._repo_collections = repo_collections
         self.rebuild_collections()
+
+    def html(self, id):
+        """Return html of the matadata given the id.
+
+        :param id: The id of the collection
+        :type id: str
+        """
+        html = ''
+        html += "<style>" \
+                "   body, table {" \
+                "   padding:0px;" \
+                "   margin:0px;" \
+                "   font-family:verdana;" \
+                "   font-size: 12px;" \
+                "  }" \
+                "</style>"
+        html += "<body>"
+        html += "<table cellspacing=\"4\" width=\"100%\"><tr><td>";
+        html += "<h1>%s</h1>" % self.collections[id]['name']
+        html += "<h3>%s</h3><br/>" % self.collections[id]['description']
+        html += "URL: %s <br/></br>" % self.collections[id]['repository_url']
+        html += "Tags: %s <br/></br>" % self.collections[id]['tags']
+        html += "Author: %s <br/></br>" % self.collections[id]['author']
+        html += "E-mail: %s" % self.collections[id]['author_email']
+        html += "</td></tr></table>"
+        html += "</body>"
+        return html

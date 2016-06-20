@@ -60,10 +60,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         super(SymbologySharingDialog, self).__init__(parent)
         self.setupUi(self)
         self.iface = iface
-        self.repository_manager = RepositoryManager()
-        # Collections list view
-        self.collections_model = QStandardItemModel(0, 1)
-        self.list_view_collections.setModel(self.collections_model)
 
         # Init the message bar
         self.message_bar = QgsMessageBar(self)
@@ -127,6 +123,12 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.progress_dialog.setAutoClose(False)
         title = self.tr('Symbology Sharing')
         self.progress_dialog.setWindowTitle(title)
+
+        # Init repository manager
+        self.repository_manager = RepositoryManager()
+        # Collections list view
+        self.collections_model = QStandardItemModel(0, 1)
+        self.list_view_collections.setModel(self.collections_model)
 
         # Populate repositories widget and collections list view
         self.populate_repositories_widget()
@@ -350,4 +352,4 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         """Slot when the dialog is closed."""
         # Serialize collections to settings
         self.repository_manager.collections_manager.serialize()
-        self.done(1)
+        self.done(0)

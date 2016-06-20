@@ -166,13 +166,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         if repo_name in self.repository_manager.repositories:
             repo_name += '(2)'
 
-        if self.progress_dialog is not None:
-            self.progress_dialog.show()
-            # Just use infinite progress bar here
-            self.progress_dialog.setMaximum(0)
-            self.progress_dialog.setMinimum(0)
-            self.progress_dialog.setValue(0)
-            self.progress_dialog.setLabelText("Fetching repository's metadata")
+        # Show progress dialog
+        self.show_progress_dialog("Fetching repository's metadata")
 
         # Add repository
         try:
@@ -234,13 +229,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         if new_name in self.repository_manager.repositories and new_name != repo_name:
             new_name += '(2)'
 
-        if self.progress_dialog is not None:
-            self.progress_dialog.show()
-            # Just use infinite progress bar here
-            self.progress_dialog.setMaximum(0)
-            self.progress_dialog.setMinimum(0)
-            self.progress_dialog.setValue(0)
-            self.progress_dialog.setLabelText("Fetching repository's metadata")
+        # Show progress dialog
+        self.show_progress_dialog("Fetching repository's metadata")
 
         # Edit repository
         try:
@@ -353,3 +343,17 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Serialize collections to settings
         self.repository_manager.collections_manager.serialize()
         self.done(0)
+
+    def show_progress_dialog(self, text):
+        """Show infinite progress dialog with given text.
+
+        :param text: Text as the label of the progress dialog
+        :type text: str
+        """
+        if self.progress_dialog is not None:
+            self.progress_dialog.show()
+            # Just use infinite progress bar here
+            self.progress_dialog.setMaximum(0)
+            self.progress_dialog.setMinimum(0)
+            self.progress_dialog.setValue(0)
+            self.progress_dialog.setLabelText(text)

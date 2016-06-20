@@ -54,8 +54,7 @@ class RepositoryManager(QObject):
                 official_repo_present = True
                 break
         if not official_repo_present:
-            settings.setValue(
-                self.OFFICIAL_REPO[0] + '/url', self.OFFICIAL_REPO[1])
+            self.add_repository(self.OFFICIAL_REPO[0], self.OFFICIAL_REPO[1])
 
         for repo_name in settings.childGroups():
             self._repositories[repo_name] = {}
@@ -86,6 +85,9 @@ class RepositoryManager(QObject):
             settings.beginGroup(repo_settings_group())
             settings.setValue(repo_name + '/url', url)
             settings.endGroup()
+            # Serialize collections every time we sucessfully added repo
+            self._collections_manager.serialize()
+
         return status, description
 
     def edit_repository(self, old_repo_name, new_repo_name, new_url):
@@ -110,6 +112,8 @@ class RepositoryManager(QObject):
             settings.remove(old_repo_name)
             settings.setValue(new_repo_name + '/url', new_url)
             settings.endGroup()
+            # Serialize collections every time we sucessfully edited repo
+            self._collections_manager.serialize()
         return status, description
 
     def remove_repository(self, old_repo_name):
@@ -121,6 +125,9 @@ class RepositoryManager(QObject):
         settings.beginGroup(repo_settings_group())
         settings.remove(old_repo_name)
         settings.endGroup()
+        # Serialize collections every time sucessfully remove a repo
+        self._collections_manager.serialize()
+
 
     def get_handler(self, url):
         """Get the right handler instance for given URL.

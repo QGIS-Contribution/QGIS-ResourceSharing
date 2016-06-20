@@ -128,9 +128,9 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         title = self.tr('Symbology Sharing')
         self.progress_dialog.setWindowTitle(title)
 
-        # Load repositories registered and collections available
-        self.repository_manager.collections_manager.load()
-        self.reload_data()
+        # Populate repositories widget and collections list view
+        self.populate_repositories_widget()
+        self.reload_collections_model()
 
     def set_current_tab(self, index):
         """Set stacked widget based on active tab.
@@ -194,7 +194,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self.progress_dialog.hide()
 
         # Reload data and widget
-        self.reload_data()
+        self.reload_data_and_widget()
 
         # Deactivate edit and delete button
         self.button_edit.setEnabled(False)
@@ -262,7 +262,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self.progress_dialog.hide()
 
         # Reload data and widget
-        self.reload_data()
+        self.reload_data_and_widget()
 
         # Deactivate edit and delete button
         self.button_edit.setEnabled(False)
@@ -300,13 +300,13 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.repository_manager.remove_repository(repo_name)
 
         # Reload data and widget
-        self.reload_data()
+        self.reload_data_and_widget()
 
         # Deactivate edit and delete button
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
 
-    def reload_data(self):
+    def reload_data_and_widget(self):
         """Reload repositories and collections and update widgets related."""
         self.reload_repositories_widget()
         self.reload_collections_model()

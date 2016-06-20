@@ -109,7 +109,7 @@ class CollectionsManager(object):
         :param id: The id of the collection
         :type id: str
         """
-        html = ''
+        html = u''
         html += "<style>" \
                 "   body, table {" \
                 "   padding:0px;" \

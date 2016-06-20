@@ -23,7 +23,7 @@
 
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
-from PyQt4.QtCore import Qt, QSettings
+from PyQt4.QtCore import Qt, QSettings, pyqtSlot, QRegExp
 from PyQt4.QtGui import (
     QIcon,
     QListWidgetItem,
@@ -32,7 +32,8 @@ from PyQt4.QtGui import (
     QMessageBox,
     QProgressDialog,
     QStandardItemModel,
-    QStandardItem
+    QStandardItem,
+    QSortFilterProxyModel
 )
 from qgis.gui import QgsMessageBar
 
@@ -121,9 +122,12 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Init repository manager
         self.repository_manager = RepositoryManager()
+
         # Collections list view
         self.collections_model = QStandardItemModel(0, 1)
-        self.list_view_collections.setModel(self.collections_model)
+        self.collection_proxy = QSortFilterProxyModel(self)
+        self.collection_proxy.setSourceModel(self.collections_model)
+        self.list_view_collections.setModel(self.collection_proxy)
 
         # Slots
         self.button_add.clicked.connect(self.add_repository)
@@ -132,6 +136,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
         self.list_view_collections.selectionModel().currentChanged.connect(
             self.on_list_view_collections_clicked)
+        self.line_edit_filter.textChanged.connect(self.filter_collections)
 
         # Populate repositories widget and collections list view
         self.populate_repositories_widget()
@@ -343,8 +348,18 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.button_delete.setEnabled(True)
 
     def on_list_view_collections_clicked(self, index):
-        collection_item = self.collections_model.itemFromIndex(index)
-        self.show_collection_metadata(collection_item.data())
+        real_index = self.collection_proxy.mapToSource(index)
+        if real_index.row() != -1:
+            collection_item = self.collections_model.itemFromIndex(real_index)
+            self.show_collection_metadata(collection_item.data())
+
+    @pyqtSlot(str)
+    def filter_collections(self, text):
+        search = QRegExp(
+            text,
+            Qt.CaseInsensitive,
+            QRegExp.RegExp)
+        self.collection_proxy.setFilterRegExp(search)
 
     def show_collection_metadata(self, id):
         """Show the collection metadata given the id."""

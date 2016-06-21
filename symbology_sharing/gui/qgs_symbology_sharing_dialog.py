@@ -69,17 +69,13 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.iface = iface
 
-        # Init the message bar
-        self.message_bar = QgsMessageBar(self)
-        self.message_bar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.vlayoutRightColumn.insertWidget(0, self.message_bar)
-
-        # Mock plugin manager dialog
+        # Reconfigure UI
         self.resize(796, 594)
         self.setMinimumSize(QSize(790, 0))
         self.setModal(True)
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
+        self.download_button.setEnabled(False)
 
         # Set QListWidgetItem
         # All
@@ -120,6 +116,11 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.menu_list_widget.addItem(item_installed)
         self.menu_list_widget.addItem(item_settings)
 
+        # Init the message bar
+        self.message_bar = QgsMessageBar(self)
+        self.message_bar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.vlayoutRightColumn.insertWidget(0, self.message_bar)
+
         # Creating progress dialog for downloading stuffs
         self.progress_dialog = QProgressDialog(self)
         self.progress_dialog.setAutoClose(False)
@@ -128,12 +129,13 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Init repository manager
         self.repository_manager = RepositoryManager()
-
         # Collections list view
         self.collections_model = QStandardItemModel(0, 1)
         self.collection_proxy = CustomSortFilterProxyModel(self)
         self.collection_proxy.setSourceModel(self.collections_model)
         self.list_view_collections.setModel(self.collection_proxy)
+        # Active selected collection
+        self._selected_collection_id = None
 
         # Slots
         self.button_add.clicked.connect(self.add_repository)
@@ -143,6 +145,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.list_view_collections.selectionModel().currentChanged.connect(
             self.on_list_view_collections_clicked)
         self.line_edit_filter.textChanged.connect(self.filter_collections)
+        self.download_button.clicked.connect(self.download_collection)
 
         # Populate repositories widget and collections list view
         self.populate_repositories_widget()
@@ -154,6 +157,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         :param index: The index of the active list widget item.
         :type index: int
         """
+        # Clear message bar
+        self.message_bar.clearWidgets()
         if index == (self.menu_list_widget.count() - 1):
             # Switch to settings tab
             self.stacked_menu_widget.setCurrentIndex(1)
@@ -312,6 +317,12 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
 
+    def download_collection(self):
+        """Slot for when user clicks download button."""
+        if self._selected_collection_id:
+            name = self.repository_manager.collections[self._selected_collection_id]['name']
+            QMessageBox.information(self, 'Test', name)
+
     def reload_data_and_widget(self):
         """Reload repositories and collections and update widgets related."""
         self.reload_repositories_widget()
@@ -361,10 +372,14 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.button_delete.setEnabled(True)
 
     def on_list_view_collections_clicked(self, index):
+        """Slow for when the list_view_collections is clicked."""
         real_index = self.collection_proxy.mapToSource(index)
         if real_index.row() != -1:
             collection_item = self.collections_model.itemFromIndex(real_index)
-            self.show_collection_metadata(collection_item.data(COLLECTION_ID_ROLE))
+            collection_id = collection_item.data(COLLECTION_ID_ROLE)
+            self._selected_collection_id = collection_id
+            self.show_collection_metadata(collection_id)
+            self.download_button.setEnabled(True)
 
     @pyqtSlot(str)
     def filter_collections(self, text):

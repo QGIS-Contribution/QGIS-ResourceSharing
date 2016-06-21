@@ -32,14 +32,21 @@ from PyQt4.QtGui import (
     QMessageBox,
     QProgressDialog,
     QStandardItemModel,
-    QStandardItem,
-    QSortFilterProxyModel
+    QStandardItem
 )
 from qgis.gui import QgsMessageBar
 
 from manage_dialog import ManageRepositoryDialog
 from ..repository_manager import RepositoryManager
 from ..utilities import resources_path, ui_path, repo_settings_group
+from custom_sort_filter_proxy import (
+    CustomSortFilterProxyModel,
+    COLLECTION_NAME_ROLE,
+    COLLECTION_DESCRIPTION_ROLE,
+    COLLECTION_AUTHOR_ROLE,
+    COLLECTION_TAGS_ROLE,
+    COLLECTION_ID_ROLE
+)
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('qgs_symbology_sharing_dialog_base.ui'))
 
@@ -48,7 +55,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     TAB_ALL = 0
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
-
 
     def __init__(self, parent=None, iface=None):
         """Constructor.
@@ -125,7 +131,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Collections list view
         self.collections_model = QStandardItemModel(0, 1)
-        self.collection_proxy = QSortFilterProxyModel(self)
+        self.collection_proxy = CustomSortFilterProxyModel(self)
         self.collection_proxy.setSourceModel(self.collections_model)
         self.list_view_collections.setModel(self.collection_proxy)
 
@@ -336,9 +342,16 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.collections_model.clear()
         for id in self.repository_manager.collections:
             collection_name = self.repository_manager.collections[id]['name']
+            collection_author = self.repository_manager.collections[id]['author']
+            collection_tags = self.repository_manager.collections[id]['tags']
+            collection_description = self.repository_manager.collections[id]['description']
             item = QStandardItem(collection_name)
             item.setEditable(False)
-            item.setData(id)
+            item.setData(id, COLLECTION_ID_ROLE)
+            item.setData(collection_name, COLLECTION_NAME_ROLE)
+            item.setData(collection_description, COLLECTION_DESCRIPTION_ROLE)
+            item.setData(collection_author, COLLECTION_AUTHOR_ROLE)
+            item.setData(collection_tags, COLLECTION_TAGS_ROLE)
             self.collections_model.appendRow(item)
 
     def on_tree_repositories_itemSelectionChanged(self):
@@ -351,7 +364,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         real_index = self.collection_proxy.mapToSource(index)
         if real_index.row() != -1:
             collection_item = self.collections_model.itemFromIndex(real_index)
-            self.show_collection_metadata(collection_item.data())
+            self.show_collection_metadata(collection_item.data(COLLECTION_ID_ROLE))
 
     @pyqtSlot(str)
     def filter_collections(self, text):

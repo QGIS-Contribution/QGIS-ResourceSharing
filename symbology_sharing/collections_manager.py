@@ -109,7 +109,7 @@ class CollectionsManager(object):
         :param id: The id of the collection
         :type id: str
         """
-        html = u''
+        html = ''
         html += "<style>" \
                 "   body, table {" \
                 "   padding:0px;" \
@@ -119,13 +119,13 @@ class CollectionsManager(object):
                 "  }" \
                 "</style>"
         html += "<body>"
-        html += "<table cellspacing=\"4\" width=\"100%\"><tr><td>";
-        html += "<h1>%s</h1>" % self.collections[id]['name'].decode('utf8')
-        html += "<h3>%s</h3><br/>" % self.collections[id]['description'].decode('utf8')
-        html += "URL: %s <br/></br>" % self.collections[id]['repository_url'].decode('utf8')
-        html += "Tags: %s <br/></br>" % self.collections[id]['tags'].decode('utf8')
-        html += "Author: %s <br/></br>" % self.collections[id]['author'].decode('utf8')
-        html += "E-mail: %s" % self.collections[id]['author_email'].decode('utf8')
+        html += "<table cellspacing=\"4\" width=\"100%\"><tr><td>"
+        html += "<h1>%s</h1>" % self.collections[id]['name']
+        html += "<h3>%s</h3><br/>" % self.collections[id]['description']
+        html += "URL: %s <br/></br>" % self.collections[id]['repository_url']
+        html += "Tags: %s <br/></br>" % self.collections[id]['tags']
+        html += "Author: %s <br/></br>" % self.collections[id]['author']
+        html += "E-mail: %s" % self.collections[id]['author_email']
         html += "</td></tr></table>"
         html += "</body>"
         return html

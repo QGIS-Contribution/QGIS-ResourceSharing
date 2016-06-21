@@ -6,7 +6,8 @@ __revision__ = '$Format:%H$'
 __date__ = '15/03/15'
 
 
-import ConfigParser
+import codecs
+from ConfigParser import SafeConfigParser
 
 from PyQt4.QtCore import QTemporaryFile
 
@@ -83,8 +84,9 @@ class BaseHandler(object):
             metadata_file.close()
 
         # TODO: Add colection only if the version is ok with user's QGIS
-        parser = ConfigParser.ConfigParser()
-        parser.read(metadata_file.fileName())
+        parser = SafeConfigParser()
+        with codecs.open(metadata_file.fileName(), 'r', encoding='utf-8') as f:
+            parser.readfp(f)
         author = parser.get('general', 'author')
         email = parser.get('general', 'email')
         collections_str = parser.get('general', 'collections')

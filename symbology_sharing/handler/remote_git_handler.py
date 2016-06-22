@@ -1,5 +1,5 @@
 # coding=utf-8
-from PyQt4.QtCore import QCoreApplication, QUrl, QTemporaryFile
+from PyQt4.QtCore import QCoreApplication, QUrl, QByteArray
 from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
 
 from qgis.core import QgsNetworkAccessManager
@@ -61,6 +61,9 @@ class RemoteGitHandler(BaseHandler):
         """Fetch metadata file from the repository."""
         # Fetch the metadata
         request = QNetworkRequest(QUrl(self.metadata_url))
+        request.setAttribute(
+            QNetworkRequest.CacheLoadControlAttribute,
+            QNetworkRequest.AlwaysNetwork)
         self._reply = self._network_manager.get(request)
         self._reply.finished.connect(self.fetch_metadata_finished)
         self._network_manager.requestTimedOut.connect(self.request_timeout)

@@ -141,6 +141,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.button_add.clicked.connect(self.add_repository)
         self.button_edit.clicked.connect(self.edit_repository)
         self.button_delete.clicked.connect(self.delete_repository)
+        self.button_reload.clicked.connect(self.reload_repositories)
         self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
         self.list_view_collections.selectionModel().currentChanged.connect(
             self.on_list_view_collections_clicked)
@@ -316,6 +317,35 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Deactivate edit and delete button
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
+
+    def reload_repositories(self):
+        """Slot for when user clicks reload repositories button."""
+        # Show progress dialog
+        self.show_progress_dialog("Reloading all repositories")
+
+        for repo_name in self.repository_manager.repositories:
+            url = self.repository_manager.repositories[repo_name]['url']
+            try:
+                status, description = self.repository_manager.reload_repository(repo_name, url)
+                if status:
+                    self.message_bar.pushMessage(
+                        self.tr(
+                            'Repository %s is succesfully reloaded') % repo_name,
+                        QgsMessageBar.INFO, 5)
+                else:
+                    self.message_bar.pushMessage(
+                        self.tr(
+                            'Unable to reload %s: %s') % (
+                            repo_name, description),
+                        QgsMessageBar.CRITICAL, 5)
+            except Exception, e:
+                self.message_bar.pushMessage(
+                    self.tr('%s') % e,
+                    QgsMessageBar.CRITICAL, 5)
+
+        self.progress_dialog.hide()
+        # Reload data and widget
+        self.reload_data_and_widget()
 
     def download_collection(self):
         """Slot for when user clicks download button."""

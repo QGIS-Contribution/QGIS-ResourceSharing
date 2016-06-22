@@ -13,7 +13,14 @@ class RepositoryManager(QObject):
         'https://github.com/anitagraser/QGIS-style-repo-dummy.git')
 
     def __init__(self):
-        """Constructor."""
+        """Constructor.
+
+        ..example:
+        self._repositories = {
+            'QGIS Official Repository': 'http://example',
+            'My Repository': 'http://my_repository',
+        }
+        """
         QObject.__init__(self)
         self._repositories = {}
         self._collections_manager = CollectionsManager()
@@ -127,6 +134,11 @@ class RepositoryManager(QObject):
         settings.endGroup()
         # Serialize collections every time sucessfully remove a repo
         self._collections_manager.serialize()
+
+    def reload_repository(self, repo_name, url):
+        """Re-fetch the repository and update the collections registry."""
+        status, description = self.edit_repository(repo_name, repo_name, url)
+        return status, description
 
     def get_handler(self, url):
         """Get the right handler instance for given URL.

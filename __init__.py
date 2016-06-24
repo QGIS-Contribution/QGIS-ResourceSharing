@@ -23,13 +23,24 @@
 """
 
 import sys
+import copy
 import os
+
+from qgis.core import QgsApplication
+
+# Dulwich tries to call sys.argv while in QGIS, argv module is missing (?)
+sys.argv = copy.deepcopy(QgsApplication.instance().argv)
+
 sys.path.append(os.path.dirname(__file__))
 
 PLUGIN_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__)))
 if PLUGIN_DIR not in sys.path:
     sys.path.append(PLUGIN_DIR)
+
+EXT_LIBS_DIR = os.path.abspath(os.path.join(PLUGIN_DIR, 'ext_libs'))
+if EXT_LIBS_DIR not in sys.path:
+    sys.path.append(EXT_LIBS_DIR)
 
 
 # noinspection PyPep8Naming

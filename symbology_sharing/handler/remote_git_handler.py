@@ -1,10 +1,13 @@
 # coding=utf-8
-from PyQt4.QtCore import QCoreApplication, QUrl, QByteArray
-from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
+import os
 
-from qgis.core import QgsNetworkAccessManager
+from PyQt4.QtCore import QCoreApplication, QUrl
+from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
+from qgis.core import QgsNetworkAccessManager, QgsApplication
 
 from ext_libs.giturlparse import parse, validate
+from ext_libs.dulwich import porcelain
+
 from base import BaseHandler
 
 
@@ -92,3 +95,22 @@ class RemoteGitHandler(BaseHandler):
     def request_timeout(self):
         self._network_timeout = True
 
+    def download_collection(self, id, errstream):
+        """Download a collection given its ID.
+
+        :param id: The ID of the collection.
+        :type id: str
+        """
+        local_repo_dir = os.path.join(
+            QgsApplication.qgisSettingsDirPath(),
+            'symbology_sharing',
+            'repositories',
+            self.git_host, self.git_owner, self.git_repository)
+        if not os.path.exists(local_repo_dir):
+            os.makedirs(local_repo_dir)
+            porcelain.clone(self.url.encode('utf-8'), local_repo_dir, errstream)
+        else:
+            # Pull for updates
+            porcelain.pull(
+                local_repo_dir, self.url.encode('utf-8'),
+                b'refs/heads/master', errstream)

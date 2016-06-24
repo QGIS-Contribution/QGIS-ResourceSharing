@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 """
+from io import BytesIO
+import sys
 
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
@@ -37,6 +39,7 @@ from PyQt4.QtGui import (
 from qgis.gui import QgsMessageBar
 
 from manage_dialog import ManageRepositoryDialog
+from download_dialog import DownloadDialog, OutLog
 from ..repository_manager import RepositoryManager
 from ..utilities import resources_path, ui_path, repo_settings_group
 from custom_sort_filter_proxy import (
@@ -350,8 +353,9 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def download_collection(self):
         """Slot for when user clicks download button."""
         if self._selected_collection_id:
-            name = self.repository_manager.collections[self._selected_collection_id]['name']
-            QMessageBox.information(self, 'Test', name)
+            dlg = DownloadDialog(self, self._selected_collection_id)
+            if not dlg.exec_():
+                return
 
     def reload_data_and_widget(self):
         """Reload repositories and collections and update widgets related."""

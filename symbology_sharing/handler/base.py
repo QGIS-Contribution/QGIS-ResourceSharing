@@ -108,4 +108,10 @@ class BaseHandler(object):
 
         return collections
 
+    def download_collection(self, id):
+        """Download a collection given its ID.
 
+        :param id: The ID of the collection.
+        :type id: str
+        """
+        raise NotImplementedError

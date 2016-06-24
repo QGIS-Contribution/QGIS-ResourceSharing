@@ -288,10 +288,10 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         if not repo_name:
             return
-        # Check if it's the official repository
+        # Check if it's the approved online dir repository
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
-        if settings.value(repo_name + '/url') == self.repository_manager.OFFICIAL_REPO[1]:
+        if settings.value(repo_name + '/url') in self.repository_manager._online_directory.values():
             self.message_bar.pushMessage(
                 self.tr(
                     'You can not remove the official repository!'),

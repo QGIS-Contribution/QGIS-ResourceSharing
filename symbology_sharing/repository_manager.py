@@ -1,29 +1,37 @@
 # coding=utf-8
-from PyQt4.QtCore import QObject, QSettings
+import csv
+
+from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
 from .utilities import repo_settings_group
 from .handler import BaseHandler
+from .file_downloader import FileDownloader
 from collections_manager import CollectionsManager
 
 
 class RepositoryManager(QObject):
     """Class to handle collection repositories."""
-    OFFICIAL_REPO = (
-        'QGIS Official Repository',
-        'https://github.com/anitagraser/QGIS-style-repo-dummy.git')
+
+    DIRECTORY_URL = 'https://raw.githubusercontent.com/anitagraser/QGIS-style-repo-dummy/master/directory.csv'
 
     def __init__(self):
         """Constructor.
 
-        ..example:
+        ..note:
+        - Repositories is a list of repository that are registered in user's
+        QGIS. Data structure of repositories:
         self._repositories = {
-            'QGIS Official Repository': 'http://example',
-            'My Repository': 'http://my_repository',
+            'QGIS Official Repository': 'git@github.com:anitagraser/QGIS-style-repo-dummy.git',
+            'Akbar's Github Repository': 'git@github.com:akbargumbira/QGIS-style-repo-dummy.git',
+            'Akbar's Bitbucket Repository': 'git@bitbucket.org:akbargumbira/qgis-style-repo-dummy.git'
         }
         """
         QObject.__init__(self)
+        self._online_directory = {}
         self._repositories = {}
         self._collections_manager = CollectionsManager()
+        # Fetch online dir
+        self.fetch_directory()
         # Load repositories from settings
         self.load()
         # Load collections from settings
@@ -47,21 +55,40 @@ class RepositoryManager(QObject):
         """Get all the collections registered."""
         return self._collections_manager.collections
 
+    def fetch_directory(self):
+        downloader = FileDownloader(self.DIRECTORY_URL)
+        status, _ = downloader.fetch()
+        if status:
+            directory_file = QTemporaryFile()
+            if directory_file.open():
+                directory_file.write(downloader.content)
+                directory_file.close()
+
+            with open(directory_file.fileName()) as csv_file:
+                reader = csv.DictReader(csv_file, fieldnames=('name', 'url'))
+                for row in reader:
+                    self._online_directory[row['name']] = row['url'].strip()
+
     def load(self):
         """Load repositories registered in settings."""
+        # import pydevd
+        # pydevd.settrace('localhost', port=8080, stdoutToServer=True,
+        #                 stderrToServer=True)
         self._repositories = {}
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
 
-        # Write Official Repository first to QSettings if needed
-        official_repo_present = False
-        for repo_name in settings.childGroups():
-            url = settings.value(repo_name + '/url', '', type=unicode)
-            if url == self.OFFICIAL_REPO[1]:
-                official_repo_present = True
-                break
-        if not official_repo_present:
-            self.add_repository(self.OFFICIAL_REPO[0], self.OFFICIAL_REPO[1])
+        # Write online directory first to QSettings if needed
+        for online_dir_name in self._online_directory:
+            repo_present = False
+            for repo_name in settings.childGroups():
+                url = settings.value(repo_name + '/url', '', type=unicode)
+                if url == self._online_directory[online_dir_name]:
+                    repo_present = True
+                    break
+            if not repo_present:
+                self.add_repository(
+                    online_dir_name, self._online_directory[online_dir_name])
 
         for repo_name in settings.childGroups():
             self._repositories[repo_name] = {}

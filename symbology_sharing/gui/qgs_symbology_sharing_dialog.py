@@ -39,7 +39,7 @@ from PyQt4.QtGui import (
 from qgis.gui import QgsMessageBar
 
 from manage_dialog import ManageRepositoryDialog
-from download_dialog import DownloadDialog, OutLog
+from download_dialog import DownloadDialog
 from ..repository_manager import RepositoryManager
 from ..utilities import resources_path, ui_path, repo_settings_group
 from custom_sort_filter_proxy import (
@@ -356,6 +356,9 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             dlg = DownloadDialog(self, self._selected_collection_id)
             if not dlg.exec_():
                 return
+
+            # Start downloading the collection
+            # dlg.start_download()
 
     def reload_data_and_widget(self):
         """Reload repositories and collections and update widgets related."""

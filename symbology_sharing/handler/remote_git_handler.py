@@ -108,9 +108,10 @@ class RemoteGitHandler(BaseHandler):
             self.git_host, self.git_owner, self.git_repository)
         if not os.path.exists(local_repo_dir):
             os.makedirs(local_repo_dir)
-            porcelain.clone(self.url.encode('utf-8'), local_repo_dir, errstream)
+            porcelain.clone(self.url.encode('utf-8'), local_repo_dir,
+                            errstream=errstream)
         else:
             # Pull for updates
             porcelain.pull(
                 local_repo_dir, self.url.encode('utf-8'),
-                b'refs/heads/master', errstream)
+                b'refs/heads/master', outstream=errstream, errstream=errstream)

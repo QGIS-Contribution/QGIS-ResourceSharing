@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 import sys
-from PyQt4 import QtGui, uic
+from PyQt4 import QtGui, uic, QtCore
 
 from ..utilities import ui_path
 from ..repository_manager import RepositoryManager
@@ -35,35 +35,25 @@ class DownloadDialog(QtGui.QDialog, FORM_CLASS):
         super(DownloadDialog, self).__init__(parent)
         self.setupUi(self)
         self.repository_manager = RepositoryManager()
+        self._collection_id = collection_id
+        self.start_download()
 
-        out_log = OutLog(self.text_edit_log, sys.stderr)
-        self.repository_manager.download_collection(collection_id, out_log)
+    def start_download(self):
+        err_stream = EmittingStream(text_written=self.normal_output_written)
+        self.repository_manager.download_collection(self._collection_id,
+                                                    err_stream)
 
-
-class OutLog:
-    def __init__(self, edit, out=None, color=None):
-        """(edit, out=None, color=None) -> can write stdout, stderr to a
-        QTextEdit.
-        edit = QTextEdit
-        out = alternate stream ( can be the original sys.stdout )
-        color = alternate color (i.e. color stderr a different color)
-        """
-        self.edit = edit
-        self.out = None
-        self.color = color
-
-    def write(self, m):
-        if self.color:
-            tc = self.edit.textColor()
-            self.edit.setTextColor(self.color)
-
-        self.edit.moveCursor(QtGui.QTextCursor.End)
-        self.edit.insertPlainText( m )
-
-        if self.color:
-            self.edit.setTextColor(tc)
-
-        if self.out:
-            self.out.write(m)
+    def normal_output_written(self, text):
+        """Append text to the QTextEdit."""
+        cursor = self.text_edit_log.textCursor()
+        cursor.movePosition(QtGui.QTextCursor.End)
+        cursor.insertText(text)
+        self.text_edit_log.setTextCursor(cursor)
+        self.text_edit_log.ensureCursorVisible()
 
 
+class EmittingStream(QtCore.QObject):
+    text_written = QtCore.pyqtSignal(str)
+
+    def write(self, text):
+        self.text_written.emit(str(text))

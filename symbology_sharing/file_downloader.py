@@ -18,7 +18,21 @@ class FileDownloader(object):
     def content(self):
         return self._content
 
+    @property
+    def network_finished(self):
+        return self._network_finished
+
+    @property
+    def network_timeout(self):
+        return self._network_timeout
+
     def fetch(self):
+        """Fetch the content."""
+        # Initialize some properties again
+        self._content = False
+        self._network_finished = False
+        self._network_timeout = False
+
         request = QNetworkRequest(QUrl(self._url))
         request.setAttribute(
             QNetworkRequest.CacheLoadControlAttribute,

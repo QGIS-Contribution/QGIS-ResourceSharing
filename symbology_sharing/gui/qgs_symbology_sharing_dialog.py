@@ -71,8 +71,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.iface = iface
 
         # Reconfigure UI
-        self.resize(796, 594)
-        self.setMinimumSize(QSize(790, 0))
         self.setModal(True)
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)

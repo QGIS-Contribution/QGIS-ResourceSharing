@@ -71,9 +71,6 @@ class RepositoryManager(QObject):
 
     def load(self):
         """Load repositories registered in settings."""
-        # import pydevd
-        # pydevd.settrace('localhost', port=8080, stdoutToServer=True,
-        #                 stderrToServer=True)
         self._repositories = {}
         settings = QSettings()
         settings.beginGroup(repo_settings_group())

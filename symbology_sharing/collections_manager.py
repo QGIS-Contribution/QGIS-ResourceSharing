@@ -84,7 +84,7 @@ class CollectionsManager(object):
 
     def get_collection_id(self, collection_name, repo_url):
         """Generate id of a collection."""
-        hash_object = hashlib.sha1(collection_name + repo_url)
+        hash_object = hashlib.sha1((collection_name + repo_url).encode('utf-8'))
         hex_dig = hash_object.hexdigest()
         return hex_dig
 

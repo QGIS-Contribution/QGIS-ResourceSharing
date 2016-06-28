@@ -10,7 +10,7 @@ from collections_manager import CollectionsManager
 
 
 class RepositoryManager(QObject):
-    """Class to handle collection repositories."""
+    """Class to handle repositories."""
 
     DIRECTORY_URL = 'https://raw.githubusercontent.com/anitagraser/QGIS-style-repo-dummy/master/directory.csv'
 
@@ -56,6 +56,7 @@ class RepositoryManager(QObject):
         return self._collections_manager.collections
 
     def fetch_directory(self):
+        """Fetch online directory of repositories."""
         downloader = NetworkManager(self.DIRECTORY_URL)
         status, _ = downloader.fetch()
         if status:
@@ -116,7 +117,7 @@ class RepositoryManager(QObject):
             settings.beginGroup(repo_settings_group())
             settings.setValue(repo_name + '/url', url)
             settings.endGroup()
-            # Serialize collections every time we sucessfully added repo
+            # Serialize collections every time we successfully added repo
             self._collections_manager.serialize()
 
         return status, description

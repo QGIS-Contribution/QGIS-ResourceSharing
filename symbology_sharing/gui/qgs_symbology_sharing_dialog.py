@@ -37,6 +37,7 @@ from PyQt4.QtGui import (
 from qgis.gui import QgsMessageBar
 
 from symbology_sharing.gui.manage_dialog import ManageRepositoryDialog
+from symbology_sharing.gui.download_dialog import DownloadDialog
 from symbology_sharing.repository_manager import RepositoryManager
 from symbology_sharing.utilities import (
     resources_path, ui_path, repo_settings_group)

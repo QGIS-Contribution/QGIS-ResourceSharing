@@ -36,10 +36,11 @@ from PyQt4.QtGui import (
 )
 from qgis.gui import QgsMessageBar
 
-from manage_dialog import ManageRepositoryDialog
-from ..repository_manager import RepositoryManager
-from ..utilities import resources_path, ui_path, repo_settings_group
-from custom_sort_filter_proxy import (
+from symbology_sharing.gui.manage_dialog import ManageRepositoryDialog
+from symbology_sharing.repository_manager import RepositoryManager
+from symbology_sharing.utilities import (
+    resources_path, ui_path, repo_settings_group)
+from symbology_sharing.gui.custom_sort_filter_proxy import (
     CustomSortFilterProxyModel,
     COLLECTION_NAME_ROLE,
     COLLECTION_DESCRIPTION_ROLE,
@@ -196,7 +197,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             if status:
                 self.message_bar.pushMessage(
                     self.tr(
-                        'Repository is sucessfully added'),
+                        'Repository is successfully added'),
                     QgsMessageBar.SUCCESS, 5)
             else:
                 self.message_bar.pushMessage(
@@ -259,7 +260,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             if status:
                 self.message_bar.pushMessage(
                     self.tr(
-                        'Repository is sucessfully updated'),
+                        'Repository is successfully updated'),
                     QgsMessageBar.SUCCESS, 5)
             else:
                 self.message_bar.pushMessage(
@@ -330,8 +331,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 if status:
                     self.message_bar.pushMessage(
                         self.tr(
-                            'Repository %s is succesfully reloaded') % repo_name,
-                        QgsMessageBar.INFO, 5)
+                            'Repository %s is successfully reloaded') %
+                        repo_name, QgsMessageBar.INFO, 5)
                 else:
                     self.message_bar.pushMessage(
                         self.tr(

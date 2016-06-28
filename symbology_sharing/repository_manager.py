@@ -5,7 +5,7 @@ from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
 from .utilities import repo_settings_group
 from .handler import BaseHandler
-from .file_downloader import FileDownloader
+from .network_manager import NetworkManager
 from collections_manager import CollectionsManager
 
 
@@ -56,7 +56,7 @@ class RepositoryManager(QObject):
         return self._collections_manager.collections
 
     def fetch_directory(self):
-        downloader = FileDownloader(self.DIRECTORY_URL)
+        downloader = NetworkManager(self.DIRECTORY_URL)
         status, _ = downloader.fetch()
         if status:
             directory_file = QTemporaryFile()

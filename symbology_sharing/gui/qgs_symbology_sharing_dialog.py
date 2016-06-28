@@ -157,7 +157,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         :param index: The index of the active list widget item.
         :type index: int
         """
-        # Clear message bar
+        # Clear message bar first
         self.message_bar.clearWidgets()
         if index == (self.menu_list_widget.count() - 1):
             # Switch to settings tab

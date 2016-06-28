@@ -1,9 +1,12 @@
 # coding=utf-8
 import hashlib
+import pickle
+import os
 
 from PyQt4.QtCore import QSettings
 
-from symbology_sharing.utilities import repo_settings_group
+from symbology_sharing.utilities import (
+    repo_settings_group, collection_cache_path)
 
 
 class CollectionsManager(object):
@@ -89,17 +92,16 @@ class CollectionsManager(object):
         return hex_dig
 
     def serialize(self):
-        """Save repo collections to settings."""
-        settings = QSettings()
-        settings.beginGroup(repo_settings_group())
-        settings.setValue('repo_collections', self.repo_collections)
-        settings.endGroup()
+        """Save repo collections to cache."""
+        with open(collection_cache_path(), 'wb') as f:
+            pickle.dump(self.repo_collections, f)
 
     def load(self):
-        """Load repo collections from settings and rebuild collections."""
-        settings = QSettings()
-        settings.beginGroup(repo_settings_group())
-        repo_collections = settings.value('repo_collections', {})
+        """Load repo collections from cache and rebuild collections."""
+        repo_collections = {}
+        if os.path.exists(collection_cache_path()):
+            with open(collection_cache_path(), 'r') as f:
+                repo_collections = pickle.load(f)
         self._repo_collections = repo_collections
         self.rebuild_collections()
 

@@ -5,7 +5,7 @@ from PyQt4.QtCore import QUrl, QCoreApplication
 from qgis.core import QgsNetworkAccessManager
 
 
-class FileDownloader(object):
+class NetworkManager(object):
     """Class to get the content of the file in the URL given."""
     def __init__(self, url):
         self._network_manager = QgsNetworkAccessManager.instance()
@@ -18,7 +18,21 @@ class FileDownloader(object):
     def content(self):
         return self._content
 
+    @property
+    def network_finished(self):
+        return self._network_finished
+
+    @property
+    def network_timeout(self):
+        return self._network_timeout
+
     def fetch(self):
+        """Fetch the content."""
+        # Initialize some properties again
+        self._content = None
+        self._network_finished = False
+        self._network_timeout = False
+
         request = QNetworkRequest(QUrl(self._url))
         request.setAttribute(
             QNetworkRequest.CacheLoadControlAttribute,
@@ -49,4 +63,5 @@ class FileDownloader(object):
         self._network_finished = True
 
     def request_timeout(self):
+        """Slot for when request timeout signal is emitted."""
         self._network_timeout = True

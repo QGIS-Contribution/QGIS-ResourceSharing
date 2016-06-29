@@ -5,12 +5,12 @@ from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
 from .utilities import repo_settings_group
 from .handler import BaseHandler
-from .file_downloader import FileDownloader
+from .network_manager import NetworkManager
 from collections_manager import CollectionsManager
 
 
 class RepositoryManager(QObject):
-    """Class to handle collection repositories."""
+    """Class to handle repositories."""
 
     DIRECTORY_URL = 'https://raw.githubusercontent.com/anitagraser/QGIS-style-repo-dummy/master/directory.csv'
 
@@ -56,7 +56,8 @@ class RepositoryManager(QObject):
         return self._collections_manager.collections
 
     def fetch_directory(self):
-        downloader = FileDownloader(self.DIRECTORY_URL)
+        """Fetch online directory of repositories."""
+        downloader = NetworkManager(self.DIRECTORY_URL)
         status, _ = downloader.fetch()
         if status:
             directory_file = QTemporaryFile()
@@ -71,9 +72,6 @@ class RepositoryManager(QObject):
 
     def load(self):
         """Load repositories registered in settings."""
-        # import pydevd
-        # pydevd.settrace('localhost', port=8080, stdoutToServer=True,
-        #                 stderrToServer=True)
         self._repositories = {}
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
@@ -119,7 +117,7 @@ class RepositoryManager(QObject):
             settings.beginGroup(repo_settings_group())
             settings.setValue(repo_name + '/url', url)
             settings.endGroup()
-            # Serialize collections every time we sucessfully added repo
+            # Serialize collections every time we successfully added repo
             self._collections_manager.serialize()
 
         return status, description

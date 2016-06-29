@@ -72,8 +72,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.iface = iface
 
         # Reconfigure UI
-        self.resize(796, 594)
-        self.setMinimumSize(QSize(790, 0))
         self.setModal(True)
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
@@ -133,6 +131,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.repository_manager = RepositoryManager()
         # Collections list view
         self.collections_model = QStandardItemModel(0, 1)
+        self.collections_model.sort(0, Qt.AscendingOrder)
         self.collection_proxy = CustomSortFilterProxyModel(self)
         self.collection_proxy.setSourceModel(self.collections_model)
         self.list_view_collections.setModel(self.collection_proxy)
@@ -160,7 +159,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         :param index: The index of the active list widget item.
         :type index: int
         """
-        # Clear message bar
+        # Clear message bar first
         self.message_bar.clearWidgets()
         if index == (self.menu_list_widget.count() - 1):
             # Switch to settings tab
@@ -304,7 +303,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                           'repository?') + '\n' + repo_name
         if QMessageBox.warning(
                 self,
-                self.tr("QGIS Symbology Sharing"),
+                self.tr('QGIS Symbology Sharing'),
                 warning,
                 QMessageBox.Yes,
                 QMessageBox.No) == QMessageBox.No:
@@ -370,7 +369,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.populate_repositories_widget()
 
     def populate_repositories_widget(self):
-        """Populate dictionary repositories to the tree widget."""
+        """Populate the current dictionary repositories to the tree widget."""
         # Clear the current tree widget
         self.tree_repositories.clear()
 
@@ -385,7 +384,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.tree_repositories.sortItems(1, Qt.AscendingOrder)
 
     def reload_collections_model(self):
-        """Reload collections model with new collections object."""
+        """Reload the collections model with the current collections."""
         self.collections_model.clear()
         for id in self.repository_manager.collections:
             collection_name = self.repository_manager.collections[id]['name']
@@ -400,6 +399,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             item.setData(collection_author, COLLECTION_AUTHOR_ROLE)
             item.setData(collection_tags, COLLECTION_TAGS_ROLE)
             self.collections_model.appendRow(item)
+        self.collections_model.sort(0, Qt.AscendingOrder)
 
     def on_tree_repositories_itemSelectionChanged(self):
         """Slot for when the itemSelectionChanged signal emitted."""

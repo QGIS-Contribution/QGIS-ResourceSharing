@@ -1,6 +1,7 @@
 # coding=utf-8
-
 import os
+
+from qgis.core import QgsApplication
 
 
 def resources_path(*args):
@@ -40,3 +41,10 @@ def ui_path(*args):
 def repo_settings_group():
     """Get the settings group for Symbology Sharing Dialog."""
     return '/SymbologySharing/repository'
+
+def collection_cache_path():
+    """Get the path to the collection cache."""
+    return os.path.join(
+        QgsApplication.qgisSettingsDirPath(),
+        'symbology_sharing',
+        'collections_cache')

@@ -1,14 +1,12 @@
 # coding=utf-8
-import os
-
 from PyQt4.QtCore import QCoreApplication, QUrl
 from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
-from qgis.core import QgsNetworkAccessManager, QgsApplication
+
+from qgis.core import QgsNetworkAccessManager
 
 from ext_libs.giturlparse import parse, validate
-from ext_libs.dulwich import porcelain
-
-from base import BaseHandler
+from symbology_sharing.handler.base import BaseHandler
+from symbology_sharing.network_manager import NetworkManager
 
 
 class RemoteGitHandler(BaseHandler):
@@ -22,10 +20,6 @@ class RemoteGitHandler(BaseHandler):
         self._git_host = None
         self._git_owner = None
         self._git_repository = None
-        self._network_manager = QgsNetworkAccessManager.instance()
-        self._reply = None
-        self._network_finished = False
-        self._network_timeout = False
 
         # Call proper setters here
         self.url = url
@@ -63,37 +57,11 @@ class RemoteGitHandler(BaseHandler):
     def fetch_metadata(self):
         """Fetch metadata file from the repository."""
         # Fetch the metadata
-        request = QNetworkRequest(QUrl(self.metadata_url))
-        request.setAttribute(
-            QNetworkRequest.CacheLoadControlAttribute,
-            QNetworkRequest.AlwaysNetwork)
-        self._reply = self._network_manager.get(request)
-        self._reply.finished.connect(self.fetch_metadata_finished)
-        self._network_manager.requestTimedOut.connect(self.request_timeout)
-
-        while not self._reply.isFinished():
-            # noinspection PyArgumentList
-            QCoreApplication.processEvents()
-
-        # Finished
-        description = None
-        if self._reply.error() != QNetworkReply.NoError:
-            status = False
-            description = self._reply.errorString()
-        else:
-            status = True
-            self.metadata = self._reply.readAll()
-
-        self._reply.deleteLater()
-
+        network_manager = NetworkManager(self.metadata_url)
+        status, description = network_manager.fetch()
+        if status:
+            self.metadata = network_manager.content
         return status, description
-
-    def fetch_metadata_finished(self):
-        """Slot for when fetching metadata finished."""
-        self._network_finished = True
-
-    def request_timeout(self):
-        self._network_timeout = True
 
     def download_collection(self, id, errstream):
         """Download a collection given its ID.

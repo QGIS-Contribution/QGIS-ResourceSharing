@@ -11,6 +11,8 @@ from ConfigParser import SafeConfigParser
 
 from PyQt4.QtCore import QTemporaryFile
 
+from symbology_sharing.collection import COLLECTION_NOT_INSTALLED_STATUS
+
 
 class HandlerMeta(type):
     """Handler meta class definition."""
@@ -99,6 +101,7 @@ class BaseHandler(object):
                 'author': author,
                 'author_email': email,
                 'repository_url': self.url,
+                'status': COLLECTION_NOT_INSTALLED_STATUS,
                 'name': parser.get(collection, 'name'),
                 'tags': parser.get(collection, 'tags'),
                 'description': parser.get(collection, 'description'),
@@ -109,7 +112,7 @@ class BaseHandler(object):
 
         return collections
 
-    def download_collection(self, id):
+    def download_collection(self, id, register_name):
         """Download a collection given its ID.
 
         :param id: The ID of the collection.

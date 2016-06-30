@@ -165,13 +165,13 @@ class RepositoryManager(QObject):
         status, description = self.edit_repository(repo_name, repo_name, url)
         return status, description
 
-    def download_collection(self, id, errstream=None):
+    def download_collection(self, id, register_name):
         """Download collection given the id."""
         repo_url = self.collections[id]['repository_url']
         repo_handler = self.get_handler(repo_url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
-        status = repo_handler.download_collection(id, errstream)
+        status = repo_handler.download_collection(id, register_name)
         return status
 
     def get_handler(self, url):

@@ -2,17 +2,30 @@
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QSortFilterProxyModel
 
+from symbology_sharing.collection import COLLECTION_INSTALLED_STATUS
+
 COLLECTION_NAME_ROLE = Qt.UserRole + 1
 COLLECTION_DESCRIPTION_ROLE = Qt.UserRole + 2
 COLLECTION_AUTHOR_ROLE = Qt.UserRole + 3
 COLLECTION_TAGS_ROLE = Qt.UserRole + 4
 COLLECTION_ID_ROLE = Qt.UserRole + 5
+COLLECTION_STATUS_ROLE = Qt.UserRole + 6
 
 
 class CustomSortFilterProxyModel(QSortFilterProxyModel):
     """Custom QSortFilterProxyModel to be able to search on multiple data."""
     def __init__(self, parent=None):
         super(CustomSortFilterProxyModel, self).__init__(parent)
+        self._accepted_status = None
+
+    @property
+    def accepted_status(self):
+        return self._accepted_status
+
+    @accepted_status.setter
+    def accepted_status(self, status):
+        self._accepted_status = status
+        self.invalidateFilter()
 
     def filterAcceptsRow(self, row_num, source_parent):
         """Override this function."""
@@ -26,4 +39,11 @@ class CustomSortFilterProxyModel(QSortFilterProxyModel):
         tags = self.filterRegExp().indexIn(
             self.sourceModel().data(index, COLLECTION_TAGS_ROLE)) >= 0
 
-        return name or author or description or tags
+        if self.accepted_status == COLLECTION_INSTALLED_STATUS:
+            # For installed collection status
+            status = self.sourceModel().data(index, COLLECTION_STATUS_ROLE) == \
+                 COLLECTION_INSTALLED_STATUS
+        else:
+            status = True
+
+        return (name or author or description or tags) and status

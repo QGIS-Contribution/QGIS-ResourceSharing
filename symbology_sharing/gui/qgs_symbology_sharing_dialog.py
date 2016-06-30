@@ -46,8 +46,12 @@ from symbology_sharing.gui.custom_sort_filter_proxy import (
     COLLECTION_DESCRIPTION_ROLE,
     COLLECTION_AUTHOR_ROLE,
     COLLECTION_TAGS_ROLE,
-    COLLECTION_ID_ROLE
+    COLLECTION_ID_ROLE,
+    COLLECTION_STATUS_ROLE
 )
+from symbology_sharing.collection import (
+    COLLECTION_ALL_STATUS,
+    COLLECTION_INSTALLED_STATUS)
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('qgs_symbology_sharing_dialog_base.ui'))
 
@@ -185,6 +189,12 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self.stacked_menu_widget.setCurrentIndex(1)
         else:
             # Switch to plugins tab
+            if index == 1:
+                # Installed
+                self.collection_proxy.accepted_status = COLLECTION_INSTALLED_STATUS
+            else:
+                # All
+                self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
             self.stacked_menu_widget.setCurrentIndex(0)
 
     def add_repository(self):
@@ -380,6 +390,9 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def download_collection_done(self):
         """Slot for when the thread to download collection is finished."""
+        self.repository_manager.collections[self._selected_collection_id][
+            'status'] = COLLECTION_INSTALLED_STATUS
+        self.reload_collections_model()
         self.progress_dialog.hide()
         QtGui.QMessageBox.information(
             self,
@@ -427,6 +440,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             collection_author = self.repository_manager.collections[id]['author']
             collection_tags = self.repository_manager.collections[id]['tags']
             collection_description = self.repository_manager.collections[id]['description']
+            collection_status = self.repository_manager.collections[id]['status']
             item = QStandardItem(collection_name)
             item.setEditable(False)
             item.setData(id, COLLECTION_ID_ROLE)
@@ -434,6 +448,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             item.setData(collection_description, COLLECTION_DESCRIPTION_ROLE)
             item.setData(collection_author, COLLECTION_AUTHOR_ROLE)
             item.setData(collection_tags, COLLECTION_TAGS_ROLE)
+            item.setData(collection_status, COLLECTION_STATUS_ROLE)
             self.collections_model.appendRow(item)
         self.collections_model.sort(0, Qt.AscendingOrder)
 

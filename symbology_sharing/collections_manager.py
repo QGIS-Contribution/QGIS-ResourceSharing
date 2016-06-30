@@ -3,10 +3,8 @@ import hashlib
 import pickle
 import os
 
-from PyQt4.QtCore import QSettings
 
-from symbology_sharing.utilities import (
-    repo_settings_group, collection_cache_path)
+from symbology_sharing.utilities import collection_cache_path
 
 
 class CollectionsManager(object):
@@ -16,9 +14,11 @@ class CollectionsManager(object):
         self.collections is a dict of collection with this structure:
         self.collections = {
             collection_id (computed): {
+                'register_name': collection,
                 'author': author,
                 'author_email': email,
                 'repository_url': self.url,
+                'status': COLLECTION_NOT_INSTALLED_STATUS,
                 'name': parser.get(collection, 'name'),
                 'tags': parser.get(collection, 'tags'),
                 'description': parser.get(collection, 'description'),
@@ -31,9 +31,11 @@ class CollectionsManager(object):
         self.repo_collections is a list dict of collection with this structure:
         self.repo_collection = {
             repo_name: [{
+                'register_name': collection,
                 'author': author,
                 'author_email': email,
                 'repository_url': self.url,
+                'status': COLLECTION_NOT_INSTALLED_STATUS,
                 'name': parser.get(collection, 'name'),
                 'tags': parser.get(collection, 'tags'),
                 'description': parser.get(collection, 'description'),

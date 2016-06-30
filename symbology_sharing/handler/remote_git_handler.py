@@ -1,10 +1,11 @@
 # coding=utf-8
-from PyQt4.QtCore import QCoreApplication, QUrl
-from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
+import os
+from contextlib import closing
 
-from qgis.core import QgsNetworkAccessManager
+from qgis.core import QgsApplication
 
 from ext_libs.giturlparse import parse, validate
+from ext_libs.dulwich import porcelain
 from symbology_sharing.handler.base import BaseHandler
 from symbology_sharing.network_manager import NetworkManager
 
@@ -63,7 +64,7 @@ class RemoteGitHandler(BaseHandler):
             self.metadata = network_manager.content
         return status, description
 
-    def download_collection(self, id, errstream):
+    def download_collection(self, id, errstream=None):
         """Download a collection given its ID.
 
         :param id: The ID of the collection.
@@ -76,10 +77,15 @@ class RemoteGitHandler(BaseHandler):
             self.git_host, self.git_owner, self.git_repository)
         if not os.path.exists(local_repo_dir):
             os.makedirs(local_repo_dir)
-            porcelain.clone(self.url.encode('utf-8'), local_repo_dir,
-                            errstream=errstream)
+            with closing(
+                    porcelain.clone(
+                        self.url.encode('utf-8'), local_repo_dir)) as repo:
+                return repo.path == local_repo_dir
         else:
-            # Pull for updates
             porcelain.pull(
-                local_repo_dir, self.url.encode('utf-8'),
-                b'refs/heads/master', outstream=errstream, errstream=errstream)
+                local_repo_dir, self.url.encode('utf-8'), b'refs/heads/master')
+            # TODO: User should know if it's pulling out update again or just
+            # using the current local repo to download the collection. For
+            # now just return True
+            return True
+        return False

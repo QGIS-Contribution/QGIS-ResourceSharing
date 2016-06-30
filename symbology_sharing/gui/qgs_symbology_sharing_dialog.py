@@ -23,7 +23,7 @@
 
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
-from PyQt4.QtCore import Qt, QSettings, pyqtSlot, QRegExp
+from PyQt4.QtCore import Qt, QSettings, pyqtSignal, pyqtSlot, QRegExp, QThread
 from PyQt4.QtGui import (
     QIcon,
     QListWidgetItem,
@@ -37,7 +37,6 @@ from PyQt4.QtGui import (
 from qgis.gui import QgsMessageBar
 
 from symbology_sharing.gui.manage_dialog import ManageRepositoryDialog
-from symbology_sharing.gui.download_dialog import DownloadDialog
 from symbology_sharing.repository_manager import RepositoryManager
 from symbology_sharing.utilities import (
     resources_path, ui_path, repo_settings_group)
@@ -51,6 +50,27 @@ from symbology_sharing.gui.custom_sort_filter_proxy import (
 )
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('qgs_symbology_sharing_dialog_base.ui'))
+
+
+class DownloadCollectionThread(QThread):
+    download_finished = pyqtSignal()
+    download_canceled = pyqtSignal()
+
+    def __init__(self, repository_manager, collection_id):
+        QThread.__init__(self)
+        self._repository_manager = repository_manager
+        self._selected_collection_id = collection_id
+        self._is_running = True
+
+    def __del__(self):
+        self.wait()
+
+    def stop(self):
+        self.terminate()
+
+    def run(self):
+        self._repository_manager.download_collection(self._selected_collection_id)
+        self.download_finished.emit()
 
 
 class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
@@ -121,11 +141,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.message_bar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.vlayoutRightColumn.insertWidget(0, self.message_bar)
 
-        # Creating progress dialog for downloading stuffs
-        self.progress_dialog = QProgressDialog(self)
-        self.progress_dialog.setAutoClose(False)
-        title = self.tr('Symbology Sharing')
-        self.progress_dialog.setWindowTitle(title)
+        # Progress dialog for any long running process
+        self.progress_dialog = None
 
         # Init repository manager
         self.repository_manager = RepositoryManager()
@@ -350,13 +367,30 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def download_collection(self):
         """Slot for when user clicks download button."""
-        if self._selected_collection_id:
-            dlg = DownloadDialog(self, self._selected_collection_id)
-            if not dlg.exec_():
-                return
+        self.show_progress_dialog("Downloading the collection")
+        self.download_thread = DownloadCollectionThread(
+            self.repository_manager, self._selected_collection_id)
+        self.download_thread.download_finished.connect(
+            self.download_collection_done)
+        self.progress_dialog.canceled.connect(
+            self.download_collection_canceled)
+        self.download_thread.start()
 
-            # Start downloading the collection
-            # dlg.start_download()
+    def download_collection_done(self):
+        """Slot for when the thread to download collection is finished."""
+        self.progress_dialog.hide()
+        QtGui.QMessageBox.information(
+            self,
+            'Symbology Sharing',
+            '%s is downloaded successfully' %
+            self.repository_manager.collections[self._selected_collection_id]['name'])
+
+    def download_collection_canceled(self):
+        self.download_thread.stop()
+        QtGui.QMessageBox.information(
+            self,
+            'Symbology Sharing',
+            'Downloading the collection is canceled!')
 
     def reload_data_and_widget(self):
         """Reload repositories and collections and update widgets related."""
@@ -442,10 +476,13 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         :param text: Text as the label of the progress dialog
         :type text: str
         """
-        if self.progress_dialog is not None:
-            self.progress_dialog.show()
-            # Just use infinite progress bar here
-            self.progress_dialog.setMaximum(0)
-            self.progress_dialog.setMinimum(0)
-            self.progress_dialog.setValue(0)
-            self.progress_dialog.setLabelText(text)
+        self.progress_dialog = QProgressDialog(self)
+        self.progress_dialog.setAutoClose(False)
+        title = self.tr('Symbology Sharing')
+        self.progress_dialog.setWindowTitle(title)
+        self.progress_dialog.show()
+        # Just use infinite progress bar here
+        self.progress_dialog.setMaximum(0)
+        self.progress_dialog.setMinimum(0)
+        self.progress_dialog.setValue(0)
+        self.progress_dialog.setLabelText(text)

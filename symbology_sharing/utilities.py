@@ -42,9 +42,24 @@ def repo_settings_group():
     """Get the settings group for Symbology Sharing Dialog."""
     return '/SymbologySharing/repository'
 
+
 def collection_cache_path():
     """Get the path to the collection cache."""
     return os.path.join(
         QgsApplication.qgisSettingsDirPath(),
         'symbology_sharing',
         'collections_cache')
+
+
+def local_collection_path(id=None):
+    """Get the path to the local collection dir.
+
+    If id is not passed, it will just return the root dir of the collections.
+    """
+    path = os.path.join(
+        QgsApplication.qgisSettingsDirPath(),
+        'symbology_sharing',
+        'collections')
+    if id:
+        path = os.path.join(path, id)
+    return path

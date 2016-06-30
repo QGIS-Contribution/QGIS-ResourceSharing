@@ -95,6 +95,7 @@ class BaseHandler(object):
         # Read all the collections
         for collection in collection_list:
             collection_dict = {
+                'register_name': collection,
                 'author': author,
                 'author_email': email,
                 'repository_url': self.url,

@@ -69,7 +69,9 @@ class DownloadCollectionThread(QThread):
         self.terminate()
 
     def run(self):
-        self._repository_manager.download_collection(self._selected_collection_id)
+        id = self._selected_collection_id
+        register_name = self._repository_manager.collections[id]['register_name']
+        self._repository_manager.download_collection(id, register_name)
         self.download_finished.emit()
 
 

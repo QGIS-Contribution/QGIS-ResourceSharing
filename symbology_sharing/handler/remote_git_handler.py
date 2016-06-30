@@ -1,6 +1,6 @@
 # coding=utf-8
 import os
-from contextlib import closing
+import shutil
 
 from qgis.core import QgsApplication
 
@@ -8,6 +8,7 @@ from ext_libs.giturlparse import parse, validate
 from ext_libs.dulwich import porcelain
 from symbology_sharing.handler.base import BaseHandler
 from symbology_sharing.network_manager import NetworkManager
+from symbology_sharing.utilities import local_collection_path
 
 
 class RemoteGitHandler(BaseHandler):
@@ -64,12 +65,18 @@ class RemoteGitHandler(BaseHandler):
             self.metadata = network_manager.content
         return status, description
 
-    def download_collection(self, id, errstream=None):
+    def download_collection(self, id, register_name):
         """Download a collection given its ID.
+
+        For remote git repositories, we will clone the repository first (or pull
+        if the repo is already cloned before) and copy the collection to
+        collections dir.
 
         :param id: The ID of the collection.
         :type id: str
         """
+        # Clone or pull the repositories first
+        download_status = True
         local_repo_dir = os.path.join(
             QgsApplication.qgisSettingsDirPath(),
             'symbology_sharing',
@@ -77,15 +84,16 @@ class RemoteGitHandler(BaseHandler):
             self.git_host, self.git_owner, self.git_repository)
         if not os.path.exists(local_repo_dir):
             os.makedirs(local_repo_dir)
-            with closing(
-                    porcelain.clone(
-                        self.url.encode('utf-8'), local_repo_dir)) as repo:
-                return repo.path == local_repo_dir
+            repo = porcelain.clone(self.url.encode('utf-8'), local_repo_dir)
+            download_status = repo.path == local_repo_dir
         else:
             porcelain.pull(
                 local_repo_dir, self.url.encode('utf-8'), b'refs/heads/master')
-            # TODO: User should know if it's pulling out update again or just
-            # using the current local repo to download the collection. For
-            # now just return True
-            return True
-        return False
+
+        # Copy the specific downloaded collection to collections dir
+        src_dir = os.path.join(local_repo_dir, 'collections', register_name)
+        dest_dir = local_collection_path(id)
+        if download_status:
+            if os.path.exists(dest_dir):
+                shutil.rmtree(dest_dir)
+            shutil.copytree(src_dir, dest_dir)

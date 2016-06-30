@@ -82,12 +82,12 @@ class CollectionsManager(object):
             repo_collections = self.repo_collections[repo]
             for collection in repo_collections:
                 colection_id = self.get_collection_id(
-                    collection['name'], collection['repository_url'])
+                    collection['register_name'], collection['repository_url'])
                 self._collections[colection_id] = collection
 
-    def get_collection_id(self, collection_name, repo_url):
+    def get_collection_id(self, register_name, repo_url):
         """Generate id of a collection."""
-        hash_object = hashlib.sha1((collection_name + repo_url).encode('utf-8'))
+        hash_object = hashlib.sha1((register_name + repo_url).encode('utf-8'))
         hex_dig = hash_object.hexdigest()
         return hex_dig
 

@@ -95,6 +95,9 @@ class CollectionsManager(object):
 
     def serialize(self):
         """Save repo collections to cache."""
+        if not os.path.exists(collection_cache_path()):
+            os.makedirs(os.path.dirname(collection_cache_path()))
+
         with open(collection_cache_path(), 'wb') as f:
             pickle.dump(self.repo_collections, f)
 

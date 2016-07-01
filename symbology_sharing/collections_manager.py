@@ -3,8 +3,9 @@ import hashlib
 import pickle
 import os
 
-
-from symbology_sharing.utilities import collection_cache_path
+from symbology_sharing.collection import COLLECTION_NOT_INSTALLED_STATUS
+from symbology_sharing.utilities import (
+    collection_cache_path, local_collection_path)
 
 
 class CollectionsManager(object):
@@ -83,9 +84,12 @@ class CollectionsManager(object):
         for repo in self._repo_collections.keys():
             repo_collections = self.repo_collections[repo]
             for collection in repo_collections:
-                colection_id = self.get_collection_id(
+                collection_id = self.get_collection_id(
                     collection['register_name'], collection['repository_url'])
-                self._collections[colection_id] = collection
+                self._collections[collection_id] = collection
+                # Check in the file system if the collection exists
+                if not os.path.exists(local_collection_path(collection_id)):
+                    self._collections[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS
 
     def get_collection_id(self, register_name, repo_url):
         """Generate id of a collection."""
@@ -111,7 +115,7 @@ class CollectionsManager(object):
         self.rebuild_collections()
 
     def html(self, id):
-        """Return html of the matadata given the id.
+        """Return html of the metadata given the id.
 
         :param id: The id of the collection
         :type id: str

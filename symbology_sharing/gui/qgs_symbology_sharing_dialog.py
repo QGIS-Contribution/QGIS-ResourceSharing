@@ -64,7 +64,6 @@ class DownloadCollectionThread(QThread):
         QThread.__init__(self)
         self._repository_manager = repository_manager
         self._selected_collection_id = collection_id
-        self._is_running = True
 
     def __del__(self):
         self.wait()

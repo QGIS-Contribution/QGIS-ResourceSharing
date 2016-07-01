@@ -74,9 +74,12 @@ class RemoteGitHandler(BaseHandler):
 
         :param id: The ID of the collection.
         :type id: str
+
+        :param register_name: The register name of the collection (the
+            section name of the collection)
+        :type register_name: unicode
         """
         # Clone or pull the repositories first
-        download_status = True
         local_repo_dir = os.path.join(
             QgsApplication.qgisSettingsDirPath(),
             'symbology_sharing',
@@ -84,16 +87,31 @@ class RemoteGitHandler(BaseHandler):
             self.git_host, self.git_owner, self.git_repository)
         if not os.path.exists(local_repo_dir):
             os.makedirs(local_repo_dir)
-            repo = porcelain.clone(self.url.encode('utf-8'), local_repo_dir)
-            download_status = repo.path == local_repo_dir
+            try:
+                repo = porcelain.clone(self.url.encode('utf-8'), local_repo_dir)
+            except Exception as e:
+                error_information = 'Error: %s' % str(e)
+                return False, error_information
+
+            if not repo:
+                error_information = 'Error: Cloning the repository of the collection failed.'
+                return False, error_information
         else:
-            porcelain.pull(
-                local_repo_dir, self.url.encode('utf-8'), b'refs/heads/master')
+            try:
+                porcelain.pull(local_repo_dir, self.url.encode('utf-8'), b'refs/heads/master')
+            except Exception as e:
+                error_information = 'Error: %s' % str(e)
+                return False, error_information
 
         # Copy the specific downloaded collection to collections dir
         src_dir = os.path.join(local_repo_dir, 'collections', register_name)
+        if not os.path.exists(src_dir):
+            error_information = 'Error: The collection does not exist in the repository.'
+            return False, error_information
+
         dest_dir = local_collection_path(id)
-        if download_status:
-            if os.path.exists(dest_dir):
-                shutil.rmtree(dest_dir)
-            shutil.copytree(src_dir, dest_dir)
+        if os.path.exists(dest_dir):
+            shutil.rmtree(dest_dir)
+        shutil.copytree(src_dir, dest_dir)
+
+        return True, None

@@ -171,8 +171,9 @@ class RepositoryManager(QObject):
         repo_handler = self.get_handler(repo_url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
-        status = repo_handler.download_collection(id, register_name)
-        return status
+        status, information = repo_handler.download_collection(
+            id, register_name)
+        return status, information
 
     def get_handler(self, url):
         """Get the right handler instance for given URL.

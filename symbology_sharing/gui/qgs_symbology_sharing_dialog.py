@@ -65,7 +65,7 @@ class DownloadCollectionThread(QThread):
         self._repository_manager = repository_manager
         self._selected_collection_id = collection_id
         self.download_status = False
-        self.download_information = None
+        self.error_message = None
 
     def __del__(self):
         self.wait()
@@ -76,7 +76,7 @@ class DownloadCollectionThread(QThread):
     def run(self):
         id = self._selected_collection_id
         register_name = self._repository_manager.collections[id]['register_name']
-        self.download_status, self.download_information = self._repository_manager.download_collection(id, register_name)
+        self.download_status, self.error_message = self._repository_manager.download_collection(id, register_name)
         self.download_finished.emit()
 
 
@@ -399,7 +399,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             message = '%s is downloaded successfully' % (
                 self.repository_manager.collections[self._selected_collection_id]['name'])
         else:
-            message = self.download_thread.download_information
+            message = self.download_thread.error_message
         QtGui.QMessageBox.information(self, 'Symbology Sharing', message)
 
     def download_collection_canceled(self):

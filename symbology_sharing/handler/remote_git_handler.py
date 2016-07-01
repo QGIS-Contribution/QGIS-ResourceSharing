@@ -90,24 +90,24 @@ class RemoteGitHandler(BaseHandler):
             try:
                 repo = porcelain.clone(self.url.encode('utf-8'), local_repo_dir)
             except Exception as e:
-                error_information = 'Error: %s' % str(e)
-                return False, error_information
+                error_message = 'Error: %s' % str(e)
+                return False, error_message
 
             if not repo:
-                error_information = 'Error: Cloning the repository of the collection failed.'
-                return False, error_information
+                error_message = 'Error: Cloning the repository of the collection failed.'
+                return False, error_message
         else:
             try:
                 porcelain.pull(local_repo_dir, self.url.encode('utf-8'), b'refs/heads/master')
             except Exception as e:
-                error_information = 'Error: %s' % str(e)
-                return False, error_information
+                error_message = 'Error: %s' % str(e)
+                return False, error_message
 
         # Copy the specific downloaded collection to collections dir
         src_dir = os.path.join(local_repo_dir, 'collections', register_name)
         if not os.path.exists(src_dir):
-            error_information = 'Error: The collection does not exist in the repository.'
-            return False, error_information
+            error_message = 'Error: The collection does not exist in the repository.'
+            return False, error_message
 
         dest_dir = local_collection_path(id)
         if os.path.exists(dest_dir):

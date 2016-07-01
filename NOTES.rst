@@ -75,3 +75,35 @@ Notes:
    just add them all at this time
 4. low priority: we could store the name in the DIRECTORY of repos, by
    using csv or a # separator or whatever you think is best
+
+
+
+Conversation Ale-Akbar from 01/07/2016
+.......................................
+
+
+We discussed how to import SVGs and symbols:
+
+SVGs
+----
+
+Add the SVG path to the settings as QgsApplication does
+
+QString myPaths = settings.value( "svg/searchPathsForSVG", QDir::homePath() ).toString();
+
+
+Symbols
+---------
+
+Using the API provided by QgsStyleV2 for:
+
+#. tag all symbols with the collection id
+#. create a group with the name of the collection and place all symbols inside (check for other groups with the same name and add a suffix if needed)
+#. place all symbols in the group
+
+Collection removal
+------------------
+
+#. remove the path from SVG paths setting
+#. remove all tagged symbols
+#. find the empty group starting with the same name of the collection and delete it

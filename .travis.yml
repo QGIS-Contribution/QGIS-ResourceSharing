@@ -19,7 +19,7 @@ install:
 
 script:
   - export PATH=/usr/bin:$PATH
-  - xvfb-run nose2 --with-coverage
+  - xvfb-run nose2 -s test --with-coverage
 
 after_success:
   - coveralls

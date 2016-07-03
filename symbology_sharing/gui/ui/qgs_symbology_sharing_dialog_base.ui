@@ -381,6 +381,16 @@
                   </spacer>
                  </item>
                  <item>
+                  <widget class="QPushButton" name="open_button">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Open</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QPushButton" name="download_button">
                    <property name="text">
                     <string>Download</string>

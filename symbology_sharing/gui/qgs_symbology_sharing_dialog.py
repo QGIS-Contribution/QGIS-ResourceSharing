@@ -23,7 +23,8 @@
 
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
-from PyQt4.QtCore import Qt, QSettings, pyqtSignal, pyqtSlot, QRegExp, QThread
+from PyQt4.QtCore import (
+    Qt, QSettings, pyqtSignal, pyqtSlot, QRegExp, QThread, QUrl)
 from PyQt4.QtGui import (
     QIcon,
     QListWidgetItem,
@@ -32,14 +33,15 @@ from PyQt4.QtGui import (
     QMessageBox,
     QProgressDialog,
     QStandardItemModel,
-    QStandardItem
+    QStandardItem,
+    QDesktopServices
 )
 from qgis.gui import QgsMessageBar
 
 from symbology_sharing.gui.manage_dialog import ManageRepositoryDialog
 from symbology_sharing.repository_manager import RepositoryManager
 from symbology_sharing.utilities import (
-    resources_path, ui_path, repo_settings_group)
+    resources_path, ui_path, repo_settings_group, local_collection_path)
 from symbology_sharing.gui.custom_sort_filter_proxy import (
     CustomSortFilterProxyModel,
     COLLECTION_NAME_ROLE,
@@ -172,6 +174,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self.on_list_view_collections_clicked)
         self.line_edit_filter.textChanged.connect(self.filter_collections)
         self.download_button.clicked.connect(self.download_collection)
+        self.open_button.clicked.connect(self.open_collection)
 
         # Populate repositories widget and collections list view
         self.populate_repositories_widget()
@@ -409,6 +412,11 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             'Symbology Sharing',
             'Downloading the collection is canceled!')
 
+    def open_collection(self):
+        """Slot for when user clicks 'Open' button."""
+        directory_url = QUrl.fromLocalFile(local_collection_path(self._selected_collection_id))
+        QDesktopServices.openUrl(directory_url)
+
     def reload_data_and_widget(self):
         """Reload repositories and collections and update widgets related."""
         self.reload_repositories_widget()
@@ -461,14 +469,26 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.button_delete.setEnabled(True)
 
     def on_list_view_collections_clicked(self, index):
-        """Slow for when the list_view_collections is clicked."""
+        """Slot for when the list_view_collections is clicked."""
         real_index = self.collection_proxy.mapToSource(index)
         if real_index.row() != -1:
             collection_item = self.collections_model.itemFromIndex(real_index)
             collection_id = collection_item.data(COLLECTION_ID_ROLE)
             self._selected_collection_id = collection_id
+
+            # Enable/disable button
+            is_installed = self.repository_manager.collections[
+                self._selected_collection_id][
+                'status'] == COLLECTION_INSTALLED_STATUS
+            if is_installed:
+                self.download_button.setEnabled(False)
+                self.open_button.setEnabled(True)
+            else:
+                self.download_button.setEnabled(True)
+                self.open_button.setEnabled(False)
+
+            # Show  metadata
             self.show_collection_metadata(collection_id)
-            self.download_button.setEnabled(True)
 
     @pyqtSlot(str)
     def filter_collections(self, text):

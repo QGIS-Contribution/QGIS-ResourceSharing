@@ -6,7 +6,7 @@ from qgis.core import QgsApplication
 
 from ext_libs.giturlparse import parse, validate
 from ext_libs.dulwich import porcelain
-from symbology_sharing.handler.base import BaseHandler
+from symbology_sharing.repository_handler.base import BaseHandler
 from symbology_sharing.network_manager import NetworkManager
 from symbology_sharing.utilities import local_collection_path
 

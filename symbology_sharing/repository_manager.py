@@ -3,10 +3,10 @@ import csv
 
 from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
-from .utilities import repo_settings_group
-from .handler import BaseHandler
-from .network_manager import NetworkManager
-from collections_manager import CollectionsManager
+from symbology_sharing.utilities import repo_settings_group
+from symbology_sharing.repository_handler import BaseHandler
+from symbology_sharing.network_manager import NetworkManager
+from symbology_sharing.collections_manager import CollectionsManager
 
 
 class RepositoryManager(QObject):

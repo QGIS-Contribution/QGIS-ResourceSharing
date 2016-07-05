@@ -49,6 +49,24 @@ class BaseRepositoryHandler(object):
         """Checking if handler can handle this URL."""
         raise NotImplementedError
 
+    @classmethod
+    def get_handler(cls, url):
+        """Get the right repository handler instance for given URL.
+
+        :param url: The url of the repository
+        :type url: str
+
+        :return: The handler instance. None if no handler found.
+        :rtype: BaseHandler, None
+        """
+        repo_handler = None
+        for handler in cls.registry.values():
+            handler_instance = handler(url)
+            if handler_instance.can_handle():
+                repo_handler = handler_instance
+                break
+        return repo_handler
+
     @property
     def url(self):
         """The URL to the repository.

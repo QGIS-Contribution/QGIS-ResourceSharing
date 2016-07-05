@@ -106,7 +106,7 @@ class RepositoryManager(QObject):
         :param url: The URL of the repository
         :type url: str
         """
-        repo_handler = self.get_repository_handler(url)
+        repo_handler = BaseRepositoryHandler.get_handler(url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
 
@@ -130,7 +130,7 @@ class RepositoryManager(QObject):
     def edit_repository(self, old_repo_name, new_repo_name, new_url):
         """Edit repository and update the collections."""
         # Fetch the metadata from the new url
-        repo_handler = self.get_repository_handler(new_url)
+        repo_handler = BaseRepositoryHandler.get_handler(new_url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
         status, description = repo_handler.fetch_metadata()
@@ -173,7 +173,7 @@ class RepositoryManager(QObject):
     def download_collection(self, collection_id):
         """Download collection given the id."""
         repo_url = self.collections[collection_id]['repository_url']
-        repo_handler = self.get_repository_handler(repo_url)
+        repo_handler = BaseRepositoryHandler.get_handler(repo_url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
         register_name = self.collections[collection_id]['register_name']
@@ -199,20 +199,3 @@ class RepositoryManager(QObject):
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.uninstall()
         self.collections[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS
-
-    def get_repository_handler(self, url):
-        """Get the right handler instance for given URL.
-
-        :param url: The url of the repository
-        :type url: str
-
-        :return: The handler instance. None if no handler found.
-        :rtype: BaseHandler, None
-        """
-        repo_handler = None
-        for handler in BaseRepositoryHandler.registry.values():
-            handler_instance = handler(url)
-            if handler_instance.can_handle():
-                repo_handler = handler_instance
-                break
-        return repo_handler

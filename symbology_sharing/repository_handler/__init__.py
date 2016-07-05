@@ -1,4 +1,4 @@
-from base import BaseHandler
+from base import BaseRepositoryHandler
 from remote_git_handler import RemoteGitHandler
 from github_handler import GithubHandler
 from bitbucket_handler import BitBucketHandler

@@ -14,7 +14,7 @@ from PyQt4.QtCore import QTemporaryFile
 from symbology_sharing.collection import COLLECTION_NOT_INSTALLED_STATUS
 
 
-class HandlerMeta(type):
+class RepositoryHandlerMeta(type):
     """Handler meta class definition."""
     def __init__(cls, name, bases, dct):
         if not hasattr(cls, 'registry'):
@@ -27,12 +27,12 @@ class HandlerMeta(type):
                 interface_id = name.lower()
                 cls.registry[interface_id] = cls
 
-        super(HandlerMeta, cls).__init__(name, bases, dct)
+        super(RepositoryHandlerMeta, cls).__init__(name, bases, dct)
 
 
-class BaseHandler(object):
+class BaseRepositoryHandler(object):
     """Abstract class of handler."""
-    __metaclass__ = HandlerMeta
+    __metaclass__ = RepositoryHandlerMeta
 
     METADATA_FILE = 'metadata.ini'
     IS_DISABLED = False

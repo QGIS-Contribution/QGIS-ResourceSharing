@@ -77,8 +77,7 @@ class DownloadCollectionThread(QThread):
 
     def run(self):
         id = self._selected_collection_id
-        register_name = self._repository_manager.collections[id]['register_name']
-        self.download_status, self.error_message = self._repository_manager.download_collection(id, register_name)
+        self.download_status, self.error_message = self._repository_manager.install_collection(id)
         self.download_finished.emit()
 
 
@@ -104,7 +103,9 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.setModal(True)
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
-        self.download_button.setEnabled(False)
+        self.button_install.setEnabled(False)
+        self.button_open.setEnabled(False)
+        self.button_uninstall.setEnabled(False)
 
         # Set QListWidgetItem
         # All
@@ -173,8 +174,9 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.list_view_collections.selectionModel().currentChanged.connect(
             self.on_list_view_collections_clicked)
         self.line_edit_filter.textChanged.connect(self.filter_collections)
-        self.download_button.clicked.connect(self.download_collection)
-        self.open_button.clicked.connect(self.open_collection)
+        self.button_install.clicked.connect(self.install_collection)
+        self.button_open.clicked.connect(self.open_collection)
+        self.button_uninstall.clicked.connect(self.uninstall_collection)
 
         # Populate repositories widget and collections list view
         self.populate_repositories_widget()
@@ -381,7 +383,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Reload data and widget
         self.reload_data_and_widget()
 
-    def download_collection(self):
+    def install_collection(self):
         """Slot for when user clicks download button."""
         self.show_progress_dialog("Downloading the collection")
         self.download_thread = DownloadCollectionThread(
@@ -392,15 +394,27 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self.download_collection_canceled)
         self.download_thread.start()
 
+    def uninstall_collection(self):
+        """Slot called when user clicks uninstall button."""
+        QtGui.QMessageBox.information(
+            self, 'Symbology Sharing', 'Uninstall button clicked!')
+
     def download_collection_done(self):
         """Slot for when the thread to download collection is finished."""
         self.progress_dialog.hide()
         if self.download_thread.download_status:
+            # Install the collection
+            self.show_progress_dialog('Installing the collection.')
+            try:
+                self.repository_manager.install_collection(self._selected_collection_id)
+            except Exception, e:
+                pass
             self.repository_manager.collections[self._selected_collection_id][
                 'status'] = COLLECTION_INSTALLED_STATUS
             self.reload_collections_model()
-            message = '%s is downloaded successfully' % (
+            message = '%s is installed successfully' % (
                 self.repository_manager.collections[self._selected_collection_id]['name'])
+            self.progress_dialog.hide()
         else:
             message = self.download_thread.error_message
         QtGui.QMessageBox.information(self, 'Symbology Sharing', message)
@@ -481,11 +495,13 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 self._selected_collection_id][
                 'status'] == COLLECTION_INSTALLED_STATUS
             if is_installed:
-                self.download_button.setEnabled(False)
-                self.open_button.setEnabled(True)
+                self.button_install.setEnabled(False)
+                self.button_open.setEnabled(True)
+                self.button_uninstall.setEnabled(True)
             else:
-                self.download_button.setEnabled(True)
-                self.open_button.setEnabled(False)
+                self.button_install.setEnabled(True)
+                self.button_open.setEnabled(False)
+                self.button_uninstall.setEnabled(False)
 
             # Show  metadata
             self.show_collection_metadata(collection_id)

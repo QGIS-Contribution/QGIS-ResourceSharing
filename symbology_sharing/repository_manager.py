@@ -4,7 +4,8 @@ import csv
 from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
 from symbology_sharing.utilities import repo_settings_group
-from symbology_sharing.repository_handler import BaseHandler
+from symbology_sharing.repository_handler import BaseRepositoryHandler
+from symbology_sharing.resource_handler import BaseResourceHandler
 from symbology_sharing.network_manager import NetworkManager
 from symbology_sharing.collections_manager import CollectionsManager
 
@@ -101,7 +102,7 @@ class RepositoryManager(QObject):
         :param url: The URL of the repository
         :type url: str
         """
-        repo_handler = self.get_handler(url)
+        repo_handler = self.get_repository_handler(url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
 
@@ -125,7 +126,7 @@ class RepositoryManager(QObject):
     def edit_repository(self, old_repo_name, new_repo_name, new_url):
         """Edit repository and update the collections."""
         # Fetch the metadata from the new url
-        repo_handler = self.get_handler(new_url)
+        repo_handler = self.get_repository_handler(new_url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
         status, description = repo_handler.fetch_metadata()
@@ -165,17 +166,24 @@ class RepositoryManager(QObject):
         status, description = self.edit_repository(repo_name, repo_name, url)
         return status, description
 
-    def download_collection(self, id, register_name):
+    def download_collection(self, collection_id):
         """Download collection given the id."""
-        repo_url = self.collections[id]['repository_url']
-        repo_handler = self.get_handler(repo_url)
+        repo_url = self.collections[collection_id]['repository_url']
+        repo_handler = self.get_repository_handler(repo_url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
+        register_name = self.collections[collection_id]['register_name']
         status, information = repo_handler.download_collection(
-            id, register_name)
+            collection_id, register_name)
         return status, information
 
-    def get_handler(self, url):
+    def install_collection(self, collection_id):
+        """Install a collection."""
+        for resource_handler in BaseResourceHandler.registry.values():
+            resource_handler_instance = resource_handler(collection_id)
+            resource_handler_instance.install()
+
+    def get_repository_handler(self, url):
         """Get the right handler instance for given URL.
 
         :param url: The url of the repository
@@ -185,7 +193,7 @@ class RepositoryManager(QObject):
         :rtype: BaseHandler, None
         """
         repo_handler = None
-        for handler in BaseHandler.registry.values():
+        for handler in BaseRepositoryHandler.registry.values():
             handler_instance = handler(url)
             if handler_instance.can_handle():
                 repo_handler = handler_instance

@@ -6,18 +6,18 @@ from qgis.core import QgsApplication
 
 from ext_libs.giturlparse import parse, validate
 from ext_libs.dulwich import porcelain
-from symbology_sharing.repository_handler.base import BaseHandler
+from symbology_sharing.repository_handler.base import BaseRepositoryHandler
 from symbology_sharing.network_manager import NetworkManager
 from symbology_sharing.utilities import local_collection_path
 
 
-class RemoteGitHandler(BaseHandler):
+class RemoteGitHandler(BaseRepositoryHandler):
     """Class to handle generic git remote repository."""
     IS_DISABLED = True
 
     def __init__(self, url=None):
         """Constructor."""
-        BaseHandler.__init__(self, url)
+        BaseRepositoryHandler.__init__(self, url)
         self._git_platform = None
         self._git_host = None
         self._git_owner = None
@@ -29,7 +29,7 @@ class RemoteGitHandler(BaseHandler):
     def can_handle(self):
         return False
 
-    @BaseHandler.url.setter
+    @BaseRepositoryHandler.url.setter
     def url(self, url):
         """Setter to the repository's URL."""
         if validate(url):

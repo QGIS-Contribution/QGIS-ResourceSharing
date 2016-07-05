@@ -368,6 +368,23 @@
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
+                  <widget class="QPushButton" name="button_open">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>Open</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="button_uninstall">
+                   <property name="text">
+                    <string>Uninstall</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <spacer name="horizontalSpacer_3">
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -381,19 +398,9 @@
                   </spacer>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="open_button">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
+                  <widget class="QPushButton" name="button_install">
                    <property name="text">
-                    <string>Open</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="download_button">
-                   <property name="text">
-                    <string>Download</string>
+                    <string>Install</string>
                    </property>
                   </widget>
                  </item>

@@ -495,11 +495,13 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 self._selected_collection_id][
                 'status'] == COLLECTION_INSTALLED_STATUS
             if is_installed:
-                self.button_install.setEnabled(False)
+                self.button_install.setEnabled(True)
+                self.button_install.setText('Reinstall')
                 self.button_open.setEnabled(True)
                 self.button_uninstall.setEnabled(True)
             else:
                 self.button_install.setEnabled(True)
+                self.button_install.setText('Install')
                 self.button_open.setEnabled(False)
                 self.button_uninstall.setEnabled(False)
 

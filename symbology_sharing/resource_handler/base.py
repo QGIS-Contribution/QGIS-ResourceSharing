@@ -46,12 +46,12 @@ class BaseResourceHandler(object):
         return resource_dir
 
     def install(self):
-        """Install all the resources in the collection."""
-        # Check if the dir exists, pass installing if it doesn't exist
+        """Install all the resources of this type in the collection."""
+        # Check if the dir exists, pass installing silently if it doesn't exist
         if not os.path.exists(self.resource_dir):
             return
 
     def uninstall(self):
-        """Uninstall all the resources in the collection."""
+        """Uninstall all the resources of this type in the collection."""
         raise NotImplementedError
 

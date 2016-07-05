@@ -77,7 +77,7 @@ class DownloadCollectionThread(QThread):
 
     def run(self):
         id = self._selected_collection_id
-        self.download_status, self.error_message = self._repository_manager.install_collection(id)
+        self.download_status, self.error_message = self._repository_manager.download_collection(id)
         self.download_finished.emit()
 
 

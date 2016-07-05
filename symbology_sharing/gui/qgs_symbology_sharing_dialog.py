@@ -210,7 +210,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         if not dlg.exec_():
             return
 
-        for repo in self.repository_manager.repositories.values():
+        for repo in self.repository_manager.directories.values():
             if dlg.line_edit_url.text().strip() == repo['url']:
                 self.message_bar.pushMessage(
                     self.tr(
@@ -220,7 +220,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         repo_name = dlg.line_edit_name.text()
         repo_url = dlg.line_edit_url.text().strip()
-        if repo_name in self.repository_manager.repositories:
+        if repo_name in self.repository_manager.directories:
             repo_name += '(2)'
 
         # Show progress dialog
@@ -266,15 +266,15 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         dlg = ManageRepositoryDialog(self)
         dlg.line_edit_name.setText(repo_name)
         dlg.line_edit_url.setText(
-            self.repository_manager.repositories[repo_name]['url'])
+            self.repository_manager.directories[repo_name]['url'])
 
         if not dlg.exec_():
             return
 
         # Check if the changed URL is already there in the repo
         new_url = dlg.line_edit_url.text().strip()
-        old_url = self.repository_manager.repositories[repo_name]['url']
-        for repo in self.repository_manager.repositories.values():
+        old_url = self.repository_manager.directories[repo_name]['url']
+        for repo in self.repository_manager.directories.values():
             if new_url == repo['url'] and (old_url != new_url):
                 self.message_bar.pushMessage(
                     self.tr(
@@ -283,7 +283,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 return
 
         new_name = dlg.line_edit_name.text()
-        if new_name in self.repository_manager.repositories and new_name != repo_name:
+        if new_name in self.repository_manager.directories and new_name != repo_name:
             new_name += '(2)'
 
         # Show progress dialog
@@ -328,7 +328,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Check if it's the approved online dir repository
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
-        if settings.value(repo_name + '/url') in self.repository_manager._online_directory.values():
+        if settings.value(repo_name + '/url') in self.repository_manager._online_directories.values():
             self.message_bar.pushMessage(
                 self.tr(
                     'You can not remove the official repository!'),
@@ -360,8 +360,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         # Show progress dialog
         self.show_progress_dialog("Reloading all repositories")
 
-        for repo_name in self.repository_manager.repositories:
-            url = self.repository_manager.repositories[repo_name]['url']
+        for repo_name in self.repository_manager.directories:
+            url = self.repository_manager.directories[repo_name]['url']
             try:
                 status, description = self.repository_manager.reload_repository(repo_name, url)
                 if status:
@@ -454,8 +454,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.tree_repositories.clear()
 
         # Export the updated ones from the repository manager
-        for repo_name in self.repository_manager.repositories:
-            url = self.repository_manager.repositories[repo_name]['url']
+        for repo_name in self.repository_manager.directories:
+            url = self.repository_manager.directories[repo_name]['url']
             item = QTreeWidgetItem(self.tree_repositories)
             item.setText(0, repo_name)
             item.setText(1, url)

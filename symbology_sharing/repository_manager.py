@@ -23,33 +23,33 @@ class RepositoryManager(QObject):
         """Constructor.
 
         ..note:
-        - Repositories is a list of repository that are registered in user's
-        QGIS. Data structure of repositories:
-        self._repositories = {
+        - Directories is a list of repository that are registered in user's
+        QGIS. Data structure of directories:
+        self._directories = {
             'QGIS Official Repository': 'git@github.com:anitagraser/QGIS-style-repo-dummy.git',
             'Akbar's Github Repository': 'git@github.com:akbargumbira/QGIS-style-repo-dummy.git',
             'Akbar's Bitbucket Repository': 'git@bitbucket.org:akbargumbira/qgis-style-repo-dummy.git'
         }
         """
         QObject.__init__(self)
-        self._online_directory = {}
-        self._repositories = {}
+        self._online_directories = {}
+        self._directories = {}
         self._collections_manager = CollectionsManager()
         # Fetch online dir
-        self.fetch_directory()
+        self.fetch_online_directories()
         # Load repositories from settings
         self.load()
         # Load collections from settings
         self._collections_manager.load()
 
     @property
-    def repositories(self):
+    def directories(self):
         """Property for repositories registered in settings.
 
         :returns: Dictionary of repositories registered
         :rtype: dict
         """
-        return self._repositories
+        return self._directories
 
     @property
     def collections_manager(self):
@@ -60,7 +60,7 @@ class RepositoryManager(QObject):
         """Get all the collections registered."""
         return self._collections_manager.collections
 
-    def fetch_directory(self):
+    def fetch_online_directories(self):
         """Fetch online directory of repositories."""
         downloader = NetworkManager(self.DIRECTORY_URL)
         status, _ = downloader.fetch()
@@ -73,31 +73,31 @@ class RepositoryManager(QObject):
             with open(directory_file.fileName()) as csv_file:
                 reader = csv.DictReader(csv_file, fieldnames=('name', 'url'))
                 for row in reader:
-                    self._online_directory[row['name']] = row['url'].strip()
+                    self._online_directories[row['name']] = row['url'].strip()
 
     def load(self):
         """Load repositories registered in settings."""
-        self._repositories = {}
+        self._directories = {}
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
 
         # Write online directory first to QSettings if needed
-        for online_dir_name in self._online_directory:
+        for online_dir_name in self._online_directories:
             repo_present = False
             for repo_name in settings.childGroups():
                 url = settings.value(repo_name + '/url', '', type=unicode)
-                if url == self._online_directory[online_dir_name]:
+                if url == self._online_directories[online_dir_name]:
                     repo_present = True
                     break
             if not repo_present:
                 self.add_repository(
-                    online_dir_name, self._online_directory[online_dir_name])
+                    online_dir_name, self._online_directories[online_dir_name])
 
         for repo_name in settings.childGroups():
-            self._repositories[repo_name] = {}
+            self._directories[repo_name] = {}
             url = settings.value(
                 repo_name + '/url', '', type=unicode)
-            self._repositories[repo_name]['url'] = url
+            self._directories[repo_name]['url'] = url
         settings.endGroup()
 
     def add_repository(self, repo_name, url):

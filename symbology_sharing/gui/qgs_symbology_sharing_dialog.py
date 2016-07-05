@@ -20,6 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os
 
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
@@ -396,8 +397,15 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def uninstall_collection(self):
         """Slot called when user clicks uninstall button."""
+        try:
+            self.repository_manager.uninstall_collection(self._selected_collection_id)
+        except Exception, e:
+            raise
+        self.reload_collections_model()
         QtGui.QMessageBox.information(
-            self, 'Symbology Sharing', 'Uninstall button clicked!')
+            self,
+            'Symbology Sharing',
+            'The collection is uninstalled succesfully!')
 
     def download_collection_done(self):
         """Slot for when the thread to download collection is finished."""
@@ -409,8 +417,6 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 self.repository_manager.install_collection(self._selected_collection_id)
             except Exception, e:
                 pass
-            self.repository_manager.collections[self._selected_collection_id][
-                'status'] = COLLECTION_INSTALLED_STATUS
             self.reload_collections_model()
             message = '%s is installed successfully' % (
                 self.repository_manager.collections[self._selected_collection_id]['name'])
@@ -428,7 +434,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def open_collection(self):
         """Slot for when user clicks 'Open' button."""
-        directory_url = QUrl.fromLocalFile(local_collection_path(self._selected_collection_id))
+        collection_path = local_collection_path(self._selected_collection_id)
+        directory_url = QUrl.fromLocalFile(collection_path)
         QDesktopServices.openUrl(directory_url)
 
     def reload_data_and_widget(self):

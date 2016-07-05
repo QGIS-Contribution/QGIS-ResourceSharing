@@ -1,13 +1,17 @@
 # coding=utf-8
 import csv
+import os
+import shutil
 
 from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
-from symbology_sharing.utilities import repo_settings_group
+from symbology_sharing.utilities import repo_settings_group, local_collection_path
 from symbology_sharing.repository_handler import BaseRepositoryHandler
 from symbology_sharing.resource_handler import BaseResourceHandler
 from symbology_sharing.network_manager import NetworkManager
 from symbology_sharing.collections_manager import CollectionsManager
+from symbology_sharing.collection import (
+    COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
 
 
 class RepositoryManager(QObject):
@@ -182,6 +186,19 @@ class RepositoryManager(QObject):
         for resource_handler in BaseResourceHandler.registry.values():
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.install()
+        self.collections[collection_id]['status'] = COLLECTION_INSTALLED_STATUS
+
+    def uninstall_collection(self, collection_id):
+        """Uninstall the collection from QGIS."""
+        # Remove the collection directory
+        collection_dir = local_collection_path(collection_id)
+        if os.path.exists(collection_dir):
+            shutil.rmtree(collection_dir)
+        # Uninstall all type of resources from QGIS
+        for resource_handler in BaseResourceHandler.registry.values():
+            resource_handler_instance = resource_handler(collection_id)
+            resource_handler_instance.uninstall()
+        self.collections[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS
 
     def get_repository_handler(self, url):
         """Get the right handler instance for given URL.

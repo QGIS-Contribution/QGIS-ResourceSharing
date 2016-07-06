@@ -228,7 +228,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Add repository
         try:
-            status, description = self.repository_manager.add_repository(
+            status, description = self.repository_manager.add_directory(
                 repo_name, repo_url)
             if status:
                 self.message_bar.pushMessage(
@@ -291,7 +291,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Edit repository
         try:
-            status, description = self.repository_manager.edit_repository(
+            status, description = self.repository_manager.edit_directory(
                 repo_name, new_name, new_url)
             if status:
                 self.message_bar.pushMessage(
@@ -346,7 +346,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             return
 
         # Remove repository
-        self.repository_manager.remove_repository(repo_name)
+        self.repository_manager.remove_directory(repo_name)
 
         # Reload data and widget
         self.reload_data_and_widget()
@@ -363,7 +363,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         for repo_name in self.repository_manager.directories:
             url = self.repository_manager.directories[repo_name]['url']
             try:
-                status, description = self.repository_manager.reload_repository(repo_name, url)
+                status, description = self.repository_manager.reload_directory(repo_name, url)
                 if status:
                     self.message_bar.pushMessage(
                         self.tr(
@@ -445,7 +445,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def reload_repositories_widget(self):
         """Refresh tree repositories using new repositories data."""
-        self.repository_manager.load()
+        self.repository_manager.load_directories()
         self.populate_repositories_widget()
 
     def populate_repositories_widget(self):

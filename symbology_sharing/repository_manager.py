@@ -32,19 +32,24 @@ class RepositoryManager(QObject):
         }
         """
         QObject.__init__(self)
+        # Online directories from the DIRECTORY_URL
         self._online_directories = {}
+        # Registered directories
         self._directories = {}
+
+        # Collection manager instance to deal with collections
         self._collections_manager = CollectionsManager()
-        # Fetch online dir
+        # Fetch online directories
         self.fetch_online_directories()
-        # Load repositories from settings
-        self.load()
+        # Load directory of repositories from settings
+        self.load_directories()
         # Load collections from settings
         self._collections_manager.load()
 
     @property
     def directories(self):
-        """Property for repositories registered in settings.
+        """Directories contains all the repositories (name and URL)
+        registered in setting.
 
         :returns: Dictionary of repositories registered
         :rtype: dict
@@ -75,8 +80,8 @@ class RepositoryManager(QObject):
                 for row in reader:
                     self._online_directories[row['name']] = row['url'].strip()
 
-    def load(self):
-        """Load repositories registered in settings."""
+    def load_directories(self):
+        """Load directories of repository registered in settings."""
         self._directories = {}
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
@@ -90,7 +95,7 @@ class RepositoryManager(QObject):
                     repo_present = True
                     break
             if not repo_present:
-                self.add_repository(
+                self.add_directory(
                     online_dir_name, self._online_directories[online_dir_name])
 
         for repo_name in settings.childGroups():
@@ -100,8 +105,11 @@ class RepositoryManager(QObject):
             self._directories[repo_name]['url'] = url
         settings.endGroup()
 
-    def add_repository(self, repo_name, url):
-        """Add repository to settings and add the collections from that repo.
+    def add_directory(self, repo_name, url):
+        """Add a directory to settings and add the collections from that repo.
+
+        :param repo_name: The name of the repository
+        :type repo_name: str
 
         :param url: The URL of the repository
         :type url: str
@@ -115,20 +123,19 @@ class RepositoryManager(QObject):
         if status:
             # Parse metadata
             collections = repo_handler.parse_metadata()
-            self._collections_manager.add_repo_collection(
-                repo_name, collections)
+            self._collections_manager.add_repo_collection(repo_name, collections)
             # Add to QSettings
             settings = QSettings()
             settings.beginGroup(repo_settings_group())
             settings.setValue(repo_name + '/url', url)
             settings.endGroup()
-            # Serialize collections every time we successfully added repo
+            # Serialize collections every time we successfully added a repo
             self._collections_manager.serialize()
 
         return status, description
 
-    def edit_repository(self, old_repo_name, new_repo_name, new_url):
-        """Edit repository and update the collections."""
+    def edit_directory(self, old_repo_name, new_repo_name, new_url):
+        """Edit a directory and update the collections."""
         # Fetch the metadata from the new url
         repo_handler = BaseRepositoryHandler.get_handler(new_url)
         if repo_handler is None:
@@ -149,12 +156,12 @@ class RepositoryManager(QObject):
             settings.remove(old_repo_name)
             settings.setValue(new_repo_name + '/url', new_url)
             settings.endGroup()
-            # Serialize collections every time we sucessfully edited repo
+            # Serialize collections every time we successfully edited repo
             self._collections_manager.serialize()
         return status, description
 
-    def remove_repository(self, old_repo_name):
-        """Remove repository and all the collections of that repository."""
+    def remove_directory(self, old_repo_name):
+        """Remove a directory and all the collections of that repository."""
         # Remove collections
         self._collections_manager.remove_repo_collection(old_repo_name)
         # Remove repo from QSettings
@@ -162,12 +169,12 @@ class RepositoryManager(QObject):
         settings.beginGroup(repo_settings_group())
         settings.remove(old_repo_name)
         settings.endGroup()
-        # Serialize collections every time sucessfully remove a repo
+        # Serialize collections every time successfully removed a repo
         self._collections_manager.serialize()
 
-    def reload_repository(self, repo_name, url):
-        """Re-fetch the repository and update the collections registry."""
-        status, description = self.edit_repository(repo_name, repo_name, url)
+    def reload_directory(self, repo_name, url):
+        """Re-fetch the directory and update the collections registry."""
+        status, description = self.edit_directory(repo_name, repo_name, url)
         return status, description
 
     def download_collection(self, collection_id):

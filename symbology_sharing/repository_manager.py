@@ -1,17 +1,12 @@
 # coding=utf-8
 import csv
-import os
-import shutil
 
 from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
-from symbology_sharing.utilities import repo_settings_group, local_collection_path
+from symbology_sharing.utilities import repo_settings_group
 from symbology_sharing.repository_handler import BaseRepositoryHandler
-from symbology_sharing.resource_handler import BaseResourceHandler
 from symbology_sharing.network_manager import NetworkManager
 from symbology_sharing.collections_manager import CollectionsManager
-from symbology_sharing.collection import (
-    COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
 
 
 class RepositoryManager(QObject):
@@ -135,7 +130,17 @@ class RepositoryManager(QObject):
         return status, description
 
     def edit_directory(self, old_repo_name, new_repo_name, new_url):
-        """Edit a directory and update the collections."""
+        """Edit a directory and update the collections.
+
+        :param old_repo_name: The old name of the repository
+        :type old_repo_name: str
+
+        :param new_repo_name: The new name of the repository
+        :type new_repo_name: str
+
+        :param new_url: The new URL of the repository
+        :type new_url: str
+        """
         # Fetch the metadata from the new url
         repo_handler = BaseRepositoryHandler.get_handler(new_url)
         if repo_handler is None:
@@ -161,7 +166,11 @@ class RepositoryManager(QObject):
         return status, description
 
     def remove_directory(self, old_repo_name):
-        """Remove a directory and all the collections of that repository."""
+        """Remove a directory and all the collections of that repository.
+
+        :param old_repo_name: The old name of the repository
+        :type old_repo_name: str
+        """
         # Remove collections
         self._collections_manager.remove_repo_collection(old_repo_name)
         # Remove repo from QSettings
@@ -173,36 +182,14 @@ class RepositoryManager(QObject):
         self._collections_manager.serialize()
 
     def reload_directory(self, repo_name, url):
-        """Re-fetch the directory and update the collections registry."""
+        """Re-fetch the directory and update the collections registry.
+
+        :param repo_name: The name of the repository
+        :type repo_name: str
+
+        :param url: The URL of the repository
+        :type url: str
+        """
+        # We're basically editing a directory with the same repo name
         status, description = self.edit_directory(repo_name, repo_name, url)
         return status, description
-
-    def download_collection(self, collection_id):
-        """Download collection given the id."""
-        repo_url = self.collections[collection_id]['repository_url']
-        repo_handler = BaseRepositoryHandler.get_handler(repo_url)
-        if repo_handler is None:
-            raise Exception('There is no handler available for the given URL!')
-        register_name = self.collections[collection_id]['register_name']
-        status, information = repo_handler.download_collection(
-            collection_id, register_name)
-        return status, information
-
-    def install_collection(self, collection_id):
-        """Install a collection."""
-        for resource_handler in BaseResourceHandler.registry.values():
-            resource_handler_instance = resource_handler(collection_id)
-            resource_handler_instance.install()
-        self.collections[collection_id]['status'] = COLLECTION_INSTALLED_STATUS
-
-    def uninstall_collection(self, collection_id):
-        """Uninstall the collection from QGIS."""
-        # Remove the collection directory
-        collection_dir = local_collection_path(collection_id)
-        if os.path.exists(collection_dir):
-            shutil.rmtree(collection_dir)
-        # Uninstall all type of resources from QGIS
-        for resource_handler in BaseResourceHandler.registry.values():
-            resource_handler_instance = resource_handler(collection_id)
-            resource_handler_instance.uninstall()
-        self.collections[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS

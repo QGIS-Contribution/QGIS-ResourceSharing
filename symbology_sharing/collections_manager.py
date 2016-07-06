@@ -2,10 +2,14 @@
 import hashlib
 import pickle
 import os
+import shutil
 
-from symbology_sharing.collection import COLLECTION_NOT_INSTALLED_STATUS
+from symbology_sharing.collection import (
+    COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
 from symbology_sharing.utilities import (
     collection_cache_path, local_collection_path)
+from symbology_sharing.repository_handler import BaseRepositoryHandler
+from symbology_sharing.resource_handler import BaseResourceHandler
 
 
 class CollectionsManager(object):
@@ -114,11 +118,11 @@ class CollectionsManager(object):
         self._repo_collections = repo_collections
         self.rebuild_collections()
 
-    def html(self, id):
-        """Return html of the metadata given the id.
+    def html(self, collection_id):
+        """Return the detail of a collection in HTML form given the id.
 
-        :param id: The id of the collection
-        :type id: str
+        :param collection_id: The id of the collection
+        :type collection_id: str
         """
         html = ''
         html += "<style>" \
@@ -131,12 +135,55 @@ class CollectionsManager(object):
                 "</style>"
         html += "<body>"
         html += "<table cellspacing=\"4\" width=\"100%\"><tr><td>"
-        html += "<h1>%s</h1>" % self.collections[id]['name']
-        html += "<h3>%s</h3><br/>" % self.collections[id]['description']
-        html += "URL: %s <br/></br>" % self.collections[id]['repository_url']
-        html += "Tags: %s <br/></br>" % self.collections[id]['tags']
-        html += "Author: %s <br/></br>" % self.collections[id]['author']
-        html += "E-mail: %s" % self.collections[id]['author_email']
+        html += "<h1>%s</h1>" % self.collections[collection_id]['name']
+        html += "<h3>%s</h3><br/>" % self.collections[collection_id]['description']
+        html += "URL: %s <br/></br>" % self.collections[collection_id]['repository_url']
+        html += "Tags: %s <br/></br>" % self.collections[collection_id]['tags']
+        html += "Author: %s <br/></br>" % self.collections[collection_id]['author']
+        html += "E-mail: %s" % self.collections[collection_id]['author_email']
         html += "</td></tr></table>"
         html += "</body>"
         return html
+
+    def download_collection(self, collection_id):
+        """Download a collection given the id.
+
+        :param collection_id: The id of the collection about to be downloaded.
+        :type collection_id: str
+        """
+        repo_url = self.collections[collection_id]['repository_url']
+        repo_handler = BaseRepositoryHandler.get_handler(repo_url)
+        if repo_handler is None:
+            raise Exception('There is no handler available for the given URL!')
+        register_name = self.collections[collection_id]['register_name']
+        status, information = repo_handler.download_collection(
+            collection_id, register_name)
+        return status, information
+
+    def install_collection(self, collection_id):
+        """Install a collection into QGIS.
+
+        :param collection_id: The id of the collection about to be installed.
+        :type collection_id: str
+        """
+        for resource_handler in BaseResourceHandler.registry.values():
+            resource_handler_instance = resource_handler(collection_id)
+            resource_handler_instance.install()
+        self.collections[collection_id]['status'] = COLLECTION_INSTALLED_STATUS
+
+    def uninstall_collection(self, collection_id):
+        """Uninstall the collection from QGIS.
+
+        :param collection_id: The id of the collection about to be uninstalled.
+        :type collection_id: str
+        """
+        # Remove the collection directory
+        collection_dir = local_collection_path(collection_id)
+        if os.path.exists(collection_dir):
+            shutil.rmtree(collection_dir)
+        # Uninstall all type of resources from QGIS
+        for resource_handler in BaseResourceHandler.registry.values():
+            resource_handler_instance = resource_handler(collection_id)
+            resource_handler_instance.uninstall()
+        self.collections[collection_id][
+            'status'] = COLLECTION_NOT_INSTALLED_STATUS

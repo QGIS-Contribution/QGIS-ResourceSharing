@@ -20,8 +20,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os
-
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
 from PyQt4.QtCore import (
@@ -66,7 +64,7 @@ class DownloadCollectionThread(QThread):
     def __init__(self, repository_manager, collection_id):
         QThread.__init__(self)
         self._repository_manager = repository_manager
-        self._selected_collection_id = collection_id
+        self._collection_id = collection_id
         self.download_status = False
         self.error_message = None
 
@@ -77,8 +75,7 @@ class DownloadCollectionThread(QThread):
         self.terminate()
 
     def run(self):
-        id = self._selected_collection_id
-        self.download_status, self.error_message = self._repository_manager.collections_manager.download_collection(id)
+        self.download_status, self.error_message = self._repository_manager.collections_manager.download_collection(self._collection_id)
         self.download_finished.emit()
 
 
@@ -533,7 +530,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def reject(self):
         """Slot when the dialog is closed."""
         # Serialize collections to settings
-        self.repository_manager.collections_manager.serialize()
+        self.repository_manager.serialize_repositories()
         self.done(0)
 
     def show_progress_dialog(self, text):

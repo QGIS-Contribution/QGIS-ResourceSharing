@@ -1,12 +1,16 @@
 # coding=utf-8
 import csv
+import os
+import pickle
 
 from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
-from symbology_sharing.utilities import repo_settings_group
+from symbology_sharing.utilities import (
+    repo_settings_group, local_collection_path, collection_cache_path)
 from symbology_sharing.repository_handler import BaseRepositoryHandler
 from symbology_sharing.network_manager import NetworkManager
 from symbology_sharing.collections_manager import CollectionsManager
+from symbology_sharing.collection import COLLECTION_NOT_INSTALLED_STATUS
 
 
 class RepositoryManager(QObject):
@@ -25,12 +29,33 @@ class RepositoryManager(QObject):
             'Akbar's Github Repository': 'git@github.com:akbargumbira/QGIS-style-repo-dummy.git',
             'Akbar's Bitbucket Repository': 'git@bitbucket.org:akbargumbira/qgis-style-repo-dummy.git'
         }
+
+        - Repositories is a dictionary of repository with all the collections
+        contained in that repository. Data structure of repositories:
+        self._repositories = {
+            repo_name: [{
+                'register_name': collection,
+                'author': author,
+                'author_email': email,
+                'repository_url': self.url,
+                'status': COLLECTION_NOT_INSTALLED_STATUS,
+                'name': parser.get(collection, 'name'),
+                'tags': parser.get(collection, 'tags'),
+                'description': parser.get(collection, 'description'),
+                'qgis_min_version': parser.get(collection, 'qgis_minimum_version'),
+                'qgis_max_version': parser.get(collection, 'qgis_maximum_version')
+            },
+            ....
+        }
+
         """
         QObject.__init__(self)
         # Online directories from the DIRECTORY_URL
         self._online_directories = {}
         # Registered directories
         self._directories = {}
+        # Registered repositories
+        self._repositories = {}
 
         # Collection manager instance to deal with collections
         self._collections_manager = CollectionsManager()
@@ -38,8 +63,8 @@ class RepositoryManager(QObject):
         self.fetch_online_directories()
         # Load directory of repositories from settings
         self.load_directories()
-        # Load collections from settings
-        self._collections_manager.load()
+        # Load repositories from settings
+        self.load_repositories()
 
     @property
     def directories(self):
@@ -118,14 +143,16 @@ class RepositoryManager(QObject):
         if status:
             # Parse metadata
             collections = repo_handler.parse_metadata()
-            self._collections_manager.add_repo_collection(repo_name, collections)
+            # Add the repo and the collections
+            self._repositories[repo_name] = collections
+            self.rebuild_collections()
             # Add to QSettings
             settings = QSettings()
             settings.beginGroup(repo_settings_group())
             settings.setValue(repo_name + '/url', url)
             settings.endGroup()
-            # Serialize collections every time we successfully added a repo
-            self._collections_manager.serialize()
+            # Serialize repositories every time we successfully added a repo
+            self.serialize_repositories()
 
         return status, description
 
@@ -150,19 +177,20 @@ class RepositoryManager(QObject):
         if status:
             # Parse metadata
             collections = repo_handler.parse_metadata()
-            # Remove old repo collections
-            self._collections_manager.remove_repo_collection(old_repo_name)
+            # Remove old repo and its collections
+            self._repositories.pop(old_repo_name, None)
+            self.rebuild_collections()
             # Add collections with the new repo name
-            self._collections_manager.add_repo_collection(
-                new_repo_name, collections)
+            self._repositories[new_repo_name] = collections
+            self.rebuild_collections()
             # Update QSettings
             settings = QSettings()
             settings.beginGroup(repo_settings_group())
             settings.remove(old_repo_name)
             settings.setValue(new_repo_name + '/url', new_url)
             settings.endGroup()
-            # Serialize collections every time we successfully edited repo
-            self._collections_manager.serialize()
+            # Serialize repositories every time we successfully edited repo
+            self.serialize_repositories()
         return status, description
 
     def remove_directory(self, old_repo_name):
@@ -171,15 +199,16 @@ class RepositoryManager(QObject):
         :param old_repo_name: The old name of the repository
         :type old_repo_name: str
         """
-        # Remove collections
-        self._collections_manager.remove_repo_collection(old_repo_name)
+        # Remove the repository
+        self._repositories.pop(old_repo_name, None)
+        self.rebuild_collections()
         # Remove repo from QSettings
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
         settings.remove(old_repo_name)
         settings.endGroup()
-        # Serialize collections every time successfully removed a repo
-        self._collections_manager.serialize()
+        # Serialize repositories every time successfully removed a repo
+        self.serialize_repositories()
 
     def reload_directory(self, repo_name, url):
         """Re-fetch the directory and update the collections registry.
@@ -193,3 +222,33 @@ class RepositoryManager(QObject):
         # We're basically editing a directory with the same repo name
         status, description = self.edit_directory(repo_name, repo_name, url)
         return status, description
+
+    def rebuild_collections(self):
+        """Rebuild collections from repositories."""
+        self.collections_manager.collections = {}
+        for repo in self._repositories.keys():
+            repo_collections = self._repositories[repo]
+            for collection in repo_collections:
+                collection_id = self.collections_manager.get_collection_id(
+                    collection['register_name'], collection['repository_url'])
+                self.collections_manager.collections[collection_id] = collection
+                # Check in the file system if the collection exists
+                if not os.path.exists(local_collection_path(collection_id)):
+                    self.collections_manager.collections[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS
+
+    def serialize_repositories(self):
+        """Save repositories to cache."""
+        if not os.path.exists(os.path.dirname(collection_cache_path())):
+            os.makedirs(os.path.dirname(collection_cache_path()))
+
+        with open(collection_cache_path(), 'wb') as f:
+            pickle.dump(self._repositories, f)
+
+    def load_repositories(self):
+        """Load repositories from cache and rebuild collections."""
+        repo_collections = {}
+        if os.path.exists(collection_cache_path()):
+            with open(collection_cache_path(), 'r') as f:
+                repo_collections = pickle.load(f)
+        self._repositories = repo_collections
+        self.rebuild_collections()

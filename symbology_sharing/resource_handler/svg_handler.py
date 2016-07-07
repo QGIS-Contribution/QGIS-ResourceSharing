@@ -36,5 +36,6 @@ class SVGResourceHandler(BaseResourceHandler):
         # Remove from the default path
         search_paths = QgsApplication.svgPaths()
         unique_search_paths = list(set(search_paths))
-        unique_search_paths.remove(self.resource_dir)
+        if self.resource_dir in unique_search_paths:
+            unique_search_paths.remove(self.resource_dir)
         QgsApplication.setDefaultSvgPaths(unique_search_paths)

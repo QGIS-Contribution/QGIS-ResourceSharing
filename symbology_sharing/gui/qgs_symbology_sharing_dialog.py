@@ -20,8 +20,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os
-
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
 from PyQt4.QtCore import (
@@ -66,7 +64,7 @@ class DownloadCollectionThread(QThread):
     def __init__(self, repository_manager, collection_id):
         QThread.__init__(self)
         self._repository_manager = repository_manager
-        self._selected_collection_id = collection_id
+        self._collection_id = collection_id
         self.download_status = False
         self.error_message = None
 
@@ -77,8 +75,7 @@ class DownloadCollectionThread(QThread):
         self.terminate()
 
     def run(self):
-        id = self._selected_collection_id
-        self.download_status, self.error_message = self._repository_manager.download_collection(id)
+        self.download_status, self.error_message = self._repository_manager.collections_manager.download_collection(self._collection_id)
         self.download_finished.emit()
 
 
@@ -228,7 +225,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Add repository
         try:
-            status, description = self.repository_manager.add_repository(
+            status, description = self.repository_manager.add_directory(
                 repo_name, repo_url)
             if status:
                 self.message_bar.pushMessage(
@@ -291,7 +288,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Edit repository
         try:
-            status, description = self.repository_manager.edit_repository(
+            status, description = self.repository_manager.edit_directory(
                 repo_name, new_name, new_url)
             if status:
                 self.message_bar.pushMessage(
@@ -346,7 +343,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             return
 
         # Remove repository
-        self.repository_manager.remove_repository(repo_name)
+        self.repository_manager.remove_directory(repo_name)
 
         # Reload data and widget
         self.reload_data_and_widget()
@@ -363,7 +360,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         for repo_name in self.repository_manager.directories:
             url = self.repository_manager.directories[repo_name]['url']
             try:
-                status, description = self.repository_manager.reload_repository(repo_name, url)
+                status, description = self.repository_manager.reload_directory(repo_name, url)
                 if status:
                     self.message_bar.pushMessage(
                         self.tr(
@@ -398,7 +395,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def uninstall_collection(self):
         """Slot called when user clicks uninstall button."""
         try:
-            self.repository_manager.uninstall_collection(self._selected_collection_id)
+            self.repository_manager.collections_manager.uninstall_collection(
+                self._selected_collection_id)
         except Exception, e:
             raise
         self.reload_collections_model()
@@ -414,7 +412,8 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             # Install the collection
             self.show_progress_dialog('Installing the collection.')
             try:
-                self.repository_manager.install_collection(self._selected_collection_id)
+                self.repository_manager.collections_manager.install_collection(
+                    self._selected_collection_id)
             except Exception, e:
                 pass
             self.reload_collections_model()
@@ -445,7 +444,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def reload_repositories_widget(self):
         """Refresh tree repositories using new repositories data."""
-        self.repository_manager.load()
+        self.repository_manager.load_directories()
         self.populate_repositories_widget()
 
     def populate_repositories_widget(self):
@@ -531,7 +530,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def reject(self):
         """Slot when the dialog is closed."""
         # Serialize collections to settings
-        self.repository_manager.collections_manager.serialize()
+        self.repository_manager.serialize_repositories()
         self.done(0)
 
     def show_progress_dialog(self, text):

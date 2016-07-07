@@ -43,12 +43,12 @@ def repo_settings_group():
     return '/SymbologySharing/repository'
 
 
-def collection_cache_path():
-    """Get the path to the collection cache."""
+def repositories_cache_path():
+    """Get the path to the repositories cache."""
     return os.path.join(
         QgsApplication.qgisSettingsDirPath(),
         'symbology_sharing',
-        'collections_cache')
+        'repositories_cache')
 
 
 def local_collection_path(id=None):

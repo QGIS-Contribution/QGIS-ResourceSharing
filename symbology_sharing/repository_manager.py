@@ -6,7 +6,7 @@ import pickle
 from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
 from symbology_sharing.utilities import (
-    repo_settings_group, local_collection_path, collection_cache_path)
+    repo_settings_group, local_collection_path, repositories_cache_path)
 from symbology_sharing.repository_handler import BaseRepositoryHandler
 from symbology_sharing.network_manager import NetworkManager
 from symbology_sharing.collections_manager import CollectionsManager
@@ -63,7 +63,7 @@ class RepositoryManager(QObject):
         self.fetch_online_directories()
         # Load directory of repositories from settings
         self.load_directories()
-        # Load repositories from settings
+        # Load repositories from cache
         self.load_repositories()
 
     @property
@@ -238,17 +238,17 @@ class RepositoryManager(QObject):
 
     def serialize_repositories(self):
         """Save repositories to cache."""
-        if not os.path.exists(os.path.dirname(collection_cache_path())):
-            os.makedirs(os.path.dirname(collection_cache_path()))
+        if not os.path.exists(os.path.dirname(repositories_cache_path())):
+            os.makedirs(os.path.dirname(repositories_cache_path()))
 
-        with open(collection_cache_path(), 'wb') as f:
+        with open(repositories_cache_path(), 'wb') as f:
             pickle.dump(self._repositories, f)
 
     def load_repositories(self):
         """Load repositories from cache and rebuild collections."""
         repo_collections = {}
-        if os.path.exists(collection_cache_path()):
-            with open(collection_cache_path(), 'r') as f:
+        if os.path.exists(repositories_cache_path()):
+            with open(repositories_cache_path(), 'r') as f:
                 repo_collections = pickle.load(f)
         self._repositories = repo_collections
         self.rebuild_collections()

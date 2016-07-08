@@ -17,39 +17,41 @@ REPOSITORY, a set of collections, described by metadata.ini
 COLLECTION, a set of QGIS resources
 
 
-Example repository DIRECTORY file:
-git@github.com/anitagraser/QGIS-style-repo-dummy.git # Official repo
-git@github.com:qgis/QGIS.git # My Amazing repo
-http://www.repo.com/repo1 # Repository title
-ftp://ftp.repo.cmo/repo1  # Title of this FTP repo
-scp://user@server:/fany_repo # SSH repo
-...
+Example repository DIRECTORY file::
 
-Or, CSV:
-git@github.com/anitagraser/QGIS-style-repo-dummy.git,Official repository
-http://www.repo.com/repo1,Repository title
+    git@github.com/anitagraser/QGIS-style-repo-dummy.git # Official repo
+    git@github.com:qgis/QGIS.git # My Amazing repo
+    http://www.repo.com/repo1 # Repository title
+    ftp://ftp.repo.cmo/repo1  # Title of this FTP repo
+    scp://user@server:/fany_repo # SSH repo
+    ...
+
+Or, CSV::
+
+    git@github.com/anitagraser/QGIS-style-repo-dummy.git,Official repository
+    http://www.repo.com/repo1,Repository title
 
 
-Example metadata.ini:
+Example metadata.ini::
 
-[general]
-author=Anita Graser
-email=anitagraser@gmx.at
-collections=collection_1, collection_2
+    [general]
+    author=Anita Graser
+    email=anitagraser@gmx.at
+    collections=collection_1, collection_2
 
-[collection_1]
-name=OSM Spatialite Googlemaps
-tags=osm, spatialite, google maps, roads
-description=The collection contains a complete resources to create a coherent map that looks similar to the old Google Maps style from OSM data in a SpatiaLite database
-qgis_minimum_version=2.0
-qgis_maximum_version=2.99
+    [collection_1]
+    name=OSM Spatialite Googlemaps
+    tags=osm, spatialite, google maps, roads
+    description=The collection contains a complete resources to create a coherent map that looks similar to the old Google Maps style from OSM data in a SpatiaLite database
+    qgis_minimum_version=2.0
+    qgis_maximum_version=2.99
 
-[collection_2]
-name=OSM Spatialite Googlemaps 2
-tags=osm, spatialite, google maps, roads
-description=The collection 2 contains a complete resources to create a coherent map that looks similar to the old Google Maps style from OSM data in a SpatiaLite database
-qgis_minimum_version=2.0
-qgis_maximum_version=2.99
+    [collection_2]
+    name=OSM Spatialite Googlemaps 2
+    tags=osm, spatialite, google maps, roads
+    description=The collection 2 contains a complete resources to create a coherent map that looks similar to the old Google Maps style from OSM data in a SpatiaLite database
+    qgis_minimum_version=2.0
+    qgis_maximum_version=2.99
 
 
 
@@ -107,3 +109,66 @@ Collection removal
 #. remove the path from SVG paths setting
 #. remove all tagged symbols
 #. find the empty group starting with the same name of the collection and delete it
+
+
+
+
+Conversation Ale-Akbar from 08/07/2016
+.......................................
+
+We discussed again how to import SVGs and symbols:
+
+SVGs
+----
+
+Now saved in ``/home/user/.qgis2/symbology_sharing/collections/6d38d61abd52a05495dfd3189b04900a3cc73c36/svg/`
+
+Problem: in the GUI SVG selector tree all collections appear under "User Symbols"
+Solution: move all the symbology sharing related collections outside `.qgis2` (in the parent folder)
+
+Problem: in the GUI SVG selector tree all collections appear with the hash `6d38d61abd52a05495dfd3189b04900a3cc73c36`
+Solution: the only purpose of the hash is to avoid collection name collisions, we can change the folder name to be the name of the collection followed by the hash in brackets, like::
+
+    /home/ale/.qgis2/symbology_sharing
+    ├── collections
+    │   ├── King's Landing (6d38d61abd52a05495dfd3189b04900a3cc73c36)
+    │   │   ├── colorramp
+    │   │   │   └── rainbows.xml
+    │   │   ├── image
+    │   │   │   └── QGis_Logo.png
+    │   │   ├── license
+    │   │   ├── preview
+    │   │   │   ├── osm_spatialite_googlemaps_lines.qml.png
+    │   │   │   └── osm_spatialite_googlemaps.png
+    │   │   ├── style
+    │   │   │   ├── osm_spatialite_googlemaps_lines.qml
+    │   │   │   ├── osm_spatialite_googlemaps_multipolygon.qml
+    │   │   │   └── osm_spatialite_googlemaps_places.qml
+    │   │   ├── svg
+    │   │   │   └── Blank_shield.svg
+    │   │   └── symbol
+    │   │       ├── osm_symbols.xml
+    │   │       ├── symbol_collection_svg.xml
+    │   │       ├── symbol_qgisdefault_svg.xml
+    │   │       └── symbol_rasterimagefill.xml
+    │   └── Westeros (ed86f2b4406dbd2c9afce1da12436836a89d3a5b)
+    │       └── license
+
+
+Symbols
+-------
+
+Problem: The symbol import from XML GUI in QGIS does not seem to work!
+
+TODO:
+* check if the bug is reported in the hub
+* try to make a python test case using the API
+* try to fix it
+
+Problem: symbols names must be unique
+
+TODO:
+* check why it is like that (ask to qgis-dev list and Martin and Nyall)
+* what if the constraint is removed upstream?
+* what if the symbol search is done first using the name **and** the group and then (if nothing was found) by using the name alone?
+* other option: ask the user what to do (rename the imported || rename the old one || overwrite the old one)

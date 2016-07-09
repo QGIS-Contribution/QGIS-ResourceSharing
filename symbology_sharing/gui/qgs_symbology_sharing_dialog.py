@@ -77,7 +77,7 @@ class DownloadCollectionThread(QThread):
         self.terminate()
 
     def run(self):
-        self.download_status, self.error_message = self._collection_manager.download_collection(self._collection_id)
+        self.download_status, self.error_message = self._collection_manager.download(self._collection_id)
         self.download_finished.emit()
 
 
@@ -398,7 +398,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def uninstall_collection(self):
         """Slot called when user clicks uninstall button."""
         try:
-            self.collection_manager.uninstall_collection(self._selected_collection_id)
+            self.collection_manager.uninstall(self._selected_collection_id)
         except Exception, e:
             raise
         self.reload_collections_model()
@@ -414,7 +414,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             # Install the collection
             self.show_progress_dialog('Installing the collection.')
             try:
-                self.collection_manager.install_collection(self._selected_collection_id)
+                self.collection_manager.install(self._selected_collection_id)
             except Exception, e:
                 pass
             self.reload_collections_model()
@@ -523,7 +523,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def show_collection_metadata(self, id):
         """Show the collection metadata given the id."""
-        html = self.collection_manager.html(id)
+        html = self.collection_manager.get_html(id)
         self.web_view_details.setHtml(html)
 
     def reject(self):

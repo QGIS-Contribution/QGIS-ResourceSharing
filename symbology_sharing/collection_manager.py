@@ -21,7 +21,7 @@ class CollectionManager(object):
         hex_dig = hash_object.hexdigest()
         return hex_dig
 
-    def html(self, collection_id):
+    def get_html(self, collection_id):
         """Return the detail of a collection in HTML form given the id.
 
         :param collection_id: The id of the collection
@@ -48,7 +48,7 @@ class CollectionManager(object):
         html += "</body>"
         return html
 
-    def download_collection(self, collection_id):
+    def download(self, collection_id):
         """Download a collection given the id.
 
         :param collection_id: The id of the collection about to be downloaded.
@@ -63,7 +63,7 @@ class CollectionManager(object):
             collection_id, register_name)
         return status, information
 
-    def install_collection(self, collection_id):
+    def install(self, collection_id):
         """Install a collection into QGIS.
 
         :param collection_id: The id of the collection about to be installed.
@@ -74,7 +74,7 @@ class CollectionManager(object):
             resource_handler_instance.install()
         config.COLLECTIONS[collection_id]['status'] = COLLECTION_INSTALLED_STATUS
 
-    def uninstall_collection(self, collection_id):
+    def uninstall(self, collection_id):
         """Uninstall the collection from QGIS.
 
         :param collection_id: The id of the collection about to be uninstalled.

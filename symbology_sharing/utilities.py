@@ -1,7 +1,10 @@
 # coding=utf-8
 import os
 
+from PyQt4.QtCore import QDir
 from qgis.core import QgsApplication
+
+from symbology_sharing import config
 
 
 def resources_path(*args):
@@ -57,9 +60,11 @@ def local_collection_path(id=None):
     If id is not passed, it will just return the root dir of the collections.
     """
     path = os.path.join(
-        QgsApplication.qgisSettingsDirPath(),
-        'symbology_sharing',
-        'collections')
+        QDir.homePath(),
+        'QGIS',
+        'Symbology Manager')
     if id:
-        path = os.path.join(path, id)
+        collection_name = config.COLLECTIONS[id]['name']
+        dir_name = '%s (%s)' % (collection_name, id)
+        path = os.path.join(path, dir_name)
     return path

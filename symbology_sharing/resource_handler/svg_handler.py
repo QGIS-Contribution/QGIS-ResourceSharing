@@ -1,8 +1,10 @@
 # coding=utf-8
+import os
+
 from PyQt4.QtCore import QSettings
-from qgis.core import QgsApplication
 
 from symbology_sharing.resource_handler.base import BaseResourceHandler
+from symbology_sharing.utilities import local_collection_path
 
 
 class SVGResourceHandler(BaseResourceHandler):
@@ -20,8 +22,8 @@ class SVGResourceHandler(BaseResourceHandler):
     def install(self):
         """Install the SVGs from this collection in to QGIS.
 
-        We simply just add the path to the SVG of this collection to the SVG
-        search path in QGIS.
+        We simply just add the path to the collection root directory to search
+        path in QGIS.
         """
         # Call parent method first
         super(SVGResourceHandler, self).install()
@@ -32,19 +34,24 @@ class SVGResourceHandler(BaseResourceHandler):
             search_paths = []
         else:
             search_paths = search_paths_str.split('|')
-        if self.resource_dir not in search_paths:
-            search_paths.append(self.resource_dir)
+
+        if local_collection_path() not in search_paths:
+            search_paths.append(local_collection_path())
+
         settings.setValue('svg/searchPathsForSVG', '|'.join(search_paths))
 
     def uninstall(self):
         """Uninstall the SVGs from QGIS."""
-        # Remove from the searchPaths for SVG
+        # Remove from the searchPaths if the dir empty of collection
         settings = QSettings()
         search_paths_str = settings.value('svg/searchPathsForSVG')
         if not search_paths_str:
             search_paths = []
         else:
             search_paths = search_paths_str.split('|')
-        if self.resource_dir in search_paths:
-            search_paths.remove(self.resource_dir)
+
+        collection_directories = os.listdir(local_collection_path())
+        if len(collection_directories) == 0:
+            search_paths.remove(local_collection_path())
+
         settings.setValue('svg/searchPathsForSVG', '|'.join(search_paths))

@@ -2,7 +2,7 @@
 from qgis.testing import start_app, unittest
 import nose2
 
-from symbology_sharing.collections_manager import CollectionsManager
+from symbology_sharing.collection_manager import CollectionManager
 
 
 class TestCollections(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestCollections(unittest.TestCase):
 
     def test_get_collection_id(self):
         """Testing get_collection_id."""
-        collections_manager = CollectionsManager()
+        collections_manager = CollectionManager()
         collection_name = 'Westeros Map'
         repository_url = 'https://github.com/john.doe/my_map'
         collection_id = collections_manager.get_collection_id(

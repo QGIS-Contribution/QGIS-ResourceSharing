@@ -11,7 +11,7 @@ from ConfigParser import SafeConfigParser
 
 from PyQt4.QtCore import QTemporaryFile
 
-from symbology_sharing.collection import COLLECTION_NOT_INSTALLED_STATUS
+from symbology_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
 
 
 class RepositoryHandlerMeta(type):

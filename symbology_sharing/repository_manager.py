@@ -9,8 +9,9 @@ from symbology_sharing.utilities import (
     repo_settings_group, local_collection_path, repositories_cache_path)
 from symbology_sharing.repository_handler import BaseRepositoryHandler
 from symbology_sharing.network_manager import NetworkManager
-from symbology_sharing.collections_manager import CollectionsManager
-from symbology_sharing.collection import COLLECTION_NOT_INSTALLED_STATUS
+from symbology_sharing.collection_manager import CollectionManager
+from symbology_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
+from symbology_sharing import config
 
 
 class RepositoryManager(QObject):
@@ -58,7 +59,7 @@ class RepositoryManager(QObject):
         self._repositories = {}
 
         # Collection manager instance to deal with collections
-        self._collections_manager = CollectionsManager()
+        self._collections_manager = CollectionManager()
         # Fetch online directories
         self.fetch_online_directories()
         # Load directory of repositories from settings
@@ -75,15 +76,6 @@ class RepositoryManager(QObject):
         :rtype: dict
         """
         return self._directories
-
-    @property
-    def collections_manager(self):
-        return self._collections_manager
-
-    @property
-    def collections(self):
-        """Get all the collections registered."""
-        return self._collections_manager.collections
 
     def fetch_online_directories(self):
         """Fetch online directory of repositories."""
@@ -225,16 +217,15 @@ class RepositoryManager(QObject):
 
     def rebuild_collections(self):
         """Rebuild collections from repositories."""
-        self.collections_manager.collections = {}
+        config.COLLECTIONS = {}
         for repo in self._repositories.keys():
             repo_collections = self._repositories[repo]
             for collection in repo_collections:
-                collection_id = self.collections_manager.get_collection_id(
-                    collection['register_name'], collection['repository_url'])
-                self.collections_manager.collections[collection_id] = collection
+                collection_id = self._collections_manager.get_collection_id(collection['register_name'], collection['repository_url'])
+                config.COLLECTIONS[collection_id] = collection
                 # Check in the file system if the collection exists
                 if not os.path.exists(local_collection_path(collection_id)):
-                    self.collections_manager.collections[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS
+                    config.COLLECTIONS[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS
 
     def serialize_repositories(self):
         """Save repositories to cache."""

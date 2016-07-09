@@ -39,6 +39,7 @@ from qgis.gui import QgsMessageBar
 
 from symbology_sharing.gui.manage_dialog import ManageRepositoryDialog
 from symbology_sharing.repository_manager import RepositoryManager
+from symbology_sharing.collection_manager import CollectionManager
 from symbology_sharing.utilities import (
     resources_path, ui_path, repo_settings_group, local_collection_path)
 from symbology_sharing.gui.custom_sort_filter_proxy import (
@@ -50,9 +51,10 @@ from symbology_sharing.gui.custom_sort_filter_proxy import (
     COLLECTION_ID_ROLE,
     COLLECTION_STATUS_ROLE
 )
-from symbology_sharing.collection import (
+from symbology_sharing.config import (
     COLLECTION_ALL_STATUS,
     COLLECTION_INSTALLED_STATUS)
+from symbology_sharing import config
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('qgs_symbology_sharing_dialog_base.ui'))
 
@@ -61,9 +63,9 @@ class DownloadCollectionThread(QThread):
     download_finished = pyqtSignal()
     download_canceled = pyqtSignal()
 
-    def __init__(self, repository_manager, collection_id):
+    def __init__(self, collection_manager, collection_id):
         QThread.__init__(self)
-        self._repository_manager = repository_manager
+        self._collection_manager = collection_manager
         self._collection_id = collection_id
         self.download_status = False
         self.error_message = None
@@ -75,7 +77,7 @@ class DownloadCollectionThread(QThread):
         self.terminate()
 
     def run(self):
-        self.download_status, self.error_message = self._repository_manager.collections_manager.download_collection(self._collection_id)
+        self.download_status, self.error_message = self._collection_manager.download(self._collection_id)
         self.download_finished.emit()
 
 
@@ -154,6 +156,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
         # Init repository manager
         self.repository_manager = RepositoryManager()
+        self.collection_manager = CollectionManager()
         # Collections list view
         self.collections_model = QStandardItemModel(0, 1)
         self.collections_model.sort(0, Qt.AscendingOrder)
@@ -385,7 +388,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         """Slot for when user clicks download button."""
         self.show_progress_dialog("Downloading the collection")
         self.download_thread = DownloadCollectionThread(
-            self.repository_manager, self._selected_collection_id)
+            self.collection_manager, self._selected_collection_id)
         self.download_thread.download_finished.connect(
             self.download_collection_done)
         self.progress_dialog.canceled.connect(
@@ -395,8 +398,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def uninstall_collection(self):
         """Slot called when user clicks uninstall button."""
         try:
-            self.repository_manager.collections_manager.uninstall_collection(
-                self._selected_collection_id)
+            self.collection_manager.uninstall(self._selected_collection_id)
         except Exception, e:
             raise
         self.reload_collections_model()
@@ -412,13 +414,12 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             # Install the collection
             self.show_progress_dialog('Installing the collection.')
             try:
-                self.repository_manager.collections_manager.install_collection(
-                    self._selected_collection_id)
+                self.collection_manager.install(self._selected_collection_id)
             except Exception, e:
                 pass
             self.reload_collections_model()
             message = '%s is installed successfully' % (
-                self.repository_manager.collections[self._selected_collection_id]['name'])
+                config.COLLECTIONS[self._selected_collection_id]['name'])
             self.progress_dialog.hide()
         else:
             message = self.download_thread.error_message
@@ -465,12 +466,12 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def reload_collections_model(self):
         """Reload the collections model with the current collections."""
         self.collections_model.clear()
-        for id in self.repository_manager.collections:
-            collection_name = self.repository_manager.collections[id]['name']
-            collection_author = self.repository_manager.collections[id]['author']
-            collection_tags = self.repository_manager.collections[id]['tags']
-            collection_description = self.repository_manager.collections[id]['description']
-            collection_status = self.repository_manager.collections[id]['status']
+        for id in config.COLLECTIONS:
+            collection_name = config.COLLECTIONS[id]['name']
+            collection_author = config.COLLECTIONS[id]['author']
+            collection_tags = config.COLLECTIONS[id]['tags']
+            collection_description = config.COLLECTIONS[id]['description']
+            collection_status = config.COLLECTIONS[id]['status']
             item = QStandardItem(collection_name)
             item.setEditable(False)
             item.setData(id, COLLECTION_ID_ROLE)
@@ -497,9 +498,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self._selected_collection_id = collection_id
 
             # Enable/disable button
-            is_installed = self.repository_manager.collections[
-                self._selected_collection_id][
-                'status'] == COLLECTION_INSTALLED_STATUS
+            is_installed = config.COLLECTIONS[self._selected_collection_id]['status'] == COLLECTION_INSTALLED_STATUS
             if is_installed:
                 self.button_install.setEnabled(True)
                 self.button_install.setText('Reinstall')
@@ -524,7 +523,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def show_collection_metadata(self, id):
         """Show the collection metadata given the id."""
-        html = self.repository_manager.collections_manager.html(id)
+        html = self.collection_manager.get_html(id)
         self.web_view_details.setHtml(html)
 
     def reject(self):

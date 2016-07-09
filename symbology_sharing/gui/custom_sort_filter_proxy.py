@@ -2,7 +2,7 @@
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QSortFilterProxyModel
 
-from symbology_sharing.collection import COLLECTION_INSTALLED_STATUS
+from symbology_sharing.config import COLLECTION_INSTALLED_STATUS
 
 COLLECTION_NAME_ROLE = Qt.UserRole + 1
 COLLECTION_DESCRIPTION_ROLE = Qt.UserRole + 2

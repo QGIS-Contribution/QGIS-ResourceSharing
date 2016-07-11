@@ -84,7 +84,7 @@ class SymbolXMLExtractor():
         colorramps = [
             {
                 'name': str
-                'colorramp': QgsVectorColorRampV3
+                'colorramp': QgsVectorColorRampV2
             }
         ]
         """

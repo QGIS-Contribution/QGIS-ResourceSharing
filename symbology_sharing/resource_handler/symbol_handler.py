@@ -42,30 +42,33 @@ class SymbolResourceHandler(BaseResourceHandler):
             file_path = os.path.join(self.resource_dir, item)
             if fnmatch.fnmatch(file_path, '*.xml'):
                 symbol_files.append(file_path)
+
         # If there's no symbol files don't do anything
-        if len(symbol_files) != 0:
-            parent_group_name = '%s (%s)' % (
-                self.collection['name'], self.collection_id)
-            group_id = self.style.addGroup(parent_group_name)
+        if len(symbol_files) == 0:
+            return
 
-            for symbol_file in symbol_files:
-                file_name = os.path.splitext(os.path.basename(symbol_file))[0]
-                child_id = self.style.addGroup(file_name, group_id)
-                # Add all symbols and colorramps and group it
-                symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
+        parent_group_name = '%s (%s)' % (
+            self.collection['name'], self.collection_id)
+        group_id = self.style.addGroup(parent_group_name)
 
-                for symbol in symbol_xml_extractor.symbols:
-                    symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
-                    if self.style.addSymbol(symbol_name, symbol['symbol'], True):
-                        self.style.group(
-                            QgsStyleV2.SymbolEntity, symbol_name, child_id)
+        for symbol_file in symbol_files:
+            file_name = os.path.splitext(os.path.basename(symbol_file))[0]
+            child_id = self.style.addGroup(file_name, group_id)
+            # Add all symbols and colorramps and group it
+            symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
 
-                for colorramp in symbol_xml_extractor.colorramps:
-                    colorramp_name = '%s (%s)' % (colorramp['name'], self.collection_id)
-                    if self.style.addColorRamp(
-                            colorramp_name, colorramp['colorramp'], True):
-                        self.style.group(
-                            QgsStyleV2.ColorrampEntity, colorramp_name, child_id)
+            for symbol in symbol_xml_extractor.symbols:
+                symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
+                if self.style.addSymbol(symbol_name, symbol['symbol'], True):
+                    self.style.group(
+                        QgsStyleV2.SymbolEntity, symbol_name, child_id)
+
+            for colorramp in symbol_xml_extractor.colorramps:
+                colorramp_name = '%s (%s)' % (colorramp['name'], self.collection_id)
+                if self.style.addColorRamp(
+                        colorramp_name, colorramp['colorramp'], True):
+                    self.style.group(
+                        QgsStyleV2.ColorrampEntity, colorramp_name, child_id)
 
     def uninstall(self):
         """Uninstall the symbols from QGIS."""

@@ -1,6 +1,129 @@
 Implementation addendum
 -----------------------
 
+
+Conversation Ale-Akbar from 11/07/2016
+.......................................
+
+
+We discussed again how to import SVGs and symbols and some problems:
+
+1. what to do with SVG paths stored in styles or symbols XMLs when they contain wrong relative paths
+2. how to deal with duplicated symbol names
+3. how to import symbols XML and group them at the same time
+
+1. we decided to do some post-import processing with the XMLs to rewrite the wrong
+   paths to add the name (with hash) of the collection, so that the rewrite will be, for example:
+
+from::
+
+    <prop k="name" v="../../my_svg_path/svg/transport_fuel.svg"/>
+
+to::
+
+    <prop k="name" v="Collection 1 (6d38d61abd52a05495dfd3189b04)/svg/transport_fuel.svg"/>
+
+
+2. Akbar had the good idea of adding the collection hash to all symbol names, this
+   will avoid name collisions and solve the 3. at the same time because we could
+   easily group the symbols querying for the hash in the name
+
+
+
+
+Conversation Ale-Akbar from 08/07/2016
+.......................................
+
+We discussed again how to import SVGs and symbols:
+
+SVGs
+----
+
+Now saved in ``/home/user/.qgis2/symbology_sharing/collections/6d38d61abd52a05495dfd3189b04900a3cc73c36/svg/`
+
+Problem: in the GUI SVG selector tree all collections appear under "User Symbols"
+Solution: move all the symbology sharing related collections outside `.qgis2` (in the parent folder)
+
+Problem: in the GUI SVG selector tree all collections appear with the hash `6d38d61abd52a05495dfd3189b04900a3cc73c36`
+Solution: the only purpose of the hash is to avoid collection name collisions, we can change the folder name to be the name of the collection followed by the hash in brackets, like::
+
+    /home/ale/.qgis2/symbology_sharing
+    ├── collections
+    │   ├── King's Landing (6d38d61abd52a05495dfd3189b04900a3cc73c36)
+    │   │   ├── colorramp
+    │   │   │   └── rainbows.xml
+    │   │   ├── image
+    │   │   │   └── QGis_Logo.png
+    │   │   ├── license
+    │   │   ├── preview
+    │   │   │   ├── osm_spatialite_googlemaps_lines.qml.png
+    │   │   │   └── osm_spatialite_googlemaps.png
+    │   │   ├── style
+    │   │   │   ├── osm_spatialite_googlemaps_lines.qml
+    │   │   │   ├── osm_spatialite_googlemaps_multipolygon.qml
+    │   │   │   └── osm_spatialite_googlemaps_places.qml
+    │   │   ├── svg
+    │   │   │   └── Blank_shield.svg
+    │   │   └── symbol
+    │   │       ├── osm_symbols.xml
+    │   │       ├── symbol_collection_svg.xml
+    │   │       ├── symbol_qgisdefault_svg.xml
+    │   │       └── symbol_rasterimagefill.xml
+    │   └── Westeros (ed86f2b4406dbd2c9afce1da12436836a89d3a5b)
+    │       └── license
+
+
+Symbols
+-------
+
+Problem: The symbol import from XML GUI in QGIS does not seem to work!
+
+TODO:
+* check if the bug is reported in the hub
+* try to make a python test case using the API
+* try to fix it
+
+Problem: symbols names must be unique
+
+TODO:
+* check why it is like that (ask to qgis-dev list and Martin and Nyall)
+* what if the constraint is removed upstream?
+* what if the symbol search is done first using the name **and** the group and then (if nothing was found) by using the name alone?
+* other option: ask the user what to do (rename the imported || rename the old one || overwrite the old one)
+
+
+Conversation Ale-Akbar from 01/07/2016
+.......................................
+
+
+We discussed how to import SVGs and symbols:
+
+SVGs
+----
+
+Add the SVG path to the settings as QgsApplication does
+
+QString myPaths = settings.value( "svg/searchPathsForSVG", QDir::homePath() ).toString();
+
+
+Symbols
+---------
+
+Using the API provided by QgsStyleV2 for:
+
+#. tag all symbols with the collection id
+#. create a group with the name of the collection and place all symbols inside (check for other groups with the same name and add a suffix if needed)
+#. place all symbols in the group
+
+Collection removal
+------------------
+
+#. remove the path from SVG paths setting
+#. remove all tagged symbols
+#. find the empty group starting with the same name of the collection and delete it
+
+
+
 Conversation Ale-Akbar from 24/06/2016
 .......................................
 
@@ -77,98 +200,3 @@ Notes:
    just add them all at this time
 4. low priority: we could store the name in the DIRECTORY of repos, by
    using csv or a # separator or whatever you think is best
-
-
-
-Conversation Ale-Akbar from 01/07/2016
-.......................................
-
-
-We discussed how to import SVGs and symbols:
-
-SVGs
-----
-
-Add the SVG path to the settings as QgsApplication does
-
-QString myPaths = settings.value( "svg/searchPathsForSVG", QDir::homePath() ).toString();
-
-
-Symbols
----------
-
-Using the API provided by QgsStyleV2 for:
-
-#. tag all symbols with the collection id
-#. create a group with the name of the collection and place all symbols inside (check for other groups with the same name and add a suffix if needed)
-#. place all symbols in the group
-
-Collection removal
-------------------
-
-#. remove the path from SVG paths setting
-#. remove all tagged symbols
-#. find the empty group starting with the same name of the collection and delete it
-
-
-
-
-Conversation Ale-Akbar from 08/07/2016
-.......................................
-
-We discussed again how to import SVGs and symbols:
-
-SVGs
-----
-
-Now saved in ``/home/user/.qgis2/symbology_sharing/collections/6d38d61abd52a05495dfd3189b04900a3cc73c36/svg/`
-
-Problem: in the GUI SVG selector tree all collections appear under "User Symbols"
-Solution: move all the symbology sharing related collections outside `.qgis2` (in the parent folder)
-
-Problem: in the GUI SVG selector tree all collections appear with the hash `6d38d61abd52a05495dfd3189b04900a3cc73c36`
-Solution: the only purpose of the hash is to avoid collection name collisions, we can change the folder name to be the name of the collection followed by the hash in brackets, like::
-
-    /home/ale/.qgis2/symbology_sharing
-    ├── collections
-    │   ├── King's Landing (6d38d61abd52a05495dfd3189b04900a3cc73c36)
-    │   │   ├── colorramp
-    │   │   │   └── rainbows.xml
-    │   │   ├── image
-    │   │   │   └── QGis_Logo.png
-    │   │   ├── license
-    │   │   ├── preview
-    │   │   │   ├── osm_spatialite_googlemaps_lines.qml.png
-    │   │   │   └── osm_spatialite_googlemaps.png
-    │   │   ├── style
-    │   │   │   ├── osm_spatialite_googlemaps_lines.qml
-    │   │   │   ├── osm_spatialite_googlemaps_multipolygon.qml
-    │   │   │   └── osm_spatialite_googlemaps_places.qml
-    │   │   ├── svg
-    │   │   │   └── Blank_shield.svg
-    │   │   └── symbol
-    │   │       ├── osm_symbols.xml
-    │   │       ├── symbol_collection_svg.xml
-    │   │       ├── symbol_qgisdefault_svg.xml
-    │   │       └── symbol_rasterimagefill.xml
-    │   └── Westeros (ed86f2b4406dbd2c9afce1da12436836a89d3a5b)
-    │       └── license
-
-
-Symbols
--------
-
-Problem: The symbol import from XML GUI in QGIS does not seem to work!
-
-TODO:
-* check if the bug is reported in the hub
-* try to make a python test case using the API
-* try to fix it
-
-Problem: symbols names must be unique
-
-TODO:
-* check why it is like that (ask to qgis-dev list and Martin and Nyall)
-* what if the constraint is removed upstream?
-* what if the symbol search is done first using the name **and** the group and then (if nothing was found) by using the name alone?
-* other option: ask the user what to do (rename the imported || rename the old one || overwrite the old one)

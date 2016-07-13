@@ -12,6 +12,7 @@ from symbology_sharing.network_manager import NetworkManager
 from symbology_sharing.collection_manager import CollectionManager
 from symbology_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
 from symbology_sharing import config
+from symbology_sharing.exception import MetadataError
 
 
 class RepositoryManager(QObject):
@@ -134,7 +135,10 @@ class RepositoryManager(QObject):
         status, description = repo_handler.fetch_metadata()
         if status:
             # Parse metadata
-            collections = repo_handler.parse_metadata()
+            try:
+                collections = repo_handler.parse_metadata()
+            except MetadataError:
+                raise
             # Add the repo and the collections
             self._repositories[repo_name] = collections
             self.rebuild_collections()
@@ -168,7 +172,10 @@ class RepositoryManager(QObject):
 
         if status:
             # Parse metadata
-            collections = repo_handler.parse_metadata()
+            try:
+                collections = repo_handler.parse_metadata()
+            except MetadataError:
+                raise
             # Remove old repo and its collections
             self._repositories.pop(old_repo_name, None)
             self.rebuild_collections()

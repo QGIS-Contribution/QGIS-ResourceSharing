@@ -12,6 +12,7 @@ from ConfigParser import SafeConfigParser
 from PyQt4.QtCore import QTemporaryFile
 
 from symbology_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
+from symbology_sharing.exception import MetadataError
 
 
 class RepositoryHandlerMeta(type):
@@ -104,27 +105,40 @@ class BaseRepositoryHandler(object):
             metadata_file.close()
 
         # TODO: Add colection only if the version is ok with user's QGIS
-        parser = SafeConfigParser()
-        with codecs.open(metadata_file.fileName(), 'r', encoding='utf-8') as f:
-            parser.readfp(f)
-        author = parser.get('general', 'author')
-        email = parser.get('general', 'email')
-        collections_str = parser.get('general', 'collections')
+        try:
+            parser = SafeConfigParser()
+            with codecs.open(metadata_file.fileName(), 'r', encoding='utf-8') as f:
+                parser.readfp(f)
+            author = parser.get('general', 'author')
+            email = parser.get('general', 'email')
+            collections_str = parser.get('general', 'collections')
+        except Exception as e:
+            raise MetadataError('Error parsing metadata: %s' % e)
+
         collection_list = [
             collection.strip() for collection in collections_str.split(',')]
         # Read all the collections
         for collection in collection_list:
+            try:
+                name = parser.get(collection, 'name')
+                tags = parser.get(collection, 'tags')
+                description = parser.get(collection, 'description')
+                qgis_min_version = parser.get(collection, 'qgis_minimum_version')
+                qgis_max_version = parser.get(collection, 'qgis_maximum_version')
+            except Exception as e:
+                raise MetadataError('Error parsing metadata: %s' % e)
+
             collection_dict = {
                 'register_name': collection,
                 'author': author,
                 'author_email': email,
                 'repository_url': self.url,
                 'status': COLLECTION_NOT_INSTALLED_STATUS,
-                'name': parser.get(collection, 'name'),
-                'tags': parser.get(collection, 'tags'),
-                'description': parser.get(collection, 'description'),
-                'qgis_min_version': parser.get(collection, 'qgis_minimum_version'),
-                'qgis_max_version': parser.get(collection, 'qgis_maximum_version')
+                'name': name,
+                'tags': tags,
+                'description': description,
+                'qgis_min_version': qgis_min_version,
+                'qgis_max_version': qgis_max_version
             }
             collections.append(collection_dict)
 

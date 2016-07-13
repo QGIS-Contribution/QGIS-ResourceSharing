@@ -92,6 +92,17 @@ class RepositoryManager(QObject):
                 reader = csv.DictReader(csv_file, fieldnames=('name', 'url'))
                 for row in reader:
                     self._online_directories[row['name']] = row['url'].strip()
+            # Save it to cache
+            settings = QSettings()
+            settings.beginGroup(repo_settings_group())
+            settings.setValue('online_directories', self._online_directories)
+            settings.endGroup()
+        else:
+            # Just use cache from previous use
+            settings = QSettings()
+            settings.beginGroup(repo_settings_group())
+            self._online_directories = settings.value('online_directories', {})
+            settings.endGroup()
 
     def load_directories(self):
         """Load directories of repository registered in settings."""

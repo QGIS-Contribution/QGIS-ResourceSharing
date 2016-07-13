@@ -25,8 +25,10 @@ class SVGResourceHandler(BaseResourceHandler):
         We simply just add the path to the collection root directory to search
         path in QGIS.
         """
-        # Call parent method first
-        super(SVGResourceHandler, self).install()
+        # Check if the dir exists, pass installing silently if it doesn't exist
+        if not os.path.exists(self.resource_dir):
+            return
+
         # Add to the search paths for SVG
         settings = QSettings()
         search_paths_str = settings.value('svg/searchPathsForSVG')

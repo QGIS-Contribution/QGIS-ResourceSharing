@@ -2,11 +2,9 @@
 import os
 import fnmatch
 
-from PyQt4.QtCore import QSettings
 from qgis.core import QgsStyleV2
 
 from symbology_sharing.resource_handler.base import BaseResourceHandler
-from symbology_sharing.utilities import local_collection_path
 from symbology_sharing.symbol_xml_extractor import SymbolXMLExtractor
 
 
@@ -51,13 +49,21 @@ class SymbolResourceHandler(BaseResourceHandler):
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             child_id = self.style.addGroup(file_name, group_id)
-            # Add all symbols and group it
+            # Add all symbols and colorramps and group it
             symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
+
             for symbol in symbol_xml_extractor.symbols:
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
                 if self.style.addSymbol(symbol_name, symbol['symbol'], True):
                     self.style.group(
                         QgsStyleV2.SymbolEntity, symbol_name, child_id)
+
+            for colorramp in symbol_xml_extractor.colorramps:
+                colorramp_name = '%s (%s)' % (colorramp['name'], self.collection_id)
+                if self.style.addColorRamp(
+                        colorramp_name, colorramp['colorramp'], True):
+                    self.style.group(
+                        QgsStyleV2.ColorrampEntity, colorramp_name, child_id)
 
     def uninstall(self):
         """Uninstall the symbols from QGIS."""
@@ -72,8 +78,14 @@ class SymbolResourceHandler(BaseResourceHandler):
                 QgsStyleV2.SymbolEntity, child_group_id)
             for symbol in symbols:
                 self.style.removeSymbol(symbol)
+            # Get all the colorramps and remove them
+            colorramps = self.style.symbolsOfGroup(
+                QgsStyleV2.ColorrampEntity, child_group_id)
+            for colorramp in colorramps:
+                self.style.removeColorRamp(colorramp)
+
             # Remove this child group
             self.style.remove(QgsStyleV2.GroupEntity, child_group_id)
+
         # Remove parent group:
         self.style.remove(QgsStyleV2.GroupEntity, parent_group_id)
-

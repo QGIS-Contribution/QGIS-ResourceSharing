@@ -23,11 +23,11 @@ class SymbolResourceHandler(BaseResourceHandler):
         return 'symbol'
 
     def install(self):
-        """Install the symbol from this collection into QGIS.
+        """Install the symbol and collection from this collection into QGIS.
 
         We create a group with the name of the collection, a child group for
-        each xml file and save all the symbols defined that xml file into
-        that child group.
+        each xml file and save all the symbols and colorramp defined that xml
+        file into that child group.
         """
         # Call parent method first
         super(SymbolResourceHandler, self).install()

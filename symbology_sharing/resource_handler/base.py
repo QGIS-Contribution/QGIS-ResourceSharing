@@ -2,6 +2,7 @@
 import os
 
 from symbology_sharing.utilities import local_collection_path
+from symbology_sharing import config
 
 class ResourceHandlerMeta(type):
     """Resource handler meta class definition."""
@@ -28,10 +29,15 @@ class BaseResourceHandler(object):
     def __init__(self, collection_id=None):
         """Constructor of the base class."""
         self._collection_id = collection_id
+        self._collection = config.COLLECTIONS[self._collection_id]
 
     @property
     def collection_id(self):
         return self._collection_id
+
+    @property
+    def collection(self):
+        return self._collection
 
     @property
     def dir_name(self):

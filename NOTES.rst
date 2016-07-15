@@ -2,6 +2,49 @@ Implementation addendum
 -----------------------
 
 
+Conversation Ale-Akbar from 15/07/2016
+.......................................
+
+
+We need an independent function (no qgis imports!) to check the XML before we import it,
+we need to check for wrong SVG or images paths (or whatever other paths could be in there).
+
+The same or similar function could maybe be useful to import or export projects.
+
+The idea is that we can re-use the same function when the user wants to create
+a collection before she exports/share it.
+
+The function should be able to fix the paths (relative!) and to optionally copy
+the SVGs/images in the right place before exporting/sharing.
+
+
+
+Pseudo code:
+
+def fix_collection(collection_path, xml, default_search_paths=[], additional_search_paths=[], copy=False):
+    """/home/ale/Collection 1 (2303210392103921039)
+    <xml .... ?>
+    ~/ale/.qgis2/svg
+    ~/ale/.qgis2/svg
+    ~/ale/.qgis2/svg
+    """
+    for each path inside xml
+        find the SVG or the IMAGE in default search path
+        find the SVG or the IMAGE in additional search path
+        if found:
+            if path is wrong:
+                if copy:
+                    copy SVGs to collection in the right place
+                fix path
+        else:
+            add to error list
+    return fixed_xml, errors_warnings
+
+# Call as
+fixed_xml = fix_collection('/collection_path (0231232131)/', '<xml ....>', [QgsApplication.instance().pkgDataPath() + '/svg/', QgsApplication.instance().qgisSettingsDirPath() + '/svg/'], ['/svg1/', '/svg2'])
+
+
+
 Conversation Ale-Akbar from 11/07/2016
 .......................................
 

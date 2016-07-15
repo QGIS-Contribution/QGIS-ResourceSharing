@@ -1,5 +1,6 @@
 # coding=utf-8
 import os
+import ntpath
 
 from PyQt4.QtCore import QDir
 from qgis.core import QgsApplication
@@ -68,3 +69,8 @@ def local_collection_path(id=None):
         dir_name = '%s (%s)' % (collection_name, id)
         path = os.path.join(path, dir_name)
     return path
+
+
+def path_leaf(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)

@@ -2,10 +2,17 @@
 import os
 import fnmatch
 
-from qgis.core import QgsStyleV2
+from qgis.core import (
+    QgsStyleV2,
+    QgsSvgMarkerSymbolLayerV2,
+    QgsMarkerLineSymbolLayerV2,
+    QgsRasterFillSymbolLayer,
+    QgsSVGFillSymbolLayer)
 
 from symbology_sharing.resource_handler.base import BaseResourceHandler
+from symbology_sharing.resource_handler.svg_handler import SVGResourceHandler
 from symbology_sharing.symbol_xml_extractor import SymbolXMLExtractor
+from symbology_sharing.utilities import path_leaf, local_collection_path
 
 
 class SymbolResourceHandler(BaseResourceHandler):
@@ -18,7 +25,7 @@ class SymbolResourceHandler(BaseResourceHandler):
         # Init the default style
         self.style = QgsStyleV2.defaultStyle()
 
-    @property
+    @classmethod
     def dir_name(self):
         return 'symbol'
 
@@ -59,6 +66,7 @@ class SymbolResourceHandler(BaseResourceHandler):
 
             for symbol in symbol_xml_extractor.symbols:
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
+                self.resolve_dependency(symbol['symbol'])
                 if self.style.addSymbol(symbol_name, symbol['symbol'], True):
                     self.style.group(
                         QgsStyleV2.SymbolEntity, symbol_name, child_id)
@@ -94,3 +102,62 @@ class SymbolResourceHandler(BaseResourceHandler):
 
         # Remove parent group:
         self.style.remove(QgsStyleV2.GroupEntity, parent_group_id)
+
+    def resolve_dependency(self, symbol):
+        """Update dependency of the symbol.
+
+        We need to update any path dependency of downloaded symbol so that
+        the path points to the right path after it's installed.
+
+        For now, we only update the svg/image path to the svg/ directory of
+        the collection if the svg exists.
+
+        :param symbol: The symbol
+        :type symbol: QgsSymbolV2
+        """
+        symbol_layers = symbol.symbolLayers()
+        for symbol_layer in symbol_layers:
+            # SVG Marker
+            if isinstance(symbol_layer, QgsSvgMarkerSymbolLayerV2):
+                updated_path = self.update_svg_path(symbol_layer.path())
+                symbol_layer.setPath(updated_path)
+            # Raster fill
+            elif isinstance(symbol_layer, QgsRasterFillSymbolLayer):
+                updated_path = self.update_svg_path(symbol_layer.imageFilePath())
+                symbol_layer.setImageFilePath(updated_path)
+            # SVG fill
+            elif isinstance(symbol_layer, QgsSVGFillSymbolLayer):
+                updated_path = symbol_layer.svgFilePath()
+                symbol_layer.setSvgFilePath(updated_path)
+            # Marker Line
+            elif isinstance(symbol_layer, QgsMarkerLineSymbolLayerV2):
+                symbol = symbol_layer.subSymbol()
+                self.resolve_dependency(symbol)
+
+    def update_svg_path(self, path):
+        """Update symbol's image path to point to the collection svg dir.
+
+        QGIS will already handle intelligently the path. One case if user
+        uses the svg from the directory when they create the repository.
+        Since it hasn't added in the svg path, it will use abs path,
+        so we need to recreate the path.
+
+        :param path: The original path.
+        :type path: str
+        """
+        if not os.path.exists(path):
+            filename = path_leaf(path)
+
+            svg_path = os.path.join(
+                local_collection_path(self.collection_id),
+                SVGResourceHandler.dir_name(),
+                filename)
+            if os.path.isfile(svg_path):
+                return svg_path
+
+            # If not exist either?? :(
+            return path
+
+        return path
+
+

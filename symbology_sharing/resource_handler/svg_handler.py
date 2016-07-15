@@ -15,8 +15,8 @@ class SVGResourceHandler(BaseResourceHandler):
         """Constructor of the base class."""
         BaseResourceHandler.__init__(self, collection_id)
 
-    @property
-    def dir_name(self):
+    @classmethod
+    def dir_name(cls):
         return 'svg'
 
     def install(self):

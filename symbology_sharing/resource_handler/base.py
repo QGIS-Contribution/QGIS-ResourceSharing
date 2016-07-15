@@ -4,6 +4,7 @@ import os
 from symbology_sharing.utilities import local_collection_path
 from symbology_sharing import config
 
+
 class ResourceHandlerMeta(type):
     """Resource handler meta class definition."""
     def __init__(cls, name, bases, dct):
@@ -39,8 +40,8 @@ class BaseResourceHandler(object):
     def collection(self):
         return self._collection
 
-    @property
-    def dir_name(self):
+    @classmethod
+    def dir_name(cls):
         """The root directory name for this type of the resource."""
         raise NotImplementedError
 
@@ -48,7 +49,7 @@ class BaseResourceHandler(object):
     def resource_dir(self):
         """The root of the resource dir from this type of the resource."""
         resource_dir = os.path.join(
-            local_collection_path(self.collection_id), self.dir_name)
+            local_collection_path(self.collection_id), self.dir_name())
         return resource_dir
 
     def install(self):

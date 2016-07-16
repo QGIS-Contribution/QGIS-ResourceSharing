@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import ntpath
+import xml.etree.ElementTree as ET
 
 from PyQt4.QtCore import QDir
 from qgis.core import QgsApplication
@@ -74,3 +75,6 @@ def local_collection_path(id=None):
 def path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
+
+
+

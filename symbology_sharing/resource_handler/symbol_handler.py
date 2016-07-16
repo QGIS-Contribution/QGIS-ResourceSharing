@@ -3,6 +3,7 @@ import os
 import fnmatch
 
 from qgis.core import (
+    QgsApplication,
     QgsStyleV2,
     QgsSvgMarkerSymbolLayerV2,
     QgsMarkerLineSymbolLayerV2,
@@ -11,7 +12,7 @@ from qgis.core import (
 
 from symbology_sharing.resource_handler.base import BaseResourceHandler
 from symbology_sharing.resource_handler.svg_handler import SVGResourceHandler
-from symbology_sharing.symbol_xml_extractor import SymbolXMLExtractor
+from symbology_sharing.symbol_xml_extractor import SymbolXMLExtractor, fix_xml_node
 from symbology_sharing.utilities import path_leaf, local_collection_path
 
 
@@ -61,12 +62,23 @@ class SymbolResourceHandler(BaseResourceHandler):
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             child_id = self.style.addGroup(file_name, group_id)
+
+            # Fix the symbol file first
+            with open(symbol_file, 'r') as myfile:
+                symbol_xml = myfile.read().replace('\n', '')
+
+            new_xml = fix_xml_node(
+                symbol_xml, self.collection_path, QgsApplication.svgPaths())
+
+            with open(symbol_file, 'w') as myfile:
+                myfile.write(new_xml)
+
             # Add all symbols and colorramps and group it
             symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
 
             for symbol in symbol_xml_extractor.symbols:
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
-                self.resolve_dependency(symbol['symbol'])
+                # self.resolve_dependency(symbol['symbol'])
                 if self.style.addSymbol(symbol_name, symbol['symbol'], True):
                     self.style.group(
                         QgsStyleV2.SymbolEntity, symbol_name, child_id)

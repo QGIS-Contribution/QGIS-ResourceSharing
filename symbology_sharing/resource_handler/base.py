@@ -40,6 +40,10 @@ class BaseResourceHandler(object):
     def collection(self):
         return self._collection
 
+    @property
+    def collection_path(self):
+        return local_collection_path(self._collection_id)
+
     @classmethod
     def dir_name(cls):
         """The root directory name for this type of the resource."""

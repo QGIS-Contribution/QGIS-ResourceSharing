@@ -34,14 +34,17 @@ class BaseResourceHandler(object):
 
     @property
     def collection_id(self):
+        """Return the collection id."""
         return self._collection_id
 
     @property
     def collection(self):
+        """Return the dictionary of the collection."""
         return self._collection
 
     @property
     def collection_path(self):
+        """Return the local collection path."""
         return local_collection_path(self._collection_id)
 
     @classmethod
@@ -63,4 +66,3 @@ class BaseResourceHandler(object):
     def uninstall(self):
         """Uninstall all the resources of this type in the collection."""
         raise NotImplementedError
-

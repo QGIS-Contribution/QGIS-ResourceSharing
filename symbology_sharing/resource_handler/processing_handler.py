@@ -48,7 +48,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
             try:
                 script = ScriptAlgorithm(processing_file)
             except WrongScriptException:
-                break
+                continue
 
             # Copy the script
             dest_path = os.path.join(

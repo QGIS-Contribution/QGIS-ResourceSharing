@@ -2,15 +2,13 @@
 import os
 import fnmatch
 
-from PyQt4.QtCore import QSettings
 
 from processing.script.ScriptAlgorithm import ScriptAlgorithm
 from processing.script.WrongScriptException import WrongScriptException
 from processing.script.ScriptUtils import ScriptUtils
-from processing.core.alglist import algList
 
 from symbology_sharing.resource_handler.base import BaseResourceHandler
-from symbology_sharing.utilities import local_collection_path
+from symbology_sharing.utilities import qgis_version
 
 
 class ProcessingScriptHandler(BaseResourceHandler):
@@ -50,12 +48,12 @@ class ProcessingScriptHandler(BaseResourceHandler):
             except WrongScriptException:
                 continue
 
-            # Copy the script
             dest_path = os.path.join(
-                ScriptUtils.scriptsFolder(), os.path.basename(processing_file))
+                self.scripts_folder(), os.path.basename(processing_file))
             with open(dest_path, 'w') as f:
                 f.write(script.script)
-        algList.reloadProvider('script')
+
+        self.refresh_script_provider()
 
     def uninstall(self):
         """Uninstall the processing scripts from processing toolbox."""
@@ -69,6 +67,24 @@ class ProcessingScriptHandler(BaseResourceHandler):
         # Remove them from user's scripts dir
         for processing_file in processing_files:
             script_path = os.path.join(
-                ScriptUtils.scriptsFolder(), os.path.basename(processing_file))
+                self.scripts_folder(), os.path.basename(processing_file))
             os.remove(script_path)
-        algList.reloadProvider('script')
+
+        self.refresh_script_provider()
+
+    def refresh_script_provider(self):
+        """Refresh the processing script provider."""
+        if qgis_version() < 21600:
+            from processing.core.Processing import Processing
+            Processing.updateAlgsList()
+        else:
+            from processing.core.alglist import algList
+            algList.reloadProvider('script')
+
+    def scripts_folder(self):
+        """Return the default processing scripts folder."""
+        # Copy the script
+        if qgis_version() < 21600:
+            return ScriptUtils.scriptsFolder()
+        else:
+            return ScriptUtils.defaultScriptsFolder()

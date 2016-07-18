@@ -1,10 +1,9 @@
 # coding=utf-8
 import os
 import ntpath
-import xml.etree.ElementTree as ET
 
 from PyQt4.QtCore import QDir
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QGis
 
 from symbology_sharing import config
 
@@ -77,4 +76,12 @@ def path_leaf(path):
     return tail or ntpath.basename(head)
 
 
+def qgis_version():
+    """Get the version of QGIS.
 
+    :returns: QGIS Version where 10700 represents QGIS 1.7 etc.
+    :rtype: int
+    """
+    version = unicode(QGis.QGIS_VERSION_INT)
+    version = int(version)
+    return version

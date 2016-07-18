@@ -80,12 +80,12 @@ class CollectionManager(object):
         :param collection_id: The id of the collection about to be uninstalled.
         :type collection_id: str
         """
-        # Remove the collection directory
-        collection_dir = local_collection_path(collection_id)
-        if os.path.exists(collection_dir):
-            shutil.rmtree(collection_dir)
         # Uninstall all type of resources from QGIS
         for resource_handler in BaseResourceHandler.registry.values():
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.uninstall()
+        # Remove the collection directory
+        collection_dir = local_collection_path(collection_id)
+        if os.path.exists(collection_dir):
+            shutil.rmtree(collection_dir)
         config.COLLECTIONS[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS

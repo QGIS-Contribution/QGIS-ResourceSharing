@@ -48,8 +48,12 @@ class ProcessingScriptHandler(BaseResourceHandler):
             except WrongScriptException:
                 continue
 
-            dest_path = os.path.join(
-                self.scripts_folder(), os.path.basename(processing_file))
+            script_file_name = os.path.basename(processing_file)
+            script_name = '%s (%s).%s' % (
+                os.path.splitext(script_file_name)[0],
+                self.collection_id,
+                os.path.splitext(script_file_name)[1],)
+            dest_path = os.path.join(self.scripts_folder(), script_name)
             with open(dest_path, 'w') as f:
                 f.write(script.script)
 
@@ -66,9 +70,14 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
         # Remove them from user's scripts dir
         for processing_file in processing_files:
-            script_path = os.path.join(
-                self.scripts_folder(), os.path.basename(processing_file))
-            os.remove(script_path)
+            script_file_name = os.path.basename(processing_file)
+            script_name = '%s (%s).%s' % (
+                os.path.splitext(script_file_name)[0],
+                self.collection_id,
+                os.path.splitext(script_file_name)[1],)
+            script_path = os.path.join(self.scripts_folder(), script_name)
+            if os.path.exists(script_path):
+                os.remove(script_path)
 
         self.refresh_script_provider()
 

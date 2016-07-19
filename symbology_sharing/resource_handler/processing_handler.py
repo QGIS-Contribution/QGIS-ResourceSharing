@@ -61,6 +61,9 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
     def uninstall(self):
         """Uninstall the processing scripts from processing toolbox."""
+        if not os.path.exists(self.resource_dir):
+            return
+        
         # Get all the script files under self.resource_dir
         processing_files = []
         for item in os.listdir(self.resource_dir):

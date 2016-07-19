@@ -11,6 +11,7 @@ from symbology_sharing.utilities import path_leaf
 
 def fix_xml_node(xml, collection_path, search_paths):
     """
+    Loop through the XML nodes to resolve the SVG and image paths
     """
     root = ET.fromstring(xml)
     path_svg_marker_nodes = root.findall(".//layer/prop[@k='name']")
@@ -26,6 +27,7 @@ def fix_xml_node(xml, collection_path, search_paths):
 
 def resolve_path(path, collection_path, search_paths):
     """
+    Try to resolve the SVG and image path
     """
     # It might be a full path
     if QFile(path).exists():

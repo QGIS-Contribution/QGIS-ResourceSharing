@@ -23,7 +23,7 @@
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
 from PyQt4.QtCore import (
-    Qt, QSettings, pyqtSignal, pyqtSlot, QRegExp, QThread, QUrl)
+    Qt, QSettings, pyqtSignal, pyqtSlot, QRegExp, QThread, QUrl, QObject)
 from PyQt4.QtGui import (
     QIcon,
     QListWidgetItem,
@@ -79,6 +79,21 @@ class DownloadCollectionThread(QThread):
     def run(self):
         self.download_status, self.error_message = self._collection_manager.download(self._collection_id)
         self.download_finished.emit()
+
+
+class CollectionDownloader(QObject):
+    finished = pyqtSignal()
+
+    def __init__(self, collection_manager, collection_id):
+        QObject.__init__(self)
+        self._collection_manager = collection_manager
+        self._collection_id = collection_id
+        self.download_status = False
+        self.error_message = None
+
+    def download(self):
+        self.download_status, self.error_message = self._collection_manager.download(self._collection_id)
+        self.finished.emit()
 
 
 class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
@@ -387,13 +402,22 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def install_collection(self):
         """Slot for when user clicks download button."""
         self.show_progress_dialog("Downloading the collection")
-        self.download_thread = DownloadCollectionThread(
+        # self.download_thread = DownloadCollectionThread(
+        #     self.collection_manager, self._selected_collection_id)
+        # self.download_thread.download_finished.connect(
+        #     self.download_collection_done)
+        # self.progress_dialog.canceled.connect(
+        #     self.download_collection_canceled)
+        # self.download_thread.start()
+        self.downloader_thread = QThread()
+        self.collection_downloader = CollectionDownloader(
             self.collection_manager, self._selected_collection_id)
-        self.download_thread.download_finished.connect(
-            self.download_collection_done)
-        self.progress_dialog.canceled.connect(
-            self.download_collection_canceled)
-        self.download_thread.start()
+        self.collection_downloader.moveToThread(self.downloader_thread)
+        self.collection_downloader.finished.connect(self.downloader_thread.quit)
+        self.downloader_thread.started.connect(self.collection_downloader.download)
+        self.downloader_thread.finished.connect(self.download_collection_done)
+        self.progress_dialog.canceled.connect(self.download_collection_canceled)
+        self.downloader_thread.start()
 
     def uninstall_collection(self):
         """Slot called when user clicks uninstall button."""
@@ -410,7 +434,21 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
     def download_collection_done(self):
         """Slot for when the thread to download collection is finished."""
         self.progress_dialog.hide()
-        if self.download_thread.download_status:
+        # if self.download_thread.download_status:
+        #     # Install the collection
+        #     self.show_progress_dialog('Installing the collection.')
+        #     try:
+        #         self.collection_manager.install(self._selected_collection_id)
+        #     except Exception, e:
+        #         pass
+        #     self.reload_collections_model()
+        #     message = '%s is installed successfully' % (
+        #         config.COLLECTIONS[self._selected_collection_id]['name'])
+        #     self.progress_dialog.hide()
+        # else:
+        #     message = self.download_thread.error_message
+        # QtGui.QMessageBox.information(self, 'Symbology Sharing', message)
+        if self.collection_downloader.download_status:
             # Install the collection
             self.show_progress_dialog('Installing the collection.')
             try:
@@ -422,11 +460,13 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                 config.COLLECTIONS[self._selected_collection_id]['name'])
             self.progress_dialog.hide()
         else:
-            message = self.download_thread.error_message
+            message = self.collection_downloader.error_message
         QtGui.QMessageBox.information(self, 'Symbology Sharing', message)
 
     def download_collection_canceled(self):
-        self.download_thread.stop()
+        # self.download_thread.stop()
+        # self.downloader_thread.terminate()
+        self.downloader_thread.terminate()
         QtGui.QMessageBox.information(
             self,
             'Symbology Sharing',

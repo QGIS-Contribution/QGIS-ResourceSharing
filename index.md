@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Jekyll Docs Template"
+title: "Home"
 ---
 
 ### QGIS Resource Sharing Tools
@@ -12,3 +12,4 @@ Github and Bitbucket public repositories), or local file system.
 This tool is initially implemented as Google Summer of Code 2016 project for 
 QGIS under OsGeo organization by Akbar Gumbira (student), Alessandro Pasotti 
 (mentor), Anita Graser (mentor), and the help from QGIS community.
+    

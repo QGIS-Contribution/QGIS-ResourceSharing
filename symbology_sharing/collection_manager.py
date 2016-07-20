@@ -3,12 +3,67 @@ import hashlib
 import os
 import shutil
 
+from PyQt4.QtCore import (
+    pyqtSignal, QObject)
+
 from symbology_sharing import config
 from symbology_sharing.config import (
     COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
 from symbology_sharing.utilities import local_collection_path
 from symbology_sharing.repository_handler import BaseRepositoryHandler
 from symbology_sharing.resource_handler import BaseResourceHandler
+
+
+class CollectionInstaller(QObject):
+    finished = pyqtSignal()
+    aborted = pyqtSignal()
+    progress = pyqtSignal(basestring)
+
+    def __init__(self, collection_manager, collection_id):
+        QObject.__init__(self)
+        self._collection_manager = collection_manager
+        self._collection_id = collection_id
+        self.install_status = False
+        self.error_message = None
+        self.killed = False
+
+    def run(self):
+        self.progress.emit('Downloading the collection...')
+
+        # We can't really kill the process here, so let's finish it even when
+        # user cancels the download process
+        download_status, error_message = self._collection_manager.download(self._collection_id)
+
+        # If at this point it's killed, let's abort and tell the main thread
+        if self.killed:
+            self.aborted.emit()
+            return
+
+        # If download fails
+        if not download_status:
+            self.install_status = False
+            self.error_message = error_message
+            self.finished.emit()
+            return
+
+        # Downloading is fine, It's not killed, let's install it
+        if not self.killed:
+            self.progress.emit('Installing the collection...')
+            try:
+                self._collection_manager.install(self._collection_id)
+            except Exception, e:
+                self.error_message = e
+        else:
+            # Downloaded but killed
+            self.aborted.emit()
+            return
+
+        # If finished installing but killed here? just emit finished
+        self.install_status = True
+        self.finished.emit()
+
+    def abort(self):
+        self.killed = True
 
 
 class CollectionManager(object):

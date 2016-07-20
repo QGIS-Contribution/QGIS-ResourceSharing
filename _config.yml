@@ -1,12 +1,12 @@
 # Site title and subtitle. This is used in _includes/header.html
-title: 'jekyll-docs-template'
-subtitle: 'Painless documentation for your projects'
+title: 'QGIS Resource Sharing Tools'
+subtitle: 'Resource sharing made easy'
 
 # if you wish to integrate disqus on pages set your shortname here
 disqus_shortname: ''
 
 # if you use google analytics, add your tracking id here
-google_analytics_id: ''
+google_analytics_id: 'UA-65219695-3'
 
 # Enable/show navigation. There are there options:
 #   0 - always hide
@@ -15,7 +15,7 @@ google_analytics_id: ''
 navigation: 2
 
 # URL to source code, used in _includes/footer.html
-codeurl: 'https://github.com/bruth/jekyll-docs-template'
+codeurl: 'https://github.com/akbargumbira/qgis_symbology_sharing'
 
 # Default categories (in order) to appear in the navigation
 sections: [

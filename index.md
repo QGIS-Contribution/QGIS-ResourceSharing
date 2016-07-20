@@ -3,16 +3,12 @@ layout: default
 title: "Jekyll Docs Template"
 ---
 
-### Get Started
+### QGIS Resource Sharing Tools
+This tools allows QGIS users to share resources (symbols, svgs, 
+images, or processing scripts) in a repository so that other users can use it
+. Repository could be defined in remote GIT repositories (for now it supports 
+Github and Bitbucket public repositories), or local file system. 
 
-Start by [creating a new post](http://jekyllrb.com/docs/posts/) one of the categories listed in `_config.yml`. It will appear in the navigation on the left once recompiled. Or use the supplied script to make creating pages easier:
-
-```bash
-ruby bin/jekyll-page "Some Page Title" ref
-```
-
-#### Don't Forget
-
-- Add your own content to this page (i.e. `index.md`) and change the `title`
-- Change `title` and `subtitle` defined in `config.yml` for your site
-- Set the `baseurl` in `_config.yml` for your repo if deploying to GitHub pages
+This tool is initially implemented as Google Summer of Code 2016 project for 
+QGIS under OsGeo organization by Akbar Gumbira (student), Alessandro Pasotti 
+(mentor), Anita Graser (mentor), and the help from QGIS community.

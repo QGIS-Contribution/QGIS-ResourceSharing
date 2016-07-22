@@ -6,6 +6,7 @@ from PyQt4.QtCore import QDir
 from qgis.core import QgsApplication, QGis
 
 from symbology_sharing import config
+import jinja2
 
 
 def resources_path(*args):
@@ -85,3 +86,17 @@ def qgis_version():
     version = unicode(QGis.QGIS_VERSION_INT)
     version = int(version)
     return version
+
+
+def render_template(filename, context):
+    """Render template with specific filename under template directory.
+    :param filename: The filename (must be under template directory)
+    :type filename: str
+
+    :param context: The context passed for the template
+    :type context: dict
+    """
+    path = os.path.dirname(__file__)
+    path = os.path.abspath(
+        os.path.join(path, os.pardir, 'resources', 'template'))
+    return jinja2.Environment(loader=jinja2.FileSystemLoader(path)).get_template(filename).render(context)

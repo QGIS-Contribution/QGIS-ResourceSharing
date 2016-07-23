@@ -6,7 +6,7 @@ import shutil
 from symbology_sharing import config
 from symbology_sharing.config import (
     COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
-from symbology_sharing.utilities import local_collection_path
+from symbology_sharing.utilities import local_collection_path, render_template
 from symbology_sharing.repository_handler import BaseRepositoryHandler
 from symbology_sharing.resource_handler import BaseResourceHandler
 
@@ -27,26 +27,10 @@ class CollectionManager(object):
         :param collection_id: The id of the collection
         :type collection_id: str
         """
-        html = ''
-        html += "<style>" \
-                "   body, table {" \
-                "   padding:0px;" \
-                "   margin:0px;" \
-                "   font-family:verdana;" \
-                "   font-size: 12px;" \
-                "  }" \
-                "</style>"
-        html += "<body>"
-        html += "<table cellspacing=\"4\" width=\"100%\"><tr><td>"
-        html += "<h1>%s</h1>" % config.COLLECTIONS[collection_id]['name']
-        html += "<h3>%s</h3><br/>" % config.COLLECTIONS[collection_id]['description']
-        html += "URL: %s <br/></br>" % config.COLLECTIONS[collection_id]['repository_url']
-        html += "Tags: %s <br/></br>" % config.COLLECTIONS[collection_id]['tags']
-        html += "Author: %s <br/></br>" % config.COLLECTIONS[collection_id]['author']
-        html += "E-mail: %s" % config.COLLECTIONS[collection_id]['author_email']
-        html += "</td></tr></table>"
-        html += "</body>"
-        return html
+        context = {
+            'collection': config.COLLECTIONS[collection_id]
+        }
+        return render_template('collection_details.html', context)
 
     def download(self, collection_id):
         """Download a collection given the id.

@@ -1,0 +1,22 @@
+<style>
+  body, table {
+    padding:0px;
+    margin:0px;
+    font-family:verdana;
+    font-size: 12px;
+  }
+</style>
+<body>
+  <table cellspacing="4" width="100%">
+    <tr>
+      <td>
+        <h1>{{ collection.name }}</h1>
+        <h3>{{ collection.description}}</h3><br/>
+        URL: {{ collection.repository_url}} <br/></br>
+        Tags: {{ collection.tags}} <br/></br>
+        Author: {{ collection.author}} <br/></br>
+        E-mail: {{ collection.author_email}}
+      </td>
+    </tr>
+  </table>
+</body>

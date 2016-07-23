@@ -3,57 +3,77 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <link rel="stylesheet"
-          href="file:///{{ resources_path }}/unslider/css/unslider.css"
-          type="text/css">
-    <link rel="stylesheet" href="file:///{{ resources_path }}/unslider/css/unslider-dots.css" type="text/css">
-
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="file:///{{ resources_path }}/unslider/js/unslider-min.js"></script>
-
-    <style>
-    body, table {
-      padding:0px;
-      margin:0px;
-      font-family:verdana;
-      font-size: 12px;
-    }
-  </style>
+    <title>Test</title>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="file:////home/akbar/.qgis2/python/plugins/qgis_resources_sharing/resources/bootstrap/css/bootstrap.css" type="text/css">
+    <!-- Javascript -->
+    <script src="file:////home/akbar/.qgis2/python/plugins/qgis_resources_sharing/resources/js/jquery.js"></script>
+    <script src="file:////home/akbar/.qgis2/python/plugins/qgis_resources_sharing/resources/bootstrap/js/bootstrap.min.js"></script>
   </head>
+
   <body>
-    <table cellspacing="4" width="100%">
-      <tr>
-        <td>
-          <h1>{{ collection.name }}</h1>
-          <h3>{{ collection.description}}</h3><br/>
-          URL: {{ collection.repository_url}} <br/></br>
-          Tags: {{ collection.tags}} <br/></br>
-          Author: {{ collection.author}} <br/></br>
-          E-mail: {{ collection.author_email}}
-        </td>
-      </tr>
-    </table>
-    {% if collection.preview|length != 0 %}
-      <div class="preview-slider">
-        <ul>
-          {% for preview in collection.preview %}
-            <li><img src={{ preview }}></li>
-          {% endfor %}
-        </ul>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h2 class="panel-title">{{ collection.name}}</h2>
       </div>
-      <script>
-        jQuery(document).ready(function($) {
-          $('.preview-slider').unslider({
-            autoplay: true,
-            arrows: true,
-            dots: true,
-            arrows: {
-              prev: '<a class="unslider-arrow prev">&larr;</a>',
-              next: '<a class="unslider-arrow next">&rarr;</a>'
-            }
-          });
-        });
-    </script>
-  {% endif %}
+      <div class="panel-body">
+        <blockquote>{{ collection.description }}</blockquote>
+        <table class="table">
+          <tr>
+            <td><b>URL</b></td><td>{{ collection.repository_url}}</td>
+          </tr>
+          <tr>
+            <td><b>Tags</b></td><td>{{ collection.tags}}</td>
+          </tr>
+          <tr>
+            <td><b>Author</b></td><td>{{ collection.author}}</td>
+          </tr>
+          <tr>
+            <td><b>E-mail</b></td><td> {{ collection.author_email}}</td>
+          </tr>
+        </table>
+      </div>
+
+      {% if collection.preview|length != 0 %}
+            <!-- Preview Images -->
+          <div id="preview-carousel" class="carousel slide" data-ride="carousel">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+              {% for preview in collection.preview %}
+                {% if loop.index == 1 %}
+                  <li data-target="#preview-carousel"
+                      data-slide-to="{{ loop.index - 1 }}" class="active">
+                  </li>
+                {% else %}
+                  <li data-target="#preview-carousel"
+                          data-slide-to="{{ loop.index - 1 }}">
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ol>
+
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner"  role="listbox">
+              {% for preview in collection.preview %}
+                {% if loop.index == 1 %}
+                  <div class="item active">
+                {% else %}
+                <div class="item">
+                {% endif %}
+                  <img src="{{ preview }}">
+                </div>
+              {% endfor %}
+            </div>
+            <!-- Controls -->
+            <a class="left carousel-control" href="#preview-carousel" role="button" data-slide="prev">
+              <span class="glyphicon glyphicon-chevron-left"></span>
+            </a>
+            <a class="right carousel-control" href="#preview-carousel" role="button" data-slide="next">
+              <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+          </div>
+        {% endif %}
+    </div>
+
   </body>
 </html>

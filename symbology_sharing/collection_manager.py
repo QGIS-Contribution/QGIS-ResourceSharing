@@ -6,7 +6,10 @@ import shutil
 from symbology_sharing import config
 from symbology_sharing.config import (
     COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
-from symbology_sharing.utilities import local_collection_path, render_template
+from symbology_sharing.utilities import (
+    local_collection_path,
+    render_template,
+    resources_path)
 from symbology_sharing.repository_handler import BaseRepositoryHandler
 from symbology_sharing.resource_handler import BaseResourceHandler
 
@@ -28,6 +31,7 @@ class CollectionManager(object):
         :type collection_id: str
         """
         context = {
+            'resources_path': resources_path(),
             'collection': config.COLLECTIONS[collection_id]
         }
         return render_template('collection_details.html', context)

@@ -1,22 +1,59 @@
-<style>
-  body, table {
-    padding:0px;
-    margin:0px;
-    font-family:verdana;
-    font-size: 12px;
-  }
-</style>
-<body>
-  <table cellspacing="4" width="100%">
-    <tr>
-      <td>
-        <h1>{{ collection.name }}</h1>
-        <h3>{{ collection.description}}</h3><br/>
-        URL: {{ collection.repository_url}} <br/></br>
-        Tags: {{ collection.tags}} <br/></br>
-        Author: {{ collection.author}} <br/></br>
-        E-mail: {{ collection.author_email}}
-      </td>
-    </tr>
-  </table>
-</body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet"
+          href="file:///{{ resources_path }}/unslider/css/unslider.css"
+          type="text/css">
+    <link rel="stylesheet" href="file:///{{ resources_path }}/unslider/css/unslider-dots.css" type="text/css">
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="file:///{{ resources_path }}/unslider/js/unslider-min.js"></script>
+
+    <style>
+    body, table {
+      padding:0px;
+      margin:0px;
+      font-family:verdana;
+      font-size: 12px;
+    }
+  </style>
+  </head>
+  <body>
+    <table cellspacing="4" width="100%">
+      <tr>
+        <td>
+          <h1>{{ collection.name }}</h1>
+          <h3>{{ collection.description}}</h3><br/>
+          URL: {{ collection.repository_url}} <br/></br>
+          Tags: {{ collection.tags}} <br/></br>
+          Author: {{ collection.author}} <br/></br>
+          E-mail: {{ collection.author_email}}
+        </td>
+      </tr>
+    </table>
+    {% if collection.preview|length != 0 %}
+      <div class="preview-slider">
+        <ul>
+          {% for preview in collection.preview %}
+            <li><img src={{ preview }}></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <script>
+        jQuery(document).ready(function($) {
+          $('.preview-slider').unslider({
+            autoplay: true,
+            arrows: true,
+            dots: true,
+            arrows: {
+              prev: '<a class="unslider-arrow prev">&larr;</a>',
+              next: '<a class="unslider-arrow next">&rarr;</a>'
+            }
+          });
+        });
+    </script>
+  {% endif %}
+  </body>
+</html>

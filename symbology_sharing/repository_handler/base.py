@@ -125,6 +125,14 @@ class BaseRepositoryHandler(object):
                 description = parser.get(collection, 'description')
                 qgis_min_version = parser.get(collection, 'qgis_minimum_version')
                 qgis_max_version = parser.get(collection, 'qgis_maximum_version')
+
+                # Parse the preview urls
+                preview_str = parser.has_option(collection, 'preview') and parser.get(collection, 'preview') or ''
+                preview_file_list = [preview.strip() for preview in preview_str.split(',') if preview.strip() != '']
+                preview_list = []
+                for preview in preview_file_list:
+                    preview_list.append(self.preview_url(collection, preview))
+
             except Exception as e:
                 raise MetadataError('Error parsing metadata: %s' % e)
 
@@ -138,7 +146,8 @@ class BaseRepositoryHandler(object):
                 'tags': tags,
                 'description': description,
                 'qgis_min_version': qgis_min_version,
-                'qgis_max_version': qgis_max_version
+                'qgis_max_version': qgis_max_version,
+                'preview': preview_list
             }
             collections.append(collection_dict)
 

@@ -36,7 +36,7 @@
      </property>
      <widget class="QFrame" name="menu_frame">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -120,7 +120,7 @@
      <widget class="QFrame" name="content_frame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-        <horstretch>2</horstretch>
+        <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
@@ -457,8 +457,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>612</width>
-                 <height>463</height>
+                 <width>481</width>
+                 <height>173</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_8">

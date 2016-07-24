@@ -13,9 +13,11 @@
 
   <body>
     <div class="panel panel-primary">
+
       <div class="panel-heading">
         <h2 class="panel-title">{{ collection.name}}</h2>
       </div>
+
       <div class="panel-body">
         <blockquote>{{ collection.description }}</blockquote>
         <table class="table">
@@ -32,9 +34,8 @@
             <td><b>E-mail</b></td><td> {{ collection.author_email}}</td>
           </tr>
         </table>
-      </div>
 
-      {% if collection.preview|length != 0 %}
+         {% if collection.preview|length != 0 %}
             <!-- Preview Images -->
           <div id="preview-carousel" class="carousel slide" data-ride="carousel">
             <!-- Indicators -->
@@ -58,12 +59,13 @@
                 {% if loop.index == 1 %}
                   <div class="item active">
                 {% else %}
-                <div class="item">
+                  <div class="item">
                 {% endif %}
                   <img src="{{ preview }}">
                 </div>
               {% endfor %}
-            </div>
+            </div> <!-- endof carouse-inner -->
+
             <!-- Controls -->
             <a class="left carousel-control" href="#preview-carousel" role="button" data-slide="prev">
               <span class="glyphicon glyphicon-chevron-left"></span>
@@ -71,9 +73,12 @@
             <a class="right carousel-control" href="#preview-carousel" role="button" data-slide="next">
               <span class="glyphicon glyphicon-chevron-right"></span>
             </a>
-          </div>
-        {% endif %}
-    </div>
 
+          </div> <!-- endof preview-carousel -->
+        {% endif %}
+      </div>
+
+
+        </div> <!-- endof panel panel-primary -->
   </body>
 </html>

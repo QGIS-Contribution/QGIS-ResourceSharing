@@ -160,3 +160,14 @@ class BaseRepositoryHandler(object):
         :type id: str
         """
         raise NotImplementedError
+
+    def preview_url(self, collection_name, filename):
+        """Return the endpoint URL of the preview image.
+
+        :param collection_name: The register name of the collection.
+        :type collection_name: str
+
+        :param filename: The filename of the previe image.
+        :type filename: str
+        """
+        raise NotImplementedError

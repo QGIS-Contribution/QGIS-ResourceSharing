@@ -41,7 +41,11 @@ from symbology_sharing.gui.manage_dialog import ManageRepositoryDialog
 from symbology_sharing.repository_manager import RepositoryManager
 from symbology_sharing.collection_manager import CollectionManager
 from symbology_sharing.utilities import (
-    resources_path, ui_path, repo_settings_group, local_collection_path)
+    resources_path,
+    ui_path,
+    repo_settings_group,
+    local_collection_path,
+    render_template)
 from symbology_sharing.gui.custom_sort_filter_proxy import (
     CustomSortFilterProxyModel,
     COLLECTION_NAME_ROLE,
@@ -199,9 +203,32 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             if index == 1:
                 # Installed
                 self.collection_proxy.accepted_status = COLLECTION_INSTALLED_STATUS
+                # Set the web view
+                title = self.tr('Installed Collections')
+                description = self.tr(
+                    'On the left you see the list of all collections '
+                    'installed on your QGIS')
+                context = {
+                    'title': title,
+                    'description': description
+                }
+                self.web_view_details.setHtml(
+                    render_template('tab_description.html', context))
             else:
                 # All
                 self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
+                # Set the web view
+                title = self.tr('All Collections')
+                description = self.tr(
+                    'On the left you see the list of all collections '
+                    'available from the repositories registered in the '
+                    'settings.')
+                context = {
+                    'title': title,
+                    'description': description
+                }
+                self.web_view_details.setHtml(
+                    render_template('tab_description.html', context))
             self.stacked_menu_widget.setCurrentIndex(0)
 
     def add_repository(self):

@@ -3,6 +3,7 @@ layout: page
 title: "Creating Metadata"
 category: doc
 date: 2016-07-25 14:58:04
+order: 4
 ---
 
 In the root of the repository, you need to create a metadata file defining 
@@ -37,7 +38,6 @@ This is an example of the ```metadata.ini``` file:
 author=Anita Graser
 email=anitagraser@gmx.at
 collections=osm_spatialite_googlemaps,flowmap
-
 
 [osm_spatialite_googlemaps]
 name=OSM Spatialite Googlemaps

@@ -19,7 +19,7 @@ repository must have a specific structure. Generally the structure looks like
             * image (optional, fixed name) - *directory*
                 * PNG, JPEG, other image files that can be used for raster fill
             * preview (optional, fixed name) - *directory*
-                * Image files for your collection preview (could be screenshots of the map using the resources in the collection)  
+                * Image files for your collection preview (could be screenshots of the map using the collection)  
             * processing (optional, fixed name) - *directory*
                 * Python processing scripts
             * svg (optional, fixed name) - *directory*

@@ -9,7 +9,8 @@ order: 3
 In order for the plugin to be able to read the repository correctly, the 
 repository must have a specific structure. Generally the structure looks like
  this:
- 
+
+```
 * Repository root
     * Readme file (optional) - *file*
     * metadata.ini (required, fixed name) - *file*
@@ -26,8 +27,10 @@ repository must have a specific structure. Generally the structure looks like
             * symbol (optional, fixed name) - *directory*
                 * The symbol XML files that will be installed in QGIS Style Manager
             * license file (encouraged) - *file*
-              
-To see an example of a repository, check this github repository: https://github.com/akbargumbira/qgis_resources_data/
+```              
+
+
+To see an example of a repository, check this github repository [Test Repository](https://github.com/akbargumbira/qgis_resources_data/)
 
               
               

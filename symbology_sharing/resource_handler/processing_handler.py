@@ -12,7 +12,7 @@ from symbology_sharing.utilities import qgis_version
 
 
 class ProcessingScriptHandler(BaseResourceHandler):
-    """Abstract class handler for processing script resource."""
+    """Concrete class handler for processing script resource."""
     IS_DISABLED = False
 
     def __init__(self, collection_id=None):
@@ -63,7 +63,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
         """Uninstall the processing scripts from processing toolbox."""
         if not os.path.exists(self.resource_dir):
             return
-        
+
         # Get all the script files under self.resource_dir
         processing_files = []
         for item in os.listdir(self.resource_dir):

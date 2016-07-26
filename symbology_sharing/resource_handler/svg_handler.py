@@ -8,7 +8,7 @@ from symbology_sharing.utilities import local_collection_path
 
 
 class SVGResourceHandler(BaseResourceHandler):
-    """Abstract class of the SVG resource handler."""
+    """Concrete class of the SVG resource handler."""
     IS_DISABLED = False
 
     def __init__(self, collection_id=None):

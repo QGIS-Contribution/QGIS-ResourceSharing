@@ -2,16 +2,15 @@
 import os
 import fnmatch
 
-from qgis.core import (
-    QgsApplication,
-    QgsStyleV2)
+from qgis.core import QgsStyleV2
 
 from symbology_sharing.resource_handler.base import BaseResourceHandler
-from symbology_sharing.symbol_xml_extractor import SymbolXMLExtractor, fix_xml_node
+from symbology_sharing.symbol_xml_extractor import SymbolXMLExtractor
+from symbology_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin
 
 
-class SymbolResourceHandler(BaseResourceHandler):
-    """Abstract class of the Symbol handler."""
+class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
+    """Concrete class of the Symbol handler."""
     IS_DISABLED = False
 
     def __init__(self, collection_id=None):
@@ -99,26 +98,4 @@ class SymbolResourceHandler(BaseResourceHandler):
 
         # Remove parent group:
         self.style.remove(QgsStyleV2.GroupEntity, parent_group_id)
-
-    def resolve_dependency(self, xml_path):
-        """Modify the xml and resolve the resources dependency.
-
-        We need to update any path dependency of downloaded symbol so that
-        the path points to the right path after it's installed.
-
-        For now, we only update the svg/image path to the svg/ directory of
-        the collection if the svg exists.
-
-        :param xml_path: The path to the symbol xml file.
-        :type xml_path: str
-        """
-        with open(xml_path, 'r') as xml_file:
-            symbol_xml = xml_file.read().replace('\n', '')
-
-        updated_xml = fix_xml_node(
-            symbol_xml, self.collection_path, QgsApplication.svgPaths())
-
-        with open(xml_path, 'w') as xml_file:
-            xml_file.write(updated_xml)
-
 

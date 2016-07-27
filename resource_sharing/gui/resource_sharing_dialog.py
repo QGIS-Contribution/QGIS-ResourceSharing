@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- QgsSymbologySharingDialog
                                  A QGIS plugin
- Download colllections shared by other users
+ Download collections shared by other users
                              -------------------
         begin                : 2016-05-29
         git sha              : $Format:%H$
@@ -37,33 +36,32 @@ from PyQt4.QtGui import (
 )
 from qgis.gui import QgsMessageBar
 
-from symbology_sharing.gui.manage_dialog import ManageRepositoryDialog
-from symbology_sharing.repository_manager import RepositoryManager
-from symbology_sharing.collection_manager import CollectionManager, CollectionInstaller
-from symbology_sharing.utilities import (
+from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
+from resource_sharing.repository_manager import RepositoryManager
+from resource_sharing.collection_manager import CollectionManager, CollectionInstaller
+from resource_sharing.utilities import (
     resources_path,
     ui_path,
     repo_settings_group,
     local_collection_path,
     render_template)
-from symbology_sharing.gui.custom_sort_filter_proxy import (
+from resource_sharing.gui.custom_sort_filter_proxy import (
     CustomSortFilterProxyModel,
     COLLECTION_NAME_ROLE,
     COLLECTION_DESCRIPTION_ROLE,
     COLLECTION_AUTHOR_ROLE,
     COLLECTION_TAGS_ROLE,
     COLLECTION_ID_ROLE,
-    COLLECTION_STATUS_ROLE
-)
-from symbology_sharing.config import (
+    COLLECTION_STATUS_ROLE)
+from resource_sharing.config import (
     COLLECTION_ALL_STATUS,
     COLLECTION_INSTALLED_STATUS)
-from symbology_sharing import config
+from resource_sharing import config
 
-FORM_CLASS, _ = uic.loadUiType(ui_path('qgs_symbology_sharing_dialog_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(ui_path('resource_sharing_dialog_base.ui'))
 
 
-class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
+class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
     TAB_ALL = 0
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
@@ -77,7 +75,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         :param iface: An instance of QGisInterface
         :type iface: QGisInterface
         """
-        super(SymbologySharingDialog, self).__init__(parent)
+        super(ResourceSharingDialog, self).__init__(parent)
         self.setupUi(self)
         self.iface = iface
 
@@ -344,7 +342,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
                           'repository?') + '\n' + repo_name
         if QMessageBox.warning(
                 self,
-                self.tr('QGIS Symbology Sharing'),
+                self.tr('QGIS Resource Sharing'),
                 warning,
                 QMessageBox.Yes,
                 QMessageBox.No) == QMessageBox.No:
@@ -414,7 +412,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
             self.progress_dialog.hide()
         else:
             message = self.installer_worker.error_message
-        QtGui.QMessageBox.information(self, 'Symbology Sharing', message)
+        QtGui.QMessageBox.information(self, 'Resource Sharing', message)
         # Clean up the worker and thread
         self.installer_worker.deleteLater()
         self.installer_thread.quit()
@@ -443,7 +441,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         self.reload_collections_model()
         QtGui.QMessageBox.information(
             self,
-            'Symbology Sharing',
+            'Resource Sharing',
             'The collection is uninstalled succesfully!')
 
     def open_collection(self):
@@ -554,7 +552,7 @@ class SymbologySharingDialog(QtGui.QDialog, FORM_CLASS):
         """
         self.progress_dialog = QProgressDialog(self)
         self.progress_dialog.setAutoClose(False)
-        title = self.tr('Symbology Sharing')
+        title = self.tr('Resource Sharing')
         self.progress_dialog.setWindowTitle(title)
         self.progress_dialog.show()
         # Just use infinite progress bar here

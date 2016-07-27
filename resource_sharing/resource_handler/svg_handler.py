@@ -3,8 +3,8 @@ import os
 
 from PyQt4.QtCore import QSettings
 
-from symbology_sharing.resource_handler.base import BaseResourceHandler
-from symbology_sharing.utilities import local_collection_path
+from resource_sharing.resource_handler.base import BaseResourceHandler
+from resource_sharing.utilities import local_collection_path
 
 
 class SVGResourceHandler(BaseResourceHandler):

@@ -52,5 +52,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from symbology_sharing.plugin import Plugin
+    from resource_sharing.plugin import Plugin
     return Plugin(iface)

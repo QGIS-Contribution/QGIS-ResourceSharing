@@ -6,15 +6,15 @@ import shutil
 from PyQt4.QtCore import (
     pyqtSignal, QObject)
 
-from symbology_sharing import config
-from symbology_sharing.config import (
+from resource_sharing import config
+from resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
-from symbology_sharing.utilities import (
+from resource_sharing.utilities import (
     local_collection_path,
     render_template,
     resources_path)
-from symbology_sharing.repository_handler import BaseRepositoryHandler
-from symbology_sharing.resource_handler import BaseResourceHandler
+from resource_sharing.repository_handler import BaseRepositoryHandler
+from resource_sharing.resource_handler import BaseResourceHandler
 
 
 class CollectionInstaller(QObject):

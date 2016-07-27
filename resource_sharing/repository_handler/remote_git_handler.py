@@ -6,9 +6,9 @@ from qgis.core import QgsApplication
 
 from ext_libs.giturlparse import parse, validate
 from ext_libs.dulwich import porcelain
-from symbology_sharing.repository_handler.base import BaseRepositoryHandler
-from symbology_sharing.network_manager import NetworkManager
-from symbology_sharing.utilities import local_collection_path
+from resource_sharing.repository_handler.base import BaseRepositoryHandler
+from resource_sharing.network_manager import NetworkManager
+from resource_sharing.utilities import local_collection_path
 
 
 class RemoteGitHandler(BaseRepositoryHandler):
@@ -82,7 +82,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
         # Clone or pull the repositories first
         local_repo_dir = os.path.join(
             QgsApplication.qgisSettingsDirPath(),
-            'symbology_sharing',
+            'resource_sharing',
             'repositories',
             self.git_host, self.git_owner, self.git_repository)
         if not os.path.exists(local_repo_dir):

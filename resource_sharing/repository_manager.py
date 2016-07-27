@@ -5,14 +5,14 @@ import pickle
 
 from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
 
-from symbology_sharing.utilities import (
+from resource_sharing.utilities import (
     repo_settings_group, local_collection_path, repositories_cache_path)
-from symbology_sharing.repository_handler import BaseRepositoryHandler
-from symbology_sharing.network_manager import NetworkManager
-from symbology_sharing.collection_manager import CollectionManager
-from symbology_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
-from symbology_sharing import config
-from symbology_sharing.exception import MetadataError
+from resource_sharing.repository_handler import BaseRepositoryHandler
+from resource_sharing.network_manager import NetworkManager
+from resource_sharing.collection_manager import CollectionManager
+from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
+from resource_sharing import config
+from resource_sharing.exception import MetadataError
 
 
 class RepositoryManager(QObject):

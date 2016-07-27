@@ -5,7 +5,7 @@ import ntpath
 from PyQt4.QtCore import QDir
 from qgis.core import QgsApplication, QGis
 
-from symbology_sharing import config
+from resource_sharing import config
 import jinja2
 
 
@@ -44,15 +44,15 @@ def ui_path(*args):
 
 
 def repo_settings_group():
-    """Get the settings group for Symbology Sharing Dialog."""
-    return '/SymbologySharing/repository'
+    """Get the settings group for Resource Sharing Dialog."""
+    return '/ResourceSharing/repository'
 
 
 def repositories_cache_path():
     """Get the path to the repositories cache."""
     return os.path.join(
         QgsApplication.qgisSettingsDirPath(),
-        'symbology_sharing',
+        'resource_sharing',
         'repositories_cache')
 
 
@@ -64,7 +64,7 @@ def local_collection_path(id=None):
     path = os.path.join(
         QDir.homePath(),
         'QGIS',
-        'Symbology Manager')
+        'Resource Sharing')
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         dir_name = '%s (%s)' % (collection_name, id)

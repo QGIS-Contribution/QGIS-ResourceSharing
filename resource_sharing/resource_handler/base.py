@@ -1,8 +1,8 @@
 # coding=utf-8
 import os
 
-from symbology_sharing.utilities import local_collection_path
-from symbology_sharing import config
+from resource_sharing.utilities import local_collection_path
+from resource_sharing import config
 
 
 class ResourceHandlerMeta(type):

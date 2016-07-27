@@ -6,7 +6,7 @@ import codecs
 from PyQt4.QtCore import QFileInfo, QUrl, Qt, QFile
 from qgis.core import QgsApplication
 
-from symbology_sharing.utilities import path_leaf
+from resource_sharing.utilities import path_leaf
 
 
 class SymbolResolverMixin(object):

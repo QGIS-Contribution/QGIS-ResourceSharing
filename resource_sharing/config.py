@@ -4,7 +4,7 @@
 # http://effbot.org/pyfaq/how-do-i-share-global-variables-across-modules.htm
 
 Always call this variable as attribute from config module e.g:
-    from symbology_sharing import config
+    from resource_sharing import config
     print config.COLLECTIONS
 
 config.COLLECTIONS is a dict of collection with this structure:

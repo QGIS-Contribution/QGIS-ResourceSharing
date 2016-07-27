@@ -14,6 +14,7 @@ This project uses git submodule for the test data. To clone the project complete
 
 ```
 git clone git@github.com:akbargumbira/qgis_resources_sharing.git <the destination directory>
+cd <the destination directory>
 git submodule init
 git submodule update
 ```

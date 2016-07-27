@@ -21,7 +21,7 @@ git submodule update
 
 
 ## Status
-[![Build Status](https://travis-ci.org/akbargumbira/qgis_symbology_sharing.svg?branch=master)](https://travis-ci.org/akbargumbira/qgis_symbology_sharing) [![Coverage Status](https://coveralls.io/repos/github/akbargumbira/qgis_symbology_sharing/badge.svg?branch=master)](https://coveralls.io/github/akbargumbira/qgis_symbology_sharing?branch=master) 
+[![Build Status](https://travis-ci.org/akbargumbira/qgis_resources_sharing.svg?branch=master)](https://travis-ci.org/akbargumbira/qgis_resources_sharing) [![Coverage Status](https://coveralls.io/repos/github/akbargumbira/qgis_resources_sharing/badge.svg?branch=master)](https://coveralls.io/github/akbargumbira/qgis_resources_sharing?branch=master) 
 
 ## Participation
-[![Gitter](https://badges.gitter.im/akbargumbira/qgis_symbology_sharing.svg)](https://gitter.im/akbargumbira/qgis_symbology_sharing?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) 
+[![Gitter](https://badges.gitter.im/akbargumbira/qgis_resources_sharing.svg)](https://gitter.im/akbargumbira/qgis_resources_sharing?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) 

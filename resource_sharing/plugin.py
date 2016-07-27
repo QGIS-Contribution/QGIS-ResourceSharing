@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- QgsSymbologySharing
                                  A QGIS plugin
- Download colllections shared by other users
+ Download collections shared by other users
                               -------------------
         begin                : 2016-05-29
         git sha              : $Format:%H$
@@ -25,7 +24,7 @@ import os.path
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QAction, QIcon
 
-from gui.qgs_symbology_sharing_dialog import SymbologySharingDialog
+from gui.resource_sharing_dialog import ResourceSharingDialog
 from utilities import resources_path
 
 
@@ -49,7 +48,7 @@ class Plugin:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'QgsSymbologySharing_{}.qm'.format(locale))
+            'QgsResourceSharing_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -59,14 +58,14 @@ class Plugin:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = SymbologySharingDialog(iface=self.iface)
+        self.dlg = ResourceSharingDialog(iface=self.iface)
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Symbology Sharing')
+        self.menu = self.tr(u'&Resource Sharing')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'QgsSymbologySharing')
-        self.toolbar.setObjectName(u'QgsSymbologySharing')
+        self.toolbar = self.iface.addToolBar(u'QgsResourceSharing')
+        self.toolbar.setObjectName(u'QgsResourceSharing')
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -81,7 +80,7 @@ class Plugin:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('QgsSymbologySharing', message)
+        return QCoreApplication.translate('QgsResourceSharing', message)
 
 
     def add_action(
@@ -163,16 +162,15 @@ class Plugin:
         icon_path = resources_path('icon.png')
         self.add_action(
             icon_path,
-            text=self.tr(u'Symbology Sharing'),
+            text=self.tr(u'Resource Sharing'),
             callback=self.run,
             parent=self.iface.mainWindow())
-
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Symbology Sharing'),
+                self.tr(u'&Resource Sharing'),
                 action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar

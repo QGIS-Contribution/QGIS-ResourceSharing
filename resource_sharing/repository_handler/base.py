@@ -11,8 +11,8 @@ from ConfigParser import SafeConfigParser
 
 from PyQt4.QtCore import QTemporaryFile
 
-from symbology_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
-from symbology_sharing.exception import MetadataError
+from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
+from resource_sharing.exception import MetadataError
 
 
 class RepositoryHandlerMeta(type):

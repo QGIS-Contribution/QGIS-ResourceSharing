@@ -4,9 +4,9 @@ import fnmatch
 
 from qgis.core import QgsStyleV2
 
-from symbology_sharing.resource_handler.base import BaseResourceHandler
-from symbology_sharing.symbol_xml_extractor import SymbolXMLExtractor
-from symbology_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin
+from resource_sharing.resource_handler.base import BaseResourceHandler
+from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
+from resource_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin
 
 
 class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):

@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import shutil
+import logging
 
 from qgis.core import QgsApplication
 
@@ -9,6 +10,9 @@ from ext_libs.dulwich import porcelain
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.network_manager import NetworkManager
 from resource_sharing.utilities import local_collection_path
+
+
+LOGGER = logging.getLogger('QGIS Resources Sharing')
 
 
 class RemoteGitHandler(BaseRepositoryHandler):
@@ -91,6 +95,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 repo = porcelain.clone(self.url.encode('utf-8'), local_repo_dir)
             except Exception as e:
                 error_message = 'Error: %s' % str(e)
+                LOGGER.exception(error_message)
+
                 return False, error_message
 
             if not repo:
@@ -101,6 +107,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 porcelain.pull(local_repo_dir, self.url.encode('utf-8'), b'refs/heads/master')
             except Exception as e:
                 error_message = 'Error: %s' % str(e)
+                LOGGER.exception(error_message)
+
                 return False, error_message
 
         # Copy the specific downloaded collection to collections dir

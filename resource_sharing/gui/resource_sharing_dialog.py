@@ -193,7 +193,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                     'On the left you see the list of all collections '
                     'available from the repositories registered in the '
                     'settings.')
-                
+
             context = {
                 'resources_path': resources_path(),
                 'title': title,

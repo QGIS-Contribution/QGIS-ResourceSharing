@@ -2,6 +2,7 @@
 import hashlib
 import os
 import shutil
+import logging
 
 from PyQt4.QtCore import (
     pyqtSignal, QObject)
@@ -15,6 +16,8 @@ from resource_sharing.utilities import (
     resources_path)
 from resource_sharing.repository_handler import BaseRepositoryHandler
 from resource_sharing.resource_handler import BaseResourceHandler
+
+LOGGER = logging.getLogger('QGIS Resources Sharing')
 
 
 class CollectionInstaller(QObject):
@@ -56,6 +59,7 @@ class CollectionInstaller(QObject):
                 self._collection_manager.install(self._collection_id)
             except Exception, e:
                 self.error_message = e
+                LOGGER.exception(e)
         else:
             # Downloaded but killed
             self.aborted.emit()
@@ -100,7 +104,9 @@ class CollectionManager(object):
         repo_url = config.COLLECTIONS[collection_id]['repository_url']
         repo_handler = BaseRepositoryHandler.get_handler(repo_url)
         if repo_handler is None:
-            raise Exception('There is no handler available for the given URL!')
+            message = 'There is no handler available for the given URL!'
+            LOGGER.exception(message)
+            raise Exception(message)
         register_name = config.COLLECTIONS[collection_id]['register_name']
         status, information = repo_handler.download_collection(
             collection_id, register_name)

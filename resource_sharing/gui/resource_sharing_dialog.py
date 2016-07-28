@@ -184,13 +184,6 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                 description = self.tr(
                     'On the left you see the list of all collections '
                     'installed on your QGIS')
-                context = {
-                    'resources_path': resources_path(),
-                    'title': title,
-                    'description': description
-                }
-                self.web_view_details.setHtml(
-                    render_template('tab_description.html', context))
             else:
                 # All
                 self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
@@ -200,13 +193,14 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                     'On the left you see the list of all collections '
                     'available from the repositories registered in the '
                     'settings.')
-                context = {
-                    'resources_path': resources_path(),
-                    'title': title,
-                    'description': description
-                }
-                self.web_view_details.setHtml(
-                    render_template('tab_description.html', context))
+                
+            context = {
+                'resources_path': resources_path(),
+                'title': title,
+                'description': description
+            }
+            self.web_view_details.setHtml(
+                render_template('tab_description.html', context))
             self.stacked_menu_widget.setCurrentIndex(0)
 
     def add_repository(self):

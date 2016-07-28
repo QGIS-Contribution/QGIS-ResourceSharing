@@ -8,6 +8,7 @@ __date__ = '15/03/15'
 
 import codecs
 from ConfigParser import SafeConfigParser
+import urlparse
 
 from PyQt4.QtCore import QTemporaryFile
 
@@ -42,6 +43,7 @@ class BaseRepositoryHandler(object):
         """Constructor of the base class."""
         self._url = None
         self._metadata = None
+        self._url_parse_result = None
 
         # Call proper setters here
         self.url = url
@@ -82,6 +84,7 @@ class BaseRepositoryHandler(object):
     def url(self, url):
         """Setter to the repository's URL."""
         self._url = url
+        self._url_parse_result = urlparse.urlparse(url)
 
     @property
     def metadata(self):

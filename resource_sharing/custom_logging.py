@@ -8,9 +8,17 @@ def setup_logger():
     """Setup logger for the plugin. Should be called only once."""
     logger = logging.getLogger('QGIS Resources Sharing')
     logger.setLevel(logging.DEBUG)
-    # Add handler for qgis logger
+    # Add handler for qgis logger once
     qgis_handler = QgisLogger()
-    logger.addHandler(qgis_handler)
+
+    is_registered = False
+    handler_class_name = qgis_handler.__class__.__name__
+    for logger_handler in logger.handlers:
+        if logger_handler.__class__.__name__ == handler_class_name:
+            is_registered = True
+            break
+    if not is_registered:
+        logger.addHandler(qgis_handler)
 
 
 class QgisLogger(logging.Handler):

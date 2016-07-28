@@ -2,6 +2,7 @@
 import os
 import shutil
 import logging
+import urlparse, urllib
 
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
@@ -68,7 +69,6 @@ class FileSystemHandler(BaseRepositoryHandler):
         return True, None
 
     def preview_url(self, collection_name, filename):
-        return '%s/collections/%s/preview/%s' % (
-            self._url,
-            collection_name,
-            filename)
+        image_path = os.path.join(
+            self._path, 'collections', collection_name, 'preview', filename)
+        return urlparse.urljoin('file:', urllib.pathname2url(image_path))

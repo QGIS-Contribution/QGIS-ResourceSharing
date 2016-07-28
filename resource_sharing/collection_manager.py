@@ -3,6 +3,7 @@ import hashlib
 import os
 import shutil
 import logging
+import traceback
 
 from PyQt4.QtCore import (
     pyqtSignal, QObject)
@@ -59,7 +60,7 @@ class CollectionInstaller(QObject):
                 self._collection_manager.install(self._collection_id)
             except Exception, e:
                 self.error_message = e
-                LOGGER.exception(e)
+                LOGGER.exception(traceback.format_exc())
         else:
             # Downloaded but killed
             self.aborted.emit()
@@ -121,6 +122,7 @@ class CollectionManager(object):
         for resource_handler in BaseResourceHandler.registry.values():
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.install()
+
         config.COLLECTIONS[collection_id]['status'] = COLLECTION_INSTALLED_STATUS
 
     def uninstall(self, collection_id):

@@ -2,6 +2,7 @@
 import os
 import shutil
 import logging
+import traceback
 
 from qgis.core import QgsApplication
 
@@ -95,7 +96,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 repo = porcelain.clone(self.url.encode('utf-8'), local_repo_dir)
             except Exception as e:
                 error_message = 'Error: %s' % str(e)
-                LOGGER.exception(error_message)
+                LOGGER.exception(traceback.format_exc())
 
                 return False, error_message
 
@@ -107,7 +108,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 porcelain.pull(local_repo_dir, self.url.encode('utf-8'), b'refs/heads/master')
             except Exception as e:
                 error_message = 'Error: %s' % str(e)
-                LOGGER.exception(error_message)
+                LOGGER.exception(traceback.format_exc())
 
                 return False, error_message
 

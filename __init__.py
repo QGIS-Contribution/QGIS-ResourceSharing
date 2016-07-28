@@ -23,7 +23,6 @@
 """
 
 import sys
-import copy
 import os
 
 from qgis.core import QgsApplication
@@ -52,5 +51,8 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
+    from resource_sharing.custom_logging import setup_logger
+    setup_logger()
+
     from resource_sharing.plugin import Plugin
     return Plugin(iface)

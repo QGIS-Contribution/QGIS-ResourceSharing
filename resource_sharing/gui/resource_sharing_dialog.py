@@ -22,7 +22,7 @@
 from PyQt4 import QtGui, uic
 from PyQt4.Qt import QSize
 from PyQt4.QtCore import (
-    Qt, QSettings, pyqtSignal, pyqtSlot, QRegExp, QThread, QUrl, QObject)
+    Qt, QSettings, pyqtSlot, QRegExp, QThread, QUrl)
 from PyQt4.QtGui import (
     QIcon,
     QListWidgetItem,
@@ -185,6 +185,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                     'On the left you see the list of all collections '
                     'installed on your QGIS')
                 context = {
+                    'resources_path': resources_path(),
                     'title': title,
                     'description': description
                 }
@@ -200,6 +201,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                     'available from the repositories registered in the '
                     'settings.')
                 context = {
+                    'resources_path': resources_path(),
                     'title': title,
                     'description': description
                 }

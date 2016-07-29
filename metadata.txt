@@ -8,10 +8,10 @@
 
 # Mandatory items:
 [general]
-name=Symbology Sharing
+name=QGIS Resource Sharing
 qgisMinimumVersion=2.0
 qgisMaximumVersion=2.99
-description=Download colllections shared by other users
+description=Download collections shared by other users
 about=Developed as GSoC 2016 project
 
 # Author content information
@@ -19,8 +19,8 @@ version=0.1
 author=Akbar Gumbira
 email=akbargumbira@gmail.com
 
-tracker=https://github.com/akbargumbira/qgis_symbology_sharing/issues
-repository=https://github.com/akbargumbira/qgis_symbology_sharing
+tracker=https://github.com/akbargumbira/qgis_resources_sharing/issues
+repository=https://github.com/akbargumbira/qgis_resources_sharing
 # End of mandatory metadata
 
 # Recommended items:
@@ -29,7 +29,7 @@ repository=https://github.com/akbargumbira/qgis_symbology_sharing
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=symbol, style, svg
+tags=symbol, style, svg, processing
 
 icon=icon.png
 # experimental flag

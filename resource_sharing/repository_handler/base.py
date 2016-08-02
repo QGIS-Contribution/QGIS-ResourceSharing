@@ -135,14 +135,17 @@ class BaseRepositoryHandler(object):
                 collection, 'qgis_maximum_version') and parser.get(
                 collection, 'qgis_maximum_version') or None
             if not qgis_min_version:
-                qgis_min_version = '2'
+                qgis_min_version = '2.0'
             if not qgis_max_version:
-                qgis_max_version = qgis_min_version + '.99'
+                qgis_max_version = '3.99'
             if not isCompatible(
                     QGis.QGIS_VERSION, qgis_min_version, qgis_max_version):
                 LOGGER.info(
                     'Collection %s is not compatible with current QGIS '
-                    'version' % collection)
+                    'version. QGIS ver:%s, QGIS min ver:%s, QGIS max ver: '
+                    '%s' % (
+                        collection, QGis.QGIS_VERSION, qgis_min_version,
+                        qgis_max_version))
                 break
 
             # Collection is compatible, continue parsing

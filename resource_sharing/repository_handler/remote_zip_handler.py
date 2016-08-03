@@ -69,7 +69,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
         zf.extractall(path=local_collection_path(id))
         return True, None
 
-    def preview_url(self, collection_name, filename):
-        image_path = 'collections/%s/preview/%s' % (collection_name, filename)
+    def preview_url(self, collection_name, file_path):
+        image_path = 'collections/%s/%s' % (collection_name, file_path)
         image_url = urlparse.urljoin(self.url, image_path)
         return image_url

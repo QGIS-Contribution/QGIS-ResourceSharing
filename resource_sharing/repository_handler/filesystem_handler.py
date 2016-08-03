@@ -22,8 +22,9 @@ class FileSystemHandler(BaseRepositoryHandler):
         self._path = self._parsed_url.path
 
     def can_handle(self):
-        if self._parsed_url.scheme == 'file':
-            return True
+        if not self.is_git_repository:
+            if self._parsed_url.scheme == 'file':
+                return True
 
     def fetch_metadata(self):
         """Fetch metadata file from the repository."""

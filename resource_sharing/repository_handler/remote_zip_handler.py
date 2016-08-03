@@ -1,7 +1,6 @@
 # coding=utf-8
 import logging
 import urlparse
-import requests
 from zipfile import ZipFile
 
 from PyQt4.QtCore import QTemporaryFile
@@ -23,8 +22,10 @@ class RemoteZipHandler(BaseRepositoryHandler):
         BaseRepositoryHandler.__init__(self, url)
 
     def can_handle(self):
-        if self._parsed_url.scheme == 'http' or self._parsed_url.scheme == 'https':
-            return True
+        if not self.is_git_repository:
+            if self._parsed_url.scheme in ['http', 'https']:
+                return True
+        return False
 
     def fetch_metadata(self):
         """Fetch metadata file from the url."""

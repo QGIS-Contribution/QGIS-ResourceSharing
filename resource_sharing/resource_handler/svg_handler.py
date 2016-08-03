@@ -53,7 +53,9 @@ class SVGResourceHandler(BaseResourceHandler):
             search_paths = search_paths_str.split('|')
 
         collection_directories = os.listdir(local_collection_path())
+
         if len(collection_directories) == 0:
-            search_paths.remove(local_collection_path())
+            if local_collection_path() in search_paths:
+                search_paths.remove(local_collection_path())
 
         settings.setValue('svg/searchPathsForSVG', '|'.join(search_paths))

@@ -61,26 +61,12 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
     def uninstall(self):
         """Uninstall the processing scripts from processing toolbox."""
-        if not os.path.exists(self.resource_dir):
-            return
-
-        # Get all the script files under self.resource_dir
-        processing_files = []
-        for item in os.listdir(self.resource_dir):
-            file_path = os.path.join(self.resource_dir, item)
-            if fnmatch.fnmatch(file_path, '*.py'):
-                processing_files.append(file_path)
-
-        # Remove them from user's scripts dir
-        for processing_file in processing_files:
-            script_file_name = os.path.basename(processing_file)
-            script_name = '%s (%s).%s' % (
-                os.path.splitext(script_file_name)[0],
-                self.collection_id,
-                os.path.splitext(script_file_name)[1],)
-            script_path = os.path.join(self.scripts_folder(), script_name)
-            if os.path.exists(script_path):
-                os.remove(script_path)
+        # Remove the script files containing substring collection_id
+        for item in os.listdir(self.scripts_folder()):
+            if fnmatch.fnmatch(item, '*%s*' % self.collection_id):
+                script_path = os.path.join(self.scripts_folder(), item)
+                if os.path.exists(script_path):
+                    os.remove(script_path)
 
         self.refresh_script_provider()
 

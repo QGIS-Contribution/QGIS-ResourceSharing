@@ -10,7 +10,7 @@ from resource_sharing.utilities import (
 from resource_sharing.repository_handler import BaseRepositoryHandler
 from resource_sharing.network_manager import NetworkManager
 from resource_sharing.collection_manager import CollectionManager
-from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
+from resource_sharing.config import COLLECTION_INSTALLED_STATUS
 from resource_sharing import config
 from resource_sharing.exception import MetadataError
 
@@ -241,9 +241,13 @@ class RepositoryManager(QObject):
             for collection in repo_collections:
                 collection_id = self._collections_manager.get_collection_id(collection['register_name'], collection['repository_url'])
                 config.COLLECTIONS[collection_id] = collection
+
                 # Check in the file system if the collection exists
                 if not os.path.exists(local_collection_path(collection_id)):
-                    config.COLLECTIONS[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS
+                    current_status = config.COLLECTIONS[collection_id]['status']
+                    if current_status == COLLECTION_INSTALLED_STATUS:
+                        # Uninstall the collection
+                        self._collections_manager.uninstall(collection_id)
 
     def serialize_repositories(self):
         """Save repositories to cache."""

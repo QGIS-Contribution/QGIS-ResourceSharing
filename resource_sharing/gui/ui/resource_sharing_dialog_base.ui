@@ -158,7 +158,7 @@
           <number>0</number>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page_collections">
           <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -373,14 +373,7 @@
                     <bool>false</bool>
                    </property>
                    <property name="text">
-                    <string>Open</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="button_uninstall">
-                   <property name="text">
-                    <string>Uninstall</string>
+                    <string>Open folder</string>
                    </property>
                   </widget>
                  </item>
@@ -401,6 +394,13 @@
                   <widget class="QPushButton" name="button_install">
                    <property name="text">
                     <string>Install</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="button_uninstall">
+                   <property name="text">
+                    <string>Uninstall</string>
                    </property>
                   </widget>
                  </item>

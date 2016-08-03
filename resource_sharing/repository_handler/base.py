@@ -14,6 +14,7 @@ import logging
 from PyQt4.QtCore import QTemporaryFile
 from qgis.core import QGis
 
+from ext_libs.giturlparse import validate as git_validate
 from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
 from resource_sharing.exception import MetadataError
 from resource_sharing.version_compare import isCompatible
@@ -49,7 +50,7 @@ class BaseRepositoryHandler(object):
         """Constructor of the base class."""
         self._url = None
         self._metadata = None
-        self._url_parse_result = None
+        self._parsed_url = None
 
         # Call proper setters here
         self.url = url
@@ -90,7 +91,12 @@ class BaseRepositoryHandler(object):
     def url(self, url):
         """Setter to the repository's URL."""
         self._url = url
-        self._url_parse_result = urlparse.urlparse(url)
+        self._parsed_url = urlparse.urlparse(url)
+
+    @property
+    def is_git_repository(self):
+        """Flag if a repository is a git repository."""
+        return git_validate(self._url)
 
     @property
     def metadata(self):

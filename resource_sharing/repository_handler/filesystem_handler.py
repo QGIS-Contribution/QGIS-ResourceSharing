@@ -19,11 +19,12 @@ class FileSystemHandler(BaseRepositoryHandler):
         """Constructor."""
         BaseRepositoryHandler.__init__(self, url)
 
-        self._path = self._url_parse_result.path
+        self._path = self._parsed_url.path
 
     def can_handle(self):
-        if self._url_parse_result.scheme == 'file':
-            return True
+        if not self.is_git_repository:
+            if self._parsed_url.scheme == 'file':
+                return True
 
     def fetch_metadata(self):
         """Fetch metadata file from the repository."""

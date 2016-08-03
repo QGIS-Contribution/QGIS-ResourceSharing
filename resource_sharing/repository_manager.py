@@ -242,10 +242,11 @@ class RepositoryManager(QObject):
                 collection_id = self._collections_manager.get_collection_id(collection['register_name'], collection['repository_url'])
                 config.COLLECTIONS[collection_id] = collection
 
-                # Check in the file system if the collection exists
-                if not os.path.exists(local_collection_path(collection_id)):
-                    current_status = config.COLLECTIONS[collection_id]['status']
-                    if current_status == COLLECTION_INSTALLED_STATUS:
+                # Check in the file system if the collection exists for all
+                # installed collections. If not, also uninstall resources
+                current_status = config.COLLECTIONS[collection_id]['status']
+                if current_status == COLLECTION_INSTALLED_STATUS:
+                    if not os.path.exists(local_collection_path(collection_id)):
                         # Uninstall the collection
                         self._collections_manager.uninstall(collection_id)
 

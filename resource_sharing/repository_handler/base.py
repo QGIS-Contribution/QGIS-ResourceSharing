@@ -49,7 +49,7 @@ class BaseRepositoryHandler(object):
         """Constructor of the base class."""
         self._url = None
         self._metadata = None
-        self._url_parse_result = None
+        self._parsed_url = None
 
         # Call proper setters here
         self.url = url
@@ -90,7 +90,7 @@ class BaseRepositoryHandler(object):
     def url(self, url):
         """Setter to the repository's URL."""
         self._url = url
-        self._url_parse_result = urlparse.urlparse(url)
+        self._parsed_url = urlparse.urlparse(url)
 
     @property
     def metadata(self):

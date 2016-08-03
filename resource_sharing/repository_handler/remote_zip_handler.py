@@ -50,7 +50,8 @@ class RemoteZipHandler(BaseRepositoryHandler):
         :type register_name: unicode
         """
         # Download the zip first
-        zip_collection_url = urlparse.urljoin(self.url, 'collections', register_name)
+        collection_path = 'collections/%s.zip' % register_name
+        zip_collection_url = urlparse.urljoin(self.url, collection_path)
         network_manager = NetworkManager(zip_collection_url)
         status, description = network_manager.fetch()
 
@@ -68,6 +69,6 @@ class RemoteZipHandler(BaseRepositoryHandler):
         return True, None
 
     def preview_url(self, collection_name, filename):
-        image_url = urlparse.urljoin(
-            self.url, 'collections', collection_name, 'preview', filename)
+        image_path = 'collections/%s/preview/%s' % (collection_name, filename)
+        image_url = urlparse.urljoin(self.url, image_path)
         return image_url

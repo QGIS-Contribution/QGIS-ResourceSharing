@@ -9,11 +9,17 @@ __date__ = '15/03/15'
 import codecs
 from ConfigParser import SafeConfigParser
 import urlparse
+import logging
 
 from PyQt4.QtCore import QTemporaryFile
+from qgis.core import QGis
 
 from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
 from resource_sharing.exception import MetadataError
+from resource_sharing.version_compare import isCompatible
+
+
+LOGGER = logging.getLogger('QGIS Resources Sharing')
 
 
 class RepositoryHandlerMeta(type):
@@ -107,7 +113,6 @@ class BaseRepositoryHandler(object):
             metadata_file.write(self.metadata)
             metadata_file.close()
 
-        # TODO: Add colection only if the version is ok with user's QGIS
         try:
             parser = SafeConfigParser()
             with codecs.open(metadata_file.fileName(), 'r', encoding='utf-8') as f:
@@ -122,12 +127,32 @@ class BaseRepositoryHandler(object):
             collection.strip() for collection in collections_str.split(',')]
         # Read all the collections
         for collection in collection_list:
+            # Parse the version
+            qgis_min_version = parser.has_option(
+                collection, 'qgis_minimum_version') and parser.get(
+                collection, 'qgis_minimum_version') or None
+            qgis_max_version = parser.has_option(
+                collection, 'qgis_maximum_version') and parser.get(
+                collection, 'qgis_maximum_version') or None
+            if not qgis_min_version:
+                qgis_min_version = '2.0'
+            if not qgis_max_version:
+                qgis_max_version = '3.99'
+            if not isCompatible(
+                    QGis.QGIS_VERSION, qgis_min_version, qgis_max_version):
+                LOGGER.info(
+                    'Collection %s is not compatible with current QGIS '
+                    'version. QGIS ver:%s, QGIS min ver:%s, QGIS max ver: '
+                    '%s' % (
+                        collection, QGis.QGIS_VERSION, qgis_min_version,
+                        qgis_max_version))
+                break
+
+            # Collection is compatible, continue parsing
             try:
                 name = parser.get(collection, 'name')
                 tags = parser.get(collection, 'tags')
                 description = parser.get(collection, 'description')
-                qgis_min_version = parser.get(collection, 'qgis_minimum_version')
-                qgis_max_version = parser.get(collection, 'qgis_maximum_version')
 
                 # Parse the preview urls
                 preview_str = parser.has_option(collection, 'preview') and parser.get(collection, 'preview') or ''
@@ -135,7 +160,6 @@ class BaseRepositoryHandler(object):
                 preview_list = []
                 for preview in preview_file_list:
                     preview_list.append(self.preview_url(collection, preview))
-
             except Exception as e:
                 raise MetadataError('Error parsing metadata: %s' % e)
 

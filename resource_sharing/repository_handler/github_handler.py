@@ -22,9 +22,9 @@ class GithubHandler(RemoteGitHandler):
             self.git_repository,
             self.METADATA_FILE)
 
-    def preview_url(self, collection_name, filename):
-        return 'https://raw.githubusercontent.com/%s/%s/master/collections/%s/preview/%s' % (
+    def preview_url(self, collection_name, file_path):
+        return 'https://raw.githubusercontent.com/%s/%s/master/collections/%s/%s' % (
             self.git_owner,
             self.git_repository,
             collection_name,
-            filename)
+            file_path)

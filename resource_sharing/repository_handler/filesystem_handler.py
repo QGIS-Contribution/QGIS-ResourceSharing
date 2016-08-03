@@ -68,7 +68,7 @@ class FileSystemHandler(BaseRepositoryHandler):
 
         return True, None
 
-    def preview_url(self, collection_name, filename):
+    def preview_url(self, collection_name, file_path):
         image_path = os.path.join(
-            self._path, 'collections', collection_name, 'preview', filename)
+            self._path, 'collections', collection_name, file_path)
         return urlparse.urljoin('file:', urllib.pathname2url(image_path))

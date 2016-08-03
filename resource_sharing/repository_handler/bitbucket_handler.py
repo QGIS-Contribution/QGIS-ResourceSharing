@@ -22,9 +22,9 @@ class BitBucketHandler(RemoteGitHandler):
             self.git_repository,
             self.METADATA_FILE)
 
-    def preview_url(self, collection_name, filename):
-        return 'https://bitbucket.org/%s/%s/raw/master/collections/%s/preview/%s' % (
+    def preview_url(self, collection_name, file_path):
+        return 'https://bitbucket.org/%s/%s/raw/master/collections/%s/%s' % (
             self.git_owner,
             self.git_repository,
             collection_name,
-            filename)
+            file_path)

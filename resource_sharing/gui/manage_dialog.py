@@ -22,6 +22,9 @@
 """
 
 from PyQt4 import QtGui, uic
+from PyQt4.QtCore import Qt
+from PyQt4.QtGui import QDialog, QVBoxLayout, QDialogButtonBox
+from qgis.gui import QgsAuthConfigSelect
 
 from ..utilities import ui_path
 
@@ -36,12 +39,41 @@ class ManageRepositoryDialog(QtGui.QDialog, FORM_CLASS):
         self.line_edit_url.setText('http://')
         self.line_edit_name.textChanged.connect(self.form_changed)
         self.line_edit_url.textChanged.connect(self.form_changed)
+        self.button_add_auth.clicked.connect(self.add_authentication)
+        self.button_clear_auth.clicked.connect(self.line_edit_auth_id.clear)
 
     def form_changed(self):
         """Slot for when the form changed."""
         is_enabled = (len(self.line_edit_name.text()) > 0 and
                       len(self.line_edit_url.text()) > 0)
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(is_enabled)
+
+    def add_authentication(self):
+        """Slot for when the add auth button is clicked."""
+        dlg = QDialog(self)
+        dlg.setWindowTitle(self.tr("Select Authentication"))
+        layout = QVBoxLayout(dlg)
+
+        acs = QgsAuthConfigSelect(dlg)
+        if self.line_edit_auth_id.text():
+            acs.setConfigId(self.line_edit_auth_id.text())
+        layout.addWidget(acs)
+
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal,
+            dlg)
+        layout.addWidget(button_box)
+        button_box.accepted.connect(dlg.accept)
+        button_box.rejected.connect(dlg.close)
+
+        dlg.setLayout(layout)
+        dlg.setWindowModality(Qt.WindowModal)
+        if dlg.exec_():
+            self.line_edit_auth_id.setText(acs.configId())
+        del dlg
+
+
 
 
 

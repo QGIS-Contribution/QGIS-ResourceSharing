@@ -49,6 +49,7 @@ class BaseRepositoryHandler(object):
     def __init__(self, url=None):
         """Constructor of the base class."""
         self._url = None
+        self._auth_cfg = None
         self._metadata = None
         self._parsed_url = None
 
@@ -92,6 +93,16 @@ class BaseRepositoryHandler(object):
         """Setter to the repository's URL."""
         self._url = url
         self._parsed_url = urlparse.urlparse(url)
+
+    @property
+    def auth_cfg(self):
+        """The authentication configuration id."""
+        return self._auth_cfg
+
+    @auth_cfg.setter
+    def auth_cfg(self, auth_cfg):
+        """Setter to the authentication configuration id."""
+        self._auth_cfg = auth_cfg
 
     @property
     def is_git_repository(self):

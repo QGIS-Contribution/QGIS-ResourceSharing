@@ -219,6 +219,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
 
         repo_name = dlg.line_edit_name.text()
         repo_url = dlg.line_edit_url.text().strip()
+        repo_auth_cfg\
+            = dlg.line_edit_auth_id.text().strip()
         if repo_name in self.repository_manager.directories:
             repo_name += '(2)'
 
@@ -228,7 +230,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         # Add repository
         try:
             status, description = self.repository_manager.add_directory(
-                repo_name, repo_url)
+                repo_name, repo_url, repo_auth_cfg)
             if status:
                 self.message_bar.pushMessage(
                     self.tr(
@@ -266,6 +268,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         dlg.line_edit_name.setText(repo_name)
         dlg.line_edit_url.setText(
             self.repository_manager.directories[repo_name]['url'])
+        dlg.line_edit_auth_id.setText(
+            self.repository_manager.directories[repo_name]['auth_cfg'])
 
         if not dlg.exec_():
             return
@@ -285,13 +289,15 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         if new_name in self.repository_manager.directories and new_name != repo_name:
             new_name += '(2)'
 
+        new_auth_cfg = dlg.line_edit_auth_id.text()
+
         # Show progress dialog
         self.show_progress_dialog("Fetching repository's metadata")
 
         # Edit repository
         try:
             status, description = self.repository_manager.edit_directory(
-                repo_name, new_name, new_url)
+                repo_name, new_name, new_url, new_auth_cfg)
             if status:
                 self.message_bar.pushMessage(
                     self.tr(
@@ -361,8 +367,10 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
 
         for repo_name in self.repository_manager.directories:
             url = self.repository_manager.directories[repo_name]['url']
+            auth_cfg = self.repository_manager.directories[repo_name]['auth_cfg']
             try:
-                status, description = self.repository_manager.reload_directory(repo_name, url)
+                status, description = self.repository_manager.reload_directory(
+                    repo_name, url, auth_cfg)
                 if status:
                     self.message_bar.pushMessage(
                         self.tr(

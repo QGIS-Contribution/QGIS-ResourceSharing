@@ -27,9 +27,10 @@ class RepositoryManager(QObject):
         - Directories is a list of repository that are registered in user's
         QGIS. Data structure of directories:
         self._directories = {
-            'QGIS Official Repository': 'git@github.com:anitagraser/QGIS-style-repo-dummy.git',
-            'Akbar's Github Repository': 'git@github.com:akbargumbira/QGIS-style-repo-dummy.git',
-            'Akbar's Bitbucket Repository': 'git@bitbucket.org:akbargumbira/qgis-style-repo-dummy.git'
+            'QGIS Official Repository': {
+                'url': 'git@github.com:anitagraser/QGIS-style-repo-dummy.git',
+                'auth_cfg': '0193jkad'
+             }
         }
 
         - Repositories is a dictionary of repository with all the collections
@@ -127,9 +128,12 @@ class RepositoryManager(QObject):
             url = settings.value(
                 repo_name + '/url', '', type=unicode)
             self._directories[repo_name]['url'] = url
+            auth_cfg = settings.value(
+                repo_name + '/auth_cfg', '', type=unicode).strip()
+            self._directories[repo_name]['auth_cfg'] = auth_cfg
         settings.endGroup()
 
-    def add_directory(self, repo_name, url):
+    def add_directory(self, repo_name, url, auth_cfg=None):
         """Add a directory to settings and add the collections from that repo.
 
         :param repo_name: The name of the repository
@@ -141,6 +145,9 @@ class RepositoryManager(QObject):
         repo_handler = BaseRepositoryHandler.get_handler(url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
+
+        if auth_cfg:
+            repo_handler.auth_cfg = auth_cfg
 
         # Fetch metadata
         status, description = repo_handler.fetch_metadata()
@@ -157,13 +164,15 @@ class RepositoryManager(QObject):
             settings = QSettings()
             settings.beginGroup(repo_settings_group())
             settings.setValue(repo_name + '/url', url)
+            if auth_cfg:
+                settings.setValue(repo_name + '/auth_cfg', auth_cfg)
             settings.endGroup()
             # Serialize repositories every time we successfully added a repo
             self.serialize_repositories()
 
         return status, description
 
-    def edit_directory(self, old_repo_name, new_repo_name, new_url):
+    def edit_directory(self, old_repo_name, new_repo_name, new_url, new_auth_cfg):
         """Edit a directory and update the collections.
 
         :param old_repo_name: The old name of the repository
@@ -179,6 +188,10 @@ class RepositoryManager(QObject):
         repo_handler = BaseRepositoryHandler.get_handler(new_url)
         if repo_handler is None:
             raise Exception('There is no handler available for the given URL!')
+
+        if new_auth_cfg:
+            repo_handler.auth_cfg = new_auth_cfg
+
         status, description = repo_handler.fetch_metadata()
 
         if status:
@@ -198,6 +211,7 @@ class RepositoryManager(QObject):
             settings.beginGroup(repo_settings_group())
             settings.remove(old_repo_name)
             settings.setValue(new_repo_name + '/url', new_url)
+            settings.setValue(new_repo_name + '/auth_cfg', new_auth_cfg)
             settings.endGroup()
             # Serialize repositories every time we successfully edited repo
             self.serialize_repositories()
@@ -220,7 +234,7 @@ class RepositoryManager(QObject):
         # Serialize repositories every time successfully removed a repo
         self.serialize_repositories()
 
-    def reload_directory(self, repo_name, url):
+    def reload_directory(self, repo_name, url, auth_cfg):
         """Re-fetch the directory and update the collections registry.
 
         :param repo_name: The name of the repository
@@ -230,7 +244,7 @@ class RepositoryManager(QObject):
         :type url: str
         """
         # We're basically editing a directory with the same repo name
-        status, description = self.edit_directory(repo_name, repo_name, url)
+        status, description = self.edit_directory(repo_name, repo_name, url, auth_cfg)
         return status, description
 
     def rebuild_collections(self):

@@ -1,17 +1,22 @@
 # coding=utf-8
+import logging
+
 from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
 from PyQt4.QtCore import QUrl, QCoreApplication
 
-from qgis.core import QgsNetworkAccessManager
+from qgis.core import QgsNetworkAccessManager, QgsAuthManager
+
+LOGGER = logging.getLogger('QGIS Resources Sharing')
 
 
 class NetworkManager(object):
     """Class to get the content of the file in the URL given."""
-    def __init__(self, url):
+    def __init__(self, url, auth_cfg=None):
         self._network_manager = QgsNetworkAccessManager.instance()
         self._network_finished = False
         self._network_timeout = False
         self._url = url
+        self._auth_cfg = auth_cfg
         self._content = None
 
     @property
@@ -37,6 +42,11 @@ class NetworkManager(object):
         request.setAttribute(
             QNetworkRequest.CacheLoadControlAttribute,
             QNetworkRequest.AlwaysNetwork)
+
+        if self._auth_cfg:
+            LOGGER.info('Update request with auth_cfg %s' % self._auth_cfg)
+            QgsAuthManager.instance().updateNetworkRequest(request, self._auth_cfg)
+
         self._reply = self._network_manager.get(request)
         self._reply.finished.connect(self.fetch_finished)
         self._network_manager.requestTimedOut.connect(self.request_timeout)

@@ -64,7 +64,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
     def fetch_metadata(self):
         """Fetch metadata file from the repository."""
         # Fetch the metadata
-        network_manager = NetworkManager(self.metadata_url)
+        network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
         status, description = network_manager.fetch()
         if status:
             self.metadata = network_manager.content

@@ -15,7 +15,7 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         BaseResourceHandler.__init__(self, collection_id)
 
     @classmethod
-    def dir_name(self):
+    def dir_name(cls):
         return 'style'
 
     def install(self):

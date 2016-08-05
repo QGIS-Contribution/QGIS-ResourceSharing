@@ -8,7 +8,7 @@ fi
 export QGIS_PREFIX_PATH=${QGIS_PREFIX_PATH}
 export QGIS_PATH=${QGIS_PREFIX_PATH}
 export LD_LIBRARY_PATH=${QGIS_PREFIX_PATH}/lib
-export PYTHONPATH=${QGIS_PREFIX_PATH}/share/qgis/python:${QGIS_PREFIX_PATH}/share/qgis/python/plugins:${EXT_LIBS_PATH}:${PYTHONPATH}
+export PYTHONPATH=${QGIS_PREFIX_PATH}/share/qgis/python:${QGIS_PREFIX_PATH}/share/qgis/python/plugins:${PYTHONPATH}
 
 echo "QGIS PATH: $QGIS_PREFIX_PATH"
 export QGIS_DEBUG=0

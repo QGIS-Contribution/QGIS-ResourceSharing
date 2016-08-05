@@ -2,7 +2,7 @@
 from qgis.testing import start_app, unittest
 import nose2
 
-from symbology_sharing.collection_manager import CollectionManager
+from resource_sharing.collection_manager import CollectionManager
 
 
 class TestCollections(unittest.TestCase):

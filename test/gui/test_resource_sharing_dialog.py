@@ -18,7 +18,7 @@ import nose2
 
 from PyQt4.QtGui import QDialogButtonBox, QDialog
 
-from symbology_sharing.gui.qgs_symbology_sharing_dialog import SymbologySharingDialog
+from resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
 
 
 class QgsSymbologySharingDialogTest(unittest.TestCase):
@@ -29,7 +29,7 @@ class QgsSymbologySharingDialogTest(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test."""
-        self.dialog = SymbologySharingDialog(None)
+        self.dialog = ResourceSharingDialog(None)
 
     def tearDown(self):
         """Runs after each test."""

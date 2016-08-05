@@ -2,7 +2,7 @@
 from qgis.testing import start_app, unittest
 import nose2
 
-from symbology_sharing.repository_handler import (
+from resource_sharing.repository_handler import (
     BaseRepositoryHandler,
     GithubHandler,
     BitBucketHandler)
@@ -16,11 +16,8 @@ class TestBaseHandler(unittest.TestCase):
 
     def test_parse_metadata(self):
         """Testing parsing the metadata."""
+        url
         handler = BaseRepositoryHandler()
-
-        # metadata_path = test_data_path('metadata.ini')
-        # collection = handler.parse_metadata(metadata_path)
-        # print collection
 
 
 class TestRepositoryHandler(unittest.TestCase):

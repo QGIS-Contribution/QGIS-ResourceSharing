@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 
+from PyQt4.QtCore import QUrl
 
 def test_data_path(*args):
     """Return the absolute path to the InaSAFE test data or directory path.
@@ -20,3 +21,12 @@ def test_data_path(*args):
         path = os.path.abspath(os.path.join(path, item))
 
     return path
+
+
+def test_repository_url():
+    """Return the test repository URL on file system.
+
+    :return: The test repository URL string
+    :rtype: str
+    """
+    return QUrl.fromLocalFile(test_data_path()).toString()

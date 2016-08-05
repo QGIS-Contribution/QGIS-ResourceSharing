@@ -3,10 +3,10 @@ from qgis.testing import start_app, unittest
 import nose2
 
 from resource_sharing.repository_handler import (
-    BaseRepositoryHandler,
+    FileSystemHandler,
     GithubHandler,
     BitBucketHandler)
-from utilities import test_data_path
+from utilities import test_repository_url
 
 
 class TestBaseHandler(unittest.TestCase):
@@ -14,10 +14,36 @@ class TestBaseHandler(unittest.TestCase):
     def setUpClass(cls):
         start_app()
 
+    def setUp(self):
+        self.fs_handler = FileSystemHandler(test_repository_url())
+
+    def test_is_git_repository(self):
+        self.assertEqual(self.fs_handler.is_git_repository, False)
+
     def test_parse_metadata(self):
         """Testing parsing the metadata."""
-        url
-        handler = BaseRepositoryHandler()
+        self.fs_handler.fetch_metadata()
+        collections = self.fs_handler.parse_metadata()
+        # There's only 1 collection defined there
+        self.assertEqual(len(collections), 1)
+        expected_collection = {
+            'status': 0,
+            'description':
+                u'The collection contains various resources for testing',
+            'tags': u'test, symbol, svg, processing',
+            'register_name': u'test_collection',
+            'repository_url': u'file:///home/akbar/dev/python/qgis_resources_sharing/test/data',
+            'name': u"Akbar's Test Collection",
+            'author': u'Akbar Gumbira',
+            'author_email': u'akbargumbira@gmail.com',
+            'qgis_min_version': u'2.0',
+            'qgis_max_version': u'2.99',
+            'preview': [
+                u'file:///home/akbar/dev/python/qgis_resources_sharing/test/data/collections/test_collection/prev_1.png',
+                u'file:///home/akbar/dev/python/qgis_resources_sharing/test/data/collections/test_collection/prev_2.png'
+            ]
+        }
+        self.assertEqual(collections[0], expected_collection)
 
 
 class TestRepositoryHandler(unittest.TestCase):

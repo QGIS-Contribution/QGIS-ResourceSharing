@@ -17,7 +17,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
     """Class to handle remote zip repository."""
     IS_DISABLED = False
 
-    def __init__(self, url=None):
+    def __init__(self, url):
         """Constructor."""
         BaseRepositoryHandler.__init__(self, url)
 

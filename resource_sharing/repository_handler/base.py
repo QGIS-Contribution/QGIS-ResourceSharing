@@ -46,7 +46,7 @@ class BaseRepositoryHandler(object):
     METADATA_FILE = 'metadata.ini'
     IS_DISABLED = False
 
-    def __init__(self, url=None):
+    def __init__(self, url):
         """Constructor of the base class."""
         self._url = None
         self._auth_cfg = None
@@ -124,6 +124,11 @@ class BaseRepositoryHandler(object):
 
     def parse_metadata(self):
         """Parse str metadata to collection dict."""
+        if not self.metadata:
+            msg = 'The metadata content is None'
+            LOGGER.error(msg)
+            raise MetadataError(msg)
+
         collections = []
         metadata_file = QTemporaryFile()
         if metadata_file.open():

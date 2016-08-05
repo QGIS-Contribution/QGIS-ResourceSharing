@@ -15,7 +15,7 @@ class FileSystemHandler(BaseRepositoryHandler):
     """Class to handle file system repository."""
     IS_DISABLED = False
 
-    def __init__(self, url=None):
+    def __init__(self, url):
         """Constructor."""
         BaseRepositoryHandler.__init__(self, url)
 

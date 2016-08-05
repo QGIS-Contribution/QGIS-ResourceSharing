@@ -7,7 +7,7 @@ class GithubHandler(RemoteGitHandler):
     """Handler class for Github Repository."""
     IS_DISABLED = False
 
-    def __init__(self, url=None):
+    def __init__(self, url):
         RemoteGitHandler.__init__(self, url)
 
     def can_handle(self):

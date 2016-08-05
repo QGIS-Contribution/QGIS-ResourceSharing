@@ -20,7 +20,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
     """Class to handle generic git remote repository."""
     IS_DISABLED = True
 
-    def __init__(self, url=None):
+    def __init__(self, url):
         """Constructor."""
         BaseRepositoryHandler.__init__(self, url)
         self._git_platform = None

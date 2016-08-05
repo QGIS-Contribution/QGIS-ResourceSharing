@@ -31,7 +31,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
         """Fetch metadata file from the url."""
         # Download the metadata
         metadata_url = urlparse.urljoin(self.url, self.METADATA_FILE)
-        network_manager = NetworkManager(metadata_url)
+        network_manager = NetworkManager(metadata_url, self.auth_cfg)
         status, description = network_manager.fetch()
         if status:
             self.metadata = network_manager.content

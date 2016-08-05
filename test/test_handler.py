@@ -32,25 +32,25 @@ class TestBaseHandler(unittest.TestCase):
         collections = self.fs_handler.parse_metadata()
         # There's only 1 collection defined there
         self.assertEqual(len(collections), 1)
+
         expected_collection = {
             'status': 0,
             'description':
                 u'The collection contains various resources for testing',
             'tags': u'test, symbol, svg, processing',
             'register_name': u'test_collection',
-            'repository_url': u'file:///home/akbar/dev/python/qgis_resources_sharing/test/data',
+            'repository_url': test_repository_url(),
             'name': u"Akbar's Test Collection",
             'author': u'Akbar Gumbira',
             'author_email': u'akbargumbira@gmail.com',
             'qgis_min_version': u'2.0',
             'qgis_max_version': u'2.99',
             'preview': [
-                u'file:///home/akbar/dev/python/qgis_resources_sharing/test/data/collections/test_collection/prev_1.png',
-                u'file:///home/akbar/dev/python/qgis_resources_sharing/test/data/collections/test_collection/prev_2.png'
+                '%s/collections/test_collection/preview/prev_1.png' % test_repository_url(),
+                '%s/collections/test_collection/preview/prev_2.png' % test_repository_url()
             ]
         }
-        for key in expected_collection:
-            self.assertEqual(collections[0][key], expected_collection[key])
+        self.assertDictEqual(collections[0], expected_collection)
 
 
 class TestRepositoryHandler(unittest.TestCase):

@@ -219,8 +219,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
 
         repo_name = dlg.line_edit_name.text()
         repo_url = dlg.line_edit_url.text().strip()
-        repo_auth_cfg\
-            = dlg.line_edit_auth_id.text().strip()
+        repo_auth_cfg = dlg.line_edit_auth_id.text().strip()
         if repo_name in self.repository_manager.directories:
             repo_name += '(2)'
 
@@ -280,8 +279,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         for repo in self.repository_manager.directories.values():
             if new_url == repo['url'] and (old_url != new_url):
                 self.message_bar.pushMessage(
-                    self.tr(
-                        'Unable to add another repository with the same URL!'),
+                    self.tr('Unable to add another repository with the same '
+                            'URL!'),
                     QgsMessageBar.CRITICAL, 5)
                 return
 
@@ -300,18 +299,15 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                 repo_name, new_name, new_url, new_auth_cfg)
             if status:
                 self.message_bar.pushMessage(
-                    self.tr(
-                        'Repository is successfully updated'),
+                    self.tr('Repository is successfully updated'),
                     QgsMessageBar.SUCCESS, 5)
             else:
                 self.message_bar.pushMessage(
-                    self.tr(
-                        'Unable to add repository: %s') % description,
+                    self.tr('Unable to add repository: %s') % description,
                     QgsMessageBar.CRITICAL, 5)
         except Exception, e:
             self.message_bar.pushMessage(
-                self.tr('%s') % e,
-                QgsMessageBar.CRITICAL, 5)
+                self.tr('%s') % e, QgsMessageBar.CRITICAL, 5)
         finally:
             self.progress_dialog.hide()
 

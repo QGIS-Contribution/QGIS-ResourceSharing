@@ -24,7 +24,7 @@ from resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS)
 
 
-class QgsSymbologySharingDialogTest(unittest.TestCase):
+class ResourceSharingDialogTest(unittest.TestCase):
     """Test dialog works."""
     @classmethod
     def setUpClass(cls):

@@ -21,22 +21,23 @@
  ***************************************************************************/
 """
 
-from PyQt4 import QtGui, uic
+from PyQt4 import uic
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QDialog, QVBoxLayout, QDialogButtonBox
 from qgis.gui import QgsAuthConfigSelect
 
-from ..utilities import ui_path
+from resource_sharing.utilities import ui_path
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('manage_repository.ui'))
 
 
-class ManageRepositoryDialog(QtGui.QDialog, FORM_CLASS):
+class ManageRepositoryDialog(QDialog, FORM_CLASS):
     def __init__(self, parent=None):
-        """Constructor."""
+        """Create the dialog and configure the UI."""
         super(ManageRepositoryDialog, self).__init__(parent)
         self.setupUi(self)
         self.line_edit_url.setText('http://')
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.line_edit_name.textChanged.connect(self.form_changed)
         self.line_edit_url.textChanged.connect(self.form_changed)
         self.button_add_auth.clicked.connect(self.add_authentication)
@@ -46,7 +47,7 @@ class ManageRepositoryDialog(QtGui.QDialog, FORM_CLASS):
         """Slot for when the form changed."""
         is_enabled = (len(self.line_edit_name.text()) > 0 and
                       len(self.line_edit_url.text()) > 0)
-        self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(is_enabled)
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(is_enabled)
 
     def add_authentication(self):
         """Slot for when the add auth button is clicked."""
@@ -72,9 +73,3 @@ class ManageRepositoryDialog(QtGui.QDialog, FORM_CLASS):
         if dlg.exec_():
             self.line_edit_auth_id.setText(acs.configId())
         del dlg
-
-
-
-
-
-

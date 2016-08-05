@@ -2,3 +2,7 @@
 omit =
     test/*
     ext_libs/*
+    resources/*
+    help/*
+    i18n/*
+    scripts/*

@@ -19,6 +19,9 @@ import nose2
 from PyQt4.QtGui import QDialogButtonBox, QDialog
 
 from resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
+from resource_sharing.config import (
+    COLLECTION_ALL_STATUS,
+    COLLECTION_INSTALLED_STATUS)
 
 
 class QgsSymbologySharingDialogTest(unittest.TestCase):
@@ -59,6 +62,14 @@ class QgsSymbologySharingDialogTest(unittest.TestCase):
                 # Tab All and installed
                 self.assertEqual(
                     self.dialog.stacked_menu_widget.currentIndex(), 0)
+                if index == 0:
+                    self.assertEqual(
+                        self.dialog.collection_proxy.accepted_status,
+                        COLLECTION_ALL_STATUS)
+                else:
+                    self.assertEqual(
+                        self.dialog.collection_proxy.accepted_status,
+                        COLLECTION_INSTALLED_STATUS)
             else:
                 # Tab Settings
                 self.assertEqual(

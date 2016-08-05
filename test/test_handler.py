@@ -3,6 +3,7 @@ from qgis.testing import start_app, unittest
 import nose2
 
 from resource_sharing.repository_handler import (
+    BaseRepositoryHandler,
     FileSystemHandler,
     GithubHandler,
     BitBucketHandler)
@@ -15,7 +16,12 @@ class TestBaseHandler(unittest.TestCase):
         start_app()
 
     def setUp(self):
+        self.base_handler = BaseRepositoryHandler(test_repository_url())
         self.fs_handler = FileSystemHandler(test_repository_url())
+
+    def test_get_handler(self):
+        handler = self.base_handler.get_handler(test_repository_url())
+        self.assertTrue(isinstance(handler, FileSystemHandler))
 
     def test_is_git_repository(self):
         self.assertEqual(self.fs_handler.is_git_repository, False)
@@ -43,7 +49,7 @@ class TestBaseHandler(unittest.TestCase):
                 u'file:///home/akbar/dev/python/qgis_resources_sharing/test/data/collections/test_collection/prev_2.png'
             ]
         }
-        self.assertEqual(collections[0], expected_collection)
+        self.assertDictEqual(collections[0], expected_collection)
 
 
 class TestRepositoryHandler(unittest.TestCase):

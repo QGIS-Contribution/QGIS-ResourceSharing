@@ -49,7 +49,8 @@ class TestBaseHandler(unittest.TestCase):
                 u'file:///home/akbar/dev/python/qgis_resources_sharing/test/data/collections/test_collection/prev_2.png'
             ]
         }
-        self.assertDictEqual(collections[0], expected_collection)
+        for key in expected_collection:
+            self.assertEqual(collections[0][key], expected_collection[key])
 
 
 class TestRepositoryHandler(unittest.TestCase):

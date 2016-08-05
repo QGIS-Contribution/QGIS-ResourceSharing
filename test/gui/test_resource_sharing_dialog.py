@@ -50,5 +50,20 @@ class QgsSymbologySharingDialogTest(unittest.TestCase):
         result = self.dialog.result()
         self.assertEqual(result, QDialog.Rejected)
 
+    def test_set_current_tab(self):
+        """Test set the current tab works."""
+        # Set to index 0, 1, or 2
+        for index in [0, 1, 2]:
+            self.dialog.menu_list_widget.setCurrentRow(index)
+            if index in [0, 1]:
+                # Tab All and installed
+                self.assertEqual(
+                    self.dialog.stacked_menu_widget.currentIndex(), 0)
+            else:
+                # Tab Settings
+                self.assertEqual(
+                    self.dialog.stacked_menu_widget.currentIndex(), 1)
+
+
 if __name__ == "__main__":
     nose2.main()

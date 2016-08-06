@@ -1,13 +1,19 @@
 # coding=utf-8
+import os
+
 from PyQt4.QtXml import QDomDocument
 from PyQt4.QtCore import QFile, QIODevice
 from qgis.core import QgsSymbolLayerV2Utils
 
 
 class SymbolXMLExtractor(object):
-    """A class which parses the given file and returns the symbols and
-    colorramps"""
+    """Parses the given file and returns the symbols and colorramps"""
     def __init__(self, xml_path):
+        """Constructor of the class.
+
+        :param xml_path: The path to the symbol xml
+        :type xml_path: str
+        """
         self._xml_path = xml_path
         self._symbols = []
         self._colorramps = []

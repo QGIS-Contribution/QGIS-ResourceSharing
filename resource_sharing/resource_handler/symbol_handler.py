@@ -6,7 +6,8 @@ from qgis.core import QgsStyleV2
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
-from resource_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin
+from resource_sharing.resource_handler.symbol_resolver_mixin import \
+    SymbolResolverMixin
 
 
 class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
@@ -68,7 +69,8 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                         QgsStyleV2.SymbolEntity, symbol_name, child_id)
 
             for colorramp in symbol_xml_extractor.colorramps:
-                colorramp_name = '%s (%s)' % (colorramp['name'], self.collection_id)
+                colorramp_name = '%s (%s)' % (
+                    colorramp['name'], self.collection_id)
                 if self.style.addColorRamp(
                         colorramp_name, colorramp['colorramp'], True):
                     self.style.group(
@@ -98,4 +100,3 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         # Remove parent group:
         self.style.remove(QgsStyleV2.GroupEntity, parent_group_id)
-

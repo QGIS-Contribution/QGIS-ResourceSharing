@@ -1,7 +1,6 @@
 # coding=utf-8
 import os
 import xml.etree.ElementTree as ET
-import codecs
 
 from PyQt4.QtCore import QFileInfo, QUrl, Qt, QFile
 from qgis.core import QgsApplication
@@ -39,10 +38,10 @@ def fix_xml_node(xml, collection_path, search_paths):
     Loop through the XML nodes to resolve the SVG and image paths
     """
     root = ET.fromstring(xml)
-    path_svg_marker_nodes = root.findall(".//layer/prop[@k='name']")
-    path_svg_fill_nodes = root.findall(".//layer/prop[@k='svgFile']")
-    path_raster_fill_nodes = root.findall(".//layer/prop[@k='imageFile']")
-    path_nodes = path_svg_marker_nodes + path_svg_fill_nodes + path_raster_fill_nodes
+    svg_marker_nodes = root.findall(".//layer/prop[@k='name']")
+    svg_fill_nodes = root.findall(".//layer/prop[@k='svgFile']")
+    raster_fill_nodes = root.findall(".//layer/prop[@k='imageFile']")
+    path_nodes = svg_marker_nodes + svg_fill_nodes + raster_fill_nodes
     for path_node in path_nodes:
         path = resolve_path(path_node.get('v'), collection_path, search_paths)
         path_node.set('v', path)

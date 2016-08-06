@@ -99,4 +99,6 @@ def render_template(filename, context):
     path = os.path.dirname(__file__)
     path = os.path.abspath(
         os.path.join(path, os.pardir, 'resources', 'template'))
-    return jinja2.Environment(loader=jinja2.FileSystemLoader(path)).get_template(filename).render(context)
+    return jinja2.Environment(
+        loader=jinja2.FileSystemLoader(path)
+    ).get_template(filename).render(context)

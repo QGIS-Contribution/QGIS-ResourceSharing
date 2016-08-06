@@ -45,8 +45,8 @@ class RepositoryManager(QObject):
                 'name': parser.get(collection, 'name'),
                 'tags': parser.get(collection, 'tags'),
                 'description': parser.get(collection, 'description'),
-                'qgis_min_version': parser.get(collection, 'qgis_minimum_version'),
-                'qgis_max_version': parser.get(collection, 'qgis_maximum_version')
+                'qgis_min_version': '2.0',
+                'qgis_max_version': '2.99'
             },
             ....
         }
@@ -172,7 +172,12 @@ class RepositoryManager(QObject):
 
         return status, description
 
-    def edit_directory(self, old_repo_name, new_repo_name, new_url, new_auth_cfg):
+    def edit_directory(
+            self,
+            old_repo_name,
+            new_repo_name,
+            new_url,
+            new_auth_cfg):
         """Edit a directory and update the collections.
 
         :param old_repo_name: The old name of the repository
@@ -244,7 +249,12 @@ class RepositoryManager(QObject):
         :type url: str
         """
         # We're basically editing a directory with the same repo name
-        status, description = self.edit_directory(repo_name, repo_name, url, auth_cfg)
+        status, description = self.edit_directory(
+            repo_name,
+            repo_name,
+            url,
+            auth_cfg
+        )
         return status, description
 
     def rebuild_collections(self):
@@ -253,14 +263,18 @@ class RepositoryManager(QObject):
         for repo in self._repositories.keys():
             repo_collections = self._repositories[repo]
             for collection in repo_collections:
-                collection_id = self._collections_manager.get_collection_id(collection['register_name'], collection['repository_url'])
+                collection_id = self._collections_manager.get_collection_id(
+                    collection['register_name'],
+                    collection['repository_url']
+                )
                 config.COLLECTIONS[collection_id] = collection
 
                 # Check in the file system if the collection exists for all
                 # installed collections. If not, also uninstall resources
                 current_status = config.COLLECTIONS[collection_id]['status']
                 if current_status == COLLECTION_INSTALLED_STATUS:
-                    if not os.path.exists(local_collection_path(collection_id)):
+                    collection_path = local_collection_path(collection_id)
+                    if not os.path.exists(collection_path):
                         # Uninstall the collection
                         self._collections_manager.uninstall(collection_id)
 

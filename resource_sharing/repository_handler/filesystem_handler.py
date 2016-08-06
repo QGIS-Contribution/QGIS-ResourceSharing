@@ -2,7 +2,8 @@
 import os
 import shutil
 import logging
-import urlparse, urllib
+import urlparse
+import urllib
 
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
@@ -45,8 +46,8 @@ class FileSystemHandler(BaseRepositoryHandler):
     def download_collection(self, id, register_name):
         """Download a collection given its ID.
 
-        For remote git repositories, we will clone the repository first (or pull
-        if the repo is already cloned before) and copy the collection to
+        For remote git repositories, we will clone the repository first (or
+        pull if the repo is already cloned before) and copy the collection to
         collections dir.
 
         :param id: The ID of the collection.
@@ -59,7 +60,8 @@ class FileSystemHandler(BaseRepositoryHandler):
         # Copy the specific downloaded collection to collections dir
         src_dir = os.path.join(self._path, 'collections', register_name)
         if not os.path.exists(src_dir):
-            error_message = 'Error: The collection does not exist in the repository.'
+            error_message = ('Error: The collection does not exist in the '
+                             'repository.')
             return False, error_message
 
         dest_dir = local_collection_path(id)

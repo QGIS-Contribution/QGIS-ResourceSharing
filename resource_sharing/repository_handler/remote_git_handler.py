@@ -73,8 +73,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
     def download_collection(self, id, register_name):
         """Download a collection given its ID.
 
-        For remote git repositories, we will clone the repository first (or pull
-        if the repo is already cloned before) and copy the collection to
+        For remote git repositories, we will clone the repository first (or
+        pull if the repo is already cloned before) and copy the collection to
         collections dir.
 
         :param id: The ID of the collection.
@@ -89,33 +89,40 @@ class RemoteGitHandler(BaseRepositoryHandler):
             QgsApplication.qgisSettingsDirPath(),
             'resource_sharing',
             'repositories',
-            self.git_host, self.git_owner, self.git_repository)
+            self.git_host, self.git_owner, self.git_repository
+        )
         if not os.path.exists(local_repo_dir):
             os.makedirs(local_repo_dir)
             try:
-                repo = porcelain.clone(self.url.encode('utf-8'), local_repo_dir)
+                repo = porcelain.clone(
+                    self.url.encode('utf-8'), local_repo_dir
+                )
             except Exception as e:
                 error_message = 'Error: %s' % str(e)
                 LOGGER.exception(traceback.format_exc())
-
                 return False, error_message
 
             if not repo:
-                error_message = 'Error: Cloning the repository of the collection failed.'
+                error_message = ('Error: Cloning the repository of the '
+                                 'collection failed.')
                 return False, error_message
         else:
             try:
-                porcelain.pull(local_repo_dir, self.url.encode('utf-8'), b'refs/heads/master')
+                porcelain.pull(
+                    local_repo_dir,
+                    self.url.encode('utf-8'),
+                    b'refs/heads/master'
+                )
             except Exception as e:
                 error_message = 'Error: %s' % str(e)
                 LOGGER.exception(traceback.format_exc())
-
                 return False, error_message
 
         # Copy the specific downloaded collection to collections dir
         src_dir = os.path.join(local_repo_dir, 'collections', register_name)
         if not os.path.exists(src_dir):
-            error_message = 'Error: The collection does not exist in the repository.'
+            error_message = ('Error: The collection does not exist in the '
+                             'repository.')
             return False, error_message
 
         dest_dir = local_collection_path(id)

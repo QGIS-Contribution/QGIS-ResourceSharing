@@ -45,7 +45,9 @@ class NetworkManager(object):
 
         if self._auth_cfg:
             LOGGER.info('Update request with auth_cfg %s' % self._auth_cfg)
-            QgsAuthManager.instance().updateNetworkRequest(request, self._auth_cfg)
+            QgsAuthManager.instance().updateNetworkRequest(
+                request, self._auth_cfg
+            )
 
         self._reply = self._network_manager.get(request)
         self._reply.finished.connect(self.fetch_finished)

@@ -39,7 +39,8 @@ class CollectionInstaller(QObject):
 
         # We can't really kill the process here, so let's finish it even when
         # user cancels the download process
-        download_status, error_message = self._collection_manager.download(self._collection_id)
+        download_status, error_message = self._collection_manager.download(
+            self._collection_id)
 
         # If at this point it's killed, let's abort and tell the main thread
         if self.killed:
@@ -123,7 +124,8 @@ class CollectionManager(object):
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.install()
 
-        config.COLLECTIONS[collection_id]['status'] = COLLECTION_INSTALLED_STATUS
+        config.COLLECTIONS[collection_id]['status'] = \
+            COLLECTION_INSTALLED_STATUS
 
     def uninstall(self, collection_id):
         """Uninstall the collection from QGIS.
@@ -141,4 +143,5 @@ class CollectionManager(object):
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.uninstall()
 
-        config.COLLECTIONS[collection_id]['status'] = COLLECTION_NOT_INSTALLED_STATUS
+        config.COLLECTIONS[collection_id]['status'] = \
+            COLLECTION_NOT_INSTALLED_STATUS

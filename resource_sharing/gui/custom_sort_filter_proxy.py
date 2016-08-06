@@ -41,8 +41,9 @@ class CustomSortFilterProxyModel(QSortFilterProxyModel):
 
         if self.accepted_status == COLLECTION_INSTALLED_STATUS:
             # For installed collection status
-            status = self.sourceModel().data(index, COLLECTION_STATUS_ROLE) == \
-                 COLLECTION_INSTALLED_STATUS
+            collection_status = self.sourceModel().data(
+                index, COLLECTION_STATUS_ROLE)
+            status = collection_status == COLLECTION_INSTALLED_STATUS
         else:
             status = True
 

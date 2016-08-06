@@ -3,7 +3,8 @@ import os
 import fnmatch
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
-from resource_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin
+from resource_sharing.resource_handler.symbol_resolver_mixin import \
+    SymbolResolverMixin
 
 
 class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):

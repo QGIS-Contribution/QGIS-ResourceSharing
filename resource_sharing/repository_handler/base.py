@@ -1,11 +1,5 @@
 # coding=utf-8
 """This module contains the base class of repository handler."""
-
-__author__ = 'akbargumbira@gmail.com'
-__revision__ = '$Format:%H$'
-__date__ = '15/03/15'
-
-
 import codecs
 from ConfigParser import SafeConfigParser
 import urlparse
@@ -137,7 +131,8 @@ class BaseRepositoryHandler(object):
 
         try:
             parser = SafeConfigParser()
-            with codecs.open(metadata_file.fileName(), 'r', encoding='utf-8') as f:
+            metadata_path = metadata_file.fileName()
+            with codecs.open(metadata_path, 'r', encoding='utf-8') as f:
                 parser.readfp(f)
             author = parser.get('general', 'author')
             email = parser.get('general', 'email')

@@ -38,7 +38,9 @@ from qgis.gui import QgsMessageBar
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 from resource_sharing.repository_manager import RepositoryManager
-from resource_sharing.collection_manager import CollectionManager, CollectionInstaller
+from resource_sharing.collection_manager import (
+    CollectionManager,
+    CollectionInstaller)
 from resource_sharing.utilities import (
     resources_path,
     ui_path,
@@ -178,7 +180,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
             # Switch to plugins tab
             if index == 1:
                 # Installed
-                self.collection_proxy.accepted_status = COLLECTION_INSTALLED_STATUS
+                self.collection_proxy.accepted_status = \
+                    COLLECTION_INSTALLED_STATUS
                 # Set the web view
                 title = self.tr('Installed Collections')
                 description = self.tr(
@@ -285,7 +288,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                 return
 
         new_name = dlg.line_edit_name.text()
-        if new_name in self.repository_manager.directories and new_name != repo_name:
+        if (new_name in self.repository_manager.directories) and (
+                    new_name != repo_name):
             new_name += '(2)'
 
         new_auth_cfg = dlg.line_edit_auth_id.text()
@@ -329,7 +333,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         # Check if it's the approved online dir repository
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
-        if settings.value(repo_name + '/url') in self.repository_manager._online_directories.values():
+        if settings.value(repo_name + '/url') in \
+                self.repository_manager._online_directories.values():
             self.message_bar.pushMessage(
                 self.tr(
                     'You can not remove the official repository!'),
@@ -362,8 +367,9 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         self.show_progress_dialog("Reloading all repositories")
 
         for repo_name in self.repository_manager.directories:
-            url = self.repository_manager.directories[repo_name]['url']
-            auth_cfg = self.repository_manager.directories[repo_name]['auth_cfg']
+            directory = self.repository_manager.directories[repo_name]
+            url = directory['url']
+            auth_cfg = directory['auth_cfg']
             try:
                 status, description = self.repository_manager.reload_directory(
                     repo_name, url, auth_cfg)
@@ -510,7 +516,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
             self._selected_collection_id = collection_id
 
             # Enable/disable button
-            is_installed = config.COLLECTIONS[self._selected_collection_id]['status'] == COLLECTION_INSTALLED_STATUS
+            status = config.COLLECTIONS[self._selected_collection_id]['status']
+            is_installed = status == COLLECTION_INSTALLED_STATUS
             if is_installed:
                 self.button_install.setEnabled(True)
                 self.button_install.setText('Reinstall')

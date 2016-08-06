@@ -18,7 +18,8 @@ from resource_sharing.exception import MetadataError
 class RepositoryManager(QObject):
     """Class to handle repositories."""
 
-    DIRECTORY_URL = 'https://raw.githubusercontent.com/anitagraser/QGIS-style-repo-dummy/master/directory.csv'
+    DIRECTORY_URL = ('https://raw.githubusercontent.com/anitagraser/'
+                     'QGIS-style-repo-dummy/master/directory.csv')
 
     def __init__(self):
         """Constructor.

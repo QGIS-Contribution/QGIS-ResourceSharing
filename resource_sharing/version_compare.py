@@ -53,7 +53,8 @@ import re
 
 def normalizeVersion(s):
     """ remove possible prefix from given string and convert to uppercase """
-    prefixes = ['VERSION', 'VER.', 'VER', 'V.', 'V', 'REVISION', 'REV.', 'REV', 'R.', 'R']
+    prefixes = ['VERSION', 'VER.', 'VER', 'V.', 'V', 'REVISION', 'REV.',
+                'REV', 'R.', 'R']
     if not s:
         return unicode()
     s = unicode(s).upper()
@@ -95,8 +96,10 @@ def compareElements(s1, s2):
     # check if the matter is easy solvable:
     if s1 == s2:
         return 0
-    # try to compare as numeric values (but only if the first character is not 0):
-    if s1 and s2 and s1.isnumeric() and s2.isnumeric() and s1[0] != '0' and s2[0] != '0':
+    # try to compare as numeric values (but only if the first character is
+    # not 0):
+    if s1 and s2 and s1.isnumeric() and s2.isnumeric() \
+            and s1[0] != '0' and s2[0] != '0':
         if float(s1) == float(s2):
             return 0
         elif float(s1) > float(s2):
@@ -104,7 +107,8 @@ def compareElements(s1, s2):
         else:
             return 2
     # if the strings aren't numeric or start from 0, compare them as a strings:
-    # but first, set ALPHA < BETA < PREVIEW < RC < TRUNK < [NOTHING] < [ANYTHING_ELSE]
+    # but first, set:
+    # ALPHA < BETA < PREVIEW < RC < TRUNK < [NOTHING] < [ANYTHING_ELSE]
     if s1 not in ['ALPHA', 'BETA', 'PREVIEW', 'RC', 'TRUNK']:
         s1 = 'Z' + s1
     if s2 not in ['ALPHA', 'BETA', 'PREVIEW', 'RC', 'TRUNK']:
@@ -118,7 +122,10 @@ def compareElements(s1, s2):
 
 # ------------------------------------------------------------------------ #
 def compareVersions(a, b):
-    """ Compare two version numbers. Return 0 if a==b or error, 1 if a>b and 2 if b>a """
+    """Compare two version numbers.
+
+    Return 0 if a==b or error, 1 if a>b and 2 if b>a.
+    """
     if not a or not b:
         return 0
     a = normalizeVersion(a)
@@ -136,8 +143,9 @@ def compareVersions(a, b):
     for i in range(l):
         if compareElements(v1[i], v2[i]):
             return compareElements(v1[i], v2[i])
-    # if the lists are identical till the end of the shorther string, try to compare the odd tail
-    #with the simple space (because the 'alpha', 'beta', 'preview' and 'rc' are LESS then nothing)
+    # if the lists are identical till the end of the shorther string, try to
+    # compare the odd tail with the simple space (because the 'alpha',
+    # 'beta', 'preview' and 'rc' are LESS then nothing)
     if len(v1) > l:
         return compareElements(v1[l], u' ')
     if len(v2) > l:
@@ -151,7 +159,8 @@ def compareVersions(a, b):
 
 """
 COMPARE CURRENT QGIS VERSION WITH qgisMinimumVersion AND qgisMaximumVersion
-ALLOWED FORMATS ARE: major.minor OR major.minor.bugfix, where each segment must be 0..99
+ALLOWED FORMATS ARE: major.minor OR major.minor.bugfix, where each segment
+must be 0..99
 """
 
 

@@ -172,11 +172,17 @@ class BaseRepositoryHandler(object):
                 description = parser.get(collection, 'description')
 
                 # Parse the preview urls
-                preview_str = parser.has_option(collection, 'preview') and parser.get(collection, 'preview') or ''
-                preview_file_list = [preview.strip() for preview in preview_str.split(',') if preview.strip() != '']
+                preview_str = parser.has_option(collection, 'preview') and \
+                    parser.get(collection, 'preview') or ''
                 preview_list = []
-                for preview in preview_file_list:
-                    preview_list.append(self.preview_url(collection, preview))
+                for preview in preview_str.split(','):
+                    if preview.strip() != '':
+                        preview_url = self.preview_url(
+                            collection,
+                            preview.strip()
+                        )
+                        preview_list.append(preview_url)
+
             except Exception as e:
                 raise MetadataError('Error parsing metadata: %s' % e)
 

@@ -65,6 +65,11 @@ class TestSymbolResolverMixin(unittest.TestCase):
             'collections', 'test_collection', 'preview', 'prev_1.png')
         self.assertEqual(fixed_path, expected_path)
 
+        # Test case 7: not finding anywhere (return the original path)
+        img_path = '/you/would/not/find/this/anywhere.png'
+        fixed_path = resolve_path(img_path, collection_path, search_paths)
+        self.assertEqual(fixed_path, img_path)
+
 
 if __name__ == "__main__":
     nose2.main()

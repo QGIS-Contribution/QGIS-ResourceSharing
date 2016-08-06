@@ -34,9 +34,7 @@ class SymbolResolverMixin(object):
 
 
 def fix_xml_node(xml, collection_path, search_paths):
-    """
-    Loop through the XML nodes to resolve the SVG and image paths
-    """
+    """Loop through the XML nodes to resolve the SVG and image paths."""
     root = ET.fromstring(xml)
     svg_marker_nodes = root.findall(".//layer/prop[@k='name']")
     svg_fill_nodes = root.findall(".//layer/prop[@k='svgFile']")
@@ -50,8 +48,23 @@ def fix_xml_node(xml, collection_path, search_paths):
 
 
 def resolve_path(path, collection_path, search_paths):
-    """
-    Try to resolve the SVG and image path
+    """Try to resolve the SVG and image path.
+
+    This is the procedure to check it by order:
+        * It might be a full local path, check if it exists
+        * It might be a url (either local file system or http(s))
+        * Check in the 'svg' collection path
+        * Check in the 'image' collection path
+        * Check in the search_paths
+
+    :param path: The original path.
+    :type path: str
+
+    :param collection_path: The downloaded collection path in local.
+    :type collection_path: str
+
+    :param search_paths: List of paths to search the image/svg path
+    :type search_paths: str
     """
     # It might be a full path
     if QFile(path).exists():
@@ -60,8 +73,8 @@ def resolve_path(path, collection_path, search_paths):
     # It might be a url
     if '://'in path:
         url = QUrl(path)
-        if url.isValid() and not url.scheme().isEmpty():
-            if url.scheme().compare("file", Qt.CaseInsensitive) == 0:
+        if url.isValid() and url.scheme() != '':
+            if url.scheme().lower() == 'file':
                 # It's a url to local file
                 path = url.toLocalFile()
                 if QFile(path).exists():

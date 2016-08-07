@@ -11,7 +11,7 @@ class SVGResourceHandler(BaseResourceHandler):
     """Concrete class of the SVG resource handler."""
     IS_DISABLED = False
 
-    def __init__(self, collection_id=None):
+    def __init__(self, collection_id):
         """Constructor of the base class."""
         BaseResourceHandler.__init__(self, collection_id)
 

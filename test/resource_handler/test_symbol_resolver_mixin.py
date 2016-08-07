@@ -4,8 +4,8 @@ import nose2
 
 from PyQt4.QtCore import QUrl
 from resource_sharing.resource_handler.symbol_resolver_mixin import (
-    resolve_path
-)
+    resolve_path,
+    fix_xml_node)
 from test.utilities import test_data_path
 
 
@@ -13,6 +13,44 @@ class TestSymbolResolverMixin(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         start_app()
+
+    def test_fix_xml_node(self):
+        """Test if fixing xml node works."""
+        symbol_xml = """
+            <symbol alpha="1" clip_to_extent="1" type="fill" name="fill_raster">
+                <layer pass="0" class="RasterFill" locked="0">
+                    <prop k="alpha" v="1"/>
+                    <prop k="angle" v="0"/>
+                    <prop k="coordinate_mode" v="0"/>
+                    <prop k="imageFile" v="/you/will/not/find/pikachu.png"/>
+                    <prop k="offset" v="0,0"/>
+                    <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
+                    <prop k="offset_unit" v="MM"/>
+                    <prop k="width" v="0"/>
+                    <prop k="width_map_unit_scale" v="0,0,0,0,0,0"/>
+                    <prop k="width_unit" v="Pixel"/>
+                </layer>
+            </symbol>
+        """
+        collection_path = test_data_path('collections', 'test_collection')
+        fixed_xml = fix_xml_node(symbol_xml, collection_path, [])
+        expected_xml = """<symbol alpha="1" clip_to_extent="1" name="fill_raster" type="fill">
+                <layer class="RasterFill" locked="0" pass="0">
+                    <prop k="alpha" v="1" />
+                    <prop k="angle" v="0" />
+                    <prop k="coordinate_mode" v="0" />
+                    <prop k="imageFile" v="{0}/collections/test_collection/image/pikachu.png" />
+                    <prop k="offset" v="0,0" />
+                    <prop k="offset_map_unit_scale" v="0,0,0,0,0,0" />
+                    <prop k="offset_unit" v="MM" />
+                    <prop k="width" v="0" />
+                    <prop k="width_map_unit_scale" v="0,0,0,0,0,0" />
+                    <prop k="width_unit" v="Pixel" />
+                </layer>
+            </symbol>""".format(test_data_path())
+
+        self.assertEqual(fixed_xml, expected_xml)
+
 
     def test_resolve_path(self):
         """Test resolving the path works correctly."""

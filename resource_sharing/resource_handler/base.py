@@ -27,7 +27,7 @@ class BaseResourceHandler(object):
 
     IS_DISABLED = True
 
-    def __init__(self, collection_id=None):
+    def __init__(self, collection_id):
         """Constructor of the base class."""
         self._collection_id = collection_id
         self._collection = config.COLLECTIONS[self._collection_id]

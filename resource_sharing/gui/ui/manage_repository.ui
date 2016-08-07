@@ -121,6 +121,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>line_edit_name</tabstop>
+  <tabstop>line_edit_url</tabstop>
+  <tabstop>line_edit_auth_id</tabstop>
+  <tabstop>button_add_auth</tabstop>
+  <tabstop>button_clear_auth</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -134,8 +134,6 @@ class BaseRepositoryHandler(object):
             metadata_path = metadata_file.fileName()
             with codecs.open(metadata_path, 'r', encoding='utf-8') as f:
                 parser.readfp(f)
-            author = parser.get('general', 'author')
-            email = parser.get('general', 'email')
             collections_str = parser.get('general', 'collections')
         except Exception as e:
             raise MetadataError('Error parsing metadata: %s' % e)
@@ -167,6 +165,8 @@ class BaseRepositoryHandler(object):
 
             # Collection is compatible, continue parsing
             try:
+                author = parser.get(collection, 'author')
+                email = parser.get(collection, 'email')
                 name = parser.get(collection, 'name')
                 tags = parser.get(collection, 'tags')
                 description = parser.get(collection, 'description')

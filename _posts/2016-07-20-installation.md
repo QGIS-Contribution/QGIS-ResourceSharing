@@ -25,7 +25,7 @@ Github here: https://github.com/akbargumbira/qgis_resources_sharing. There
 are 2 ways that you can do generally: 
 
 * Download the zip from github here: [ZIP Master](https://github
-.com/akbargumbira/qgis_resources_sharing/archive/master.zip]), extract the 
+.com/akbargumbira/qgis_resources_sharing/archive/master.zip), extract the 
 zip, and copy the extracted files into QGIS local plugins directory (on linux
  it's ```~/.qgis2/python/plugins```, on Windows it's ```C:\Users\{username}\.qgis2\python\plugins```
   

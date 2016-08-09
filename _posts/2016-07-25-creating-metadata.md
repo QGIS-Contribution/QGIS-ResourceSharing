@@ -3,7 +3,7 @@ layout: page
 title: "Creating Metadata"
 category: doc
 date: 2016-07-25 14:58:04
-order: 4
+order: 6
 ---
 
 In the root of the repository, you need to create a metadata file defining 

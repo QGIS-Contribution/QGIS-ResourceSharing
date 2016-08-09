@@ -3,7 +3,7 @@ layout: page
 title: "What to share?"
 category: doc
 date: 2016-07-22 17:06:34
-order: 2
+order: 4
 ---
 
 In the repository, you can share collections. Collection is defined as a set 

@@ -3,7 +3,7 @@ layout: page
 title: "Repository Structure"
 category: doc
 date: 2016-07-22 17:04:29
-order: 3
+order: 5
 ---
 
 In order for the plugin to be able to read the repository correctly, the 

@@ -13,7 +13,7 @@ click ```Plugin``` menu and ```Manage and Install Plugins...```. After the
 Plugin Installer dialog shows up, search for ```QGIS Resources Sharing``` in 
 the search box of the dialog in the ```All``` tab.
 
-![Search Plugin]({{ site.url }}/assets/search_plugin.png)
+![Search Plugin]({{ site.baseurl }}/assets/search_plugin.png)
 
 
 Select the ```QGIS Resources Sharing``` plugin and click ```Install```

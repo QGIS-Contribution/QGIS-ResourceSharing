@@ -1,0 +1,1 @@
+../_posts/2016-08-10-publishing-repository.md

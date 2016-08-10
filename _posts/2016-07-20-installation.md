@@ -21,7 +21,7 @@ Select the ```QGIS Resources Sharing``` plugin and click ```Install```
 ### From the repository 
 If you are adventurous and would like to get the latest code of the plugin, 
 you can install it directly from the repository. The repository is in 
-Github here: https://github.com/akbargumbira/qgis_resources_sharing. There 
+Github [here](https://github.com/akbargumbira/qgis_resources_sharing). There 
 are 2 ways that you can do generally: 
 
 * Download the zip from github here: [ZIP Master](https://github

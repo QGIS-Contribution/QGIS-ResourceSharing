@@ -36,3 +36,6 @@ For QML style, the plugin will not do anything other than resolving the image
  style is for later use.
  
 
+### Processing Script
+After the installation, the processing scripts in the collection will be 
+available for use in the Processing Toolbox under ```Scripts``` menu.

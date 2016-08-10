@@ -10,6 +10,8 @@ images, or processing scripts) in a repository so that other users can use it
 Github and Bitbucket public repositories), local file system, or in http(s) 
 with zip collections. 
 
+![the plugin]({{ site.baseurl }}/assets/app.png)
+
 This tool is initially implemented as Google Summer of Code 2016 project for 
 QGIS under OSGeo organization by Akbar Gumbira (student), Alessandro Pasotti 
 (mentor), Anita Graser (mentor), and the help of Richard Duivenvoorde, 

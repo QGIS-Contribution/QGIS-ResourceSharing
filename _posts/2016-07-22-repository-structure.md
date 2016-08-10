@@ -1,9 +1,9 @@
 ---
 layout: page
 title: "Repository Structure"
-category: doc
+category: author
 date: 2016-07-22 17:04:29
-order: 5
+order: 3
 ---
 
 In order for the plugin to be able to read the repository correctly, the 

@@ -1,9 +1,9 @@
 ---
 layout: page
 title: "Creating Repository"
-category: doc
+category: author
 date: 2016-08-09 11:13:38
-order: 3
+order: 1
 ---
 
 

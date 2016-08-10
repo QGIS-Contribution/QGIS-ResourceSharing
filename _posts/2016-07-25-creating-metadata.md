@@ -1,9 +1,9 @@
 ---
 layout: page
 title: "Creating Metadata"
-category: doc
+category: author
 date: 2016-07-25 14:58:04
-order: 6
+order: 4
 ---
 
 In the root of the repository, you need to create a metadata file defining 

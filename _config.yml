@@ -19,10 +19,11 @@ codeurl: 'https://github.com/akbargumbira/qgis_resources_sharing'
 
 # Default categories (in order) to appear in the navigation
 sections: [
-    ['doc', 'Documentation'],
+    ['user', 'For Users'],
+    ['author', 'For Authors'],
+    ['dev', 'For Developers'],
     ['tut', 'Tutorial'],
     ['ref', 'Reference'],
-    ['dev', 'Developers'],
     ['post', 'Posts']
 ]
 

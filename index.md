@@ -3,6 +3,7 @@ layout: default
 title: "Home"
 ---
 
+### QGIS Resource Sharing Plugin
 Have you ever wished you can share QGIS resources easily with your peers? 
 Well, this tool might be handy for you!
 

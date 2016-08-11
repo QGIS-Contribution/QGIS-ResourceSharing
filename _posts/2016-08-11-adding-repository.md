@@ -11,4 +11,7 @@ please go to the ```Settings``` tab. Fill the name and the URL of the
 repository. If there is authentication configuration needed to access the 
 repository, please add the configuration.
 
-[INSERT IMAGE here]
+![Add repository]({{ site.baseurl }}/assets/settings.png)
+
+If the repository is added successfully, you can now browse the collections 
+available from that repository in ```All`` tab and install them.

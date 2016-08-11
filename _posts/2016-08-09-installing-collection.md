@@ -7,13 +7,10 @@ order: 2
 ---
 Now that you have **QGIS Resource Sharing** plugin installed, you can browse 
 the collections available from the repositories registered in the 
-```Settings``` tab and install them on your local machine.
-
-To install a collection, you just simply need to click the collection you 
-want to install and click ```Install``` button below the collection description.
-
-For each type of resources in the collection, the plugin will install them 
-differently.
+```Settings``` tab and install them on your local machine. To install a 
+collection, you just simply need to click the collection you want to install 
+and click ```Install``` button below the collection description. For each 
+type of resources in the collection, the plugin will install them differently.
 
 ### SVG
 If the collection contains SVGs, it will be added to SVG search paths in your
@@ -27,7 +24,7 @@ file) will be installed in the Style Manager.
 
 [INSERT IMAGE Style Manager here]
 For each symbol XML file, the plugin will create a child group with name equals
-to the file name. Please click on the tab ```Marker```, ```Line```,  
+to the file name. Please click on the tab ```Marker```, ```Line```, 
 ```Fill```, or ```Color ramp``` to see what's intalled from the collection.
  
 ### Style

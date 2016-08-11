@@ -46,8 +46,7 @@ Note that right now you need to use branch ```master``` for your repository.
 #### Local File System
 Well, this one is even simpler. After preparing the repository, you can use 
 it right away. In the ```Settings``` tab, try to add a repository with URL 
-pointing to the repository root in your local machine. It's as simple as that
-. If there is a problem with metadata or other issues when adding the 
+pointing to the repository root in your local machine. It's as simple as that. If there is a problem with metadata or other issues when adding the 
 repository, the tools will tell you.
 
 #### Your Own Server
@@ -62,6 +61,9 @@ requirements that you need to be aware of if you choose this option:
   * The collections must be in zip format. For example, if you have a 
   collection named ```test_collection```, the collection must exist in: 
   ```http://www.akbargumbira.com/repository/collections/test_collection.zip```
+  * The preview images are relative to the collection base URL. As an example,
+   if you define the preview images in the metadata ```preview=preview/prev1.png, preview/prev2.png```, it is needed that you have to make the previews 
+  available for collection ```test_collection``` in this URL: ```http://www.akbargumbira.com/repository/collections/test_collection/preview/prev1.png``` and ```http://www.akbargumbira.com/repository/collections/test_collection/preview/prev2.png```
 
 You can also put authentication to this repository as you wish. In the 
 plugin, users can configure authentication details so that they will be able 

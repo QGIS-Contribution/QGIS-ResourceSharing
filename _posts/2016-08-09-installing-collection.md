@@ -16,13 +16,15 @@ type of resources in the collection, the plugin will install them differently.
 If the collection contains SVGs, it will be added to SVG search paths in your
  QGIS. You can directly use those SVGs when you are about to edit a symbol to
   use one of the SVG from the collection
-  [INSERT IMAGE SVG GROUP HERE]
+
+![SVG Group]({{ site.baseurl }}/assets/svg_group.png)
   
 ### Symbol
 The symbols and colorramps from the collection (defined by the XML 
 file) will be installed in the Style Manager. 
 
-[INSERT IMAGE Style Manager here]
+![Style Manager]({{ site.baseurl }}/assets/style_manager.png)
+
 For each symbol XML file, the plugin will create a child group with name equals
 to the file name. Please click on the tab ```Marker```, ```Line```, 
 ```Fill```, or ```Color ramp``` to see what's intalled from the collection.

@@ -14,8 +14,9 @@ type of resources in the collection, the plugin will install them differently.
 
 ### SVG
 If the collection contains SVGs, it will be added to SVG search paths in your
- QGIS. You can directly use those SVGs when you are about to edit a symbol to
-  use one of the SVG from the collection
+ QGIS. You can directly use those SVGs when you want to edit a symbol to
+  use one of the SVG from the collection. The SVGs should be available under 
+  ```Resource Sharing``` section in **SVG Groups**
 
 ![SVG Group]({{ site.baseurl }}/assets/svg_group.png)
   
@@ -27,7 +28,7 @@ file) will be installed in the Style Manager.
 
 For each symbol XML file, the plugin will create a child group with name equals
 to the file name. Please click on the tab ```Marker```, ```Line```, 
-```Fill```, or ```Color ramp``` to see what's intalled from the collection.
+```Fill```, or ```Color ramp``` to see the items installed from the collection.
  
 ### Style
 For QML style, the plugin will not do anything other than resolving the image

@@ -25,8 +25,9 @@ are 2 ways that you can do generally:
 
 * Download the zip from github here: [ZIP Master](https://github
 .com/akbargumbira/qgis_resources_sharing/archive/master.zip), extract the 
-zip, and copy the extracted files into QGIS local plugins directory (on Linux
- it's ```~/.qgis2/python/plugins```, on Windows it's ```C:\Users\{username}\.qgis2\python\plugins```
+zip, and copy the extracted root directory into QGIS local plugins directory 
+(on Linux it's ```~/.qgis2/python/plugins```, on Windows it's 
+```C:\Users\{username}\.qgis2\python\plugins```)
   
-* Use git, clone the repository in that directory (or using symbolic link). 
-If you know git already, I don't think I need to explain more for this :)
+* Use git: clone the repository in that directory or clone in your preferred
+ location and use symbolic link in local plugins directory.

@@ -42,7 +42,7 @@ author=Anita Graser
 email=anitagraser@gmx.at
 tags=osm, spatialite, google maps, roads
 description=The collection contains a complete resources to create a coherent map that looks similar to the old Google Maps style from OSM data in a SpatiaLite database
-preview=osm_spatialite_googlemaps.png, osm_spatialite_googlemaps_lines.qml.png
+preview=image/osm_spatialite_googlemaps.png, image/osm_spatialite_googlemaps_lines.png
 qgis_minimum_version=2.0
 qgis_maximum_version=2.99
 
@@ -52,7 +52,7 @@ author=Anita Graser
 email=anitagraser@gmx.at
 tags=flows, arrows
 description=The collection contains styles for flow maps
-preview=preview.png
+preview=preview/preview.png
 qgis_minimum_version=2.0
 qgis_maximum_version=2.99
 ```

@@ -6,7 +6,7 @@ date: 2016-07-20 17:03:00
 order: 1
 ---
 
-### From QGIS Plugin Manager
+#### From QGIS Plugin Manager
 
 To install the plugin, you can simply use **QGIS Plugin Manager**. In your 
 QGIS, click ```Plugin``` menu and ```Manage and Install Plugins...``` After 
@@ -17,7 +17,7 @@ the Plugin Installer dialog shows up, search for ```QGIS Resources Sharing```
 ![Search Plugin]({{ site.baseurl }}/assets/search_plugin.png)
 
 
-### From the repository 
+#### From the repository 
 If you are adventurous and would like to get the latest code of the plugin, 
 you can install it directly from the repository. The repository is in 
 Github [here](https://github.com/akbargumbira/qgis_resources_sharing). There 

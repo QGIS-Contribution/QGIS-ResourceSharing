@@ -269,6 +269,17 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         if not repo_name:
             return
 
+        # Check if it's the approved online dir repository
+        settings = QSettings()
+        settings.beginGroup(repo_settings_group())
+        if settings.value(repo_name + '/url') in \
+                self.repository_manager._online_directories.values():
+            self.message_bar.pushMessage(
+                self.tr(
+                    'You can not edit the official repositories!'),
+                QgsMessageBar.WARNING, 5)
+            return
+
         dlg = ManageRepositoryDialog(self)
         dlg.line_edit_name.setText(repo_name)
         dlg.line_edit_url.setText(
@@ -340,7 +351,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                 self.repository_manager._online_directories.values():
             self.message_bar.pushMessage(
                 self.tr(
-                    'You can not remove the official repository!'),
+                    'You can not remove the official repositories!'),
                 QgsMessageBar.WARNING, 5)
             return
 

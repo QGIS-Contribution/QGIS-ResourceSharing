@@ -98,9 +98,20 @@ class RemoteGitHandler(BaseRepositoryHandler):
                     self.url.encode('utf-8'), local_repo_dir
                 )
             except Exception as e:
-                error_message = 'Error: %s' % str(e)
-                LOGGER.exception(traceback.format_exc())
-                return False, error_message
+                # Try to clone with https if it's ssh url
+                git_parsed = parse(self.url)
+                if self.url.encode('utf-8') == git_parsed.url2ssh:
+                    try:
+                        repo = porcelain.clone(
+                            git_parsed.url2https, local_repo_dir)
+                    except Exception as e:
+                        error_message = 'Error: %s' % str(e)
+                        LOGGER.exception(traceback.format_exc())
+                        return False, error_message
+                else:
+                    error_message = 'Error: %s' % str(e)
+                    LOGGER.exception(traceback.format_exc())
+                    return False, error_message
 
             if not repo:
                 error_message = ('Error: Cloning the repository of the '
@@ -114,9 +125,23 @@ class RemoteGitHandler(BaseRepositoryHandler):
                     b'refs/heads/master'
                 )
             except Exception as e:
-                error_message = 'Error: %s' % str(e)
-                LOGGER.exception(traceback.format_exc())
-                return False, error_message
+                # Try to pull with https if it's ssh url
+                git_parsed = parse(self.url)
+                if self.url.encode('utf-8') == git_parsed.url2ssh:
+                    try:
+                        porcelain.pull(
+                            local_repo_dir,
+                            git_parsed.url2https,
+                            b'refs/heads/master'
+                        )
+                    except Exception as e:
+                        error_message = 'Error: %s' % str(e)
+                        LOGGER.exception(traceback.format_exc())
+                        return False, error_message
+                else:
+                    error_message = 'Error: %s' % str(e)
+                    LOGGER.exception(traceback.format_exc())
+                    return False, error_message
 
         # Copy the specific downloaded collection to collections dir
         src_dir = os.path.join(local_repo_dir, 'collections', register_name)

@@ -32,7 +32,8 @@ from PyQt4.QtGui import (
     QProgressDialog,
     QStandardItemModel,
     QStandardItem,
-    QDesktopServices
+    QDesktopServices,
+    QDialogButtonBox
 )
 from qgis.gui import QgsMessageBar
 
@@ -160,6 +161,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         self.button_install.clicked.connect(self.install_collection)
         self.button_open.clicked.connect(self.open_collection)
         self.button_uninstall.clicked.connect(self.uninstall_collection)
+        self.button_box.button(QDialogButtonBox.Help).clicked.connect(
+            self.open_help)
 
         # Populate repositories widget and collections list view
         self.populate_repositories_widget()
@@ -550,6 +553,11 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         # Serialize collections to settings
         self.repository_manager.serialize_repositories()
         self.done(0)
+
+    def open_help(self):
+        """Open help."""
+        doc_url = QUrl('http://www.akbargumbira.com/qgis_resources_sharing')
+        QDesktopServices.openUrl(doc_url)
 
     def show_progress_dialog(self, text):
         """Show infinite progress dialog with given text.

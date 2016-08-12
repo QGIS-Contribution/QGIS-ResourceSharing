@@ -23,5 +23,4 @@ Type | URL Example | Description
 Github |  https://github.com/akbargumbira/qgis_resources_sharing.git | Works only for Github public repositories
 Bitbucket |  https://bitbucket.org/akbargumbira/qgis-style-repo-dummy.git | Works only for Bitbucket public repositories
 File system | file:///home/akbar/dev/repositories/qgis_resources | Pointing to the repository root in your local file system 
-HTTP(s) with zip collections | http://www.akbargumbira.com/qgis_resources | 
-Pointing to the base URL of the repository. The metadata should be available in this URL http(s)://[base_url]/metadata.ini. The collections should be in http(s)://[base_url]/collections/[collection_name]>.zip
+HTTP(s) with zip collections | http://www.akbargumbira.com/qgis_resources | Pointing to the base URL of the repository. The metadata should be available in this URL http(s)://[base_url]/metadata.ini. The collections should be in http(s)://[base_url]/collections/[collection_name]>.zip

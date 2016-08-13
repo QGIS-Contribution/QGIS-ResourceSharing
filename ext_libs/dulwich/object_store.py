@@ -67,6 +67,11 @@ INFODIR = 'info'
 PACKDIR = 'pack'
 
 
+if not getattr(__builtins__, "WindowsError", None):
+    class WindowsError(OSError):
+        pass
+
+
 class BaseObjectStore(object):
     """Object store interface."""
 
@@ -569,7 +574,7 @@ class DiskObjectStore(PackBasedObjectStore):
         pack_base_name = self._get_pack_basepath(entries)
         try:
             os.rename(path, pack_base_name + '.pack')
-        except OSError:
+        except WindowsError:
             os.remove(pack_base_name + '.pack')
             os.rename(path, pack_base_name + '.pack')
 

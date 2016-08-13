@@ -67,11 +67,6 @@ INFODIR = 'info'
 PACKDIR = 'pack'
 
 
-if not getattr(__builtins__, "WindowsError", None):
-    class WindowsError(OSError):
-        pass
-
-
 class BaseObjectStore(object):
     """Object store interface."""
 

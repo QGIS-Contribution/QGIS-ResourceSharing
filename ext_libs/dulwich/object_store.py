@@ -28,7 +28,6 @@ import os
 import stat
 import sys
 import tempfile
-from shutil import WindowsError
 
 from dulwich.diff_tree import (
     tree_changes,
@@ -570,7 +569,7 @@ class DiskObjectStore(PackBasedObjectStore):
         pack_base_name = self._get_pack_basepath(entries)
         try:
             os.rename(path, pack_base_name + '.pack')
-        except WindowsError:
+        except OSError:
             os.remove(pack_base_name + '.pack')
             os.rename(path, pack_base_name + '.pack')
 

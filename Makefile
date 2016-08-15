@@ -40,7 +40,7 @@ SOURCES = \
 	__init__.py \
 	qgs_symbology_sharing.py qgs_symbology_sharing_dialog.py
 
-PLUGINNAME = QgsSymbologySharing
+PLUGINNAME = qgis_resource_sharing
 
 PY_FILES = \
 	__init__.py \

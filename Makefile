@@ -1,17 +1,24 @@
 SHELL := /bin/bash
 
-WORK_DIR = /tmp/qgis_resource_sharing
-VERSION=`cat metadata.txt | grep ^version | sed 's/version=//g'`
-
-clean:
-	@-find . -name '*~' -exec rm {} \;
-	@-find . -name '*.pyc' -exec rm {} \;
-	@-find . -name '*.pyo' -exec rm {} \;
-	@# Clean stray merge working files from git
-	@-find . -name '*.orig' -exec rm {} \;
+PLUGIN = qgis_resource_sharing
+WORK_DIR = /tmp/${PLUGIN}
+OUTPUT=${WORK_DIR}/${PLUGIN}.zip
 
 zip:
 	@echo "Making zip package in the WORK_DIR"
-	@mkdir -p $(WORK_DIR)
+	@mkdir -p ${WORK_DIR}/${PLUGIN}
 	@echo $(VERSION)
-	@git archive `git branch | grep '\*'| sed 's/^\* //g'` | tar -x $(WORKDIR)
+	@git archive `git branch | grep '\*'| sed 's/^\* //g'` | tar -x -C ${WORK_DIR}/${PLUGIN}
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.git*
+	@rm -rf ${WORK_DIR}/${PLUGIN}/test
+	@rm -rf ${WORK_DIR}/${PLUGIN}/scripts
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.travis.yml
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.coverage
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.coveragerc
+	@rm -rf ${WORK_DIR}/${PLUGIN}/pylintrc
+	@cd ${WORK_DIR} && zip -r ${OUTPUT} * --exclude \*.pyc
+	@echo "Your plugin archive has been generated:"
+	@ls -lah ${OUTPUT}
+	@echo "${OUTPUT}"
+
+

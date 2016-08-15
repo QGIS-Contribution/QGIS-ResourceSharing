@@ -29,4 +29,4 @@ zip:
 release-tag:
 	@echo "Version: " ${VERSION}
 	@git tag v${VERSION} -m "Version ${VERSION}"
-	@git push --tags origin v${VERSION}
+	@git push origin v${VERSION}

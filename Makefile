@@ -4,6 +4,11 @@ PLUGIN = qgis_resource_sharing
 WORK_DIR = /tmp/${PLUGIN}
 OUTPUT=${WORK_DIR}/${PLUGIN}.zip
 
+VERSION=`cat metadata.txt | grep ^version | sed 's/version=//g'`
+
+release: zip release-tag
+	@python plugin_upload.py ${OUTPUT}
+
 zip:
 	@echo "Making zip package in the WORK_DIR"
 	@mkdir -p ${WORK_DIR}/${PLUGIN}
@@ -21,4 +26,7 @@ zip:
 	@ls -lah ${OUTPUT}
 	@echo "${OUTPUT}"
 
-
+release-tag:
+	@echo "Version: " ${VERSION}
+	@git tag v${VERSION} -m "Version ${VERSION}"
+	@git push --tags origin v${VERSION}

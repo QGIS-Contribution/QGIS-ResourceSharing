@@ -3,6 +3,7 @@ layout: page
 title: "Repository Example"
 category: author
 date: 2016-08-19 11:24:17
+order: 6
 ---
 Below is the list of correctly structured repository that you can check when 
 you want to make a repository:

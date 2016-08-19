@@ -378,7 +378,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
     def reload_repositories(self):
         """Slot for when user clicks reload repositories button."""
         # Show progress dialog
-        self.show_progress_dialog("Reloading all repositories")
+        self.show_progress_dialog('Reloading all repositories')
 
         for repo_name in self.repository_manager.directories:
             directory = self.repository_manager.directories[repo_name]
@@ -409,7 +409,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def install_collection(self):
         """Slot for when user clicks download button."""
-        self.show_progress_dialog("Starting installation process...")
+        self.show_progress_dialog('Starting installation process...')
         self.progress_dialog.canceled.connect(self.install_canceled)
 
         self.installer_thread = QThread()
@@ -577,6 +577,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         :type text: str
         """
         self.progress_dialog = QProgressDialog(self)
+        self.progress_dialog.setWindowModality(Qt.WindowModal)
         self.progress_dialog.setAutoClose(False)
         title = self.tr('Resource Sharing')
         self.progress_dialog.setWindowTitle(title)

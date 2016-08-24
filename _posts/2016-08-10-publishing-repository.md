@@ -13,9 +13,9 @@ do that.
  
 To make your repository listed as default repository, please fork this 
 Github project [QGIS official resource repository](https://github
-.com/anitagraser/QGIS-style-repo-dummy), update the ```directory.csv``` file 
-and make a pull request to the upstream project. If you are not comfortable 
-doing this or you don't have Github account, please email me (akbargumbira
-(at)gmail.com) and tell me the detail of your repository.
+.com/qgis/QGIS-Resources), update the ```directory.csv``` file and make a 
+pull request to the upstream project. If you are not comfortable doing this 
+or you don't have Github account, please email me (akbargumbira(at)gmail.com) 
+and tell me the detail of your repository.
 
 

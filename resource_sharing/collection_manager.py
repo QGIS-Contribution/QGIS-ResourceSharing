@@ -97,6 +97,31 @@ class CollectionManager(object):
         }
         return render_template('collection_details.html', context)
 
+    def get_installed_collections(self, repo_url=None):
+        """Get all installed collections of a given repository url.
+
+        If repository url is not specified, it will return all the installed
+        collections.
+
+        :param repo_url: The repository url.
+        :type repo_url: str
+
+        :return: Subset of config.COLLECTIONS that meet the requirement
+        :rtype: dict
+        """
+        installed_collections = {}
+        for id, collection in config.COLLECTIONS.iteritems():
+            if collection['status'] != COLLECTION_INSTALLED_STATUS:
+                continue
+
+            if repo_url:
+                if collection['repository_url'] != repo_url:
+                    continue
+
+            installed_collections[id] = collection
+
+        return installed_collections
+
     def download(self, collection_id):
         """Download a collection given the id.
 

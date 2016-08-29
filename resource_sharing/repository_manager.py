@@ -48,10 +48,12 @@ class RepositoryManager(QObject):
                 'description': parser.get(collection, 'description'),
                 'qgis_min_version': '2.0',
                 'qgis_max_version': '2.99'
+                'preview': ['preview/image1.png', 'preview/image2.png']
             },
-            ....
+            .... //other collections from this repository
+            ],
+            ... //other repository
         }
-
         """
         QObject.__init__(self)
         # Online directories from the DIRECTORY_URL
@@ -60,7 +62,6 @@ class RepositoryManager(QObject):
         self._directories = {}
         # Registered repositories
         self._repositories = {}
-
         # Collection manager instance to deal with collections
         self._collections_manager = CollectionManager()
         # Fetch online directories
@@ -177,6 +178,7 @@ class RepositoryManager(QObject):
             self,
             old_repo_name,
             new_repo_name,
+            old_url,
             new_url,
             new_auth_cfg):
         """Edit a directory and update the collections.
@@ -187,8 +189,14 @@ class RepositoryManager(QObject):
         :param new_repo_name: The new name of the repository
         :type new_repo_name: str
 
+        :param old_url: The old URL of the repository
+        :type old_url: str
+
         :param new_url: The new URL of the repository
         :type new_url: str
+
+        :param new_auth_cfg: The auth config id.
+        :type new_auth_cfg: str
         """
         # Fetch the metadata from the new url
         repo_handler = BaseRepositoryHandler.get_handler(new_url)
@@ -203,15 +211,52 @@ class RepositoryManager(QObject):
         if status:
             # Parse metadata
             try:
-                collections = repo_handler.parse_metadata()
+                new_collections = repo_handler.parse_metadata()
             except MetadataError:
                 raise
-            # Remove old repo and its collections
+
+            old_collections = self._repositories[old_repo_name]
+            # Get all the installed collections from the old repository
+            installed_old_collections = []
+            for old_collection in old_collections:
+                if old_collection['status'] == COLLECTION_INSTALLED_STATUS:
+                    installed_old_collections.append(old_collection)
+
+            # Beware of the installed collections
+            # Old collection exists in the new URL are identified by its
+            # register name. Cases for installed collections:
+            # 1. Old collection exists in the new URL, same URL: use the new
+            # one, update the status to INSTALLED
+            # 2. Old collection exists in the new URL, different URL: keep them
+            # both (add the old one). Because they should be treated as
+            # different collection
+            # 3. Old collection doesn't exist in the new URL, same URL: keep
+            # the old collection
+            # 4. Old collection doesn't exist in the new URL, different URL:
+            # same with 3
+            for installed_collection in installed_old_collections:
+                reg_name = installed_collection['register_name']
+                is_present = False
+
+                for collection in new_collections:
+                    if collection['register_name'] == reg_name:
+                        is_present = True
+                        if old_url == new_url:
+                            collection['status'] = COLLECTION_INSTALLED_STATUS
+                        else:
+                            new_collections.append(installed_collection)
+                        break
+
+                # Get to this point could be because it's present or the old
+                # installed collection doesn't exist in the new URL
+                if not is_present:
+                    new_collections.append(installed_collection)
+
+            # Remove old repository and add new one
             self._repositories.pop(old_repo_name, None)
+            self._repositories[new_repo_name] = new_collections
             self.rebuild_collections()
-            # Add collections with the new repo name
-            self._repositories[new_repo_name] = collections
-            self.rebuild_collections()
+
             # Update QSettings
             settings = QSettings()
             settings.beginGroup(repo_settings_group())
@@ -223,19 +268,18 @@ class RepositoryManager(QObject):
             self.serialize_repositories()
         return status, description
 
-    def remove_directory(self, old_repo_name):
+    def remove_directory(self, repo_name):
         """Remove a directory and all the collections of that repository.
 
-        :param old_repo_name: The old name of the repository
-        :type old_repo_name: str
+        :param repo_name: The old name of the repository
+        :type repo_name: str
         """
-        # Remove the repository
-        self._repositories.pop(old_repo_name, None)
+        self._repositories.pop(repo_name, None)
         self.rebuild_collections()
         # Remove repo from QSettings
         settings = QSettings()
         settings.beginGroup(repo_settings_group())
-        settings.remove(old_repo_name)
+        settings.remove(repo_name)
         settings.endGroup()
         # Serialize repositories every time successfully removed a repo
         self.serialize_repositories()
@@ -249,10 +293,11 @@ class RepositoryManager(QObject):
         :param url: The URL of the repository
         :type url: str
         """
-        # We're basically editing a directory with the same repo name
+        # We're basically editing a directory with the same repo name and url
         status, description = self.edit_directory(
             repo_name,
             repo_name,
+            url,
             url,
             auth_cfg
         )
@@ -279,11 +324,25 @@ class RepositoryManager(QObject):
                         # Uninstall the collection
                         self._collections_manager.uninstall(collection_id)
 
+    def resync_repository(self):
+        """Resync from collections as opposed to rebuild_collections."""
+        for repo in self._repositories.keys():
+            repo_collections = self._repositories[repo]
+            synced_repo_collections = []
+            for collection in repo_collections:
+                collection_id = self._collections_manager.get_collection_id(
+                    collection['register_name'],
+                    collection['repository_url']
+                )
+                synced_repo_collections.append(config.COLLECTIONS[collection_id])
+            self._repositories[repo] = synced_repo_collections
+
     def serialize_repositories(self):
         """Save repositories to cache."""
         if not os.path.exists(os.path.dirname(repositories_cache_path())):
             os.makedirs(os.path.dirname(repositories_cache_path()))
 
+        self.resync_repository()
         with open(repositories_cache_path(), 'wb') as f:
             pickle.dump(self._repositories, f)
 

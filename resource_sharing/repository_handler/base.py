@@ -104,6 +104,11 @@ class BaseRepositoryHandler(object):
         return git_validate(self._url)
 
     @property
+    def metadata_url(self):
+        """Return the absolute URL to the metadata."""
+        return self.file_url(self.METADATA_FILE)
+
+    @property
     def metadata(self):
         """Metadata content."""
         return self._metadata
@@ -165,11 +170,26 @@ class BaseRepositoryHandler(object):
 
             # Collection is compatible, continue parsing
             try:
+                # Parse general information
                 author = parser.get(collection, 'author')
                 email = parser.get(collection, 'email')
                 name = parser.get(collection, 'name')
                 tags = parser.get(collection, 'tags')
                 description = parser.get(collection, 'description')
+
+                # Parse licensing stuffs
+                license_str = parser.has_option(
+                    collection, 'license') and parser.get(
+                    collection, 'license') or None
+                license_path = parser.has_option(
+                    collection, 'license_file') and parser.get(
+                    collection, 'license_file') or None
+                license_url = None
+                if license_path:
+                    license_url = self.collection_file_url(
+                        collection,
+                        license_path.strip()
+                    )
 
                 # Parse the preview urls
                 preview_str = parser.has_option(collection, 'preview') and \
@@ -177,7 +197,7 @@ class BaseRepositoryHandler(object):
                 preview_list = []
                 for preview in preview_str.split(','):
                     if preview.strip() != '':
-                        preview_url = self.preview_url(
+                        preview_url = self.collection_file_url(
                             collection,
                             preview.strip()
                         )
@@ -197,7 +217,9 @@ class BaseRepositoryHandler(object):
                 'description': description,
                 'qgis_min_version': qgis_min_version,
                 'qgis_max_version': qgis_max_version,
-                'preview': preview_list
+                'preview': preview_list,
+                'license': license_str,
+                'license_url': license_url
             }
             collections.append(collection_dict)
 
@@ -208,17 +230,40 @@ class BaseRepositoryHandler(object):
 
         :param id: The ID of the collection.
         :type id: str
+
+        :param register_name: The register name of the collection (the
+            section name of the collection)
+        :type register_name: str
         """
         raise NotImplementedError
 
-    def preview_url(self, collection_name, file_path):
-        """Return the endpoint URL of the preview image.
+    def file_url(self, relative_path):
+        """Return the URL to a path given the relative path to repository root.
+
+        This depends on the repository type so it's implemented in each
+        of the concrete repository handler classes.
+
+        :param relative_path: The relative path to the root of the repository.
+        :type relative_path: str
+
+        :return: The absolute URL to the file.
+        :rtype: str
+        """
+        raise NotImplementedError
+
+    def collection_file_url(self, collection_name, file_path):
+        """Return the URL of a file relative the collection root
+
+        ..e.g If it's file repository, calling
+            self.collection_file_url('test_collection', 'preview/prev1.png')
+            will return file:///<the_repository_path>/collections
+            /test_collection/preview/prev1.png
 
         :param collection_name: The register name of the collection.
         :type collection_name: str
 
-        :param file_path: The file path to the preview relative to the
-            collection.
+        :param file_path: The file path relative to the collection root.
         :type file_path: str
         """
-        raise NotImplementedError
+        rel_path = 'collections/%s/%s' % (collection_name, file_path)
+        return self.file_url(rel_path)

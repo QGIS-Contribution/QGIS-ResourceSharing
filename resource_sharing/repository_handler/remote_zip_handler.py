@@ -30,8 +30,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
     def fetch_metadata(self):
         """Fetch metadata file from the url."""
         # Download the metadata
-        metadata_url = urlparse.urljoin(self.url, self.METADATA_FILE)
-        network_manager = NetworkManager(metadata_url, self.auth_cfg)
+        network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
         status, description = network_manager.fetch()
         if status:
             self.metadata = network_manager.content
@@ -52,8 +51,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
         """
         # Download the zip first
         collection_path = 'collections/%s.zip' % register_name
-        zip_collection_url = urlparse.urljoin(self.url, collection_path)
-        network_manager = NetworkManager(zip_collection_url)
+        network_manager = NetworkManager(self.file_url(collection_path))
         status, description = network_manager.fetch()
 
         if not status:
@@ -69,7 +67,5 @@ class RemoteZipHandler(BaseRepositoryHandler):
         zf.extractall(path=local_collection_path(id))
         return True, None
 
-    def preview_url(self, collection_name, file_path):
-        image_path = 'collections/%s/%s' % (collection_name, file_path)
-        image_url = urlparse.urljoin(self.url, image_path)
-        return image_url
+    def file_url(self, relative_path):
+        return urlparse.urljoin(self.url, relative_path)

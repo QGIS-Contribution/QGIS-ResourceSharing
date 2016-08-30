@@ -15,16 +15,8 @@ class BitBucketHandler(RemoteGitHandler):
             return True
         return False
 
-    @property
-    def metadata_url(self):
+    def file_url(self, relative_path):
         return 'https://bitbucket.org/%s/%s/raw/master/%s' % (
             self.git_owner,
             self.git_repository,
-            self.METADATA_FILE)
-
-    def preview_url(self, collection_name, file_path):
-        return 'https://bitbucket.org/%s/%s/raw/master/collections/%s/%s' % (
-            self.git_owner,
-            self.git_repository,
-            collection_name,
-            file_path)
+            relative_path)

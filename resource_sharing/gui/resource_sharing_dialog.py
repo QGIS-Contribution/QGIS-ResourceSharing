@@ -33,8 +33,7 @@ from PyQt4.QtGui import (
     QStandardItemModel,
     QStandardItem,
     QDesktopServices,
-    QDialogButtonBox
-)
+    QDialogButtonBox)
 from qgis.gui import QgsMessageBar
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog

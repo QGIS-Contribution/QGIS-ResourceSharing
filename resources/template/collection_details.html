@@ -40,17 +40,24 @@
           </tr>
           {% if collection.license and collection.license != None %}
           <tr>
-            <td><b>License</b></td><td>{{ collection.license }}</td>
-          </tr>
-          {% endif %}
-          {% if collection.license and collection.license_url != None %}
-          <tr>
-            <td><b>License File</b></td>
-            <td>
-              Read the license <a href="{{ collection.license_url}}">here</a>
+            <td><b>License</b></td>
+            <td>{{ collection.license }}
+              {% if collection.license and collection.license_url != None %}
+              (read <a href="{{ collection.license_url}}">here</a>)
+              {% endif %}
             </td>
           </tr>
+          {% else %}
+            {% if collection.license_url and collection.license_url != None %}
+            <tr>
+              <td><b>License File</b></td>
+              <td>
+                Read the license <a href="{{ collection.license_url}}">here</a>
+              </td>
+            </tr>
+            {% endif %}
           {% endif %}
+
         </table>
 
          {% if collection.preview|length != 0 %}

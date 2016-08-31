@@ -33,8 +33,7 @@ from PyQt4.QtGui import (
     QStandardItemModel,
     QStandardItem,
     QDesktopServices,
-    QDialogButtonBox
-)
+    QDialogButtonBox)
 from qgis.gui import QgsMessageBar
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
@@ -314,7 +313,12 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         # Edit repository
         try:
             status, description = self.repository_manager.edit_directory(
-                repo_name, new_name, new_url, new_auth_cfg)
+                repo_name,
+                new_name,
+                old_url,
+                new_url,
+                new_auth_cfg
+            )
             if status:
                 self.message_bar.pushMessage(
                     self.tr('Repository is successfully updated'),
@@ -345,10 +349,8 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         if not repo_name:
             return
         # Check if it's the approved online dir repository
-        settings = QSettings()
-        settings.beginGroup(repo_settings_group())
-        if settings.value(repo_name + '/url') in \
-                self.repository_manager._online_directories.values():
+        repo_url = self.repository_manager.directories[repo_name]['url']
+        if repo_url in self.repository_manager._online_directories.values():
             self.message_bar.pushMessage(
                 self.tr(
                     'You can not remove the official repositories!'),
@@ -366,19 +368,24 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
             return
 
         # Remove repository
-        self.repository_manager.remove_directory(repo_name)
-
-        # Reload data and widget
-        self.reload_data_and_widget()
-
-        # Deactivate edit and delete button
-        self.button_edit.setEnabled(False)
-        self.button_delete.setEnabled(False)
+        installed_collections = \
+            self.collection_manager.get_installed_collections(repo_url)
+        if installed_collections:
+            message = ('You have some installed collections from this '
+                       'repository. Please uninstall them first!')
+            self.message_bar.pushMessage(message, QgsMessageBar.WARNING, 5)
+        else:
+            self.repository_manager.remove_directory(repo_name)
+            # Reload data and widget
+            self.reload_data_and_widget()
+            # Deactivate edit and delete button
+            self.button_edit.setEnabled(False)
+            self.button_delete.setEnabled(False)
 
     def reload_repositories(self):
         """Slot for when user clicks reload repositories button."""
         # Show progress dialog
-        self.show_progress_dialog("Reloading all repositories")
+        self.show_progress_dialog('Reloading all repositories')
 
         for repo_name in self.repository_manager.directories:
             directory = self.repository_manager.directories[repo_name]
@@ -409,7 +416,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
 
     def install_collection(self):
         """Slot for when user clicks download button."""
-        self.show_progress_dialog("Starting installation process...")
+        self.show_progress_dialog('Starting installation process...')
         self.progress_dialog.canceled.connect(self.install_canceled)
 
         self.installer_thread = QThread()
@@ -577,6 +584,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         :type text: str
         """
         self.progress_dialog = QProgressDialog(self)
+        self.progress_dialog.setWindowModality(Qt.WindowModal)
         self.progress_dialog.setAutoClose(False)
         title = self.tr('Resource Sharing')
         self.progress_dialog.setWindowTitle(title)

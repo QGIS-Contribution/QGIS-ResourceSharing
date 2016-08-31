@@ -215,7 +215,7 @@ class RepositoryManager(QObject):
             except MetadataError:
                 raise
 
-            old_collections = self._repositories[old_repo_name]
+            old_collections = self._repositories.get(old_repo_name, [])
             # Get all the installed collections from the old repository
             installed_old_collections = []
             for old_collection in old_collections:

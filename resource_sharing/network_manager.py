@@ -3,8 +3,13 @@ import logging
 
 from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
 from PyQt4.QtCore import QUrl, QCoreApplication
+from qgis.core import QgsNetworkAccessManager
+try:
+    from qgis.core import QgsAuthManager
+except ImportError:
+    pass
 
-from qgis.core import QgsNetworkAccessManager, QgsAuthManager
+from resource_sharing.utilities import qgis_version
 
 LOGGER = logging.getLogger('QGIS Resources Sharing')
 
@@ -43,7 +48,7 @@ class NetworkManager(object):
             QNetworkRequest.CacheLoadControlAttribute,
             QNetworkRequest.AlwaysNetwork)
 
-        if self._auth_cfg:
+        if self._auth_cfg and qgis_version() >= 21200:
             LOGGER.info('Update request with auth_cfg %s' % self._auth_cfg)
             QgsAuthManager.instance().updateNetworkRequest(
                 request, self._auth_cfg

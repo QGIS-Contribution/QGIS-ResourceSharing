@@ -25,10 +25,11 @@ author | Required | Author's name
 email | Required | Author's email
 tags | Required | List of tags separated by comma
 description | Required | Additional information describing the collection
-preview | Optional | List of preview images relative to ```preview``` directory separated by comma
+preview | Optional | List of preview images relative to the collection root separated by comma
 qgis_minimum_version | Optional | Dotted notation of minimum QGIS version. If not specified, the minimum version will be 2.0
 qgis_maximum_version | Optional | Dotted notation of maximum QGIS version. If not specified, the maxium version will be 3.99
-
+license | Optional | The license of the collection e.g GNU GPL
+license_file | Optional | License file path relative to the collection root
 
 This is an example of the ```metadata.ini``` file:
 

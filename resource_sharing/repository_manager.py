@@ -334,7 +334,9 @@ class RepositoryManager(QObject):
                     collection['register_name'],
                     collection['repository_url']
                 )
-                synced_repo_collections.append(config.COLLECTIONS[collection_id])
+                synced_repo_collections.append(
+                    config.COLLECTIONS[collection_id]
+                )
             self._repositories[repo] = synced_repo_collections
 
     def serialize_repositories(self):

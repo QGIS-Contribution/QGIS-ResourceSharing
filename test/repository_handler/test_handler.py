@@ -45,6 +45,8 @@ class TestBaseHandler(unittest.TestCase):
             'author_email': u'akbargumbira@gmail.com',
             'qgis_min_version': u'2.0',
             'qgis_max_version': u'2.99',
+            'license': 'GNU GPL',
+            'license_url': '%s/collections/test_collection/LICENSE.txt' %test_repository_url(),
             'preview': [
                 '%s/collections/test_collection/preview/prev_1.png' % test_repository_url(),
                 '%s/collections/test_collection/preview/prev_2.png' % test_repository_url()

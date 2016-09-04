@@ -3,6 +3,7 @@ layout: page
 title: "Contributing"
 category: dev
 date: 2016-07-20 17:30:10
+order: 1
 ---
 
 You are welcome to make a patch by issuing pull request on Github [here](https://github.com/akbargumbira/qgis_resources_sharing). If there is any 

@@ -1,6 +1,6 @@
 [general]
 name=QGIS Resource Sharing
-qgisMinimumVersion=2.0
+qgisMinimumVersion=2.4
 qgisMaximumVersion=2.99
 description=Download collections shared by other users
 about=Developed as GSoC 2016 project, this plugin allows users to search for available collections and install them. Users can also create repositories to put the collections there. There are some options where to put the repository: Github, Bitbucket, local file system, or with https(s). Please read the documentation for more information.

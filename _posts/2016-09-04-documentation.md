@@ -11,8 +11,7 @@ contribute to the documentation, please check out ```gh-pages``` branch (yes,
  
 This documentation is divided into 3 categories: for users, for authors, 
  and for developers section. To update a particular page, find the markdown 
- file in ```_posts``` directory. To make a new page, run ``` bin/jekyll-page 
- <page title> <category_code>```. The codes for the category are: ```user``` 
+ file in ```_posts``` directory. To make a new page, run ```bin/jekyll-page [page title] [category_code]```. The codes for the category are: ```user``` 
  (will be put in For User section), ```author``` (for authors section), and 
  ```dev``` (for developers section).
  
@@ -20,8 +19,7 @@ After you make changes to the documentation, please make a PR to branch
  ```gh-pages``` in the upstream repository.
   
 If you have images to show, put it in ```assets``` directory and to use it in
- your post, just like usual in markdown, you can reference it by writing: 
-   ```![alt_text]({{ site.baseurl }}/assets/<the_image_path>)```
+ your post, just like usual in markdown, you can reference it by writing: ```![alt_text]({{ site.baseurl }}/assets/[the_image_path])```
  
 
 

@@ -2,7 +2,7 @@
 import os
 import xml.etree.ElementTree as ET
 
-from PyQt4.QtCore import QFileInfo, QUrl, Qt, QFile
+from qgis.PyQt.QtCore import QFileInfo, QUrl, Qt, QFile
 from qgis.core import QgsApplication
 
 from resource_sharing.utilities import path_leaf
@@ -82,7 +82,7 @@ def resolve_path(path, collection_path, search_paths):
         return QFileInfo(path).canonicalFilePath()
 
     # It might be a url
-    if '://'in path:
+    if '://' in path:
         url = QUrl(path)
         if url.isValid() and url.scheme() != '':
             if url.scheme().lower() == 'file':

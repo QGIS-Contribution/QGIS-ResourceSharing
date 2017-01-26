@@ -19,21 +19,36 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4 import QtGui, uic
-from PyQt4.Qt import QSize
-from PyQt4.QtCore import (
+from qgis.PyQt import QtGui, uic
+from qgis.PyQt.Qt import QSize
+from qgis.PyQt.QtCore import (
     Qt, QSettings, pyqtSlot, QRegExp, QThread, QUrl)
-from PyQt4.QtGui import (
+
+from qgis.PyQt.QtGui import (
     QIcon,
-    QListWidgetItem,
-    QTreeWidgetItem,
-    QSizePolicy,
-    QMessageBox,
-    QProgressDialog,
-    QStandardItemModel,
-    QStandardItem,
     QDesktopServices,
-    QDialogButtonBox)
+    QStandardItem,
+    QStandardItemModel)
+try:
+    from qgis.PyQt.QtGui import (
+        QListWidgetItem,
+        QDialog,
+        QTreeWidgetItem,
+        QSizePolicy,
+        QMessageBox,
+        QProgressDialog,
+        QDialogButtonBox)
+except ImportError:
+    from qgis.PyQt.QtWidgets import (
+        QListWidgetItem,
+        QDialog,
+        QTreeWidgetItem,
+        QSizePolicy,
+        QMessageBox,
+        QProgressDialog,
+        QDialogButtonBox)
+
+
 from qgis.gui import QgsMessageBar
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
@@ -63,7 +78,7 @@ from resource_sharing import config
 FORM_CLASS, _ = uic.loadUiType(ui_path('resource_sharing_dialog_base.ui'))
 
 
-class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
+class ResourceSharingDialog(QDialog, FORM_CLASS):
     TAB_ALL = 0
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
@@ -245,7 +260,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                     self.tr(
                         'Unable to add repository: %s') % description,
                     QgsMessageBar.CRITICAL, 5)
-        except Exception, e:
+        except Exception as e:
             self.message_bar.pushMessage(
                 self.tr('%s') % e,
                 QgsMessageBar.CRITICAL, 5)
@@ -327,7 +342,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr('Unable to add repository: %s') % description,
                     QgsMessageBar.CRITICAL, 5)
-        except Exception, e:
+        except Exception as e:
             self.message_bar.pushMessage(
                 self.tr('%s') % e, QgsMessageBar.CRITICAL, 5)
         finally:
@@ -405,7 +420,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                             'Unable to reload %s: %s') % (
                             repo_name, description),
                         QgsMessageBar.CRITICAL, 5)
-            except Exception, e:
+            except Exception as e:
                 self.message_bar.pushMessage(
                     self.tr('%s') % e,
                     QgsMessageBar.CRITICAL, 5)
@@ -463,7 +478,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         """Slot called when user clicks uninstall button."""
         try:
             self.collection_manager.uninstall(self._selected_collection_id)
-        except Exception, e:
+        except Exception as e:
             raise
         self.reload_collections_model()
         QtGui.QMessageBox.information(

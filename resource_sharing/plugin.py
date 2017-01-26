@@ -21,11 +21,15 @@
 """
 import os.path
 
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from qgis.PyQt.QtGui import QIcon
+try:
+    from qgis.PyQt.QtGui import QAction
+except ImportError:
+    from qgis.PyQt.QtWidgets import QAction
 
-from gui.resource_sharing_dialog import ResourceSharingDialog
-from utilities import resources_path
+from .gui.resource_sharing_dialog import ResourceSharingDialog
+from .utilities import resources_path
 
 
 class Plugin:

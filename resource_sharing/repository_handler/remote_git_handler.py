@@ -6,8 +6,8 @@ import traceback
 
 from qgis.core import QgsApplication
 
-from ext_libs.giturlparse import parse, validate
-from ext_libs.dulwich import porcelain
+from giturlparse import parse, validate
+from dulwich import porcelain
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.network_manager import NetworkManager
 from resource_sharing.utilities import local_collection_path

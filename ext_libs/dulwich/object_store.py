@@ -2,20 +2,22 @@
 # Copyright (C) 2008-2013 Jelmer Vernooij <jelmer@samba.org>
 #                         and others
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# or (at your option) a later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 
 """Git object store interfaces and implementation."""
@@ -129,7 +131,7 @@ class BaseObjectStore(object):
     def add_objects(self, objects):
         """Add a set of objects to this object store.
 
-        :param objects: Iterable over a list of objects.
+        :param objects: Iterable over a list of (object, path) tuples
         """
         raise NotImplementedError(self.add_objects)
 
@@ -380,7 +382,8 @@ class PackBasedObjectStore(BaseObjectStore):
     def add_objects(self, objects):
         """Add a set of objects to this object store.
 
-        :param objects: Iterable over objects, should support __len__.
+        :param objects: Iterable over (object, path) tuples, should support
+            __len__.
         :return: Pack object of the objects written.
         """
         if len(objects) == 0:
@@ -478,9 +481,12 @@ class DiskObjectStore(PackBasedObjectStore):
         pack_files = set()
         for name in pack_dir_contents:
             assert isinstance(name, basestring if sys.version_info[0] == 2 else str)
-            # TODO: verify that idx exists first
             if name.startswith("pack-") and name.endswith(".pack"):
-                pack_files.add(name[:-len(".pack")])
+                # verify that idx exists first (otherwise the pack was not yet fully written)
+                idx_name = os.path.splitext(name)[0] + ".idx"
+                if idx_name in pack_dir_contents:
+                    pack_name = name[:-len(".pack")]
+                    pack_files.add(pack_name)
 
         # Open newly appeared pack files
         for f in pack_files:
@@ -567,10 +573,13 @@ class DiskObjectStore(PackBasedObjectStore):
         # Move the pack in.
         entries.sort()
         pack_base_name = self._get_pack_basepath(entries)
-        try:
-            os.rename(path, pack_base_name + '.pack')
-        except WindowsError:
-            os.remove(pack_base_name + '.pack')
+        if sys.platform == 'win32':
+            try:
+                os.rename(path, pack_base_name + '.pack')
+            except WindowsError:
+                os.remove(pack_base_name + '.pack')
+                os.rename(path, pack_base_name + '.pack')
+        else:
             os.rename(path, pack_base_name + '.pack')
 
         # Write the index.
@@ -735,7 +744,7 @@ class MemoryObjectStore(BaseObjectStore):
     def add_objects(self, objects):
         """Add a set of objects to this object store.
 
-        :param objects: Iterable over a list of objects.
+        :param objects: Iterable over a list of (object, path) tuples
         """
         for obj, path in objects:
             self.add_object(obj)

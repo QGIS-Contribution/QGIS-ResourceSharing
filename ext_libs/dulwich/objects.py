@@ -2,20 +2,22 @@
 # Copyright (C) 2007 James Westby <jw+debian@jameswestby.net>
 # Copyright (C) 2008-2013 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) a later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Access to base git objects."""
 
@@ -141,11 +143,9 @@ def serializable_property(name, docstring=None):
     """A property that helps tracking whether serialization is necessary.
     """
     def set(obj, value):
-        obj._ensure_parsed()
         setattr(obj, "_"+name, value)
         obj._needs_serialization = True
     def get(obj):
-        obj._ensure_parsed()
         return getattr(obj, "_"+name)
     return property(get, set, doc=docstring)
 
@@ -218,8 +218,7 @@ class FixedSha(object):
 class ShaFile(object):
     """A git SHA file."""
 
-    __slots__ = ('_needs_parsing', '_chunked_text', '_sha',
-                 '_needs_serialization')
+    __slots__ = ('_chunked_text', '_sha', '_needs_serialization')
 
     @staticmethod
     def _parse_legacy_object_header(magic, f):
@@ -272,9 +271,8 @@ class ShaFile(object):
 
         :return: List of strings, not necessarily one per line
         """
-        if self._needs_parsing:
-            self._ensure_parsed()
-        elif self._needs_serialization:
+        if self._needs_serialization:
+            self._sha = None
             self._chunked_text = self._serialize()
             self._needs_serialization = False
         return self._chunked_text
@@ -298,13 +296,6 @@ class ShaFile(object):
         """Return a string representing this object, fit for display."""
         return self.as_raw_string()
 
-    def _ensure_parsed(self):
-        if self._needs_parsing:
-            if not self._chunked_text:
-                raise AssertionError("ShaFile needs chunked text")
-            self._deserialize(self._chunked_text)
-            self._needs_parsing = False
-
     def set_raw_string(self, text, sha=None):
         """Set the contents of this object from a serialized string."""
         if not isinstance(text, bytes):
@@ -319,7 +310,6 @@ class ShaFile(object):
             self._sha = None
         else:
             self._sha = FixedSha(sha)
-        self._needs_parsing = False
         self._needs_serialization = False
 
     @staticmethod
@@ -365,7 +355,6 @@ class ShaFile(object):
         """Don't call this directly"""
         self._sha = None
         self._chunked_text = []
-        self._needs_parsing = False
         self._needs_serialization = True
 
     def _deserialize(self, chunks):
@@ -463,13 +452,6 @@ class ShaFile(object):
             ret += len(chunk)
         return ret
 
-    def _make_sha(self):
-        ret = sha1()
-        ret.update(self._header())
-        for chunk in self.as_raw_chunks():
-            ret.update(chunk)
-        return ret
-
     def sha(self):
         """The SHA1 object that is the name of this object."""
         if self._sha is None or self._needs_serialization:
@@ -546,7 +528,6 @@ class Blob(ShaFile):
     def __init__(self):
         super(Blob, self).__init__()
         self._chunked_text = []
-        self._needs_parsing = False
         self._needs_serialization = False
 
     def _get_data(self):
@@ -559,15 +540,12 @@ class Blob(ShaFile):
                     "The text contained within the blob object.")
 
     def _get_chunked(self):
-        self._ensure_parsed()
         return self._chunked_text
 
     def _set_chunked(self, chunks):
         self._chunked_text = chunks
 
     def _serialize(self):
-        if not self._chunked_text:
-            self._ensure_parsed()
         return self._chunked_text
 
     def _deserialize(self, chunks):
@@ -589,6 +567,33 @@ class Blob(ShaFile):
         :raise ObjectFormatException: if the object is malformed in some way
         """
         super(Blob, self).check()
+
+    def splitlines(self):
+        """Return list of lines in this blob.
+
+        This preserves the original line endings.
+        """
+        chunks = self.chunked
+        if not chunks:
+            return []
+        if len(chunks) == 1:
+            return chunks[0].splitlines(True)
+        remaining = None
+        ret = []
+        for chunk in chunks:
+            lines = chunk.splitlines(True)
+            if len(lines) > 1:
+                ret.append((remaining or b"") + lines[0])
+                ret.extend(lines[1:-1])
+                remaining = lines[-1]
+            elif len(lines) == 1:
+                if remaining is None:
+                    remaining = lines.pop()
+                else:
+                    remaining += lines.pop()
+        if remaining is not None:
+            ret.append(remaining)
+        return ret
 
 
 def _parse_message(chunks):
@@ -746,11 +751,9 @@ class Tag(ShaFile):
 
         :return: tuple of (object class, sha).
         """
-        self._ensure_parsed()
         return (self._object_class, self._object_sha)
 
     def _set_object(self, value):
-        self._ensure_parsed()
         (self._object_class, self._object_sha) = value
         self._needs_serialization = True
 
@@ -851,6 +854,23 @@ def key_entry_name_order(entry):
     return entry[0]
 
 
+def pretty_format_tree_entry(name, mode, hexsha, encoding="utf-8"):
+    """Pretty format tree entry.
+
+    :param name: Name of the directory entry
+    :param mode: Mode of entry
+    :param hexsha: Hexsha of the referenced object
+    :return: string describing the tree entry
+    """
+    if mode & stat.S_IFDIR:
+        kind = "tree"
+    else:
+        kind = "blob"
+    return "%04o %s %s\t%s\n" % (
+            mode, kind, hexsha.decode('ascii'),
+            name.decode(encoding, 'replace'))
+
+
 class Tree(ShaFile):
     """A Git tree object"""
 
@@ -871,11 +891,9 @@ class Tree(ShaFile):
         return tree
 
     def __contains__(self, name):
-        self._ensure_parsed()
         return name in self._entries
 
     def __getitem__(self, name):
-        self._ensure_parsed()
         return self._entries[name]
 
     def __setitem__(self, name, value):
@@ -887,21 +905,17 @@ class Tree(ShaFile):
             a string.
         """
         mode, hexsha = value
-        self._ensure_parsed()
         self._entries[name] = (mode, hexsha)
         self._needs_serialization = True
 
     def __delitem__(self, name):
-        self._ensure_parsed()
         del self._entries[name]
         self._needs_serialization = True
 
     def __len__(self):
-        self._ensure_parsed()
         return len(self._entries)
 
     def __iter__(self):
-        self._ensure_parsed()
         return iter(self._entries)
 
     def add(self, name, mode, hexsha):
@@ -917,7 +931,6 @@ class Tree(ShaFile):
             warnings.warn(
                 "Please use Tree.add(name, mode, hexsha)",
                 category=DeprecationWarning, stacklevel=2)
-        self._ensure_parsed()
         self._entries[name] = mode, hexsha
         self._needs_serialization = True
 
@@ -928,7 +941,6 @@ class Tree(ShaFile):
             order.
         :return: Iterator over (name, mode, sha) tuples
         """
-        self._ensure_parsed()
         return sorted_tree_items(self._entries, name_order)
 
     def items(self):
@@ -982,11 +994,7 @@ class Tree(ShaFile):
     def as_pretty_string(self):
         text = []
         for name, mode, hexsha in self.iteritems():
-            if mode & stat.S_IFDIR:
-                kind = "tree"
-            else:
-                kind = "blob"
-            text.append("%04o %s %s\t%s\n" % (mode, kind, hexsha, name))
+            text.append(pretty_format_tree_entry(name, mode, hexsha))
         return "".join(text)
 
     def lookup_path(self, lookup_obj, path):
@@ -1173,7 +1181,7 @@ class Commit(ShaFile):
 
     def _serialize(self):
         chunks = []
-        tree_bytes = self._tree.as_raw_string() if isinstance(self._tree, Tree) else self._tree
+        tree_bytes = self._tree.id if isinstance(self._tree, Tree) else self._tree
         chunks.append(git_line(_TREE_HEADER, tree_bytes))
         for p in self._parents:
             chunks.append(git_line(_PARENT_HEADER, p))
@@ -1216,12 +1224,10 @@ class Commit(ShaFile):
 
     def _get_parents(self):
         """Return a list of parents of this commit."""
-        self._ensure_parsed()
         return self._parents
 
     def _set_parents(self, value):
         """Set a list of parents of this commit."""
-        self._ensure_parsed()
         self._needs_serialization = True
         self._parents = value
 
@@ -1230,7 +1236,6 @@ class Commit(ShaFile):
 
     def _get_extra(self):
         """Return extra settings of this commit."""
-        self._ensure_parsed()
         return self._extra
 
     extra = property(_get_extra,

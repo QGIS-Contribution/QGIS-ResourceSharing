@@ -1,20 +1,22 @@
 # porcelain.py -- Porcelain-like layer on top of Dulwich
 # Copyright (C) 2013 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# or (at your option) a later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Simple wrapper that provides porcelain-like functions on top of Dulwich.
 
@@ -30,6 +32,7 @@ Currently implemented:
  * fetch
  * init
  * ls-remote
+ * ls-tree
  * pull
  * push
  * rm
@@ -54,6 +57,8 @@ from contextlib import (
     contextmanager,
 )
 import os
+import posixpath
+import stat
 import sys
 import time
 
@@ -63,6 +68,14 @@ from dulwich.archive import (
 from dulwich.client import (
     get_transport_and_path,
     )
+from dulwich.diff_tree import (
+    CHANGE_ADD,
+    CHANGE_DELETE,
+    CHANGE_MODIFY,
+    CHANGE_RENAME,
+    CHANGE_COPY,
+    RENAME_CHANGE_TYPES,
+    )
 from dulwich.errors import (
     SendPackError,
     UpdateRefsError,
@@ -71,7 +84,9 @@ from dulwich.index import get_unstaged_changes
 from dulwich.objects import (
     Commit,
     Tag,
+    format_timezone,
     parse_timezone,
+    pretty_format_tree_entry,
     )
 from dulwich.objectspec import (
     parse_object,
@@ -82,7 +97,11 @@ from dulwich.pack import (
     write_pack_objects,
     )
 from dulwich.patch import write_tree_diff
-from dulwich.protocol import Protocol
+from dulwich.protocol import (
+    Protocol,
+    ZERO_SHA,
+    )
+from dulwich.refs import ANNOTATED_TAG_SUFFIX
 from dulwich.repo import (BaseRepo, Repo)
 from dulwich.server import (
     FileSystemBackend,
@@ -101,12 +120,7 @@ default_bytes_out_stream = getattr(sys.stdout, 'buffer', sys.stdout)
 default_bytes_err_stream = getattr(sys.stderr, 'buffer', sys.stderr)
 
 
-def encode_path(path):
-    """Encode a path as bytestring."""
-    # TODO(jelmer): Use something other than ascii?
-    if not isinstance(path, bytes):
-        path = path.encode('ascii')
-    return path
+DEFAULT_ENCODING = 'utf-8'
 
 
 def open_repo(path_or_repo):
@@ -132,8 +146,8 @@ def open_repo_closing(path_or_repo):
     return closing(Repo(path_or_repo))
 
 
-def archive(repo, committish=None, outstream=sys.stdout,
-            errstream=sys.stderr):
+def archive(repo, committish=None, outstream=default_bytes_out_stream,
+            errstream=default_bytes_err_stream):
     """Create an archive.
 
     :param repo: Path of repository for which to generate an archive.
@@ -220,12 +234,15 @@ def init(path=".", bare=False):
         return Repo.init(path)
 
 
-def clone(source, target=None, bare=False, checkout=None, errstream=default_bytes_err_stream, outstream=None):
+def clone(source, target=None, bare=False, checkout=None,
+          errstream=default_bytes_err_stream, outstream=None,
+          origin=b"origin"):
     """Clone a local or remote git repository.
 
     :param source: Path or URL for source repository
     :param target: Path to target repository (optional)
     :param bare: Whether or not to create a bare repository
+    :param checkout: Whether or not to check-out HEAD after cloning
     :param errstream: Optional stream to write progress to
     :param outstream: Optional stream to write progress to (deprecated)
     :return: The new repository
@@ -256,7 +273,23 @@ def clone(source, target=None, bare=False, checkout=None, errstream=default_byte
         remote_refs = client.fetch(host_path, r,
             determine_wants=r.object_store.determine_wants_all,
             progress=errstream.write)
+        r.refs.import_refs(
+            b'refs/remotes/' + origin,
+            {n[len(b'refs/heads/'):]: v for (n, v) in remote_refs.items()
+                if n.startswith(b'refs/heads/')})
+        r.refs.import_refs(
+            b'refs/tags',
+            {n[len(b'refs/tags/'):]: v for (n, v) in remote_refs.items()
+                if n.startswith(b'refs/tags/') and
+                not n.endswith(ANNOTATED_TAG_SUFFIX)})
         r[b"HEAD"] = remote_refs[b"HEAD"]
+        target_config = r.get_config()
+        if not isinstance(source, bytes):
+            source = source.encode(DEFAULT_ENCODING)
+        target_config.set((b'remote', b'origin'), b'url', source)
+        target_config.set((b'remote', b'origin'), b'fetch',
+            b'+refs/heads/*:refs/remotes/origin/*')
+        target_config.write_to_path()
         if checkout:
             errstream.write(b'Checking out HEAD\n')
             r.reset_index()
@@ -300,7 +333,7 @@ def rm(repo=".", paths=None):
         index.write()
 
 
-def commit_decode(commit, contents, default_encoding='utf-8'):
+def commit_decode(commit, contents, default_encoding=DEFAULT_ENCODING):
     if commit.encoding is not None:
         return contents.decode(commit.encoding, "replace")
     return contents.decode(default_encoding, "replace")
@@ -317,8 +350,14 @@ def print_commit(commit, decode, outstream=sys.stdout):
     if len(commit.parents) > 1:
         outstream.write("merge: " +
             "...".join([c.decode('ascii') for c in commit.parents[1:]]) + "\n")
-    outstream.write("author: " + decode(commit.author) + "\n")
-    outstream.write("committer: " + decode(commit.committer) + "\n")
+    outstream.write("Author: " + decode(commit.author) + "\n")
+    if commit.author != commit.committer:
+        outstream.write("Committer: " + decode(commit.committer) + "\n")
+
+    time_tuple = time.gmtime(commit.author_time + commit.author_timezone)
+    time_str = time.strftime("%a %b %d %Y %H:%M:%S", time_tuple)
+    timezone_str = format_timezone(commit.author_timezone).decode('ascii')
+    outstream.write("Date:   " + time_str + " " + timezone_str + "\n")
     outstream.write("\n")
     outstream.write(decode(commit.message) + "\n")
     outstream.write("\n")
@@ -395,22 +434,61 @@ def show_object(repo, obj, decode, outstream):
             }[obj.type_name](repo, obj, decode, outstream)
 
 
-def log(repo=".", outstream=sys.stdout, max_entries=None):
+def print_name_status(changes):
+    """Print a simple status summary, listing changed files.
+    """
+    for change in changes:
+        if not change:
+            continue
+        if type(change) is list:
+            change = change[0]
+        if change.type == CHANGE_ADD:
+            path1 = change.new.path
+            path2 = ''
+            kind = 'A'
+        elif change.type == CHANGE_DELETE:
+            path1 = change.old.path
+            path2 = ''
+            kind = 'D'
+        elif change.type == CHANGE_MODIFY:
+            path1 = change.new.path
+            path2 = ''
+            kind = 'M'
+        elif change.type in RENAME_CHANGE_TYPES:
+            path1 = change.old.path
+            path2 = change.new.path
+            if change.type == CHANGE_RENAME:
+                kind = 'R'
+            elif change.type == CHANGE_COPY:
+                kind = 'C'
+        yield '%-8s%-20s%-20s' % (kind, path1, path2)
+
+
+def log(repo=".", paths=None, outstream=sys.stdout, max_entries=None,
+        reverse=False, name_status=False):
     """Write commit logs.
 
     :param repo: Path to repository
+    :param paths: Optional set of specific paths to print entries for
     :param outstream: Stream to write log output to
+    :param reverse: Reverse order in which entries are printed
+    :param name_status: Print name status
     :param max_entries: Optional maximum number of entries to display
     """
     with open_repo_closing(repo) as r:
-        walker = r.get_walker(max_entries=max_entries)
+        walker = r.get_walker(
+            max_entries=max_entries, paths=paths, reverse=reverse)
         for entry in walker:
             decode = lambda x: commit_decode(entry.commit, x)
             print_commit(entry.commit, decode, outstream)
+            if name_status:
+                outstream.writelines(
+                    [l+'\n' for l in print_name_status(entry.changes())])
 
 
 # TODO(jelmer): better default for encoding?
-def show(repo=".", objects=None, outstream=sys.stdout, default_encoding='utf-8'):
+def show(repo=".", objects=None, outstream=sys.stdout,
+         default_encoding=DEFAULT_ENCODING):
     """Print the changes in a commit.
 
     :param repo: Path to repository
@@ -489,9 +567,9 @@ def tag_create(repo, tag, author=None, message=None, annotated=False,
             tag_obj.message = message
             tag_obj.name = tag
             tag_obj.object = (type(object), object.id)
-            tag_obj.tag_time = tag_time
             if tag_time is None:
                 tag_time = int(time.time())
+            tag_obj.tag_time = tag_time
             if tag_timezone is None:
                 # TODO(jelmer) Use current user timezone rather than UTC
                 tag_timezone = 0
@@ -553,11 +631,11 @@ def reset(repo, mode, committish="HEAD"):
 
     with open_repo_closing(repo) as r:
         tree = r[committish].tree
-        r.reset_index()
+        r.reset_index(tree)
 
 
 def push(repo, remote_location, refspecs=None,
-         outstream=sys.stdout, errstream=sys.stderr):
+         outstream=default_bytes_out_stream, errstream=default_bytes_err_stream):
     """Remote push with dulwich via dulwich.client
 
     :param repo: Path to repository
@@ -577,16 +655,17 @@ def push(repo, remote_location, refspecs=None,
 
         def update_refs(refs):
             selected_refs.extend(parse_reftuples(r.refs, refs, refspecs))
+            new_refs = {}
             # TODO: Handle selected_refs == {None: None}
             for (lh, rh, force) in selected_refs:
                 if lh is None:
-                    del refs[rh]
+                    new_refs[rh] = ZERO_SHA
                 else:
-                    refs[rh] = r.refs[lh]
-            return refs
+                    new_refs[rh] = r.refs[lh]
+            return new_refs
 
-        err_encoding = getattr(errstream, 'encoding', 'utf-8')
-        remote_location_bytes = remote_location.encode(err_encoding)
+        err_encoding = getattr(errstream, 'encoding', None) or DEFAULT_ENCODING
+        remote_location_bytes = client.get_url(path).encode(err_encoding)
         try:
             client.send_pack(path, update_refs,
                 r.object_store.generate_pack_contents, progress=errstream.write)
@@ -599,7 +678,7 @@ def push(repo, remote_location, refspecs=None,
 
 
 def pull(repo, remote_location, refspecs=None,
-         outstream=sys.stdout, errstream=sys.stderr):
+         outstream=default_bytes_out_stream, errstream=default_bytes_err_stream):
     """Pull from remote via dulwich.client
 
     :param repo: Path to repository
@@ -610,6 +689,8 @@ def pull(repo, remote_location, refspecs=None,
     """
     # Open the repo
     with open_repo_closing(repo) as r:
+        if refspecs is None:
+            refspecs = [b"HEAD"]
         selected_refs = []
         def determine_wants(remote_refs):
             selected_refs.extend(parse_reftuples(remote_refs, r.refs, refspecs))
@@ -808,7 +889,8 @@ def branch_list(repo):
         return r.refs.keys(base=b"refs/heads/")
 
 
-def fetch(repo, remote_location, outstream=sys.stdout, errstream=sys.stderr):
+def fetch(repo, remote_location, outstream=sys.stdout,
+        errstream=default_bytes_err_stream):
     """Fetch objects from a remote server.
 
     :param repo: Path to the repository
@@ -824,8 +906,13 @@ def fetch(repo, remote_location, outstream=sys.stdout, errstream=sys.stderr):
 
 
 def ls_remote(remote):
+    """List the refs in a remote.
+
+    :param remote: Remote repository location
+    :return: Dictionary with remote refs
+    """
     client, host_path = get_transport_and_path(remote)
-    return client.get_refs(encode_path(host_path))
+    return client.get_refs(host_path)
 
 
 def repack(repo):
@@ -856,3 +943,31 @@ def pack_objects(repo, object_ids, packf, idxf, delta_window_size=None):
         entries = [(k, v[0], v[1]) for (k, v) in entries.items()]
         entries.sort()
         write_pack_index(idxf, entries, data_sum)
+
+
+def ls_tree(repo, tree_ish=None, outstream=sys.stdout, recursive=False,
+        name_only=False):
+    """List contents of a tree.
+
+    :param repo: Path to the repository
+    :param tree_ish: Tree id to list
+    :param outstream: Output stream (defaults to stdout)
+    :param recursive: Whether to recursively list files
+    :param name_only: Only print item name
+    """
+    def list_tree(store, treeid, base):
+        for (name, mode, sha) in store[treeid].iteritems():
+            if base:
+                name = posixpath.join(base, name)
+            if name_only:
+                outstream.write(name + b"\n")
+            else:
+                outstream.write(pretty_format_tree_entry(name, mode, sha))
+            if stat.S_ISDIR(mode):
+                list_tree(store, sha, name)
+    if tree_ish is None:
+        tree_ish = "HEAD"
+    with open_repo_closing(repo) as r:
+        c = r[tree_ish]
+        treeid = c.tree
+        list_tree(r.object_store, treeid, "")

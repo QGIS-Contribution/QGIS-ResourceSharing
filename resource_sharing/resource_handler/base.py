@@ -22,6 +22,7 @@ class ResourceHandlerMeta(type):
 
         super(ResourceHandlerMeta, cls).__init__(name, bases, dct)
 
+
 @add_metaclass(ResourceHandlerMeta)
 class BaseResourceHandler(object):
     """Abstract class of handler."""

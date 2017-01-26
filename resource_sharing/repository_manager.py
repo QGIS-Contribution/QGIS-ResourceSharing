@@ -3,7 +3,7 @@ import csv
 import os
 import pickle
 
-from PyQt4.QtCore import QObject, QSettings, QTemporaryFile
+from qgis.PyQt.QtCore import QObject, QSettings, QTemporaryFile
 
 from resource_sharing.utilities import (
     repo_settings_group, local_collection_path, repositories_cache_path)
@@ -352,7 +352,7 @@ class RepositoryManager(QObject):
         """Load repositories from cache and rebuild collections."""
         repo_collections = {}
         if os.path.exists(repositories_cache_path()):
-            with open(repositories_cache_path(), 'r') as f:
+            with open(repositories_cache_path(), 'rb') as f:
                 repo_collections = pickle.load(f)
         self._repositories = repo_collections
         self.rebuild_collections()

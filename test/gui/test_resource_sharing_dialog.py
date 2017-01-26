@@ -16,7 +16,12 @@ __copyright__ = 'Copyright 2016, Akbar Gumbira'
 from qgis.testing import start_app, unittest
 import nose2
 
-from PyQt4.QtGui import QDialogButtonBox, QDialog
+
+try:
+    from qgis.PyQt.QtGui import QDialogButtonBox, QDialog
+except ImportError:
+    from qgis.PyQt.QtWidgets import QDialogButtonBox, QDialog
+
 
 from resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
 from resource_sharing.config import (

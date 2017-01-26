@@ -2,7 +2,10 @@
 import os
 import fnmatch
 
-from qgis.core import QgsStyleV2
+try:
+    from qgis.core import QgsStyleV2 as QgsStyle
+except ImportError:
+    from qgis.core import QgsStyle
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
@@ -18,7 +21,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         """Constructor of the base class."""
         BaseResourceHandler.__init__(self, collection_id)
         # Init the default style
-        self.style = QgsStyleV2.defaultStyle()
+        self.style = QgsStyle.defaultStyle()
 
     @classmethod
     def dir_name(self):
@@ -66,7 +69,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 # self.resolve_dependency(symbol['symbol'])
                 if self.style.addSymbol(symbol_name, symbol['symbol'], True):
                     self.style.group(
-                        QgsStyleV2.SymbolEntity, symbol_name, child_id)
+                        QgsStyle.SymbolEntity, symbol_name, child_id)
 
             for colorramp in symbol_xml_extractor.colorramps:
                 colorramp_name = '%s (%s)' % (
@@ -74,7 +77,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 if self.style.addColorRamp(
                         colorramp_name, colorramp['colorramp'], True):
                     self.style.group(
-                        QgsStyleV2.ColorrampEntity, colorramp_name, child_id)
+                        QgsStyle.ColorrampEntity, colorramp_name, child_id)
 
     def uninstall(self):
         """Uninstall the symbols from QGIS."""
@@ -86,17 +89,17 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         for child_group_id in child_groups:
             # Get all the symbol from this child group and remove them
             symbols = self.style.symbolsOfGroup(
-                QgsStyleV2.SymbolEntity, child_group_id)
+                QgsStyle.SymbolEntity, child_group_id)
             for symbol in symbols:
                 self.style.removeSymbol(symbol)
             # Get all the colorramps and remove them
             colorramps = self.style.symbolsOfGroup(
-                QgsStyleV2.ColorrampEntity, child_group_id)
+                QgsStyle.ColorrampEntity, child_group_id)
             for colorramp in colorramps:
                 self.style.removeColorRamp(colorramp)
 
             # Remove this child group
-            self.style.remove(QgsStyleV2.GroupEntity, child_group_id)
+            self.style.remove(QgsStyle.GroupEntity, child_group_id)
 
         # Remove parent group:
-        self.style.remove(QgsStyleV2.GroupEntity, parent_group_id)
+        self.style.remove(QgsStyle.GroupEntity, parent_group_id)

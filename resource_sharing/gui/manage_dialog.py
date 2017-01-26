@@ -21,9 +21,12 @@
  ***************************************************************************/
 """
 
-from PyQt4 import uic
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QDialog, QVBoxLayout, QDialogButtonBox
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt
+try:
+    from qgis.PyQt.QtGui import QDialog, QVBoxLayout, QDialogButtonBox
+except ImportError:
+    from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QDialogButtonBox
 
 from resource_sharing.utilities import ui_path, qgis_version
 

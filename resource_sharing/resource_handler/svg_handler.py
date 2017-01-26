@@ -1,7 +1,7 @@
 # coding=utf-8
 import os
 
-from PyQt4.QtCore import QSettings
+from qgis.PyQt.QtCore import QSettings
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.utilities import local_collection_path

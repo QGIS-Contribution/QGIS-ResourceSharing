@@ -1,6 +1,5 @@
 # coding=utf-8
 from qgis.testing import start_app, unittest
-import nose2
 
 from resource_sharing.repository_handler import (
     BaseRepositoryHandler,
@@ -146,4 +145,4 @@ class TestRemoteGitHandler(unittest.TestCase):
         self.assertEqual(remote_repo.metadata_url, expected_metadata_url)
 
 if __name__ == '__main__':
-    nose2.main()
+    unittest.main()

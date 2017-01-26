@@ -1,12 +1,22 @@
 # coding=utf-8
 """This module contains the base class of repository handler."""
 import codecs
-from ConfigParser import SafeConfigParser
-import urlparse
+try:
+    from io import StringIO
+except:
+    from StringIO import StringIO
+
 import logging
 
-from PyQt4.QtCore import QTemporaryFile
-from qgis.core import QGis
+from six import add_metaclass
+try:
+    from ConfigParser import SafeConfigParser
+    from urlparse import urlparse
+    from qgis.core import QGis as Qgis
+except ImportError:
+    from configparser import SafeConfigParser
+    from urllib.parse import urlparse
+    from qgis.core import Qgis
 
 from ext_libs.giturlparse import validate as git_validate
 from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
@@ -33,6 +43,7 @@ class RepositoryHandlerMeta(type):
         super(RepositoryHandlerMeta, cls).__init__(name, bases, dct)
 
 
+@add_metaclass(RepositoryHandlerMeta)
 class BaseRepositoryHandler(object):
     """Abstract class of handler."""
     __metaclass__ = RepositoryHandlerMeta
@@ -86,7 +97,7 @@ class BaseRepositoryHandler(object):
     def url(self, url):
         """Setter to the repository's URL."""
         self._url = url
-        self._parsed_url = urlparse.urlparse(url)
+        self._parsed_url = urlparse(url)
 
     @property
     def auth_cfg(self):
@@ -129,16 +140,13 @@ class BaseRepositoryHandler(object):
             raise MetadataError(msg)
 
         collections = []
-        metadata_file = QTemporaryFile()
-        if metadata_file.open():
-            metadata_file.write(self.metadata)
-            metadata_file.close()
+
+
+        metadata_file = StringIO(self.metadata)
 
         try:
             parser = SafeConfigParser()
-            metadata_path = metadata_file.fileName()
-            with codecs.open(metadata_path, 'r', encoding='utf-8') as f:
-                parser.readfp(f)
+            parser.readfp(metadata_file)
             collections_str = parser.get('general', 'collections')
         except Exception as e:
             raise MetadataError('Error parsing metadata: %s' % e)
@@ -159,12 +167,12 @@ class BaseRepositoryHandler(object):
             if not qgis_max_version:
                 qgis_max_version = '3.99'
             if not isCompatible(
-                    QGis.QGIS_VERSION, qgis_min_version, qgis_max_version):
+                    Qgis.QGIS_VERSION, qgis_min_version, qgis_max_version):
                 LOGGER.info(
                     'Collection %s is not compatible with current QGIS '
                     'version. QGIS ver:%s, QGIS min ver:%s, QGIS max ver: '
                     '%s' % (
-                        collection, QGis.QGIS_VERSION, qgis_min_version,
+                        collection, Qgis.QGIS_VERSION, qgis_min_version,
                         qgis_max_version))
                 break
 

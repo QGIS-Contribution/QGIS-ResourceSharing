@@ -91,16 +91,16 @@ class RemoteGitHandler(BaseRepositoryHandler):
             'repositories',
             self.git_host, self.git_owner, self.git_repository
         )
-        if not os.path.exists(local_repo_dir):
+        if not os.path.exists(os.path.join(local_repo_dir, '.git')):
             os.makedirs(local_repo_dir)
             try:
                 repo = porcelain.clone(
-                    self.url.encode('utf-8'), local_repo_dir
+                    self.url, local_repo_dir
                 )
             except Exception as e:
                 # Try to clone with https if it's ssh url
                 git_parsed = parse(self.url)
-                if self.url.encode('utf-8') == git_parsed.url2ssh:
+                if self.url == git_parsed.url2ssh:
                     try:
                         repo = porcelain.clone(
                             git_parsed.url2https, local_repo_dir)
@@ -121,13 +121,13 @@ class RemoteGitHandler(BaseRepositoryHandler):
             try:
                 porcelain.pull(
                     local_repo_dir,
-                    self.url.encode('utf-8'),
+                    self.url,
                     b'refs/heads/master'
                 )
             except Exception as e:
                 # Try to pull with https if it's ssh url
                 git_parsed = parse(self.url)
-                if self.url.encode('utf-8') == git_parsed.url2ssh:
+                if self.url == git_parsed.url2ssh:
                     try:
                         porcelain.pull(
                             local_repo_dir,

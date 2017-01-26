@@ -1,20 +1,22 @@
 # patch.py -- For dealing with packed-style patches.
 # Copyright (C) 2009-2013 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) a later version.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Classes for dealing with git am-style patches.
 
@@ -27,6 +29,7 @@ import email.parser
 import time
 
 from dulwich.objects import (
+    Blob,
     Commit,
     S_ISGITLINK,
     )
@@ -150,22 +153,23 @@ def write_object_diff(f, store, old_file, new_file, diff_binary=False):
     new_path = patch_filename(new_path, b"b")
     def content(mode, hexsha):
         if hexsha is None:
-            return b''
+            return Blob.from_string(b'')
         elif S_ISGITLINK(mode):
-            return b"Submodule commit " + hexsha + b"\n"
+            return Blob.from_string(b"Submodule commit " + hexsha + b"\n")
         else:
-            return store[hexsha].data
+            return store[hexsha]
 
     def lines(content):
         if not content:
             return []
         else:
-            return content.splitlines(True)
+            return content.splitlines()
     f.writelines(gen_diff_header(
         (old_path, new_path), (old_mode, new_mode), (old_id, new_id)))
     old_content = content(old_mode, old_id)
     new_content = content(new_mode, new_id)
-    if not diff_binary and (is_binary(old_content) or is_binary(new_content)):
+    if not diff_binary and (
+            is_binary(old_content.data) or is_binary(new_content.data)):
         f.write(b"Binary files " + old_path + b" and " + new_path + b" differ\n")
     else:
         f.writelines(unified_diff(lines(old_content), lines(new_content),
@@ -213,7 +217,7 @@ def write_blob_diff(f, old_file, new_file):
     new_path = patch_filename(new_path, b"b")
     def lines(blob):
         if blob is not None:
-            return blob.data.splitlines(True)
+            return blob.splitlines()
         else:
             return []
     f.writelines(gen_diff_header(

@@ -2,20 +2,22 @@
 # Copyright (C) 2008 John Carr <john.carr@unrouted.co.uk>
 # Coprygith (C) 2011-2012 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# or (at your option) any later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Git smart network protocol server implementation.
 
@@ -69,6 +71,7 @@ from dulwich.pack import (
 from dulwich.protocol import (
     BufferedPktLineWriter,
     capability_agent,
+    CAPABILITIES_REF,
     CAPABILITY_DELETE_REFS,
     CAPABILITY_INCLUDE_TAG,
     CAPABILITY_MULTI_ACK_DETAILED,
@@ -103,6 +106,7 @@ from dulwich.protocol import (
     extract_want_line_capabilities,
     )
 from dulwich.refs import (
+    ANNOTATED_TAG_SUFFIX,
     write_info_refs,
     )
 from dulwich.repo import (
@@ -472,7 +476,6 @@ def _all_wants_satisfied(store, haves, wants):
         earliest = min([store[h].commit_time for h in haves])
     else:
         earliest = 0
-    unsatisfied_wants = set()
     for want in wants:
         if not _want_satisfied(store, haves, want, earliest):
             return False
@@ -535,7 +538,8 @@ class ProtocolGraphWalker(object):
                 self.proto.write_pkt_line(line + b'\n')
                 peeled_sha = self.get_peeled(ref)
                 if peeled_sha != sha:
-                    self.proto.write_pkt_line(peeled_sha + b' ' + ref + b'^{}\n')
+                    self.proto.write_pkt_line(
+                        peeled_sha + b' ' + ref + ANNOTATED_TAG_SUFFIX + b'\n')
 
             # i'm done..
             self.proto.write_pkt_line(None)
@@ -891,12 +895,12 @@ class ReceivePackHandler(PackHandler):
                           'Attempted to delete refs without delete-refs '
                           'capability.')
                     try:
-                        del self.repo.refs[ref]
+                        self.repo.refs.remove_if_equals(ref, oldsha)
                     except all_exceptions:
                         ref_status = b'failed to delete'
                 else:
                     try:
-                        self.repo.refs[ref] = sha
+                        self.repo.refs.set_if_equals(ref, oldsha, sha)
                     except all_exceptions:
                         ref_status = b'failed to write'
             except KeyError as e:
@@ -932,16 +936,14 @@ class ReceivePackHandler(PackHandler):
         if self.advertise_refs or not self.http_req:
             refs = sorted(self.repo.get_refs().items())
 
-            if refs:
-                self.proto.write_pkt_line(
-                  refs[0][1] + b' ' + refs[0][0] + b'\0' +
-                  self.capability_line() + b'\n')
-                for i in range(1, len(refs)):
-                    ref = refs[i]
-                    self.proto.write_pkt_line(ref[1] + b' ' + ref[0] + b'\n')
-            else:
-                self.proto.write_pkt_line(ZERO_SHA + b" capabilities^{}\0" +
-                    self.capability_line())
+            if not refs:
+                refs = [(CAPABILITIES_REF, ZERO_SHA)]
+            self.proto.write_pkt_line(
+              refs[0][1] + b' ' + refs[0][0] + b'\0' +
+              self.capability_line() + b'\n')
+            for i in range(1, len(refs)):
+                ref = refs[i]
+                self.proto.write_pkt_line(ref[1] + b' ' + ref[0] + b'\n')
 
             self.proto.write_pkt_line(None)
             if self.advertise_refs:

@@ -23,13 +23,13 @@ class SymbolResolverMixin(object):
         :param xml_path: The path to the style xml file.
         :type xml_path: str
         """
-        with open(xml_path, 'r') as xml_file:
+        with open(xml_path, 'rb') as xml_file:
             symbol_xml = xml_file.read()
 
         updated_xml = fix_xml_node(
             symbol_xml, self.collection_path, QgsApplication.svgPaths())
 
-        with open(xml_path, 'w') as xml_file:
+        with open(xml_path, 'wb') as xml_file:
             xml_file.write(updated_xml)
 
 

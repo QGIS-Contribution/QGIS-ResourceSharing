@@ -1,6 +1,5 @@
 # coding=utf-8
 """This module contains the base class of repository handler."""
-import codecs
 try:
     from io import StringIO
 except:
@@ -141,8 +140,7 @@ class BaseRepositoryHandler(object):
 
         collections = []
 
-
-        metadata_file = StringIO(self.metadata)
+        metadata_file = StringIO(bytes(self.metadata).decode())
 
         try:
             parser = SafeConfigParser()

@@ -454,7 +454,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.progress_dialog.hide()
         else:
             message = self.installer_worker.error_message
-        QtGui.QMessageBox.information(self, 'Resource Sharing', message)
+        QMessageBox.information(self, 'Resource Sharing', message)
         # Clean up the worker and thread
         self.installer_worker.deleteLater()
         self.installer_thread.quit()
@@ -481,7 +481,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         except Exception as e:
             raise
         self.reload_collections_model()
-        QtGui.QMessageBox.information(
+        QMessageBox.information(
             self,
             'Resource Sharing',
             'The collection is uninstalled succesfully!')

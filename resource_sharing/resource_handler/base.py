@@ -25,7 +25,6 @@ class ResourceHandlerMeta(type):
 @add_metaclass(ResourceHandlerMeta)
 class BaseResourceHandler(object):
     """Abstract class of handler."""
-    __metaclass__ = ResourceHandlerMeta
 
     IS_DISABLED = True
 

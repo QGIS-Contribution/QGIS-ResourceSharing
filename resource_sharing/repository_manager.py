@@ -123,7 +123,7 @@ class RepositoryManager(QObject):
                     break
             if not repo_present:
                 self.add_directory(
-                    online_dir_name, self._online_directories[online_dir_name])
+                online_dir_name, self._online_directories[online_dir_name])
 
         for repo_name in settings.childGroups():
             self._directories[repo_name] = {}

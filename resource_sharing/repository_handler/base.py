@@ -45,7 +45,6 @@ class RepositoryHandlerMeta(type):
 @add_metaclass(RepositoryHandlerMeta)
 class BaseRepositoryHandler(object):
     """Abstract class of handler."""
-    __metaclass__ = RepositoryHandlerMeta
 
     METADATA_FILE = 'metadata.ini'
     IS_DISABLED = False
@@ -140,7 +139,10 @@ class BaseRepositoryHandler(object):
 
         collections = []
 
-        metadata_file = StringIO(bytes(self.metadata).decode())
+        try:  # Py3/Qt5
+            metadata_file = StringIO(self.metadata)
+        except:  # Py2/Q4
+            metadata_file = StringIO(bytes(self.metadata).decode('utf-8'))
 
         try:
             parser = SafeConfigParser()

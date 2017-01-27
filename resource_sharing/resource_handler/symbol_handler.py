@@ -58,6 +58,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
+            # FIXME: no groups in QGIS3!!!
             child_id = self.style.addGroup(file_name, group_id)
             # Modify the symbol file first
             self.resolve_dependency(symbol_file)
@@ -84,6 +85,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         # Get the parent group id
         parent_group_name = '%s (%s)' % (
             self.collection['name'], self.collection_id)
+        # FIXME: groupId does not exist in QGIS3
         parent_group_id = self.style.groupId(parent_group_name)
         child_groups = self.style.childGroupNames(parent_group_name)
         for child_group_id in child_groups:

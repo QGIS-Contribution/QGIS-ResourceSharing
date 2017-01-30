@@ -28,8 +28,8 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         return 'symbol'
 
     def _get_parent_group_or_tag(self):
-        """Retrieve or create the parent group (QGIS2) or tag (QGIS3) for the styles
-        returns the group or tag id"""
+        """Retrieve or create the parent group (QGIS2) or tag (QGIS3) for
+        the styles returns the group or tag id."""
         parent_group_name = '%s (%s)' % (
             self.collection['name'], self.collection_id)
         try:
@@ -46,7 +46,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     def _get_child_group_tag(self, group_or_tag_id, file_name):
         """Retrieve or create the child group (QGIS2) or the parent tag for
         (QGIS3, no hierarchy) for the styles, returns the group or parent tag
-        id with a slash and the file_name as a way to fake a tree within QGIS3
+        id with a slash and the file_name as a way to fake a tree within QGIS3.
         """
         try:
             group = self.style.groupId(file_name)
@@ -61,16 +61,20 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             return self.style.addTag(tag_name)
 
     def _get_child_groups_tags_ids(self):
-        """Retrieve child groups (QGIS2) or tags (QGIS3) ids"""
+        """Retrieve child groups (QGIS2) or tags (QGIS3) ids."""
         parent_group_name = '%s (%s)' % (
             self.collection['name'], self.collection_id)
         try:
-            return [self.style.groupId(n) for n in self.style.childGroupNames(parent_group_name)]
+            return [self.style.groupId(n) for n in
+                    self.style.childGroupNames(parent_group_name)]
         except AttributeError:
-            return [self.style.tagId(tag) for tag in self.style.tags() if tag.find(parent_group_name) == 0]
+            return [self.style.tagId(tag) for tag in self.style.tags()
+                    if tag.find(parent_group_name) == 0]
 
-    def _get_symbols_for_group_or_tag(self, symbol_type, child_group_or_tag_id):
-        """Return all symbols names in the group id (QGIS2) or tag id (QGIS3)"""
+    def _get_symbols_for_group_or_tag(self, symbol_type,
+                                      child_group_or_tag_id):
+        """Return all symbols names in the group id (QGIS2) or tag id
+        (QGIS3)."""
         try:
             return self.style.symbolsOfGroup(
                 QgsStyle.SymbolEntity, child_group_or_tag_id)
@@ -79,19 +83,19 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 QgsStyle.SymbolEntity, child_group_or_tag_id)
 
     def _group_or_tag(self, symbol_type, symbol_name, tag_or_group):
-        """Add to group (QGIS2) or tag (QGIS3)"""
+        """Add to group (QGIS2) or tag (QGIS3)."""
         try:
             self.style.group(QgsStyle.SymbolEntity, symbol_name, tag_or_group)
         except AttributeError:
-            self.style.tagSymbol(QgsStyle.SymbolEntity, symbol_name, [self.style.tag(tag_or_group)])
+            self.style.tagSymbol(QgsStyle.SymbolEntity, symbol_name,
+                                 [self.style.tag(tag_or_group)])
 
     def _group_or_tag_remove(self, group_or_tag_id):
-        """Remove a group or tag"""
+        """Remove a group or tag."""
         try:
             self.style.remove(QgsStyle.GroupEntity, group_or_tag_id)
         except AttributeError:
             self.style.remove(QgsStyle.TagEntity, group_or_tag_id)
-
 
     def install(self):
         """Install the symbol and collection from this collection into QGIS.
@@ -134,7 +138,8 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
                 # self.resolve_dependency(symbol['symbol'])
                 if self.style.addSymbol(symbol_name, symbol['symbol'], True):
-                    self._group_or_tag(QgsStyle.SymbolEntity, symbol_name, child_id)
+                    self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
+                                       child_id)
 
             for colorramp in symbol_xml_extractor.colorramps:
                 colorramp_name = '%s (%s)' % (

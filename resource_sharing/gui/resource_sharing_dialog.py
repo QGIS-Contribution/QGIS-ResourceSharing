@@ -19,10 +19,10 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.PyQt import QtGui, uic
+from qgis.PyQt import uic
 from qgis.PyQt.Qt import QSize
 from qgis.PyQt.QtCore import (
-    Qt, QSettings, pyqtSlot, QRegExp, QThread, QUrl)
+    Qt, QSettings, pyqtSlot, QRegExp, QUrl, QThread)
 
 from qgis.PyQt.QtGui import (
     QIcon,
@@ -444,6 +444,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.installer_thread.started.connect(self.installer_worker.run)
         self.installer_thread.start()
 
+
     def install_finished(self):
         # Process the result
         self.progress_dialog.hide()
@@ -451,7 +452,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.reload_collections_model()
             message = '%s is installed successfully' % (
                 config.COLLECTIONS[self._selected_collection_id]['name'])
-            self.progress_dialog.hide()
         else:
             message = self.installer_worker.error_message
         QMessageBox.information(self, 'Resource Sharing', message)
@@ -598,14 +598,16 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         :param text: Text as the label of the progress dialog
         :type text: str
         """
-        self.progress_dialog = QProgressDialog(self)
-        self.progress_dialog.setWindowModality(Qt.WindowModal)
-        self.progress_dialog.setAutoClose(False)
-        title = self.tr('Resource Sharing')
-        self.progress_dialog.setWindowTitle(title)
+        if self.progress_dialog is None:
+            self.progress_dialog = QProgressDialog(self)
+            self.progress_dialog.setWindowModality(Qt.WindowModal)
+            self.progress_dialog.setAutoClose(False)
+            title = self.tr('Resource Sharing')
+            self.progress_dialog.setWindowTitle(title)
+            # Just use infinite progress bar here
+            self.progress_dialog.setMaximum(0)
+            self.progress_dialog.setMinimum(0)
+            self.progress_dialog.setValue(0)
+            self.progress_dialog.setLabelText(text)
+
         self.progress_dialog.show()
-        # Just use infinite progress bar here
-        self.progress_dialog.setMaximum(0)
-        self.progress_dialog.setMinimum(0)
-        self.progress_dialog.setValue(0)
-        self.progress_dialog.setLabelText(text)

@@ -444,7 +444,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.installer_thread.started.connect(self.installer_worker.run)
         self.installer_thread.start()
 
-
     def install_finished(self):
         # Process the result
         self.progress_dialog.hide()

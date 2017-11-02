@@ -2,5 +2,7 @@ from base import BaseRepositoryHandler
 from remote_git_handler import RemoteGitHandler
 from github_handler import GithubHandler
 from bitbucket_handler import BitBucketHandler
+from gitlab_handler import GitlabHandler
+from gogs_handler import GogsHandler
 from filesystem_handler import FileSystemHandler
 from remote_zip_handler import RemoteZipHandler

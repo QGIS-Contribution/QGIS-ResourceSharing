@@ -10,8 +10,12 @@ env:
   - QGIS_REPO=http://qgis.org/debian-ltr
 #  - QGIS_REPO=http://qgis.org/debian-nightly-release
 
+addons:
+  apt:
+    packages:
+    - "python-software-properties"
+
 install:
-  - sudo apt-get install python-software-properties
   - sudo add-apt-repository ${QGIS_REPO}
   - sudo apt-get update
   - sudo apt-get install -y --force-yes qgis python-qgis xvfb

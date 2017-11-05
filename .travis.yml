@@ -7,16 +7,15 @@ before_install:
   - sudo apt-get -qq -y update
 
 env:
-#  - QGIS_REPO=http://qgis.org/debian-ltr (testing module is not there)
-  - QGIS_REPO=http://qgis.org/debian-nightly-release
+  - QGIS_REPO=http://qgis.org/debian-ltr
+#  - QGIS_REPO=http://qgis.org/debian-nightly-release
 
 install:
   - sudo apt-get install python-software-properties
   - sudo add-apt-repository ${QGIS_REPO}
   - sudo apt-get update
   - sudo apt-get install -y --force-yes qgis python-qgis xvfb
-  - sudo pip install nose2==0.5.0
-  - sudo pip install cov-core python-coveralls pep8
+  - sudo pip install nose2 cov-core python-coveralls pep8
 
 before_script:
   - export QGIS_PREFIX_PATH=/usr

@@ -22,7 +22,8 @@ install:
   - sudo add-apt-repository ${QGIS_REPO}
   - sudo apt-get update
   - sudo apt-get install -y --force-yes qgis python-qgis xvfb
-  - sudo pip install nose2 cov-core python-coveralls pep8
+  - sudo pip install nose2==0.6.0
+  - sudo pip install cov-core python-coveralls pep8
 
 before_script:
   - export QGIS_PREFIX_PATH=/usr

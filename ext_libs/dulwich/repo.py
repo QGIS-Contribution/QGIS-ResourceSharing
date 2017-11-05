@@ -2,21 +2,22 @@
 # Copyright (C) 2007 James Westby <jw+debian@jameswestby.net>
 # Copyright (C) 2008-2013 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) any later version of
-# the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 
 """Repository access.
@@ -31,6 +32,7 @@ from io import BytesIO
 import errno
 import os
 import sys
+import stat
 
 from dulwich.errors import (
     NoIndexPresent,
@@ -66,7 +68,7 @@ from dulwich.hooks import (
     CommitMsgShellHook,
     )
 
-from dulwich.refs import (
+from dulwich.refs import (  # noqa: F401
     check_ref_format,
     RefsContainer,
     DictRefsContainer,
@@ -88,6 +90,9 @@ REFSDIR = 'refs'
 REFSDIR_TAGS = 'tags'
 REFSDIR_HEADS = 'heads'
 INDEX_FILENAME = "index"
+COMMONDIR = 'commondir'
+GITDIR = 'gitdir'
+WORKTREES = 'worktrees'
 
 BASE_DIRECTORIES = [
     ["branches"],
@@ -97,6 +102,8 @@ BASE_DIRECTORIES = [
     ["hooks"],
     ["info"]
     ]
+
+DEFAULT_REF = b'refs/heads/master'
 
 
 def parse_graftpoints(graftpoints):
@@ -174,6 +181,13 @@ class BaseRepo(object):
         self._graftpoints = {}
         self.hooks = {}
 
+    def _determine_file_mode(self):
+        """Probe the file-system to determine whether permissions can be trusted.
+
+        :return: True if permissions can be trusted, False otherwise.
+        """
+        raise NotImplementedError(self._determine_file_mode)
+
     def _init_files(self, bare):
         """Initialize a default set of named files."""
         from dulwich.config import ConfigFile
@@ -181,7 +195,11 @@ class BaseRepo(object):
         f = BytesIO()
         cf = ConfigFile()
         cf.set(b"core", b"repositoryformatversion", b"0")
-        cf.set(b"core", b"filemode", b"true")
+        if self._determine_file_mode():
+            cf.set(b"core", b"filemode", True)
+        else:
+            cf.set(b"core", b"filemode", False)
+
         cf.set(b"core", b"bare", bare)
         cf.set(b"core", b"logallrefupdates", True)
         cf.write_to_file(f)
@@ -243,8 +261,8 @@ class BaseRepo(object):
             that a revision is present.
         :param progress: Simple progress function that will be called with
             updated progress strings.
-        :param get_tagged: Function that returns a dict of pointed-to sha -> tag
-            sha for including tags.
+        :param get_tagged: Function that returns a dict of pointed-to sha ->
+            tag sha for including tags.
         :return: iterator over objects, with __len__ implemented
         """
         wants = determine_wants(self.get_refs())
@@ -272,8 +290,9 @@ class BaseRepo(object):
         # Deal with shallow requests separately because the haves do
         # not reflect what objects are missing
         if shallows or unshallows:
-            haves = []  # TODO: filter the haves commits from iter_shas.
-                        # the specific commits aren't missing.
+            # TODO: filter the haves commits from iter_shas. the specific
+            # commits aren't missing.
+            haves = []
 
         def get_parents(commit):
             if commit.id in shallows:
@@ -394,8 +413,8 @@ class BaseRepo(object):
 
         :param ref: The refname to peel.
         :return: The fully-peeled SHA1 of a tag object, after peeling all
-            intermediate tags; if the original ref does not point to a tag, this
-            will equal the original SHA1.
+            intermediate tags; if the original ref does not point to a tag,
+            this will equal the original SHA1.
         """
         cached = self.refs.get_peeled(ref)
         if cached is not None:
@@ -409,8 +428,8 @@ class BaseRepo(object):
             ancestors. Defaults to [HEAD]
         :param exclude: Iterable of SHAs of commits to exclude along with their
             ancestors, overriding includes.
-        :param order: ORDER_* constant specifying the order of results. Anything
-            other than ORDER_DATE may result in O(n) memory usage.
+        :param order: ORDER_* constant specifying the order of results.
+            Anything other than ORDER_DATE may result in O(n) memory usage.
         :param reverse: If True, reverse the order of output, requiring O(n)
             memory.
         :param max_entries: The maximum number of entries to yield, or None for
@@ -433,7 +452,8 @@ class BaseRepo(object):
         if isinstance(include, str):
             include = [include]
 
-        kwargs['get_parents'] = lambda commit: self.get_parents(commit.id, commit)
+        kwargs['get_parents'] = lambda commit: self.get_parents(
+            commit.id, commit)
 
         return Walker(self.object_store, include, *args, **kwargs)
 
@@ -446,7 +466,7 @@ class BaseRepo(object):
         """
         if not isinstance(name, bytes):
             raise TypeError("'name' must be bytestring, not %.80s" %
-                    type(name).__name__)
+                            type(name).__name__)
         if len(name) in (20, 40):
             try:
                 return self.object_store[name]
@@ -533,7 +553,8 @@ class BaseRepo(object):
         :param author: Author fullname (defaults to committer)
         :param commit_timestamp: Commit timestamp (defaults to now)
         :param commit_timezone: Commit timestamp timezone (defaults to GMT)
-        :param author_timestamp: Author timestamp (defaults to commit timestamp)
+        :param author_timestamp: Author timestamp (defaults to commit
+            timestamp)
         :param author_timezone: Author timestamp timezone
             (defaults to commit timestamp timezone)
         :param tree: SHA1 of the tree root to use (if not specified the
@@ -618,8 +639,8 @@ class BaseRepo(object):
                 self.object_store.add_object(c)
                 ok = self.refs.add_if_new(ref, c.id)
             if not ok:
-                # Fail if the atomic compare-and-swap failed, leaving the commit and
-                # all its objects as garbage.
+                # Fail if the atomic compare-and-swap failed, leaving the
+                # commit and all its objects as garbage.
                 raise CommitError("%s changed during commit" % (ref,))
 
         try:
@@ -630,7 +651,6 @@ class BaseRepo(object):
             pass
 
         return c.id
-
 
 
 def read_gitfile(f):
@@ -675,18 +695,29 @@ class Repo(BaseRepo):
             raise NotGitRepository(
                 "No git repository was found at %(path)s" % dict(path=root)
             )
+        commondir = self.get_named_file(COMMONDIR)
+        if commondir is not None:
+            with commondir:
+                self._commondir = os.path.join(
+                    self.controldir(),
+                    commondir.read().rstrip(b"\r\n").decode(
+                        sys.getfilesystemencoding()))
+        else:
+            self._commondir = self._controldir
         self.path = root
-        object_store = DiskObjectStore(os.path.join(self.controldir(),
-                                                    OBJECTDIR))
-        refs = DiskRefsContainer(self.controldir())
+        object_store = DiskObjectStore(
+            os.path.join(self.commondir(), OBJECTDIR))
+        refs = DiskRefsContainer(self.commondir(), self._controldir)
         BaseRepo.__init__(self, object_store, refs)
 
         self._graftpoints = {}
-        graft_file = self.get_named_file(os.path.join("info", "grafts"))
+        graft_file = self.get_named_file(os.path.join("info", "grafts"),
+                                         basedir=self.commondir())
         if graft_file:
             with graft_file:
                 self._graftpoints.update(parse_graftpoints(graft_file))
-        graft_file = self.get_named_file("shallow")
+        graft_file = self.get_named_file("shallow",
+                                         basedir=self.commondir())
         if graft_file:
             with graft_file:
                 self._graftpoints.update(parse_graftpoints(graft_file))
@@ -719,6 +750,36 @@ class Repo(BaseRepo):
         """Return the path of the control directory."""
         return self._controldir
 
+    def commondir(self):
+        """Return the path of the common directory.
+
+        For a main working tree, it is identical to controldir().
+
+        For a linked working tree, it is the control directory of the
+        main working tree."""
+
+        return self._commondir
+
+    def _determine_file_mode(self):
+        """Probe the file-system to determine whether permissions can be trusted.
+
+        :return: True if permissions can be trusted, False otherwise.
+        """
+        fname = os.path.join(self.path, '.probe-permissions')
+        with open(fname, 'w') as f:
+            f.write('')
+
+        st1 = os.lstat(fname)
+        os.chmod(fname, st1.st_mode ^ stat.S_IXUSR)
+        st2 = os.lstat(fname)
+
+        os.unlink(fname)
+
+        mode_differs = st1.st_mode != st2.st_mode
+        st2_has_exec = (st2.st_mode & stat.S_IXUSR) != 0
+
+        return mode_differs and st2_has_exec
+
     def _put_named_file(self, path, contents):
         """Write a file to the control dir with the given name and contents.
 
@@ -729,7 +790,7 @@ class Repo(BaseRepo):
         with GitFile(os.path.join(self.controldir(), path), 'wb') as f:
             f.write(contents)
 
-    def get_named_file(self, path):
+    def get_named_file(self, path, basedir=None):
         """Get a file from the control dir with a specific name.
 
         Although the filename should be interpreted as a filename relative to
@@ -737,13 +798,17 @@ class Repo(BaseRepo):
         pointing to a file in that location.
 
         :param path: The path to the file, relative to the control dir.
+        :param basedir: Optional argument that specifies an alternative to the
+            control dir.
         :return: An open file object, or None if the file does not exist.
         """
         # TODO(dborowitz): sanitize filenames, since this is used directly by
         # the dumb web serving code.
+        if basedir is None:
+            basedir = self.controldir()
         path = path.lstrip(os.path.sep)
         try:
-            return open(os.path.join(self.controldir(), path), 'rb')
+            return open(os.path.join(basedir, path), 'rb')
         except (IOError, OSError) as e:
             if e.errno == errno.ENOENT:
                 return None
@@ -789,6 +854,10 @@ class Repo(BaseRepo):
         for fs_path in fs_paths:
             if not isinstance(fs_path, bytes):
                 fs_path = fs_path.encode(sys.getfilesystemencoding())
+            if os.path.isabs(fs_path):
+                raise ValueError(
+                    "path %r should be relative to "
+                    "repository root, not absolute" % fs_path)
             tree_path = _fs_to_tree_path(fs_path)
             full_path = os.path.join(root_path_bytes, fs_path)
             try:
@@ -806,7 +875,7 @@ class Repo(BaseRepo):
         index.write()
 
     def clone(self, target_path, mkdir=True, bare=False,
-            origin=b"origin"):
+              origin=b"origin"):
         """Clone this repository.
 
         :param target_path: Target path
@@ -819,23 +888,29 @@ class Repo(BaseRepo):
         if not bare:
             target = self.init(target_path, mkdir=mkdir)
         else:
-            target = self.init_bare(target_path)
+            target = self.init_bare(target_path, mkdir=mkdir)
         self.fetch(target)
         target.refs.import_refs(
             b'refs/remotes/' + origin, self.refs.as_dict(b'refs/heads'))
         target.refs.import_refs(
             b'refs/tags', self.refs.as_dict(b'refs/tags'))
         try:
-            target.refs.add_if_new(
-                b'refs/heads/master',
-                self.refs[b'refs/heads/master'])
+            target.refs.add_if_new(DEFAULT_REF, self.refs[DEFAULT_REF])
         except KeyError:
             pass
+        target_config = target.get_config()
+        encoded_path = self.path
+        if not isinstance(encoded_path, bytes):
+            encoded_path = encoded_path.encode(sys.getfilesystemencoding())
+        target_config.set((b'remote', b'origin'), b'url', encoded_path)
+        target_config.set((b'remote', b'origin'), b'fetch',
+                          b'+refs/heads/*:refs/remotes/origin/*')
+        target_config.write_to_path()
 
         # Update target head
-        head, head_sha = self.refs._follow(b'HEAD')
-        if head is not None and head_sha is not None:
-            target.refs.set_symbolic_ref(b'HEAD', head)
+        head_chain, head_sha = self.refs.follow(b'HEAD')
+        if head_chain and head_sha is not None:
+            target.refs.set_symbolic_ref(b'HEAD', head_chain[-1])
             target[b'HEAD'] = head_sha
 
             if not bare:
@@ -857,14 +932,16 @@ class Repo(BaseRepo):
         if tree is None:
             tree = self[b'HEAD'].tree
         config = self.get_config()
-        honor_filemode = config.get_boolean('core', 'filemode', os.name != "nt")
+        honor_filemode = config.get_boolean(
+            'core', 'filemode', os.name != "nt")
         if config.get_boolean('core', 'core.protectNTFS', os.name == "nt"):
             validate_path_element = validate_path_element_ntfs
         else:
             validate_path_element = validate_path_element_default
-        return build_index_from_tree(self.path, self.index_path(),
-                self.object_store, tree, honor_filemode=honor_filemode,
-                validate_path_element=validate_path_element)
+        return build_index_from_tree(
+            self.path, self.index_path(), self.object_store, tree,
+            honor_filemode=honor_filemode,
+            validate_path_element=validate_path_element)
 
     def get_config(self):
         """Retrieve the config object.
@@ -913,7 +990,7 @@ class Repo(BaseRepo):
             os.mkdir(os.path.join(path, *d))
         DiskObjectStore.init(os.path.join(path, OBJECTDIR))
         ret = cls(path)
-        ret.refs.set_symbolic_ref(b'HEAD', b"refs/heads/master")
+        ret.refs.set_symbolic_ref(b'HEAD', DEFAULT_REF)
         ret._init_files(bare)
         return ret
 
@@ -933,14 +1010,58 @@ class Repo(BaseRepo):
         return cls(path)
 
     @classmethod
-    def init_bare(cls, path):
+    def _init_new_working_directory(cls, path, main_repo, identifier=None,
+                                    mkdir=False):
+        """Create a new working directory linked to a repository.
+
+        :param path: Path in which to create the working tree.
+        :param main_repo: Main repository to reference
+        :param identifier: Worktree identifier
+        :param mkdir: Whether to create the directory
+        :return: `Repo` instance
+        """
+        if mkdir:
+            os.mkdir(path)
+        if identifier is None:
+            identifier = os.path.basename(path)
+        main_worktreesdir = os.path.join(main_repo.controldir(), WORKTREES)
+        worktree_controldir = os.path.join(main_worktreesdir, identifier)
+        gitdirfile = os.path.join(path, CONTROLDIR)
+        with open(gitdirfile, 'wb') as f:
+            f.write(b'gitdir: ' +
+                    worktree_controldir.encode(sys.getfilesystemencoding()) +
+                    b'\n')
+        try:
+            os.mkdir(main_worktreesdir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+        try:
+            os.mkdir(worktree_controldir)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+        with open(os.path.join(worktree_controldir, GITDIR), 'wb') as f:
+            f.write(gitdirfile.encode(sys.getfilesystemencoding()) + b'\n')
+        with open(os.path.join(worktree_controldir, COMMONDIR), 'wb') as f:
+            f.write(b'../..\n')
+        with open(os.path.join(worktree_controldir, 'HEAD'), 'wb') as f:
+            f.write(main_repo.head() + b'\n')
+        r = cls(path)
+        r.reset_index()
+        return r
+
+    @classmethod
+    def init_bare(cls, path, mkdir=False):
         """Create a new bare repository.
 
-        ``path`` should already exist and be an emty directory.
+        ``path`` should already exist and be an empty directory.
 
         :param path: Path to create bare repository in
         :return: a `Repo` instance
         """
+        if mkdir:
+            os.mkdir(path)
         return cls._init_maybe_bare(path, True)
 
     create = init_bare
@@ -948,6 +1069,12 @@ class Repo(BaseRepo):
     def close(self):
         """Close any files opened by this repository."""
         self.object_store.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
 
 class MemoryRepo(BaseRepo):
@@ -963,6 +1090,20 @@ class MemoryRepo(BaseRepo):
         self._named_files = {}
         self.bare = True
         self._config = ConfigFile()
+        self._description = None
+
+    def set_description(self, description):
+        self._description = description
+
+    def get_description(self):
+        return self._description
+
+    def _determine_file_mode(self):
+        """Probe the file-system to determine whether permissions can be trusted.
+
+        :return: True if permissions can be trusted, False otherwise.
+        """
+        return sys.platform != 'win32'
 
     def _put_named_file(self, path, contents):
         """Write a file to the control dir with the given name and contents.
@@ -1000,13 +1141,6 @@ class MemoryRepo(BaseRepo):
         :return: `ConfigFile` object.
         """
         return self._config
-
-    def get_description(self):
-        """Retrieve the repository description.
-
-        This defaults to None, for no description.
-        """
-        return None
 
     @classmethod
     def init_bare(cls, objects, refs):

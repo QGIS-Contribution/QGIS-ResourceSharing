@@ -1,20 +1,22 @@
 # diff_tree.py -- Utilities for diffing files and trees.
 # Copyright (C) 2010 Google, Inc.
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# or (at your option) a later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Utilities for diffing files and trees."""
 import sys
@@ -171,10 +173,10 @@ def tree_changes(store, tree1_id, tree2_id, want_unchanged=False,
         source and target tree.
     """
     if (rename_detector is not None and tree1_id is not None and
-        tree2_id is not None):
+            tree2_id is not None):
         for change in rename_detector.changes_with_renames(
-            tree1_id, tree2_id, want_unchanged=want_unchanged):
-                yield change
+                tree1_id, tree2_id, want_unchanged=want_unchanged):
+            yield change
         return
 
     entries = walk_trees(store, tree1_id, tree2_id,
@@ -253,8 +255,11 @@ def tree_changes_for_merge(store, parent_tree_ids, tree_id,
                 path = change.new.path
             changes_by_path[path][i] = change
 
-    old_sha = lambda c: c.old.sha
-    change_type = lambda c: c.type
+    def old_sha(c):
+        return c.old.sha
+
+    def change_type(c):
+        return c.type
 
     # Yield only conflicting changes.
     for _, changes in sorted(changes_by_path.items()):
@@ -379,9 +384,9 @@ class RenameDetector(object):
             an add/delete pair to be a rename/copy; see _similarity_score.
         :param max_files: The maximum number of adds and deletes to consider,
             or None for no limit. The detector is guaranteed to compare no more
-            than max_files ** 2 add/delete pairs. This limit is provided because
-            rename detection can be quadratic in the project size. If the limit
-            is exceeded, no content rename detection is attempted.
+            than max_files ** 2 add/delete pairs. This limit is provided
+            because rename detection can be quadratic in the project size. If
+            the limit is exceeded, no content rename detection is attempted.
         :param rewrite_threshold: The threshold similarity score below which a
             modify should be considered a delete/add, or None to not break
             modifies; see _similarity_score.
@@ -402,7 +407,7 @@ class RenameDetector(object):
 
     def _should_split(self, change):
         if (self._rewrite_threshold is None or change.type != CHANGE_MODIFY or
-            change.old.sha == change.new.sha):
+                change.old.sha == change.new.sha):
             return False
         old_obj = self._store[change.old.sha]
         new_obj = self._store[change.new.sha]
@@ -549,7 +554,7 @@ class RenameDetector(object):
             path = add.new.path
             delete = delete_map.get(path)
             if (delete is not None and
-                stat.S_IFMT(delete.old.mode) == stat.S_IFMT(add.new.mode)):
+                    stat.S_IFMT(delete.old.mode) == stat.S_IFMT(add.new.mode)):
                 modifies[path] = TreeChange(CHANGE_MODIFY, delete.old, add.new)
 
         self._adds = [a for a in self._adds if a.new.path not in modifies]
@@ -568,7 +573,8 @@ class RenameDetector(object):
     def _prune_unchanged(self):
         if self._want_unchanged:
             return
-        self._deletes = [d for d in self._deletes if d.type != CHANGE_UNCHANGED]
+        self._deletes = [
+            d for d in self._deletes if d.type != CHANGE_UNCHANGED]
 
     def changes_with_renames(self, tree1_id, tree2_id, want_unchanged=False):
         """Iterate TreeChanges between two tree SHAs, with rename detection."""

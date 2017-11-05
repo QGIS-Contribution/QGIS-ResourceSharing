@@ -2,20 +2,22 @@
 # Copyright (C) 2010 Google, Inc.
 # Copyright (C) 2012 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# or (at your option) any later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """HTTP server for dulwich that implements the git smart HTTP protocol."""
 
@@ -88,8 +90,8 @@ def url_prefix(mat):
 
     :param mat: A regex match object.
     :returns: The URL prefix, defined as the text before the match in the
-        original string. Normalized to start with one leading slash and end with
-        zero.
+        original string. Normalized to start with one leading slash and end
+        with zero.
     """
     return '/' + mat.string[:mat.start()].strip('/')
 
@@ -180,11 +182,13 @@ def get_info_refs(req, backend, mat):
             yield req.forbidden('Unsupported service')
             return
         req.nocache()
-        write = req.respond(HTTP_OK, 'application/x-%s-advertisement' % service)
+        write = req.respond(
+            HTTP_OK, 'application/x-%s-advertisement' % service)
         proto = ReceivableProtocol(BytesIO().read, write)
         handler = handler_cls(backend, [url_prefix(mat)], proto,
                               http_req=req, advertise_refs=True)
-        handler.proto.write_pkt_line(b'# service=' + service.encode('ascii') + b'\n')
+        handler.proto.write_pkt_line(
+            b'# service=' + service.encode('ascii') + b'\n')
         handler.proto.write_pkt_line(None)
         handler.handle()
     else:
@@ -321,9 +325,12 @@ class HTTPGitApplication(object):
       ('GET', re.compile('/objects/info/alternates$')): get_text_file,
       ('GET', re.compile('/objects/info/http-alternates$')): get_text_file,
       ('GET', re.compile('/objects/info/packs$')): get_info_packs,
-      ('GET', re.compile('/objects/([0-9a-f]{2})/([0-9a-f]{38})$')): get_loose_object,
-      ('GET', re.compile('/objects/pack/pack-([0-9a-f]{40})\\.pack$')): get_pack_file,
-      ('GET', re.compile('/objects/pack/pack-([0-9a-f]{40})\\.idx$')): get_idx_file,
+      ('GET', re.compile('/objects/([0-9a-f]{2})/([0-9a-f]{38})$')):
+      get_loose_object,
+      ('GET', re.compile('/objects/pack/pack-([0-9a-f]{40})\\.pack$')):
+      get_pack_file,
+      ('GET', re.compile('/objects/pack/pack-([0-9a-f]{40})\\.idx$')):
+      get_idx_file,
 
       ('POST', re.compile('/git-upload-pack$')): handle_service_request,
       ('POST', re.compile('/git-receive-pack$')): handle_service_request,
@@ -383,7 +390,8 @@ class GunzipFilter(object):
                 shutil.copyfileobj(environ['wsgi.input'], wsgi_input)
                 wsgi_input.seek(0)
 
-            environ['wsgi.input'] = gzip.GzipFile(filename=None, fileobj=wsgi_input, mode='r')
+            environ['wsgi.input'] = gzip.GzipFile(
+                filename=None, fileobj=wsgi_input, mode='r')
             del environ['HTTP_CONTENT_ENCODING']
             if 'CONTENT_LENGTH' in environ:
                 del environ['CONTENT_LENGTH']
@@ -454,7 +462,7 @@ class WSGIRequestHandlerLogger(WSGIRequestHandler):
         """Handle a single HTTP request"""
 
         self.raw_requestline = self.rfile.readline()
-        if not self.parse_request(): # An error code has been sent, just exit
+        if not self.parse_request():  # An error code has been sent, just exit
             return
 
         handler = ServerHandlerLogger(
@@ -468,7 +476,9 @@ class WSGIServerLogger(WSGIServer):
 
     def handle_error(self, request, client_address):
         """Handle an error. """
-        logger.exception('Exception happened during processing of request from %s' % str(client_address))
+        logger.exception(
+            'Exception happened during processing of request from %s' %
+            str(client_address))
 
 
 def main(argv=sys.argv):

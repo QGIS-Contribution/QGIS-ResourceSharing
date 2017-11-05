@@ -1,20 +1,21 @@
 /*
  * Copyright (C) 2010 Google, Inc.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; version 2
- * of the License or (at your option) a later version of the License.
+ * Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+ * General Public License as public by the Free Software Foundation; version 2.0
+ * or (at your option) any later version. You can redistribute it and/or
+ * modify it under the terms of either of these two licenses.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
+ * You should have received a copy of the licenses; if not, see
+ * <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+ * and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+ * License, Version 2.0.
  */
 
 #include <Python.h>
@@ -24,12 +25,8 @@
 typedef unsigned short mode_t;
 #endif
 
-#if (PY_VERSION_HEX < 0x02050000)
-typedef int Py_ssize_t;
-#endif
-
-#if (PY_VERSION_HEX < 0x02060000)
-#define Py_SIZE(ob)             (((PyVarObject*)(ob))->ob_size)
+#if PY_MAJOR_VERSION < 3
+typedef long Py_hash_t;
 #endif
 
 #if PY_MAJOR_VERSION >= 3
@@ -37,7 +34,6 @@ typedef int Py_ssize_t;
 #define PyInt_AsLong PyLong_AsLong
 #define PyInt_AS_LONG PyLong_AS_LONG
 #define PyString_AS_STRING PyBytes_AS_STRING
-#define PyString_AsString PyBytes_AsString
 #define PyString_AsStringAndSize PyBytes_AsStringAndSize
 #define PyString_Check PyBytes_Check
 #define PyString_CheckExact PyBytes_CheckExact
@@ -300,11 +296,11 @@ static PyObject *py_is_tree(PyObject *self, PyObject *args)
 	return result;
 }
 
-static int add_hash(PyObject *get, PyObject *set, char *str, int n)
+static Py_hash_t add_hash(PyObject *get, PyObject *set, char *str, int n)
 {
 	PyObject *str_obj = NULL, *hash_obj = NULL, *value = NULL,
 		*set_value = NULL;
-	long hash;
+	Py_hash_t hash;
 
 	/* It would be nice to hash without copying str into a PyString, but that
 	 * isn't exposed by the API. */

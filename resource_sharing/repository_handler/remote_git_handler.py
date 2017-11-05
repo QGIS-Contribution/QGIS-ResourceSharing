@@ -8,6 +8,7 @@ from qgis.core import QgsApplication
 
 from ext_libs.giturlparse import parse, validate
 from ext_libs.dulwich import porcelain
+from ext_libs.dulwich.config import StackedConfig
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.network_manager import NetworkManager
 from resource_sharing.utilities import local_collection_path
@@ -91,6 +92,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
             'repositories',
             self.git_host, self.git_owner, self.git_repository
         )
+        config = StackedConfig.default()
+        config.set('http', 'proxy', 'http://localhost:8889')
         if not os.path.exists(local_repo_dir):
             os.makedirs(local_repo_dir)
             try:

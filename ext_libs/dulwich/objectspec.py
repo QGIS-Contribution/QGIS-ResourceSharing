@@ -1,20 +1,22 @@
 # objectspec.py -- Object specification
 # Copyright (C) 2014 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) a later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Object specification."""
 
@@ -35,6 +37,21 @@ def parse_object(repo, objectish):
     """
     objectish = to_bytes(objectish)
     return repo[objectish]
+
+
+def parse_tree(repo, treeish):
+    """Parse a string referring to a tree.
+
+    :param repo: A `Repo` object
+    :param treeish: A string referring to a tree
+    :return: A git object
+    :raise KeyError: If the object can not be found
+    """
+    treeish = to_bytes(treeish)
+    o = repo[treeish]
+    if o.type_name == b"commit":
+        return repo[o.tree]
+    return o
 
 
 def parse_ref(container, refspec):
@@ -80,7 +97,7 @@ def parse_reftuple(lh_container, rh_container, refspec):
         (lh, rh) = refspec.split(b":")
     else:
         lh = rh = refspec
-    if rh == b"":
+    if lh == b"":
         lh = None
     else:
         lh = parse_ref(lh_container, lh)
@@ -91,7 +108,7 @@ def parse_reftuple(lh_container, rh_container, refspec):
             rh = parse_ref(rh_container, rh)
         except KeyError:
             # TODO: check force?
-            if not b"/" in rh:
+            if b"/" not in rh:
                 rh = b"refs/heads/" + rh
     return (lh, rh, force)
 
@@ -155,7 +172,15 @@ def parse_commit(repo, committish):
     :raise ValueError: If the range can not be parsed
     """
     committish = to_bytes(committish)
-    return repo[committish] # For now..
+    try:
+        return repo[committish]
+    except KeyError:
+        pass
+    try:
+        return repo[parse_ref(repo, committish)]
+    except KeyError:
+        pass
+    raise KeyError(committish)
 
 
 # TODO: parse_path_in_tree(), which handles e.g. v1.0:Documentation

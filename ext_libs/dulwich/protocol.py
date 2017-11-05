@@ -2,20 +2,22 @@
 # Copyright (C) 2008 John Carr <john.carr@unrouted.co.uk>
 # Copyright (C) 2008-2012 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# or (at your option) any later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Generic functions for talking the git smart server protocol."""
 
@@ -46,6 +48,9 @@ SIDE_BAND_CHANNEL_PROGRESS = 2
 # fatal error message just before stream aborts
 SIDE_BAND_CHANNEL_FATAL = 3
 
+CAPABILITY_DEEPEN_SINCE = b'deepen-since'
+CAPABILITY_DEEPEN_NOT = b'deepen-not'
+CAPABILITY_DEEPEN_RELATIVE = b'deepen-relative'
 CAPABILITY_DELETE_REFS = b'delete-refs'
 CAPABILITY_INCLUDE_TAG = b'include-tag'
 CAPABILITY_MULTI_ACK = b'multi_ack'
@@ -56,9 +61,35 @@ CAPABILITY_OFS_DELTA = b'ofs-delta'
 CAPABILITY_QUIET = b'quiet'
 CAPABILITY_REPORT_STATUS = b'report-status'
 CAPABILITY_SHALLOW = b'shallow'
+CAPABILITY_SIDE_BAND = b'side-band'
 CAPABILITY_SIDE_BAND_64K = b'side-band-64k'
 CAPABILITY_THIN_PACK = b'thin-pack'
 CAPABILITY_AGENT = b'agent'
+CAPABILITY_SYMREF = b'symref'
+
+# Magic ref that is used to attach capabilities to when
+# there are no refs. Should always be ste to ZERO_SHA.
+CAPABILITIES_REF = b'capabilities^{}'
+
+COMMON_CAPABILITIES = [
+    CAPABILITY_OFS_DELTA,
+    CAPABILITY_SIDE_BAND,
+    CAPABILITY_SIDE_BAND_64K,
+    CAPABILITY_AGENT,
+    CAPABILITY_NO_PROGRESS]
+KNOWN_UPLOAD_CAPABILITIES = set(COMMON_CAPABILITIES + [
+    CAPABILITY_THIN_PACK,
+    CAPABILITY_MULTI_ACK,
+    CAPABILITY_MULTI_ACK_DETAILED,
+    CAPABILITY_INCLUDE_TAG,
+    CAPABILITY_DEEPEN_SINCE,
+    CAPABILITY_SYMREF,
+    CAPABILITY_SHALLOW,
+    CAPABILITY_DEEPEN_NOT,
+    CAPABILITY_DEEPEN_RELATIVE,
+    ])
+KNOWN_RECEIVE_CAPABILITIES = set(COMMON_CAPABILITIES + [
+    CAPABILITY_REPORT_STATUS])
 
 
 def agent_string():
@@ -67,6 +98,25 @@ def agent_string():
 
 def capability_agent():
     return CAPABILITY_AGENT + b'=' + agent_string()
+
+
+def capability_symref(from_ref, to_ref):
+    return CAPABILITY_SYMREF + b'=' + from_ref + b':' + to_ref
+
+
+def extract_capability_names(capabilities):
+    return set(parse_capability(c)[0] for c in capabilities)
+
+
+def parse_capability(capability):
+    parts = capability.split(b'=', 1)
+    if len(parts) == 1:
+        return (parts[0], None)
+    return tuple(parts)
+
+
+def symref_capabilities(symrefs):
+    return [capability_symref(*k) for k in symrefs]
 
 
 COMMAND_DEEPEN = b'deepen'
@@ -108,8 +158,8 @@ class Protocol(object):
 
     Parts of the git wire protocol use 'pkt-lines' to communicate. A pkt-line
     consists of the length of the line as a 4-byte hex string, followed by the
-    payload data. The length includes the 4-byte header. The special line '0000'
-    indicates the end of a section of input and is called a 'flush-pkt'.
+    payload data. The length includes the 4-byte header. The special line
+    '0000' indicates the end of a section of input and is called a 'flush-pkt'.
 
     For details on the pkt-line format, see the cgit distribution:
         Documentation/technical/protocol-common.txt
@@ -163,13 +213,15 @@ class Protocol(object):
         else:
             if len(pkt_contents) + 4 != size:
                 raise GitProtocolError(
-                    'Length of pkt read %04x does not match length prefix %04x' % (len(pkt_contents) + 4, size))
+                    'Length of pkt read %04x does not match length prefix %04x'
+                    % (len(pkt_contents) + 4, size))
             return pkt_contents
 
     def eof(self):
         """Test whether the protocol stream has reached EOF.
 
-        Note that this refers to the actual stream EOF and not just a flush-pkt.
+        Note that this refers to the actual stream EOF and not just a
+        flush-pkt.
 
         :return: True if the stream is at EOF, False otherwise.
         """
@@ -196,7 +248,8 @@ class Protocol(object):
     def read_pkt_seq(self):
         """Read a sequence of pkt-lines from the remote git process.
 
-        :return: Yields each line of data up to but not including the next flush-pkt.
+        :return: Yields each line of data up to but not including the next
+            flush-pkt.
         """
         pkt = self.read_pkt_line()
         while pkt:
@@ -285,9 +338,9 @@ class ReceivableProtocol(Protocol):
     to a read() method.
 
     If you want to read n bytes from the wire and block until exactly n bytes
-    (or EOF) are read, use read(n). If you want to read at most n bytes from the
-    wire but don't care if you get less, use recv(n). Note that recv(n) will
-    still block until at least one byte is read.
+    (or EOF) are read, use read(n). If you want to read at most n bytes from
+    the wire but don't care if you get less, use recv(n). Note that recv(n)
+    will still block until at least one byte is read.
     """
 
     def __init__(self, recv, write, report_activity=None, rbufsize=_RBUFSIZE):
@@ -304,7 +357,8 @@ class ReceivableProtocol(Protocol):
         #  - seek back to start rather than 0 in case some buffer has been
         #    consumed.
         #  - use SEEK_END instead of the magic number.
-        # Copyright (c) 2001-2010 Python Software Foundation; All Rights Reserved
+        # Copyright (c) 2001-2010 Python Software Foundation; All Rights
+        # Reserved
         # Licensed under the Python Software Foundation License.
         # TODO: see if buffer is more efficient than cBytesIO.
         assert size > 0
@@ -353,7 +407,7 @@ class ReceivableProtocol(Protocol):
             buf.write(data)
             buf_len += n
             del data  # explicit free
-            #assert buf_len == buf.tell()
+            # assert buf_len == buf.tell()
         buf.seek(start)
         return buf.read()
 
@@ -387,7 +441,7 @@ def extract_capabilities(text):
     :param text: String to extract from
     :return: Tuple with text with capabilities removed and list of capabilities
     """
-    if not b"\0" in text:
+    if b"\0" not in text:
         return text, []
     text, capabilities = text.rstrip().split(b"\0")
     return (text, capabilities.strip().split(b" "))
@@ -422,9 +476,9 @@ def ack_type(capabilities):
 class BufferedPktLineWriter(object):
     """Writer that wraps its data in pkt-lines and has an independent buffer.
 
-    Consecutive calls to write() wrap the data in a pkt-line and then buffers it
-    until enough lines have been written such that their total length (including
-    length prefix) reach the buffer size.
+    Consecutive calls to write() wrap the data in a pkt-line and then buffers
+    it until enough lines have been written such that their total length
+    (including length prefix) reach the buffer size.
     """
 
     def __init__(self, write, bufsize=65515):

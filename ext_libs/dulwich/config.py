@@ -1,20 +1,22 @@
 # config.py - Reading and writing Git config files
 # Copyright (C) 2011-2013 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) a later version.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Reading and writing Git configuration files.
 
@@ -93,6 +95,14 @@ class Config(object):
         """
         raise NotImplementedError(self.itersections)
 
+    def has_section(self, name):
+        """Check if a specified section exists.
+
+        :param name: Name of section to check for
+        :return: boolean indicating whether the section exists
+        """
+        return (name in self.itersections())
+
 
 class ConfigDict(Config, MutableMapping):
     """Git configuration stored in a dictionary."""
@@ -147,6 +157,10 @@ class ConfigDict(Config, MutableMapping):
     def set(self, section, name, value):
         if not isinstance(section, tuple):
             section = (section, )
+        if not isinstance(name, bytes):
+            raise TypeError(name)
+        if type(value) not in (bool, bytes):
+            raise TypeError(value)
         self._values.setdefault(section, OrderedDict())[name] = value
 
     def iteritems(self, section):
@@ -158,11 +172,13 @@ class ConfigDict(Config, MutableMapping):
 
 def _format_string(value):
     if (value.startswith(b" ") or
-        value.startswith(b"\t") or
-        value.endswith(b" ") or
-        value.endswith(b"\t")):
+            value.startswith(b"\t") or
+            value.endswith(b" ") or
+            b'#' in value or
+            value.endswith(b"\t")):
         return b'"' + _escape_value(value) + b'"'
-    return _escape_value(value)
+    else:
+        return _escape_value(value)
 
 
 _ESCAPE_TABLE = {
@@ -174,6 +190,7 @@ _ESCAPE_TABLE = {
     }
 _COMMENT_CHARS = [ord(b"#"), ord(b";")]
 _WHITESPACE_CHARS = [ord(b"\t"), ord(b" ")]
+
 
 def _parse_string(value):
     value = bytearray(value.strip())
@@ -193,8 +210,8 @@ def _parse_string(value):
                     (value, i))
             except KeyError:
                 raise ValueError(
-                    "escape character followed by unknown character %s at %d in %r" %
-                    (value[i], i, value))
+                    "escape character followed by unknown character "
+                    "%s at %d in %r" % (value[i], i, value))
             if whitespace:
                 ret.extend(whitespace)
                 whitespace = bytearray()
@@ -219,17 +236,13 @@ def _parse_string(value):
     return bytes(ret)
 
 
-def _unescape_value(value):
-    """Unescape a value."""
-    ret = bytearray()
-    i = 0
-
-    return ret
-
-
 def _escape_value(value):
     """Escape a value."""
-    return value.replace(b"\\", b"\\\\").replace(b"\n", b"\\n").replace(b"\t", b"\\t").replace(b"\"", b"\\\"")
+    value = value.replace(b"\\", b"\\\\")
+    value = value.replace(b"\n", b"\\n")
+    value = value.replace(b"\t", b"\\t")
+    value = value.replace(b"\"", b"\\\"")
+    return value
 
 
 def _check_variable_name(name):
@@ -288,8 +301,8 @@ class ConfigFile(ConfigDict):
                         section = (pts[0], pts[1])
                     else:
                         if not _check_section_name(pts[0]):
-                            raise ValueError("invalid section name %r" %
-                                    pts[0])
+                            raise ValueError(
+                                "invalid section name %r" % pts[0])
                         pts = pts[0].split(b".", 1)
                         if len(pts) == 2:
                             section = (pts[0], pts[1])
@@ -309,23 +322,20 @@ class ConfigFile(ConfigDict):
                 if not _check_variable_name(setting):
                     raise ValueError("invalid variable name %s" % setting)
                 if value.endswith(b"\\\n"):
-                    value = value[:-2]
-                    continuation = True
+                    continuation = value[:-2]
                 else:
-                    continuation = False
-                value = _parse_string(value)
-                ret._values[section][setting] = value
-                if not continuation:
+                    continuation = None
+                    value = _parse_string(value)
+                    ret._values[section][setting] = value
                     setting = None
             else:  # continuation line
                 if line.endswith(b"\\\n"):
-                    line = line[:-2]
-                    continuation = True
+                    continuation += line[:-2]
                 else:
-                    continuation = False
-                value = _parse_string(line)
-                ret._values[section][setting] += value
-                if not continuation:
+                    continuation += line
+                    value = _parse_string(continuation)
+                    ret._values[section][setting] = value
+                    continuation = None
                     setting = None
         return ret
 
@@ -355,14 +365,15 @@ class ConfigFile(ConfigDict):
             if subsection_name is None:
                 f.write(b"[" + section_name + b"]\n")
             else:
-                f.write(b"[" + section_name + b" \"" + subsection_name + b"\"]\n")
+                f.write(b"[" + section_name +
+                        b" \"" + subsection_name + b"\"]\n")
             for key, value in values.items():
                 if value is True:
                     value = b"true"
                 elif value is False:
                     value = b"false"
                 else:
-                    value = _escape_value(value)
+                    value = _format_string(value)
                 f.write(b"\t" + key + b" = " + value + b"\n")
 
 
@@ -377,15 +388,26 @@ class StackedConfig(Config):
         return "<%s for %r>" % (self.__class__.__name__, self.backends)
 
     @classmethod
+    def default(cls):
+        return cls(cls.default_backends())
+
+    @classmethod
     def default_backends(cls):
         """Retrieve the default configuration.
 
-        This will look in the users' home directory and the system
-        configuration.
+        See git-config(1) for details on the files searched.
         """
         paths = []
         paths.append(os.path.expanduser("~/.gitconfig"))
-        paths.append("/etc/gitconfig")
+
+        xdg_config_home = os.environ.get(
+            "XDG_CONFIG_HOME", os.path.expanduser("~/.config/"),
+        )
+        paths.append(os.path.join(xdg_config_home, "git", "config"))
+
+        if "GIT_CONFIG_NOSYSTEM" not in os.environ:
+            paths.append("/etc/gitconfig")
+
         backends = []
         for path in paths:
             try:
@@ -410,3 +432,18 @@ class StackedConfig(Config):
         if self.writable is None:
             raise NotImplementedError(self.set)
         return self.writable.set(section, name, value)
+
+
+def parse_submodules(config):
+    """Parse a gitmodules GitConfig file, returning submodules.
+
+   :param config: A `ConfigFile`
+   :return: list of tuples (submodule path, url, name),
+       where name is quoted part of the section's name.
+    """
+    for section in config.keys():
+        section_kind, section_name = section
+        if section_kind == b'submodule':
+            sm_path = config.get(section, b'path')
+            sm_url = config.get(section, b'url')
+            yield (sm_path, sm_url, section_name)

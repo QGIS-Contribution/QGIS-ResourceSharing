@@ -1,20 +1,22 @@
 # index.py -- File parser/writer for the git index file
 # Copyright (C) 2008-2013 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your opinion) any later version of the license.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Parser for the git index file format."""
 
@@ -122,8 +124,10 @@ def write_cache_entry(f, entry):
     (name, ctime, mtime, dev, ino, mode, uid, gid, size, sha, flags) = entry
     write_cache_time(f, ctime)
     write_cache_time(f, mtime)
-    flags = len(name) | (flags &~ 0x0fff)
-    f.write(struct.pack(b'>LLLLLL20sH', dev & 0xFFFFFFFF, ino & 0xFFFFFFFF, mode, uid, gid, size, hex_to_sha(sha), flags))
+    flags = len(name) | (flags & ~0x0fff)
+    f.write(struct.pack(
+            b'>LLLLLL20sH', dev & 0xFFFFFFFF, ino & 0xFFFFFFFF,
+            mode, uid, gid, size, hex_to_sha(sha), flags))
     f.write(name)
     real_size = ((f.tell() - beginoffset + 8) & ~7)
     f.write(b'\0' * ((beginoffset + real_size) - f.tell()))
@@ -241,7 +245,8 @@ class Index(object):
     def __getitem__(self, name):
         """Retrieve entry by relative path.
 
-        :return: tuple with (ctime, mtime, dev, ino, mode, uid, gid, size, sha, flags)
+        :return: tuple with (ctime, mtime, dev, ino, mode, uid, gid, size, sha,
+            flags)
         """
         return self._byname[name]
 
@@ -290,13 +295,14 @@ class Index(object):
         :param object_store: Object store to use for retrieving tree contents
         :param tree: SHA1 of the root tree
         :param want_unchanged: Whether unchanged files should be reported
-        :return: Iterator over tuples with (oldpath, newpath), (oldmode, newmode), (oldsha, newsha)
+        :return: Iterator over tuples with (oldpath, newpath), (oldmode,
+            newmode), (oldsha, newsha)
         """
         def lookup_entry(path):
             entry = self[path]
             return entry.sha, entry.mode
-        for (name, mode, sha) in changes_from_tree(self._byname.keys(),
-                lookup_entry, object_store, tree,
+        for (name, mode, sha) in changes_from_tree(
+                self._byname.keys(), lookup_entry, object_store, tree,
                 want_unchanged=want_unchanged):
             yield (name, mode, sha)
 
@@ -361,7 +367,7 @@ def commit_index(object_store, index):
 
 
 def changes_from_tree(names, lookup_entry, object_store, tree,
-        want_unchanged=False):
+                      want_unchanged=False):
     """Find the differences between the contents of a tree and
     a working copy.
 
@@ -389,8 +395,12 @@ def changes_from_tree(names, lookup_entry, object_store, tree,
 
     # Mention added files
     for name in other_names:
-        (other_sha, other_mode) = lookup_entry(name)
-        yield ((None, name), (None, other_mode), (None, other_sha))
+        try:
+            (other_sha, other_mode) = lookup_entry(name)
+        except KeyError:
+            pass
+        else:
+            yield ((None, name), (None, other_mode), (None, other_sha))
 
 
 def index_entry_from_stat(stat_val, hex_sha, flags, mode=None):
@@ -415,25 +425,41 @@ def build_file_from_blob(blob, mode, target_path, honor_filemode=True):
     :param target_path: Path to write to
     :param honor_filemode: An optional flag to honor core.filemode setting in
         config file, default is core.filemode=True, change executable bit
+    :return: stat object for the file
     """
+    try:
+        oldstat = os.lstat(target_path)
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            oldstat = None
+        else:
+            raise
+    contents = blob.as_raw_string()
     if stat.S_ISLNK(mode):
         # FIXME: This will fail on Windows. What should we do instead?
-        src_path = blob.as_raw_string()
-        try:
-            os.symlink(src_path, target_path)
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                os.unlink(target_path)
-                os.symlink(src_path, target_path)
-            else:
-                raise
+        if oldstat:
+            os.unlink(target_path)
+        if sys.platform == 'win32' and sys.version_info[0] == 3:
+            # os.readlink on Python3 on Windows requires a unicode string.
+            # TODO(jelmer): Don't assume tree_encoding == fs_encoding
+            tree_encoding = sys.getfilesystemencoding()
+            contents = contents.decode(tree_encoding)
+            target_path = target_path.decode(tree_encoding)
+        os.symlink(contents, target_path)
     else:
+        if oldstat is not None and oldstat.st_size == len(contents):
+            with open(target_path, 'rb') as f:
+                if f.read() == contents:
+                    return oldstat
+
         with open(target_path, 'wb') as f:
             # Write out file
-            f.write(blob.as_raw_string())
+            f.write(contents)
 
         if honor_filemode:
             os.chmod(target_path, mode)
+
+    return os.lstat(target_path)
 
 
 INVALID_DOTNAMES = (b".git", b".", b"..", b"")
@@ -473,8 +499,8 @@ def build_index_from_tree(root_path, index_path, object_store, tree_id,
     :param object_store: Non-empty object store holding tree contents
     :param honor_filemode: An optional flag to honor core.filemode setting in
         config file, default is core.filemode=True, change executable bit
-    :param validate_path_element: Function to validate path elements to check out;
-        default just refuses .git and .. directories.
+    :param validate_path_element: Function to validate path elements to check
+        out; default just refuses .git and .. directories.
 
     :note:: existing index is wiped and contents are not merged
         in a working dir. Suitable only for fresh clones.
@@ -492,12 +518,25 @@ def build_index_from_tree(root_path, index_path, object_store, tree_id,
         if not os.path.exists(os.path.dirname(full_path)):
             os.makedirs(os.path.dirname(full_path))
 
-        # FIXME: Merge new index into working tree
-        obj = object_store[entry.sha]
-        build_file_from_blob(obj, entry.mode, full_path,
-            honor_filemode=honor_filemode)
+        # TODO(jelmer): Merge new index into working tree
+        if S_ISGITLINK(entry.mode):
+            if not os.path.isdir(full_path):
+                os.mkdir(full_path)
+            st = os.lstat(full_path)
+            # TODO(jelmer): record and return submodule paths
+        else:
+            obj = object_store[entry.sha]
+            st = build_file_from_blob(
+                obj, entry.mode, full_path, honor_filemode=honor_filemode)
         # Add file to index
-        st = os.lstat(full_path)
+        if not honor_filemode or S_ISGITLINK(entry.mode):
+            # we can not use tuple slicing to build a new tuple,
+            # because on windows that will convert the times to
+            # longs, which causes errors further along
+            st_tuple = (entry.mode, st.st_ino, st.st_dev, st.st_nlink,
+                        st.st_uid, st.st_gid, st.st_size, st.st_atime,
+                        st.st_mtime, st.st_ctime)
+            st = st.__class__(st_tuple)
         index[entry.path] = index_entry_from_stat(st, entry.sha, 0)
 
     index.write()
@@ -516,7 +555,14 @@ def blob_from_path_and_stat(fs_path, st):
         with open(fs_path, 'rb') as f:
             blob.data = f.read()
     else:
-        blob.data = os.readlink(fs_path)
+        if sys.platform == 'win32' and sys.version_info[0] == 3:
+            # os.readlink on Python3 on Windows requires a unicode string.
+            # TODO(jelmer): Don't assume tree_encoding == fs_encoding
+            tree_encoding = sys.getfilesystemencoding()
+            fs_path = fs_path.decode(tree_encoding)
+            blob.data = os.readlink(fs_path).encode(tree_encoding)
+        else:
+            blob.data = os.readlink(fs_path)
     return blob
 
 
@@ -533,9 +579,33 @@ def get_unstaged_changes(index, root_path):
 
     for tree_path, entry in index.iteritems():
         full_path = _tree_to_fs_path(root_path, tree_path)
-        blob = blob_from_path_and_stat(full_path, os.lstat(full_path))
-        if blob.id != entry.sha:
+        try:
+            blob = blob_from_path_and_stat(full_path, os.lstat(full_path))
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
+            # The file was removed, so we assume that counts as
+            # different from whatever file used to exist.
             yield tree_path
+        except IOError as e:
+            if e.errno != errno.EISDIR:
+                raise
+            # This is actually a directory
+            if os.path.exists(os.path.join(tree_path, '.git')):
+                # Submodule
+                from dulwich.errors import NotGitRepository
+                from dulwich.repo import Repo
+                try:
+                    if entry.sha != Repo(tree_path).head():
+                        yield tree_path
+                except NotGitRepository:
+                    yield tree_path
+            else:
+                # The file was changed to a directory, so consider it removed.
+                yield tree_path
+        else:
+            if blob.id != entry.sha:
+                yield tree_path
 
 
 os_sep_bytes = os.sep.encode('ascii')

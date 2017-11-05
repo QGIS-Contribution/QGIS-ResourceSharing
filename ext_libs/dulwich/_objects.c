@@ -1,29 +1,26 @@
 /*
  * Copyright (C) 2009 Jelmer Vernooij <jelmer@samba.org>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; version 2
- * of the License or (at your option) a later version of the License.
+ * Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+ * General Public License as public by the Free Software Foundation; version 2.0
+ * or (at your option) any later version. You can redistribute it and/or
+ * modify it under the terms of either of these two licenses.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
+ * You should have received a copy of the licenses; if not, see
+ * <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+ * and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+ * License, Version 2.0.
  */
 
 #include <Python.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
-#if (PY_VERSION_HEX < 0x02050000)
-typedef int Py_ssize_t;
-#endif
 
 #if PY_MAJOR_VERSION >= 3
 #define PyInt_Check(obj) 0
@@ -64,7 +61,8 @@ static PyObject *sha_to_pyhex(const unsigned char *sha)
 static PyObject *py_parse_tree(PyObject *self, PyObject *args, PyObject *kw)
 {
 	char *text, *start, *end;
-	int len, namelen, strict;
+	int len, strict;
+	size_t namelen;
 	PyObject *ret, *item, *name, *sha, *py_strict = NULL;
 	static char *kwlist[] = {"text", "strict", NULL};
 
@@ -146,7 +144,8 @@ int cmp_tree_item(const void *_a, const void *_b)
 {
 	const struct tree_item *a = _a, *b = _b;
 	const char *remain_a, *remain_b;
-	int ret, common;
+	int ret;
+	size_t common;
 	if (strlen(a->name) > strlen(b->name)) {
 		common = strlen(b->name);
 		remain_a = a->name + common;
@@ -174,9 +173,9 @@ int cmp_tree_item_name_order(const void *_a, const void *_b) {
 static PyObject *py_sorted_tree_items(PyObject *self, PyObject *args)
 {
 	struct tree_item *qsort_entries = NULL;
-	int name_order, num_entries, n = 0, i;
+	int name_order, n = 0, i;
 	PyObject *entries, *py_name_order, *ret, *key, *value, *py_mode, *py_sha;
-	Py_ssize_t pos = 0;
+	Py_ssize_t pos = 0, num_entries;
 	int (*cmp)(const void *, const void *);
 
 	if (!PyArg_ParseTuple(args, "OO", &entries, &py_name_order))

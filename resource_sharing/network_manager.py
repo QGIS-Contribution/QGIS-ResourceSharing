@@ -2,7 +2,7 @@
 import logging
 
 from PyQt4.QtNetwork import QNetworkRequest, QNetworkReply
-from PyQt4.QtCore import QUrl, QCoreApplication
+from PyQt4.QtCore import QUrl, QCoreApplication, QSettings
 from qgis.core import QgsNetworkAccessManager
 try:
     from qgis.core import QgsAuthManager
@@ -82,3 +82,22 @@ class NetworkManager(object):
     def request_timeout(self):
         """Slot for when request timeout signal is emitted."""
         self._network_timeout = True
+
+
+class ProxyManager(object):
+    """Class to get proxy settings from QgsSettings."""
+    def __init__(self):
+        settings = QSettings()
+        self.proxy_enabled = settings.value('proxy/proxyEnabled')
+        self.proxy_type = settings.value('proxy/proxyType')
+        self.proxy_host = settings.value('proxy/proxyHost')
+        self.proxy_port = settings.value('proxy/proxyPort')
+        self.proxy_user = settings.value('proxy/proxyUser')
+        self.proxy_password = settings.value('proxy/proxyPassword')
+
+    @property
+    def git_complied_proxy_setting(self):
+        if not self.proxy_enabled:
+            return None
+
+

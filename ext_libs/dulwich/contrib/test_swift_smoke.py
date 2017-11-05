@@ -3,21 +3,22 @@
 #
 # Author: Fabien Boucher <fabien.boucher@enovance.com>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) any later version of
-# the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Start functional tests
 
@@ -41,12 +42,14 @@ import gevent
 from gevent import monkey
 monkey.patch_all()
 
-from dulwich import server
-from dulwich import repo
-from dulwich import index
-from dulwich import client
-from dulwich import objects
-from dulwich.contrib import swift
+from dulwich import (  # noqa:E402
+    server,
+    repo,
+    index,
+    client,
+    objects,
+    )
+from dulwich.contrib import swift  # noqa:E402
 
 
 class DulwichServer():
@@ -201,7 +204,7 @@ class SwiftRepoSmokeTest(unittest.TestCase):
         files = ('testfile', 'testfile2', 'dir/testfile3')
         i = 0
         for f in files:
-            file(os.path.join(self.temp_d, f), 'w').write("DATA %s" % i)
+            open(os.path.join(self.temp_d, f), 'w').write("DATA %s" % i)
             i += 1
         local_repo.stage(files)
         local_repo.do_commit('Test commit', 'fbo@localhost',
@@ -251,7 +254,7 @@ class SwiftRepoSmokeTest(unittest.TestCase):
         files = ('testfile11', 'testfile22', 'test/testfile33')
         i = 0
         for f in files:
-            file(os.path.join(self.temp_d, f), 'w').write("DATA %s" % i)
+            open(os.path.join(self.temp_d, f), 'w').write("DATA %s" % i)
             i += 1
         local_repo.stage(files)
         local_repo.do_commit('Test commit', 'fbo@localhost',

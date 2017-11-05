@@ -1,20 +1,22 @@
 # patch.py -- For dealing with packed-style patches.
 # Copyright (C) 2009-2013 Jelmer Vernooij <jelmer@samba.org>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) a later version.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Classes for dealing with git am-style patches.
 
@@ -27,6 +29,7 @@ import email.parser
 import time
 
 from dulwich.objects import (
+    Blob,
     Commit,
     S_ISGITLINK,
     )
@@ -34,7 +37,8 @@ from dulwich.objects import (
 FIRST_FEW_BYTES = 8000
 
 
-def write_commit_patch(f, commit, contents, progress, version=None, encoding=None):
+def write_commit_patch(f, commit, contents, progress, version=None,
+                       encoding=None):
     """Write a individual file patch.
 
     :param commit: Commit object
@@ -42,13 +46,16 @@ def write_commit_patch(f, commit, contents, progress, version=None, encoding=Non
     :return: tuple with filename and contents
     """
     encoding = encoding or getattr(f, "encoding", "ascii")
-    if type(contents) is str:
+    if isinstance(contents, str):
         contents = contents.encode(encoding)
     (num, total) = progress
-    f.write(b"From " + commit.id + b" " + time.ctime(commit.commit_time).encode(encoding) + b"\n")
+    f.write(b"From " + commit.id + b" " +
+            time.ctime(commit.commit_time).encode(encoding) + b"\n")
     f.write(b"From: " + commit.author + b"\n")
-    f.write(b"Date: " + time.strftime("%a, %d %b %Y %H:%M:%S %Z").encode(encoding) + b"\n")
-    f.write(("Subject: [PATCH %d/%d] " % (num, total)).encode(encoding) + commit.message + b"\n")
+    f.write(b"Date: " +
+            time.strftime("%a, %d %b %Y %H:%M:%S %Z").encode(encoding) + b"\n")
+    f.write(("Subject: [PATCH %d/%d] " % (num, total)).encode(encoding) +
+            commit.message + b"\n")
     f.write(b"\n")
     f.write(b"---\n")
     try:
@@ -56,7 +63,7 @@ def write_commit_patch(f, commit, contents, progress, version=None, encoding=Non
         p = subprocess.Popen(["diffstat"], stdout=subprocess.PIPE,
                              stdin=subprocess.PIPE)
     except (ImportError, OSError):
-        pass # diffstat not available?
+        pass  # diffstat not available?
     else:
         (diffstat, _) = p.communicate(contents)
         f.write(diffstat)
@@ -79,31 +86,63 @@ def get_summary(commit):
     return commit.message.splitlines()[0].replace(" ", "-")
 
 
-def unified_diff(a, b, fromfile, tofile, n=3):
-    """difflib.unified_diff that doesn't write any dates or trailing spaces.
+#  Unified Diff
+def _format_range_unified(start, stop):
+    'Convert range to the "ed" format'
+    # Per the diff spec at http://www.unix.org/single_unix_specification/
+    beginning = start + 1  # lines start numbering with one
+    length = stop - start
+    if length == 1:
+        return '{}'.format(beginning)
+    if not length:
+        beginning -= 1  # empty ranges begin at line just before the range
+    return '{},{}'.format(beginning, length)
 
-    Based on the same function in Python2.6.5-rc2's difflib.py
+
+def unified_diff(a, b, fromfile='', tofile='', fromfiledate='',
+                 tofiledate='', n=3, lineterm='\n'):
+    """difflib.unified_diff that can detect "No newline at end of file" as
+    original "git diff" does.
+
+    Based on the same function in Python2.7 difflib.py
     """
     started = False
     for group in SequenceMatcher(None, a, b).get_grouped_opcodes(n):
         if not started:
-            yield b'--- ' + fromfile + b'\n'
-            yield b'+++ ' + tofile + b'\n'
             started = True
-        i1, i2, j1, j2 = group[0][1], group[-1][2], group[0][3], group[-1][4]
-        sizes = "@@ -%d,%d +%d,%d @@\n" % (i1+1, i2-i1, j1+1, j2-j1)
-        yield sizes.encode('ascii')
+            fromdate = '\t{}'.format(fromfiledate) if fromfiledate else ''
+            todate = '\t{}'.format(tofiledate) if tofiledate else ''
+            yield '--- {}{}{}'.format(
+                fromfile.decode("ascii"),
+                fromdate,
+                lineterm
+                ).encode('ascii')
+            yield '+++ {}{}{}'.format(
+                tofile.decode("ascii"),
+                todate,
+                lineterm
+                ).encode('ascii')
+
+        first, last = group[0], group[-1]
+        file1_range = _format_range_unified(first[1], last[2])
+        file2_range = _format_range_unified(first[3], last[4])
+        yield '@@ -{} +{} @@{}'.format(
+            file1_range,
+            file2_range,
+            lineterm
+             ).encode('ascii')
+
         for tag, i1, i2, j1, j2 in group:
             if tag == 'equal':
                 for line in a[i1:i2]:
                     yield b' ' + line
                 continue
-            if tag == 'replace' or tag == 'delete':
+            if tag in ('replace', 'delete'):
                 for line in a[i1:i2]:
                     if not line[-1:] == b'\n':
                         line += b'\n\\ No newline at end of file\n'
                     yield b'-' + line
-            if tag == 'replace' or tag == 'insert':
+            if tag in ('replace', 'insert'):
                 for line in b[j1:j2]:
                     if not line[-1:] == b'\n':
                         line += b'\n\\ No newline at end of file\n'
@@ -148,28 +187,31 @@ def write_object_diff(f, store, old_file, new_file, diff_binary=False):
     (new_path, new_mode, new_id) = new_file
     old_path = patch_filename(old_path, b"a")
     new_path = patch_filename(new_path, b"b")
+
     def content(mode, hexsha):
         if hexsha is None:
-            return b''
+            return Blob.from_string(b'')
         elif S_ISGITLINK(mode):
-            return b"Submodule commit " + hexsha + b"\n"
+            return Blob.from_string(b"Submodule commit " + hexsha + b"\n")
         else:
-            return store[hexsha].data
+            return store[hexsha]
 
     def lines(content):
         if not content:
             return []
         else:
-            return content.splitlines(True)
+            return content.splitlines()
     f.writelines(gen_diff_header(
         (old_path, new_path), (old_mode, new_mode), (old_id, new_id)))
     old_content = content(old_mode, old_id)
     new_content = content(new_mode, new_id)
-    if not diff_binary and (is_binary(old_content) or is_binary(new_content)):
-        f.write(b"Binary files " + old_path + b" and " + new_path + b" differ\n")
+    if not diff_binary and (
+            is_binary(old_content.data) or is_binary(new_content.data)):
+        f.write(b"Binary files " + old_path + b" and " + new_path +
+                b" differ\n")
     else:
         f.writelines(unified_diff(lines(old_content), lines(new_content),
-            old_path, new_path))
+                     old_path, new_path))
 
 
 # TODO(jelmer): Support writing unicode, rather than bytes.
@@ -211,9 +253,10 @@ def write_blob_diff(f, old_file, new_file):
     (new_path, new_mode, new_blob) = new_file
     old_path = patch_filename(old_path, b"a")
     new_path = patch_filename(new_path, b"b")
+
     def lines(blob):
         if blob is not None:
-            return blob.data.splitlines(True)
+            return blob.splitlines()
         else:
             return []
     f.writelines(gen_diff_header(
@@ -222,10 +265,9 @@ def write_blob_diff(f, old_file, new_file):
     old_contents = lines(old_blob)
     new_contents = lines(new_blob)
     f.writelines(unified_diff(old_contents, new_contents,
-        old_path, new_path))
+                 old_path, new_path))
 
 
-# TODO(jelmer): Support writing unicode, rather than bytes.
 def write_tree_diff(f, store, old_tree, new_tree, diff_binary=False):
     """Write tree diff.
 
@@ -238,8 +280,7 @@ def write_tree_diff(f, store, old_tree, new_tree, diff_binary=False):
     changes = store.tree_changes(old_tree, new_tree)
     for (oldpath, newpath), (oldmode, newmode), (oldsha, newsha) in changes:
         write_object_diff(f, store, (oldpath, oldmode, oldsha),
-                                    (newpath, newmode, newsha),
-                                    diff_binary=diff_binary)
+                          (newpath, newmode, newsha), diff_binary=diff_binary)
 
 
 def git_am_patch_split(f, encoding=None):
@@ -251,7 +292,8 @@ def git_am_patch_split(f, encoding=None):
     """
     encoding = encoding or getattr(f, "encoding", "ascii")
     contents = f.read()
-    if type(contents) is bytes and getattr(email.parser, "BytesParser", None):
+    if (isinstance(contents, bytes) and
+            getattr(email.parser, "BytesParser", None)):
         parser = email.parser.BytesParser()
         msg = parser.parsebytes(contents)
     else:

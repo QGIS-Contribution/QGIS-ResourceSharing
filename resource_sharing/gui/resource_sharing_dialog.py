@@ -78,6 +78,10 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         :type iface: QGisInterface
         """
         super(ResourceSharingDialog, self).__init__(parent)
+        # import pydevd
+        # pydevd.settrace('localhost', port=8080, stdoutToServer=True,
+        #                 stderrToServer=True)
+
         self.setupUi(self)
         self.iface = iface
 

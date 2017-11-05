@@ -1,20 +1,22 @@
 # file.py -- Safe access to git files
 # Copyright (C) 2010 Google, Inc.
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) a later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Safe access to git files."""
 
@@ -23,6 +25,7 @@ import io
 import os
 import sys
 import tempfile
+
 
 def ensure_dir_exists(dirname):
     """Ensure a directory exists, creating if necessary."""
@@ -103,10 +106,12 @@ class _GitFile(object):
     PROXY_METHODS = ('__iter__', 'flush', 'fileno', 'isatty', 'read',
                      'readline', 'readlines', 'seek', 'tell',
                      'truncate', 'write', 'writelines')
+
     def __init__(self, filename, mode, bufsize):
         self._filename = filename
         self._lockfilename = '%s.lock' % self._filename
-        fd = os.open(self._lockfilename,
+        fd = os.open(
+            self._lockfilename,
             os.O_RDWR | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0))
         self._file = os.fdopen(fd, mode, bufsize)
         self._closed = False
@@ -135,12 +140,12 @@ class _GitFile(object):
         """Close this file, saving the lockfile over the original.
 
         :note: If this method fails, it will attempt to delete the lockfile.
-            However, it is not guaranteed to do so (e.g. if a filesystem becomes
-            suddenly read-only), which will prevent future writes to this file
-            until the lockfile is removed manually.
-        :raises OSError: if the original file could not be overwritten. The lock
-            file is still closed, so further attempts to write to the same file
-            object will raise ValueError.
+            However, it is not guaranteed to do so (e.g. if a filesystem
+            becomes suddenly read-only), which will prevent future writes to
+            this file until the lockfile is removed manually.
+        :raises OSError: if the original file could not be overwritten. The
+            lock file is still closed, so further attempts to write to the same
+            file object will raise ValueError.
         """
         if self._closed:
             return
@@ -150,7 +155,8 @@ class _GitFile(object):
                 os.rename(self._lockfilename, self._filename)
             except OSError as e:
                 if sys.platform == 'win32' and e.errno == errno.EEXIST:
-                    # Windows versions prior to Vista don't support atomic renames
+                    # Windows versions prior to Vista don't support atomic
+                    # renames
                     _fancy_rename(self._lockfilename, self._filename)
                 else:
                     raise

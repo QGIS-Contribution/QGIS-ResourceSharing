@@ -1,20 +1,21 @@
 /* 
  * Copyright (C) 2009 Jelmer Vernooij <jelmer@samba.org>
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; version 2
- * of the License or (at your option) a later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA  02110-1301, USA.
+ * Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+ * General Public License as public by the Free Software Foundation; version 2.0
+ * or (at your option) any later version. You can redistribute it and/or
+ * modify it under the terms of either of these two licenses.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * You should have received a copy of the licenses; if not, see
+ * <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+ * and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+ * License, Version 2.0.
  */
 
 #include <Python.h>
@@ -23,7 +24,7 @@
 #if PY_MAJOR_VERSION >= 3
 #define PyInt_FromLong PyLong_FromLong
 #define PyString_AS_STRING PyBytes_AS_STRING
-#define PyString_AsString PyBytes_AsString
+#define PyString_AS_STRING PyBytes_AS_STRING
 #define PyString_Check PyBytes_Check
 #define PyString_CheckExact PyBytes_CheckExact
 #define PyString_FromStringAndSize PyBytes_FromStringAndSize
@@ -132,7 +133,7 @@ static PyObject *py_apply_delta(PyObject *self, PyObject *args)
 		Py_DECREF(py_delta);
 		return NULL;
 	}
-	out = (uint8_t *)PyString_AsString(ret);
+	out = (uint8_t *)PyString_AS_STRING(ret);
 	while (index < delta_len) {
 		uint8_t cmd = delta[index];
 		index++;
@@ -237,7 +238,7 @@ static PyObject *py_bisect_find_sha(PyObject *self, PyObject *args)
 			Py_DECREF(file_sha);
 			return NULL;
 		}
-		cmp = memcmp(PyString_AsString(file_sha), sha, 20);
+		cmp = memcmp(PyString_AS_STRING(file_sha), sha, 20);
 		Py_DECREF(file_sha);
 		if (cmp < 0)
 			start = i + 1;
@@ -263,15 +264,6 @@ moduleinit(void)
 	PyObject *m;
 	PyObject *errors_module;
 
-	errors_module = PyImport_ImportModule("dulwich.errors");
-	if (errors_module == NULL)
-		return NULL;
-
-	PyExc_ApplyDeltaError = PyObject_GetAttrString(errors_module, "ApplyDeltaError");
-	Py_DECREF(errors_module);
-	if (PyExc_ApplyDeltaError == NULL)
-		return NULL;
-
 #if PY_MAJOR_VERSION >= 3
 	static struct PyModuleDef moduledef = {
 	  PyModuleDef_HEAD_INIT,
@@ -284,6 +276,18 @@ moduleinit(void)
 	  NULL,            /* m_clear*/
 	  NULL,            /* m_free */
 	};
+#endif
+
+	errors_module = PyImport_ImportModule("dulwich.errors");
+	if (errors_module == NULL)
+		return NULL;
+
+	PyExc_ApplyDeltaError = PyObject_GetAttrString(errors_module, "ApplyDeltaError");
+	Py_DECREF(errors_module);
+	if (PyExc_ApplyDeltaError == NULL)
+		return NULL;
+
+#if PY_MAJOR_VERSION >= 3
 	m = PyModule_Create(&moduledef);
 #else
 	m = Py_InitModule3("_pack", py_pack_methods, NULL);

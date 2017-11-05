@@ -1,20 +1,22 @@
 # walk.py -- General implementation of walking commits and their contents.
 # Copyright (C) 2010 Google, Inc.
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# or (at your option) any later version of the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """General implementation of walking commits and their contents."""
 
@@ -34,6 +36,9 @@ from dulwich.diff_tree import (
 from dulwich.errors import (
     MissingCommitError,
     )
+from dulwich.objects import (
+    Tag,
+    )
 
 ORDER_DATE = 'date'
 ORDER_TOPO = 'topo'
@@ -51,18 +56,22 @@ class WalkEntry(object):
         self.commit = commit
         self._store = walker.store
         self._get_parents = walker.get_parents
-        self._changes = None
+        self._changes = {}
         self._rename_detector = walker.rename_detector
 
-    def changes(self):
+    def changes(self, path_prefix=None):
         """Get the tree changes for this entry.
 
+        :param path_prefix: Portion of the path in the repository to
+            use to filter changes. Must be a directory name. Must be
+            a full, valid, path reference (no partial names or wildcards).
         :return: For commits with up to one parent, a list of TreeChange
-            objects; if the commit has no parents, these will be relative to the
-            empty tree. For merge commits, a list of lists of TreeChange
+            objects; if the commit has no parents, these will be relative to
+            the empty tree. For merge commits, a list of lists of TreeChange
             objects; see dulwich.diff.tree_changes_for_merge.
         """
-        if self._changes is None:
+        cached = self._changes.get(path_prefix)
+        if cached is None:
             commit = self.commit
             if not self._get_parents(commit):
                 changes_func = tree_changes
@@ -70,13 +79,41 @@ class WalkEntry(object):
             elif len(self._get_parents(commit)) == 1:
                 changes_func = tree_changes
                 parent = self._store[self._get_parents(commit)[0]].tree
+                if path_prefix:
+                    mode, subtree_sha = parent.lookup_path(
+                        self._store.__getitem__,
+                        path_prefix,
+                    )
+                    parent = self._store[subtree_sha]
             else:
                 changes_func = tree_changes_for_merge
-                parent = [self._store[p].tree for p in self._get_parents(commit)]
-            self._changes = list(changes_func(
-              self._store, parent, commit.tree,
+                parent = [
+                        self._store[p].tree for p in self._get_parents(commit)]
+                if path_prefix:
+                    parent_trees = [self._store[p] for p in parent]
+                    parent = []
+                    for p in parent_trees:
+                        try:
+                            mode, st = p.lookup_path(
+                                self._store.__getitem__,
+                                path_prefix,
+                            )
+                        except KeyError:
+                            pass
+                        else:
+                            parent.append(st)
+            commit_tree_sha = commit.tree
+            if path_prefix:
+                commit_tree = self._store[commit_tree_sha]
+                mode, commit_tree_sha = commit_tree.lookup_path(
+                    self._store.__getitem__,
+                    path_prefix,
+                )
+            cached = list(changes_func(
+              self._store, parent, commit_tree_sha,
               rename_detector=self._rename_detector))
-        return self._changes
+            self._changes[path_prefix] = cached
+        return self._changes[path_prefix]
 
     def __repr__(self):
         return '<WalkEntry commit=%s, changes=%r>' % (
@@ -103,15 +140,20 @@ class _CommitTimeQueue(object):
         for commit_id in chain(walker.include, walker.excluded):
             self._push(commit_id)
 
-    def _push(self, commit_id):
+    def _push(self, object_id):
         try:
-            commit = self._store[commit_id]
+            obj = self._store[object_id]
         except KeyError:
-            raise MissingCommitError(commit_id)
-        if commit_id not in self._pq_set and commit_id not in self._done:
+            raise MissingCommitError(object_id)
+        if isinstance(obj, Tag):
+            self._push(obj.object[1])
+            return
+        # TODO(jelmer): What to do about non-Commit and non-Tag objects?
+        commit = obj
+        if commit.id not in self._pq_set and commit.id not in self._done:
             heapq.heappush(self._pq, (-commit.commit_time, commit))
-            self._pq_set.add(commit_id)
-            self._seen.add(commit_id)
+            self._pq_set.add(commit.id)
+            self._seen.add(commit.id)
 
     def _exclude_parents(self, commit):
         excluded = self._excluded
@@ -150,20 +192,20 @@ class _CommitTimeQueue(object):
                                     for _, c in self._pq):
                     _, n = self._pq[0]
                     if self._last and n.commit_time >= self._last.commit_time:
-                        # If the next commit is newer than the last one, we need
-                        # to keep walking in case its parents (which we may not
-                        # have seen yet) are excluded. This gives the excluded
-                        # set a chance to "catch up" while the commit is still
-                        # in the Walker's output queue.
+                        # If the next commit is newer than the last one, we
+                        # need to keep walking in case its parents (which we
+                        # may not have seen yet) are excluded. This gives the
+                        # excluded set a chance to "catch up" while the commit
+                        # is still in the Walker's output queue.
                         reset_extra_commits = True
                     else:
                         reset_extra_commits = False
 
             if (self._min_time is not None and
-                commit.commit_time < self._min_time):
+                    commit.commit_time < self._min_time):
                 # We want to stop walking at min_time, but commits at the
-                # boundary may be out of order with respect to their parents. So
-                # we walk _MAX_EXTRA_COMMITS more commits once we hit this
+                # boundary may be out of order with respect to their parents.
+                # So we walk _MAX_EXTRA_COMMITS more commits once we hit this
                 # boundary.
                 reset_extra_commits = False
 
@@ -203,8 +245,8 @@ class Walker(object):
             ancestors.
         :param exclude: Iterable of SHAs of commits to exclude along with their
             ancestors, overriding includes.
-        :param order: ORDER_* constant specifying the order of results. Anything
-            other than ORDER_DATE may result in O(n) memory usage.
+        :param order: ORDER_* constant specifying the order of results.
+            Anything other than ORDER_DATE may result in O(n) memory usage.
         :param reverse: If True, reverse the order of output, requiring O(n)
             memory.
         :param max_entries: The maximum number of entries to yield, or None for
@@ -226,7 +268,9 @@ class Walker(object):
         if order not in ALL_ORDERS:
             raise ValueError('Unknown walk order %s' % order)
         self.store = store
-        if not isinstance(include, list):
+        if isinstance(include, bytes):
+            # TODO(jelmer): Really, this should require a single type.
+            # Print deprecation warning here?
             include = [include]
         self.include = include
         self.excluded = set(exclude or [])
@@ -276,8 +320,8 @@ class Walker(object):
         """Determine if a walk entry should be returned..
 
         :param entry: The WalkEntry to consider.
-        :return: True if the WalkEntry should be returned by this walk, or False
-            otherwise (e.g. if it doesn't match any requested paths).
+        :return: True if the WalkEntry should be returned by this walk, or
+            False otherwise (e.g. if it doesn't match any requested paths).
         """
         commit = entry.commit
         if self.since is not None and commit.commit_time < self.since:
@@ -324,8 +368,8 @@ class Walker(object):
 
         :param results: An iterator of WalkEntry objects, in the order returned
             from the queue_cls.
-        :return: An iterator or list of WalkEntry objects, in the order required
-            by the Walker.
+        :return: An iterator or list of WalkEntry objects, in the order
+            required by the Walker.
         """
         if self.order == ORDER_TOPO:
             results = _topo_reorder(results, self.get_parents)

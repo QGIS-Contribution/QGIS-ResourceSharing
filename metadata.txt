@@ -20,7 +20,7 @@ email=akbargumbira@gmail.com
 
 # Changelog
 changelog=
-    0.5.2 - Add support for gitlab and gogs repositories (PR by Salvatore Larosa - gh username: slarosa)
+	0.5.2 - Add support for gitlab and gogs repositories (PR by Salvatore Larosa - gh username: slarosa)
 	0.5.1 - Allow authors to add license details in the collection
 	0.5.1 - Fixed problem in QGIS < 2.12 as a result of using the new QgsAuthManager
 	0.5.1 - Change the behavior of updating and removing directory in settings (This fixed #34)

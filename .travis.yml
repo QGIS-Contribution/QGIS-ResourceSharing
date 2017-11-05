@@ -13,7 +13,10 @@ env:
 addons:
   apt:
     packages:
-    - "python-software-properties"
+    - python-software-properties
+
+before_install:
+  - sudo apt-get -qq -y update
 
 install:
   - sudo add-apt-repository ${QGIS_REPO}

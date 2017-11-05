@@ -1,6 +1,5 @@
 # coding=utf-8
-from qgis.testing import start_app, unittest
-import nose2
+import unittest
 
 from resource_sharing.repository_handler import (
     BaseRepositoryHandler,
@@ -14,7 +13,7 @@ from test.utilities import test_repository_url, test_data_path
 class TestBaseHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        start_app()
+        pass
 
     def setUp(self):
         self.base_handler = BaseRepositoryHandler(test_repository_url())
@@ -59,7 +58,7 @@ class TestBaseHandler(unittest.TestCase):
 class TestFileSystemHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        start_app()
+        pass
 
     def setUp(self):
         self.fs_handler = FileSystemHandler(test_repository_url())
@@ -90,7 +89,7 @@ class TestFileSystemHandler(unittest.TestCase):
 class TestRemoteGitHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        start_app()
+        pass
 
     def setUp(self):
         self.valid_github_https = 'https://github.com/anitagraser/QGIS-style-repo-dummy.git'
@@ -146,4 +145,4 @@ class TestRemoteGitHandler(unittest.TestCase):
         self.assertEqual(remote_repo.metadata_url, expected_metadata_url)
 
 if __name__ == '__main__':
-    nose2.main()
+    unittest.main()

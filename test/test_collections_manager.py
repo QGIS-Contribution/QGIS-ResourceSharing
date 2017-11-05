@@ -1,6 +1,5 @@
 # coding=utf-8
-from qgis.testing import start_app, unittest
-import nose2
+import unittest
 
 from resource_sharing.collection_manager import CollectionManager
 
@@ -8,7 +7,7 @@ from resource_sharing.collection_manager import CollectionManager
 class TestCollections(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        start_app()
+        pass
 
     def test_get_collection_id(self):
         """Testing get_collection_id."""
@@ -22,4 +21,4 @@ class TestCollections(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    nose2.main()
+    unittest.main()

@@ -13,22 +13,24 @@ __date__ = '2016-05-29'
 __copyright__ = 'Copyright 2016, Akbar Gumbira'
 
 
-from qgis.testing import start_app, unittest
-import nose2
+import unittest
 
 from PyQt4.QtGui import QDialogButtonBox, QDialog
+from test.utilities import get_qgis_app
 
 from resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
 from resource_sharing.config import (
     COLLECTION_ALL_STATUS,
     COLLECTION_INSTALLED_STATUS)
 
+QGIS_APP = get_qgis_app()
+
 
 class ResourceSharingDialogTest(unittest.TestCase):
     """Test dialog works."""
     @classmethod
     def setUpClass(cls):
-        start_app()
+        pass
 
     def setUp(self):
         """Runs before each test."""
@@ -77,4 +79,4 @@ class ResourceSharingDialogTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    nose2.main()
+    unittest.main()

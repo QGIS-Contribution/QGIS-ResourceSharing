@@ -1,18 +1,18 @@
 # coding=utf-8
-from qgis.testing import start_app, unittest
-import nose2
+import unittest
 
 from PyQt4.QtCore import QUrl
 from resource_sharing.resource_handler.symbol_resolver_mixin import (
     resolve_path,
     fix_xml_node)
-from test.utilities import test_data_path
+from test.utilities import test_data_path, get_qgis_app
 
+QGIS_APP, CANVAS, IFACE, PARENT = get_qgis_app()
 
 class TestSymbolResolverMixin(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        start_app()
+        pass
 
     def test_fix_xml_node(self):
         """Test if fixing xml node works."""
@@ -110,4 +110,4 @@ class TestSymbolResolverMixin(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    nose2.main()
+    unittest.main()

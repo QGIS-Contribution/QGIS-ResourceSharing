@@ -22,14 +22,14 @@ class TestSymbolXMLExtractor(unittest.TestCase):
     def test_parse_xml(self):
         """Test parsing the xml works correctly."""
         xml_path = test_data_path(
-            'collections', 'test_collection', 'symbol', 'various_symbols.xml' )
+            'collections', 'test_collection', 'symbol', 'various_symbols.xml')
         extractor = SymbolXMLExtractor(xml_path)
         # There are 9 symbols and 3 colorramps there
         expected_symbols = {
             'fill_raster': QgsFillSymbolV2,
             'fill_svg': QgsFillSymbolV2,
             'fill_svg_line': QgsFillSymbolV2,
-            'line_arrow': QgsLineSymbolV2,
+            # 'line_arrow': QgsLineSymbolV2,
             'line_svg_marker': QgsLineSymbolV2,
             'marker_ellipse': QgsMarkerSymbolV2,
             'marker_font': QgsMarkerSymbolV2,

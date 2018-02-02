@@ -65,8 +65,8 @@ class Plugin:
         self.actions = []
         self.menu = self.tr('&Resource Sharing')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar('QgsResourceSharing')
-        self.toolbar.setObjectName('QgsResourceSharing')
+        #self.toolbar = self.iface.addToolBar(self.tr('Resource Sharing'))
+        #self.toolbar.setObjectName('QgsResourceSharing')
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -173,9 +173,9 @@ class Plugin:
             self.iface.removePluginMenu(
                 self.tr('&Resource Sharing'),
                 action)
-            self.iface.removeToolBarIcon(action)
+            #self.iface.removeToolBarIcon(action)
         # remove the toolbar
-        del self.toolbar
+        #del self.toolbar
 
     def run(self):
         """Run method that performs all the real work"""

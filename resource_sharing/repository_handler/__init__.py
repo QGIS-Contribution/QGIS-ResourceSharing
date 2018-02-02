@@ -4,3 +4,5 @@ from .github_handler import GithubHandler
 from .bitbucket_handler import BitBucketHandler
 from .filesystem_handler import FileSystemHandler
 from .remote_zip_handler import RemoteZipHandler
+from .gitlab_handler import GitlabHandler
+from .gogs_handler import GogsHandler

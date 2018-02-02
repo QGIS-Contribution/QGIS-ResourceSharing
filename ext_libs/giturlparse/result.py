@@ -110,6 +110,10 @@ class GitUrlParsed(object):
     def gitlab(self):
         return self.platform == 'gitlab'
 
+    @property
+    def gogs(self):
+        return self.platform == 'gogs'
+
     ##
     # Get data as dict
     ##

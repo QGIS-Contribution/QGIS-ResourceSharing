@@ -1,21 +1,11 @@
 # coding=utf-8
 """This module contains the base class of repository handler."""
-try:
-    from io import StringIO
-except:
-    from StringIO import StringIO
 
 import logging
+from configparser import ConfigParser
+from urllib.parse import urlparse
 
-from six import add_metaclass
-try:
-    from ConfigParser import SafeConfigParser
-    from urlparse import urlparse
-    from qgis.core import QGis as Qgis
-except ImportError:
-    from configparser import SafeConfigParser
-    from urllib.parse import urlparse
-    from qgis.core import Qgis
+from qgis.core import Qgis
 
 from ext_libs.giturlparse import validate as git_validate
 from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
@@ -42,8 +32,7 @@ class RepositoryHandlerMeta(type):
         super(RepositoryHandlerMeta, cls).__init__(name, bases, dct)
 
 
-@add_metaclass(RepositoryHandlerMeta)
-class BaseRepositoryHandler(object):
+class BaseRepositoryHandler(object, metaclass=RepositoryHandlerMeta):
     """Abstract class of handler."""
 
     METADATA_FILE = 'metadata.ini'
@@ -139,29 +128,20 @@ class BaseRepositoryHandler(object):
 
         collections = []
 
-        try:  # Py3/Qt5
-            metadata_file = StringIO(self.metadata)
-        except:  # Py2/Q4
-            metadata_file = StringIO(bytes(self.metadata).decode('utf-8'))
-
         try:
-            parser = SafeConfigParser()
-            parser.readfp(metadata_file)
-            collections_str = parser.get('general', 'collections')
+            parser = ConfigParser()
+            parser.read_string(bytes(self.metadata).decode('utf-8'))
+            collections_str = parser['general']['collections']
         except Exception as e:
-            raise MetadataError('Error parsing metadata: %s' % e)
+            raise MetadataError('Error parsing metadata: {}'.format(e))
 
         collection_list = [
             collection.strip() for collection in collections_str.split(',')]
         # Read all the collections
         for collection in collection_list:
             # Parse the version
-            qgis_min_version = parser.has_option(
-                collection, 'qgis_minimum_version') and parser.get(
-                collection, 'qgis_minimum_version') or None
-            qgis_max_version = parser.has_option(
-                collection, 'qgis_maximum_version') and parser.get(
-                collection, 'qgis_maximum_version') or None
+            qgis_min_version = 'qgis_minimum_version' in parser[collection] and parser[collection]['qgis_minimum_version'] or None
+            qgis_max_version = 'qgis_maximum_version' in parser[collection] and parser[collection]['qgis_maximum_version'] or None
             if not qgis_min_version:
                 qgis_min_version = '2.0'
             if not qgis_max_version:
@@ -169,9 +149,9 @@ class BaseRepositoryHandler(object):
             if not isCompatible(
                     Qgis.QGIS_VERSION, qgis_min_version, qgis_max_version):
                 LOGGER.info(
-                    'Collection %s is not compatible with current QGIS '
+                    'Collection {} is not compatible with current QGIS '
                     'version. QGIS ver:%s, QGIS min ver:%s, QGIS max ver: '
-                    '%s' % (
+                    '%s'.format(
                         collection, Qgis.QGIS_VERSION, qgis_min_version,
                         qgis_max_version))
                 break
@@ -179,19 +159,15 @@ class BaseRepositoryHandler(object):
             # Collection is compatible, continue parsing
             try:
                 # Parse general information
-                author = parser.get(collection, 'author')
-                email = parser.get(collection, 'email')
-                name = parser.get(collection, 'name')
-                tags = parser.get(collection, 'tags')
-                description = parser.get(collection, 'description')
+                author = parser[collection]['author']
+                email = parser[collection]['email']
+                name = parser[collection]['name']
+                tags = parser[collection]['tags']
+                description = parser[collection]['description']
 
                 # Parse licensing stuffs
-                license_str = parser.has_option(
-                    collection, 'license') and parser.get(
-                    collection, 'license') or None
-                license_path = parser.has_option(
-                    collection, 'license_file') and parser.get(
-                    collection, 'license_file') or None
+                license_str = 'license' in parser[collection] and parser[collection]['license'] or None
+                license_path = 'license_file' in parser[collection] and parser[collection]['license_file'] or None
                 license_url = None
                 if license_path:
                     license_url = self.collection_file_url(
@@ -200,8 +176,7 @@ class BaseRepositoryHandler(object):
                     )
 
                 # Parse the preview urls
-                preview_str = parser.has_option(collection, 'preview') and \
-                    parser.get(collection, 'preview') or ''
+                preview_str = 'preview' in parser[collection] and parser[collection]['preview'] or ''
                 preview_list = []
                 for preview in preview_str.split(','):
                     if preview.strip() != '':
@@ -212,7 +187,7 @@ class BaseRepositoryHandler(object):
                         preview_list.append(preview_url)
 
             except Exception as e:
-                raise MetadataError('Error parsing metadata: %s' % e)
+                raise MetadataError('Error parsing metadata: {}'.format(e))
 
             collection_dict = {
                 'register_name': collection,
@@ -273,5 +248,5 @@ class BaseRepositoryHandler(object):
         :param file_path: The file path relative to the collection root.
         :type file_path: str
         """
-        rel_path = 'collections/%s/%s' % (collection_name, file_path)
+        rel_path = 'collections/{}/{}'.format(collection_name, file_path)
         return self.file_url(rel_path)

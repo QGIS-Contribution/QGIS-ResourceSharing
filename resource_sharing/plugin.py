@@ -21,12 +21,11 @@
 """
 import os.path
 
-from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from qgis.PyQt.QtCore import QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
-try:
-    from qgis.PyQt.QtGui import QAction
-except ImportError:
-    from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QAction
+
+from qgis.core import QgsApplication
 
 from .gui.resource_sharing_dialog import ResourceSharingDialog
 from .utilities import resources_path
@@ -48,7 +47,7 @@ class Plugin:
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QgsApplication.locale()
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
@@ -57,19 +56,17 @@ class Plugin:
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
-
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
+            QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
         self.dlg = ResourceSharingDialog(iface=self.iface)
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Resource Sharing')
+        self.menu = self.tr('&Resource Sharing')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'QgsResourceSharing')
-        self.toolbar.setObjectName(u'QgsResourceSharing')
+        self.toolbar = self.iface.addToolBar('QgsResourceSharing')
+        self.toolbar.setObjectName('QgsResourceSharing')
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -165,7 +162,7 @@ class Plugin:
         icon_path = resources_path('icon.png')
         self.add_action(
             icon_path,
-            text=self.tr(u'Resource Sharing'),
+            text=self.tr('Resource Sharing'),
             callback=self.run,
             parent=self.iface.mainWindow(),
             add_to_toolbar=False)
@@ -174,7 +171,7 @@ class Plugin:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Resource Sharing'),
+                self.tr('&Resource Sharing'),
                 action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar

@@ -7,7 +7,6 @@ from processing.script.WrongScriptException import WrongScriptException
 from processing.script.ScriptUtils import ScriptUtils
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
-from resource_sharing.utilities import qgis_version
 
 
 class ProcessingScriptHandler(BaseResourceHandler):
@@ -48,7 +47,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
                 continue
 
             script_file_name = os.path.basename(processing_file)
-            script_name = '%s (%s).%s' % (
+            script_name = '{} ({}).{}'.format(
                 os.path.splitext(script_file_name)[0],
                 self.collection_id,
                 os.path.splitext(script_file_name)[1],)
@@ -62,7 +61,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
         """Uninstall the processing scripts from processing toolbox."""
         # Remove the script files containing substring collection_id
         for item in os.listdir(self.scripts_folder()):
-            if fnmatch.fnmatch(item, '*%s*' % self.collection_id):
+            if fnmatch.fnmatch(item, '*{}*'.format(self.collection_id)):
                 script_path = os.path.join(self.scripts_folder(), item)
                 if os.path.exists(script_path):
                     os.remove(script_path)
@@ -71,17 +70,10 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
     def refresh_script_provider(self):
         """Refresh the processing script provider."""
-        if qgis_version() < 21600:
-            from processing.core.Processing import Processing
-            Processing.updateAlgsList()
-        else:
-            from processing.core.alglist import algList
-            algList.reloadProvider('script')
+        QgsApplication.processingRegistry().providerById("script")
+        provider.refreshAlgorithms()
 
     def scripts_folder(self):
         """Return the default processing scripts folder."""
         # Copy the script
-        if qgis_version() < 21600:
-            return ScriptUtils.scriptsFolder()
-        else:
-            return ScriptUtils.defaultScriptsFolder()
+        return ScriptUtils.defaultScriptsFolder()

@@ -29,25 +29,13 @@ from qgis.PyQt.QtGui import (
     QDesktopServices,
     QStandardItem,
     QStandardItemModel)
-try:
-    from qgis.PyQt.QtGui import (
-        QListWidgetItem,
-        QDialog,
-        QTreeWidgetItem,
-        QSizePolicy,
-        QMessageBox,
-        QProgressDialog,
-        QDialogButtonBox)
-except ImportError:
-    from qgis.PyQt.QtWidgets import (
-        QListWidgetItem,
-        QDialog,
-        QTreeWidgetItem,
-        QSizePolicy,
-        QMessageBox,
-        QProgressDialog,
-        QDialogButtonBox)
-
+from qgis.PyQt.QtWidgets import (
+    QListWidgetItem,
+    QTreeWidgetItem,
+    QSizePolicy,
+    QMessageBox,
+    QProgressDialog,
+    QDialogButtonBox)
 
 from qgis.gui import QgsMessageBar
 
@@ -75,10 +63,10 @@ from resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS)
 from resource_sharing import config
 
-FORM_CLASS, _ = uic.loadUiType(ui_path('resource_sharing_dialog_base.ui'))
+FORM_CLASS, BASE_CLASS = uic.loadUiType(ui_path('resource_sharing_dialog_base.ui'))
 
 
-class ResourceSharingDialog(QDialog, FORM_CLASS):
+class ResourceSharingDialog(BASE_CLASS, FORM_CLASS):
     TAB_ALL = 0
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
@@ -262,7 +250,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     QgsMessageBar.CRITICAL, 5)
         except Exception as e:
             self.message_bar.pushMessage(
-                self.tr('%s') % e,
+                self.tr('{}'.format(e)),
                 QgsMessageBar.CRITICAL, 5)
         finally:
             self.progress_dialog.hide()
@@ -344,7 +332,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     QgsMessageBar.CRITICAL, 5)
         except Exception as e:
             self.message_bar.pushMessage(
-                self.tr('%s') % e, QgsMessageBar.CRITICAL, 5)
+                self.tr('{}'.format(e)), QgsMessageBar.CRITICAL, 5)
         finally:
             self.progress_dialog.hide()
 
@@ -422,7 +410,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                         QgsMessageBar.CRITICAL, 5)
             except Exception as e:
                 self.message_bar.pushMessage(
-                    self.tr('%s') % e,
+                    self.tr('{}'.format(e)),
                     QgsMessageBar.CRITICAL, 5)
 
         self.progress_dialog.hide()
@@ -449,7 +437,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.progress_dialog.hide()
         if self.installer_worker.install_status:
             self.reload_collections_model()
-            message = '%s is installed successfully' % (
+            message = '{} is installed successfully'.format(
                 config.COLLECTIONS[self._selected_collection_id]['name'])
         else:
             message = self.installer_worker.error_message

@@ -3,10 +3,7 @@ import os
 import ntpath
 
 from qgis.PyQt.QtCore import QDir
-try:
-    from qgis.core import QgsApplication, QGis as Qgis
-except ImportError:
-    from qgis.core import QgsApplication, Qgis
+from qgis.core import QgsApplication, Qgis
 
 from resource_sharing import config
 import jinja2
@@ -70,7 +67,7 @@ def local_collection_path(id=None):
         'Resource Sharing')
     if id:
         collection_name = config.COLLECTIONS[id]['name']
-        dir_name = '%s (%s)' % (collection_name, id)
+        dir_name = '{} ({})'.format(collection_name, id)
         path = os.path.join(path, dir_name)
     return path
 

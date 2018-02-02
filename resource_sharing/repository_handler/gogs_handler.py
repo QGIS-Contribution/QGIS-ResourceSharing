@@ -16,7 +16,7 @@ class GogsHandler(RemoteGitHandler):
         return False
 
     def file_url(self, relative_path):
-        return 'https://%s/%s/%s/raw/master/%s' % (
+        return 'https://{}/{}/{}/raw/master/{}'.format(
             self.git_host,
             self.git_owner,
             self.git_repository,

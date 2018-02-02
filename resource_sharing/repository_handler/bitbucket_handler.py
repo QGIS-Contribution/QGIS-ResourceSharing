@@ -16,7 +16,7 @@ class BitBucketHandler(RemoteGitHandler):
         return False
 
     def file_url(self, relative_path):
-        return 'https://bitbucket.org/%s/%s/raw/master/%s' % (
+        return 'https://bitbucket.org/{}/{}/raw/master/{}'.format(
             self.git_owner,
             self.git_repository,
             relative_path)

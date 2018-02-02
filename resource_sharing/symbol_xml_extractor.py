@@ -3,10 +3,7 @@ import os
 
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.PyQt.QtCore import QFile, QIODevice
-try:
-    from qgis.core import QgsSymbolLayerV2Utils as QgsSymbolLayerUtils
-except ImportError:
-    from qgis.core import QgsSymbolLayerUtils
+from qgis.core import QgsSymbolLayerUtils
 
 
 class SymbolXMLExtractor(object):
@@ -78,7 +75,7 @@ class SymbolXMLExtractor(object):
         symbols = [
             {
                 'name': str
-                'symbol': QgsSymbolV2
+                'symbol': QgsSymbol
             }
         ]
         """
@@ -92,7 +89,7 @@ class SymbolXMLExtractor(object):
         colorramps = [
             {
                 'name': str
-                'colorramp': QgsVectorColorRampV2
+                'colorramp': QgsVectorColorRamp
             }
         ]
         """

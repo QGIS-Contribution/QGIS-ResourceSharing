@@ -105,11 +105,11 @@ class RemoteGitHandler(BaseRepositoryHandler):
                         repo = porcelain.clone(
                             git_parsed.url2https, local_repo_dir)
                     except Exception as e:
-                        error_message = 'Error: %s' % str(e)
+                        error_message = 'Error: {}'.format(str(e))
                         LOGGER.exception(traceback.format_exc())
                         return False, error_message
                 else:
-                    error_message = 'Error: %s' % str(e)
+                    error_message = 'Error: {}'.format(str(e))
                     LOGGER.exception(traceback.format_exc())
                     return False, error_message
 
@@ -135,11 +135,11 @@ class RemoteGitHandler(BaseRepositoryHandler):
                             b'refs/heads/master'
                         )
                     except Exception as e:
-                        error_message = 'Error: %s' % str(e)
+                        error_message = 'Error: {}'.format(str(e))
                         LOGGER.exception(traceback.format_exc())
                         return False, error_message
                 else:
-                    error_message = 'Error: %s' % str(e)
+                    error_message = 'Error: {}'.format(str(e))
                     LOGGER.exception(traceback.format_exc())
                     return False, error_message
 

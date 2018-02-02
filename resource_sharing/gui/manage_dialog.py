@@ -23,17 +23,16 @@
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-try:
-    from qgis.PyQt.QtGui import QDialog, QVBoxLayout, QDialogButtonBox
-except ImportError:
-    from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QDialogButtonBox
+from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QDialogButtonBox
+
+from qgis.gui import QgsAuthConfigSelect
 
 from resource_sharing.utilities import ui_path, qgis_version
 
-FORM_CLASS, _ = uic.loadUiType(ui_path('manage_repository.ui'))
+FORM_CLASS, BASE_CLASS = uic.loadUiType(ui_path('manage_repository.ui'))
 
 
-class ManageRepositoryDialog(QDialog, FORM_CLASS):
+class ManageRepositoryDialog(BASE_CLASS, FORM_CLASS):
     def __init__(self, parent=None):
         """Create the dialog and configure the UI."""
         super(ManageRepositoryDialog, self).__init__(parent)
@@ -45,16 +44,6 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
         self.button_add_auth.clicked.connect(self.add_authentication)
         self.button_clear_auth.clicked.connect(self.line_edit_auth_id.clear)
 
-        if qgis_version() < 21200:
-            self.disable_authentication()
-
-    def disable_authentication(self):
-        """Disable adding authentication by hiding all the widgets."""
-        self.label_auth.hide()
-        self.line_edit_auth_id.hide()
-        self.button_add_auth.hide()
-        self.button_clear_auth.hide()
-
     def form_changed(self):
         """Slot for when the form changed."""
         is_enabled = (len(self.line_edit_name.text()) > 0 and
@@ -63,28 +52,25 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
 
     def add_authentication(self):
         """Slot for when the add auth button is clicked."""
-        if qgis_version() >= 21200:
-            from qgis.gui import QgsAuthConfigSelect
+        dlg = QDialog(self)
+        dlg.setWindowTitle(self.tr("Select Authentication"))
+        layout = QVBoxLayout(dlg)
 
-            dlg = QDialog(self)
-            dlg.setWindowTitle(self.tr("Select Authentication"))
-            layout = QVBoxLayout(dlg)
+        acs = QgsAuthConfigSelect(dlg)
+        if self.line_edit_auth_id.text():
+            acs.setConfigId(self.line_edit_auth_id.text())
+        layout.addWidget(acs)
 
-            acs = QgsAuthConfigSelect(dlg)
-            if self.line_edit_auth_id.text():
-                acs.setConfigId(self.line_edit_auth_id.text())
-            layout.addWidget(acs)
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal,
+            dlg)
+        layout.addWidget(button_box)
+        button_box.accepted.connect(dlg.accept)
+        button_box.rejected.connect(dlg.close)
 
-            button_box = QDialogButtonBox(
-                QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
-                Qt.Horizontal,
-                dlg)
-            layout.addWidget(button_box)
-            button_box.accepted.connect(dlg.accept)
-            button_box.rejected.connect(dlg.close)
-
-            dlg.setLayout(layout)
-            dlg.setWindowModality(Qt.WindowModal)
-            if dlg.exec_():
-                self.line_edit_auth_id.setText(acs.configId())
-            del dlg
+        dlg.setLayout(layout)
+        dlg.setWindowModality(Qt.WindowModal)
+        if dlg.exec_():
+            self.line_edit_auth_id.setText(acs.configId())
+        del dlg

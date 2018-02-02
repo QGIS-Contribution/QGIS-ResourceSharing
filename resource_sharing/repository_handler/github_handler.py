@@ -16,7 +16,7 @@ class GithubHandler(RemoteGitHandler):
         return False
 
     def file_url(self, relative_path):
-        return 'https://raw.githubusercontent.com/%s/%s/master/%s' % (
+        return 'https://raw.githubusercontent.com/{}/{}/master/{}'.format(
             self.git_owner,
             self.git_repository,
             relative_path)

@@ -3,13 +3,8 @@ import os
 import shutil
 import logging
 
-try:
-    from urlparse import urljoin
-    from urllib import pathname2url
-except ImportError:
-    from urllib.parse import urljoin
-    from urllib.request import pathname2url
-
+from urllib.parse import urljoin
+from urllib.request import pathname2url
 
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path

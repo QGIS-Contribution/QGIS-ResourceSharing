@@ -16,7 +16,7 @@ class GitlabHandler(RemoteGitHandler):
         return False
 
     def file_url(self, relative_path):
-        return 'https://gitlab.com/%s/%s/raw/master/%s' % (
+        return 'https://gitlab.com/{}/{}/raw/master/{}'.format(
             self.git_owner,
             self.git_repository,
             relative_path)

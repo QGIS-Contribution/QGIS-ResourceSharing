@@ -1,11 +1,6 @@
 # coding=utf-8
 import logging
-
-try:
-    from urlparse import urljoin
-except ImportError:
-    from urllib.parse import urljoin
-
+from urllib.parse import urljoin
 from zipfile import ZipFile
 
 from qgis.PyQt.QtCore import QTemporaryFile
@@ -55,7 +50,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
         :type register_name: unicode
         """
         # Download the zip first
-        collection_path = 'collections/%s.zip' % register_name
+        collection_path = 'collections/{}.zip'.format(register_name)
         network_manager = NetworkManager(self.file_url(collection_path))
         status, description = network_manager.fetch()
 

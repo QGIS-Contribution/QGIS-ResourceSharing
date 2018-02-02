@@ -3,7 +3,8 @@ import csv
 import os
 import pickle
 
-from qgis.PyQt.QtCore import QObject, QSettings, QTemporaryFile
+from qgis.PyQt.QtCore import QObject, QTemporaryFile
+from qgis.core import QgsSettings
 
 from resource_sharing.utilities import (
     repo_settings_group, local_collection_path, repositories_cache_path)
@@ -43,9 +44,9 @@ class RepositoryManager(QObject):
                 'author_email': email,
                 'repository_url': self.url,
                 'status': COLLECTION_NOT_INSTALLED_STATUS,
-                'name': parser.get(collection, 'name'),
-                'tags': parser.get(collection, 'tags'),
-                'description': parser.get(collection, 'description'),
+                'name': parser[collection]['name'],
+                'tags': parser[collection]['tags'],
+                'description': parser[collection]['description'],
                 'qgis_min_version': '2.0',
                 'qgis_max_version': '2.99'
                 'preview': ['preview/image1.png', 'preview/image2.png']
@@ -96,13 +97,13 @@ class RepositoryManager(QObject):
                 for row in reader:
                     self._online_directories[row['name']] = row['url'].strip()
             # Save it to cache
-            settings = QSettings()
+            settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             settings.setValue('online_directories', self._online_directories)
             settings.endGroup()
         else:
             # Just use cache from previous use
-            settings = QSettings()
+            settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             self._online_directories = settings.value('online_directories', {})
             settings.endGroup()
@@ -110,14 +111,14 @@ class RepositoryManager(QObject):
     def load_directories(self):
         """Load directories of repository registered in settings."""
         self._directories = {}
-        settings = QSettings()
+        settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
 
-        # Write online directory first to QSettings if needed
+        # Write online directory first to QgsSettings if needed
         for online_dir_name in self._online_directories:
             repo_present = False
             for repo_name in settings.childGroups():
-                url = settings.value(repo_name + '/url', '', type=unicode)
+                url = settings.value(repo_name + '/url', '', type=str)
                 if url == self._online_directories[online_dir_name]:
                     repo_present = True
                     break
@@ -128,10 +129,10 @@ class RepositoryManager(QObject):
         for repo_name in settings.childGroups():
             self._directories[repo_name] = {}
             url = settings.value(
-                repo_name + '/url', '', type=unicode)
+                repo_name + '/url', '', type=str)
             self._directories[repo_name]['url'] = url
             auth_cfg = settings.value(
-                repo_name + '/auth_cfg', '', type=unicode).strip()
+                repo_name + '/auth_cfg', '', type=str).strip()
             self._directories[repo_name]['auth_cfg'] = auth_cfg
         settings.endGroup()
 
@@ -162,8 +163,8 @@ class RepositoryManager(QObject):
             # Add the repo and the collections
             self._repositories[repo_name] = collections
             self.rebuild_collections()
-            # Add to QSettings
-            settings = QSettings()
+            # Add to QgsSettings
+            settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             settings.setValue(repo_name + '/url', url)
             if auth_cfg:
@@ -257,8 +258,8 @@ class RepositoryManager(QObject):
             self._repositories[new_repo_name] = new_collections
             self.rebuild_collections()
 
-            # Update QSettings
-            settings = QSettings()
+            # Update QgsSettings
+            settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             settings.remove(old_repo_name)
             settings.setValue(new_repo_name + '/url', new_url)
@@ -276,8 +277,8 @@ class RepositoryManager(QObject):
         """
         self._repositories.pop(repo_name, None)
         self.rebuild_collections()
-        # Remove repo from QSettings
-        settings = QSettings()
+        # Remove repo from QgsSettings
+        settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
         settings.remove(repo_name)
         settings.endGroup()

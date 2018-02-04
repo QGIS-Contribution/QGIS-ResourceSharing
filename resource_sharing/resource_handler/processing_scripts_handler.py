@@ -1,10 +1,9 @@
 # coding=utf-8
 import os
 import fnmatch
+import shutil
 
-from processing.script.ScriptAlgorithm import ScriptAlgorithm
-from processing.script.WrongScriptException import WrongScriptException
-from processing.script.ScriptUtils import ScriptUtils
+from processing.script import ScriptUtils import
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
@@ -40,20 +39,13 @@ class ProcessingScriptHandler(BaseResourceHandler):
                 processing_files.append(file_path)
 
         for processing_file in processing_files:
-            # Install silently the processing file
-            try:
-                script = ScriptAlgorithm(processing_file)
-            except WrongScriptException:
-                continue
-
             script_file_name = os.path.basename(processing_file)
             script_name = '{} ({}).{}'.format(
                 os.path.splitext(script_file_name)[0],
                 self.collection_id,
                 os.path.splitext(script_file_name)[1],)
             dest_path = os.path.join(self.scripts_folder(), script_name)
-            with open(dest_path, 'w') as f:
-                f.write(script.script)
+            shutil.copy(processing_file, dest_path)
 
         self.refresh_script_provider()
 

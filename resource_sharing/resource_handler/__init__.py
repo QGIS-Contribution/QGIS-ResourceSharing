@@ -2,4 +2,5 @@ from .base import BaseResourceHandler
 from .svg_handler import SVGResourceHandler
 from .symbol_handler import SymbolResourceHandler
 from .processing_scripts_handler import ProcessingScriptHandler
+from .processing_models_handler import ProcessingModelsHandler
 from .style_handler import StyleResourceHandler

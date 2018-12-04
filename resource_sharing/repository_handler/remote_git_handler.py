@@ -10,9 +10,25 @@ from giturlparse import parse, validate
 from dulwich import porcelain
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
-
+from qgis.core import QgsMessageLog
 
 LOGGER = logging.getLogger('QGIS Resources Sharing')
+
+
+class writeOut():
+    """Stderr mock"""
+
+    @classmethod
+    def write(cls, m):
+        QgsMessageLog.logMessage(m.decode('utf8'), 'QGIS Resource Sharing')
+
+    @classmethod
+    def flush(cls):
+        pass
+
+    @classmethod
+    def isatty(cls):
+        return False
 
 
 class RemoteGitHandler(BaseRepositoryHandler):
@@ -85,7 +101,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
             os.makedirs(local_repo_dir)
             try:
                 repo = porcelain.clone(
-                    self.url, local_repo_dir
+                    self.url, local_repo_dir,
+                    errstream=writeOut
                 )
             except Exception as e:
                 # Try to clone with https if it's ssh url
@@ -93,7 +110,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 if self.url == git_parsed.url2ssh:
                     try:
                         repo = porcelain.clone(
-                            git_parsed.url2https, local_repo_dir)
+                            git_parsed.url2https, local_repo_dir,
+                            errstream=writeOut)
                     except Exception as e:
                         error_message = 'Error: %s' % str(e)
                         LOGGER.exception(traceback.format_exc())
@@ -112,7 +130,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 porcelain.pull(
                     local_repo_dir,
                     self.url,
-                    b'refs/heads/master'
+                    b'refs/heads/master',
+                    errstream=writeOut
                 )
             except Exception as e:
                 # Try to pull with https if it's ssh url
@@ -122,7 +141,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
                         porcelain.pull(
                             local_repo_dir,
                             git_parsed.url2https,
-                            b'refs/heads/master'
+                            b'refs/heads/master',
+                            errstream=writeOut
                         )
                     except Exception as e:
                         error_message = 'Error: %s' % str(e)

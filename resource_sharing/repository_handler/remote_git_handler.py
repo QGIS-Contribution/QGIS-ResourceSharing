@@ -6,14 +6,29 @@ import traceback
 
 from qgis.core import QgsApplication
 
-from ext_libs.giturlparse import parse, validate
-from ext_libs.dulwich import porcelain
+from giturlparse import parse, validate
+from dulwich import porcelain
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
-from resource_sharing.network_manager import NetworkManager
 from resource_sharing.utilities import local_collection_path
-
+from qgis.core import QgsMessageLog
 
 LOGGER = logging.getLogger('QGIS Resources Sharing')
+
+
+class writeOut():
+    """Stderr mock"""
+
+    @classmethod
+    def write(cls, m):
+        QgsMessageLog.logMessage(m.decode('utf8'), 'QGIS Resource Sharing')
+
+    @classmethod
+    def flush(cls):
+        pass
+
+    @classmethod
+    def isatty(cls):
+        return False
 
 
 class RemoteGitHandler(BaseRepositoryHandler):
@@ -61,15 +76,6 @@ class RemoteGitHandler(BaseRepositoryHandler):
     def git_repository(self):
         return self._git_repository
 
-    def fetch_metadata(self):
-        """Fetch metadata file from the repository."""
-        # Fetch the metadata
-        network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
-        status, description = network_manager.fetch()
-        if status:
-            self.metadata = network_manager.content
-        return status, description
-
     def download_collection(self, id, register_name):
         """Download a collection given its ID.
 
@@ -91,19 +97,21 @@ class RemoteGitHandler(BaseRepositoryHandler):
             'repositories',
             self.git_host, self.git_owner, self.git_repository
         )
-        if not os.path.exists(local_repo_dir):
+        if not os.path.exists(os.path.join(local_repo_dir, '.git')):
             os.makedirs(local_repo_dir)
             try:
                 repo = porcelain.clone(
-                    self.url.encode('utf-8'), local_repo_dir
+                    self.url, local_repo_dir,
+                    errstream=writeOut
                 )
             except Exception as e:
                 # Try to clone with https if it's ssh url
                 git_parsed = parse(self.url)
-                if self.url.encode('utf-8') == git_parsed.url2ssh:
+                if self.url == git_parsed.url2ssh:
                     try:
                         repo = porcelain.clone(
-                            git_parsed.url2https, local_repo_dir)
+                            git_parsed.url2https, local_repo_dir,
+                            errstream=writeOut)
                     except Exception as e:
                         error_message = 'Error: %s' % str(e)
                         LOGGER.exception(traceback.format_exc())
@@ -121,18 +129,20 @@ class RemoteGitHandler(BaseRepositoryHandler):
             try:
                 porcelain.pull(
                     local_repo_dir,
-                    self.url.encode('utf-8'),
-                    b'refs/heads/master'
+                    self.url,
+                    b'refs/heads/master',
+                    errstream=writeOut
                 )
             except Exception as e:
                 # Try to pull with https if it's ssh url
                 git_parsed = parse(self.url)
-                if self.url.encode('utf-8') == git_parsed.url2ssh:
+                if self.url == git_parsed.url2ssh:
                     try:
                         porcelain.pull(
                             local_repo_dir,
                             git_parsed.url2https,
-                            b'refs/heads/master'
+                            b'refs/heads/master',
+                            errstream=writeOut
                         )
                     except Exception as e:
                         error_message = 'Error: %s' % str(e)

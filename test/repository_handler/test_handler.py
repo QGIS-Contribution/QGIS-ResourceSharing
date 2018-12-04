@@ -1,6 +1,5 @@
 # coding=utf-8
 from qgis.testing import start_app, unittest
-import nose2
 
 from resource_sharing.repository_handler import (
     BaseRepositoryHandler,
@@ -8,8 +7,8 @@ from resource_sharing.repository_handler import (
     GithubHandler,
     BitBucketHandler,
     GogsHandler)
-from test.utilities import test_repository_url, test_data_path
 
+from test.utilities import test_data_path, test_repository_url
 
 class TestBaseHandler(unittest.TestCase):
     @classmethod
@@ -22,14 +21,15 @@ class TestBaseHandler(unittest.TestCase):
 
     def test_get_handler(self):
         handler = self.base_handler.get_handler(test_repository_url())
-        self.assertTrue(isinstance(handler, FileSystemHandler))
+        self.assertEqual(handler.__class__.__name__, 'FileSystemHandler')
 
     def test_is_git_repository(self):
         self.assertEqual(self.fs_handler.is_git_repository, False)
 
     def test_parse_metadata(self):
         """Testing parsing the metadata."""
-        self.fs_handler.fetch_metadata()
+        result, _ = self.fs_handler.fetch_metadata()
+        self.assertTrue(result)
         collections = self.fs_handler.parse_metadata()
         # There's only 1 collection defined there
         self.assertEqual(len(collections), 1)
@@ -45,7 +45,7 @@ class TestBaseHandler(unittest.TestCase):
             'author': u'Akbar Gumbira',
             'author_email': u'akbargumbira@gmail.com',
             'qgis_min_version': u'2.0',
-            'qgis_max_version': u'2.99',
+            'qgis_max_version': u'3.99',
             'license': 'GNU GPL',
             'license_url': '%s/collections/test_collection/LICENSE.txt' %test_repository_url(),
             'preview': [
@@ -146,4 +146,4 @@ class TestRemoteGitHandler(unittest.TestCase):
         self.assertEqual(remote_repo.metadata_url, expected_metadata_url)
 
 if __name__ == '__main__':
-    nose2.main()
+    unittest.main()

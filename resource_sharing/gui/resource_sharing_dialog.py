@@ -19,22 +19,38 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4 import QtGui, uic
-from PyQt4.Qt import QSize
-from PyQt4.QtCore import (
-    Qt, QSettings, pyqtSlot, QRegExp, QThread, QUrl)
-from PyQt4.QtGui import (
+from qgis.PyQt import uic
+from qgis.PyQt.Qt import QSize
+from qgis.PyQt.QtCore import (
+    Qt, QSettings, pyqtSlot, QRegExp, QUrl, QThread)
+
+from qgis.PyQt.QtGui import (
     QIcon,
-    QListWidgetItem,
-    QTreeWidgetItem,
-    QSizePolicy,
-    QMessageBox,
-    QProgressDialog,
-    QStandardItemModel,
-    QStandardItem,
     QDesktopServices,
-    QDialogButtonBox)
+    QStandardItem,
+    QStandardItemModel)
+try:
+    from qgis.PyQt.QtGui import (
+        QListWidgetItem,
+        QDialog,
+        QTreeWidgetItem,
+        QSizePolicy,
+        QMessageBox,
+        QProgressDialog,
+        QDialogButtonBox)
+except ImportError:
+    from qgis.PyQt.QtWidgets import (
+        QListWidgetItem,
+        QDialog,
+        QTreeWidgetItem,
+        QSizePolicy,
+        QMessageBox,
+        QProgressDialog,
+        QDialogButtonBox)
+
+
 from qgis.gui import QgsMessageBar
+from qgis.core import Qgis
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 from resource_sharing.repository_manager import RepositoryManager
@@ -63,7 +79,7 @@ from resource_sharing import config
 FORM_CLASS, _ = uic.loadUiType(ui_path('resource_sharing_dialog_base.ui'))
 
 
-class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
+class ResourceSharingDialog(QDialog, FORM_CLASS):
     TAB_ALL = 0
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
@@ -219,7 +235,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add another repository with the same URL!'),
-                    QgsMessageBar.CRITICAL, 5)
+                    Qgis.Critical, 5)
                 return
 
         repo_name = dlg.line_edit_name.text()
@@ -239,16 +255,16 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr(
                         'Repository is successfully added'),
-                    QgsMessageBar.SUCCESS, 5)
+                    Qgis.Success, 5)
             else:
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add repository: %s') % description,
-                    QgsMessageBar.CRITICAL, 5)
-        except Exception, e:
+                    Qgis.Critical, 5)
+        except Exception as e:
             self.message_bar.pushMessage(
                 self.tr('%s') % e,
-                QgsMessageBar.CRITICAL, 5)
+                Qgis.Critical, 5)
         finally:
             self.progress_dialog.hide()
 
@@ -276,7 +292,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
             self.message_bar.pushMessage(
                 self.tr(
                     'You can not edit the official repositories!'),
-                QgsMessageBar.WARNING, 5)
+                Qgis.Warning, 5)
             return
 
         dlg = ManageRepositoryDialog(self)
@@ -297,7 +313,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr('Unable to add another repository with the same '
                             'URL!'),
-                    QgsMessageBar.CRITICAL, 5)
+                    Qgis.Critical, 5)
                 return
 
         new_name = dlg.line_edit_name.text()
@@ -322,14 +338,14 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
             if status:
                 self.message_bar.pushMessage(
                     self.tr('Repository is successfully updated'),
-                    QgsMessageBar.SUCCESS, 5)
+                    Qgis.Success, 5)
             else:
                 self.message_bar.pushMessage(
                     self.tr('Unable to add repository: %s') % description,
-                    QgsMessageBar.CRITICAL, 5)
-        except Exception, e:
+                    Qgis.Critical, 5)
+        except Exception as e:
             self.message_bar.pushMessage(
-                self.tr('%s') % e, QgsMessageBar.CRITICAL, 5)
+                self.tr('%s') % e, Qgis.Critical, 5)
         finally:
             self.progress_dialog.hide()
 
@@ -354,7 +370,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
             self.message_bar.pushMessage(
                 self.tr(
                     'You can not remove the official repositories!'),
-                QgsMessageBar.WARNING, 5)
+                Qgis.Warning, 5)
             return
 
         warning = self.tr('Are you sure you want to remove the following '
@@ -373,7 +389,7 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         if installed_collections:
             message = ('You have some installed collections from this '
                        'repository. Please uninstall them first!')
-            self.message_bar.pushMessage(message, QgsMessageBar.WARNING, 5)
+            self.message_bar.pushMessage(message, Qgis.Warning, 5)
         else:
             self.repository_manager.remove_directory(repo_name)
             # Reload data and widget
@@ -398,17 +414,17 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
                     self.message_bar.pushMessage(
                         self.tr(
                             'Repository %s is successfully reloaded') %
-                        repo_name, QgsMessageBar.INFO, 5)
+                        repo_name, Qgis.Info, 5)
                 else:
                     self.message_bar.pushMessage(
                         self.tr(
                             'Unable to reload %s: %s') % (
                             repo_name, description),
-                        QgsMessageBar.CRITICAL, 5)
-            except Exception, e:
+                        Qgis.Critical, 5)
+            except Exception as e:
                 self.message_bar.pushMessage(
                     self.tr('%s') % e,
-                    QgsMessageBar.CRITICAL, 5)
+                    Qgis.Critical, 5)
 
         self.progress_dialog.hide()
         # Reload data and widget
@@ -436,10 +452,9 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
             self.reload_collections_model()
             message = '%s is installed successfully' % (
                 config.COLLECTIONS[self._selected_collection_id]['name'])
-            self.progress_dialog.hide()
         else:
             message = self.installer_worker.error_message
-        QtGui.QMessageBox.information(self, 'Resource Sharing', message)
+        QMessageBox.information(self, 'Resource Sharing', message)
         # Clean up the worker and thread
         self.installer_worker.deleteLater()
         self.installer_thread.quit()
@@ -463,10 +478,10 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         """Slot called when user clicks uninstall button."""
         try:
             self.collection_manager.uninstall(self._selected_collection_id)
-        except Exception, e:
+        except Exception as e:
             raise
         self.reload_collections_model()
-        QtGui.QMessageBox.information(
+        QMessageBox.information(
             self,
             'Resource Sharing',
             'The collection is uninstalled succesfully!')
@@ -583,14 +598,16 @@ class ResourceSharingDialog(QtGui.QDialog, FORM_CLASS):
         :param text: Text as the label of the progress dialog
         :type text: str
         """
-        self.progress_dialog = QProgressDialog(self)
-        self.progress_dialog.setWindowModality(Qt.WindowModal)
-        self.progress_dialog.setAutoClose(False)
-        title = self.tr('Resource Sharing')
-        self.progress_dialog.setWindowTitle(title)
+        if self.progress_dialog is None:
+            self.progress_dialog = QProgressDialog(self)
+            self.progress_dialog.setWindowModality(Qt.WindowModal)
+            self.progress_dialog.setAutoClose(False)
+            title = self.tr('Resource Sharing')
+            self.progress_dialog.setWindowTitle(title)
+            # Just use infinite progress bar here
+            self.progress_dialog.setMaximum(0)
+            self.progress_dialog.setMinimum(0)
+            self.progress_dialog.setValue(0)
+            self.progress_dialog.setLabelText(text)
+
         self.progress_dialog.show()
-        # Just use infinite progress bar here
-        self.progress_dialog.setMaximum(0)
-        self.progress_dialog.setMinimum(0)
-        self.progress_dialog.setValue(0)
-        self.progress_dialog.setLabelText(text)

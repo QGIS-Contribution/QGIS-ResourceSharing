@@ -166,9 +166,9 @@ must be 0..99
 
 def splitVersion(s):
     """ split string into 2 or 3 numerical segments """
-    if not s or type(s) not in [str, unicode]:
+    if not s or type(s) != str:
         return None
-    l = unicode(s).split('.')
+    l = s.split('.')
     for c in l:
         if not c.isnumeric():
             return None

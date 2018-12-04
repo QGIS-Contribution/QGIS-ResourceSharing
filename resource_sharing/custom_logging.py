@@ -1,7 +1,7 @@
 # coding=utf-8
 import logging
 
-from qgis.core import QgsMessageLog
+from qgis.core import QgsMessageLog, Qgis
 
 
 def setup_logger():
@@ -42,4 +42,4 @@ class QgisLogger(logging.Handler):
         QgsMessageLog.logMessage(
             record.getMessage(),
             'QGIS Resource Sharing',
-            level=QgsMessageLog.CRITICAL)
+            level=Qgis.Critical)

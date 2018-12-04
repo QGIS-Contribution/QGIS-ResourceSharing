@@ -3,21 +3,22 @@
 #
 # Author: Fabien Boucher <fabien.boucher@enovance.com>
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; version 2
-# of the License or (at your option) any later version of
-# the License.
+# Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
+# General Public License as public by the Free Software Foundation; version 2.0
+# or (at your option) any later version. You can redistribute it and/or
+# modify it under the terms of either of these two licenses.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA  02110-1301, USA.
+# You should have received a copy of the licenses; if not, see
+# <http://www.gnu.org/licenses/> for a copy of the GNU General Public License
+# and <http://www.apache.org/licenses/LICENSE-2.0> for a copy of the Apache
+# License, Version 2.0.
+#
 
 """Repo implementation atop OpenStack SWIFT."""
 
@@ -31,9 +32,16 @@ import zlib
 import tempfile
 import posixpath
 
-from urlparse import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
+
 from io import BytesIO
-from ConfigParser import ConfigParser
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
 from geventhttpclient import HTTPClient
 
 from dulwich.greenthreads import (
@@ -204,7 +212,7 @@ def pack_info_create(pack_data, pack_index):
         # Tree
         elif obj.type_num == Tree.type_num:
             shas = [(s, n, not stat.S_ISDIR(m)) for
-                    n, m, s in obj.iteritems() if not S_ISGITLINK(m)]
+                    n, m, s in obj.items() if not S_ISGITLINK(m)]
             info[obj.id] = (obj.type_num, shas)
         # Blob
         elif obj.type_num == Blob.type_num:
@@ -274,8 +282,8 @@ class SwiftConnector(object):
                                 connection_timeout=self.http_timeout,
                                 network_timeout=self.http_timeout,
                                 headers=token_header)
-        self.base_path = str(posixpath.join(urlparse(self.storage_url).path,
-                             self.root))
+        self.base_path = str(
+            posixpath.join(urlparse.urlparse(self.storage_url).path, self.root))
 
     def swift_auth_v1(self):
         self.user = self.user.replace(";", ":")
@@ -286,7 +294,7 @@ class SwiftConnector(object):
             )
         headers = {'X-Auth-User': self.user,
                    'X-Auth-Key': self.password}
-        path = urlparse(self.auth_url).path
+        path = urlparse.urlparse(self.auth_url).path
 
         ret = auth_httpclient.request('GET', path, headers=headers)
 
@@ -318,7 +326,7 @@ class SwiftConnector(object):
             connection_timeout=self.http_timeout,
             network_timeout=self.http_timeout,
             )
-        path = urlparse(self.auth_url).path
+        path = urlparse.urlparse(self.auth_url).path
         if not path.endswith('tokens'):
             path = posixpath.join(path, 'tokens')
         ret = auth_httpclient.request('POST', path,
@@ -397,7 +405,7 @@ class SwiftConnector(object):
             raise SwiftException('HEAD request failed with error code %s'
                                  % ret.status_code)
         resp_headers = {}
-        for header, value in ret.iteritems():
+        for header, value in ret.items():
             resp_headers[header.lower()] = value
         return resp_headers
 
@@ -502,7 +510,7 @@ class SwiftPackReader(object):
         self.pack_length = pack_length
         self.offset = 0
         self.base_offset = 0
-        self.buff = ''
+        self.buff = b''
         self.buff_length = self.scon.chunk_length
 
     def _read(self, more=False):
@@ -523,16 +531,14 @@ class SwiftPackReader(object):
         if self.base_offset + end > self.pack_length:
             data = self.buff[self.offset:]
             self.offset = end
-            return "".join(data)
-        try:
-            self.buff[end]
-        except IndexError:
+            return data
+        if end > len(self.buff):
             # Need to read more from swift
             self._read(more=True)
             return self.read(length)
         data = self.buff[self.offset:end]
         self.offset = end
-        return "".join(data)
+        return data
 
     def seek(self, offset):
         """Seek to a specified offset
@@ -579,8 +585,6 @@ class SwiftPackData(PackData):
     def get_object_at(self, offset):
         if offset in self._offset_cache:
             return self._offset_cache[offset]
-        assert isinstance(offset, long) or isinstance(offset, int),\
-            'offset was %r' % offset
         assert offset >= self._header_size
         pack_reader = SwiftPackReader(self.scon, self._filename,
                                       self.pack_length)
@@ -803,7 +807,8 @@ class SwiftObjectStore(PackBasedObjectStore):
         # Move the pack in.
         entries.sort()
         pack_base_name = posixpath.join(
-            self.pack_dir, 'pack-' + iter_sha1(e[0] for e in entries))
+            self.pack_dir,
+            'pack-' + iter_sha1(e[0] for e in entries).decode(sys.getfilesystemencoding()))
         self.scon.put_object(pack_base_name + '.pack', f)
 
         # Write the index.
@@ -842,7 +847,7 @@ class SwiftInfoRefsContainer(InfoRefsContainer):
         self.store = store
         f = self.scon.get_object(self.filename)
         if not f:
-            f = BytesIO('')
+            f = BytesIO(b'')
         super(SwiftInfoRefsContainer, self).__init__(f)
 
     def _load_check_ref(self, name, old_ref):
@@ -922,6 +927,13 @@ class SwiftRepo(BaseRepo):
         refs = SwiftInfoRefsContainer(self.scon, object_store)
         BaseRepo.__init__(self, object_store, refs)
 
+    def _determine_file_mode(self):
+        """Probe the file-system to determine whether permissions can be trusted.
+
+        :return: True if permissions can be trusted, False otherwise.
+        """
+        return False
+
     def _put_named_file(self, filename, contents):
         """Put an object in a Swift container
 
@@ -944,7 +956,7 @@ class SwiftRepo(BaseRepo):
         scon.create_root()
         for obj in [posixpath.join(OBJECTDIR, PACKDIR),
                     posixpath.join(INFODIR, 'refs')]:
-            scon.put_object(obj, BytesIO(''))
+            scon.put_object(obj, BytesIO(b''))
         ret = cls(scon.root, conf)
         ret._init_files(True)
         return ret

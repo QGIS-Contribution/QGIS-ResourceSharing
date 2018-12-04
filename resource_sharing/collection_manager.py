@@ -5,7 +5,7 @@ import shutil
 import logging
 import traceback
 
-from PyQt4.QtCore import (
+from qgis.PyQt.QtCore import (
     pyqtSignal, QObject)
 
 from resource_sharing import config
@@ -59,7 +59,7 @@ class CollectionInstaller(QObject):
             self.progress.emit('Installing the collection...')
             try:
                 self._collection_manager.install(self._collection_id)
-            except Exception, e:
+            except Exception as e:
                 self.error_message = e
                 LOGGER.exception(traceback.format_exc())
         else:

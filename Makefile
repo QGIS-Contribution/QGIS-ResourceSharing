@@ -30,3 +30,29 @@ release-tag:
 	@echo "Version: " ${VERSION}
 	@git tag v${VERSION} -m "Version ${VERSION}"
 	@git push origin v${VERSION}
+
+devzip:
+	@echo "Making a zip package with current tree"
+	@if [ -d "${WORK_DIR}/${PLUGIN}" ]; then \
+		echo "Deleting ${WORK_DIR}/${PLUGIN}..." \
+		rm -rf "${WORK_DIR}/${PLUGIN}"; \
+	fi
+	@if [ -e "${OUTPUT}" ]; then \
+		echo "Deleting ${OUTPUT}..." \
+		rm -rf "${OUTPUT}"; \
+	fi
+	@mkdir -p ${WORK_DIR}/${PLUGIN}
+	cp -r * ${WORK_DIR}/${PLUGIN}
+	@rm -rf ${WORK_DIR}/${PLUGIN}/*.sh
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.git*
+	@rm -rf ${WORK_DIR}/${PLUGIN}/test
+	@rm -rf ${WORK_DIR}/${PLUGIN}/scripts
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.travis.yml
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.coverage
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.coveragerc
+	@rm -rf ${WORK_DIR}/${PLUGIN}/pylintrc
+	@cd ${WORK_DIR} && zip -r ${OUTPUT} * --exclude \*.pyc
+	@echo "Your plugin archive has been generated:"
+	@ls -lah ${OUTPUT}
+	@echo "${OUTPUT}"
+

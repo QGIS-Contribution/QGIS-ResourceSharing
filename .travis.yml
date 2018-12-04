@@ -1,48 +1,40 @@
-language: python
-
-sudo: required
-dist: trusty
-
-before_install:
-  - sudo apt-get -qq -y update
+services:
+    - docker
 
 env:
-  - QGIS_REPO=http://qgis.org/debian-ltr
-#  - QGIS_REPO=http://qgis.org/debian-nightly-release
+  global:
+    - IMAGE=qgis/qgis
+
+  matrix:
+    - QGIS_VERSION_TAG=latest
+
+language: python
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+python:
+  - "3.6"
 
 addons:
   apt:
     packages:
-    - python-software-properties
+      - git
+      - python-software-properties
 
 before_install:
-  - sudo apt-get -qq -y update
+  - docker pull ${IMAGE}:${QGIS_VERSION_TAG}
 
 install:
-  - sudo add-apt-repository ${QGIS_REPO}
-  - sudo apt-get update
-  - sudo apt-get install -y --force-yes qgis python-qgis xvfb
-  - sudo pip install nose2==0.6.0
-  - sudo pip install cov-core python-coveralls pep8
-
-before_script:
-  - export QGIS_PREFIX_PATH=/usr
-  - export PYTHONPATH=${QGIS_PREFIX_PATH}/share/qgis/python/:${QGIS_PREFIX_PATH}/share/qgis/python/plugins:`pwd`
-  - export LD_LIBRARY_PATH=${QGIS_PREFIX_PATH}/lib
+  - pip install --upgrade pip
+  - pip install --upgrade pylint
+  - pip install --upgrade pycodestyle
+  - docker run -d --name qgis-testing-environment -v ${TRAVIS_BUILD_DIR}:/tests_directory -e DISPLAY=:99 ${IMAGE}:${QGIS_VERSION_TAG}
+  - sleep 10
+  - docker exec -it qgis-testing-environment sh -c "qgis_setup.sh qgis_resource_sharing"
 
 script:
-  - export PATH=/usr/bin:$PATH
-  - pep8 resource_sharing
-  - xvfb-run nose2 -s test --with-coverage
+  - docker exec -it qgis-testing-environment sh -c "cd /tests_directory && qgis_testrunner.sh test_suite.test_qgis3"
 
-after_success:
-  - coveralls
-
-notifications:
-  webhooks:
-    urls:
-      - https://webhooks.gitter.im/e/f55e2fa1a258c0906e3b
-    on_success: change  # options: [always|never|change] default: always
-    on_failure: always  # options: [always|never|change] default: always
-    on_start: never     # options: [always|never|change] default: always
-
+sudo: false

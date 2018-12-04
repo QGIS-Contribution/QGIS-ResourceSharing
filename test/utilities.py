@@ -1,7 +1,7 @@
 # coding=utf-8
 import os
 
-from PyQt4.QtCore import QUrl
+from qgis.PyQt.QtCore import QUrl
 
 def test_data_path(*args):
     """Return the absolute path to the InaSAFE test data or directory path.

@@ -1,9 +1,9 @@
 # coding=utf-8
 import os
 
-from PyQt4.QtXml import QDomDocument
-from PyQt4.QtCore import QFile, QIODevice
-from qgis.core import QgsSymbolLayerV2Utils
+from qgis.PyQt.QtXml import QDomDocument
+from qgis.PyQt.QtCore import QFile, QIODevice
+from qgis.core import QgsSymbolLayerUtils, QgsReadWriteContext, QgsProject
 
 
 class SymbolXMLExtractor(object):
@@ -40,9 +40,11 @@ class SymbolXMLExtractor(object):
         self._symbols = []
         symbols_element = document_element.firstChildElement('symbols')
         symbol_element = symbols_element.firstChildElement()
+        context = QgsReadWriteContext()
+        context.setPathResolver(QgsProject.instance().pathResolver())
         while not symbol_element.isNull():
             if symbol_element.tagName() == 'symbol':
-                symbol = QgsSymbolLayerV2Utils.loadSymbol(symbol_element)
+                symbol = QgsSymbolLayerUtils.loadSymbol(symbol_element, context)
                 if symbol:
                     self._symbols.append({
                         'name': symbol_element.attribute('name'),
@@ -56,7 +58,7 @@ class SymbolXMLExtractor(object):
         ramp_element = ramps_element.firstChildElement()
         while not ramp_element.isNull():
             if ramp_element.tagName() == 'colorramp':
-                colorramp = QgsSymbolLayerV2Utils.loadColorRamp(ramp_element)
+                colorramp = QgsSymbolLayerUtils.loadColorRamp(ramp_element)
                 if colorramp:
                     self._colorramps.append({
                         'name': ramp_element.attribute('name'),

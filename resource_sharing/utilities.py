@@ -2,8 +2,11 @@
 import os
 import ntpath
 
-from PyQt4.QtCore import QDir
-from qgis.core import QgsApplication, QGis
+from qgis.PyQt.QtCore import QDir
+try:
+    from qgis.core import QgsApplication, QGis as Qgis
+except ImportError:
+    from qgis.core import QgsApplication, Qgis
 
 from resource_sharing import config
 import jinja2
@@ -83,7 +86,7 @@ def qgis_version():
     :returns: QGIS Version where 10700 represents QGIS 1.7 etc.
     :rtype: int
     """
-    version = unicode(QGis.QGIS_VERSION_INT)
+    version = unicode(Qgis.QGIS_VERSION_INT)
     version = int(version)
     return version
 

@@ -1,9 +1,14 @@
 # coding=utf-8
 import logging
-import urlparse
+
+try:
+    from urlparse import urljoin
+except ImportError:
+    from urllib.parse import urljoin
+
 from zipfile import ZipFile
 
-from PyQt4.QtCore import QTemporaryFile
+from qgis.PyQt.QtCore import QTemporaryFile
 
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
@@ -26,15 +31,6 @@ class RemoteZipHandler(BaseRepositoryHandler):
             if self._parsed_url.scheme in ['http', 'https']:
                 return True
         return False
-
-    def fetch_metadata(self):
-        """Fetch metadata file from the url."""
-        # Download the metadata
-        network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
-        status, description = network_manager.fetch()
-        if status:
-            self.metadata = network_manager.content
-        return status, description
 
     def download_collection(self, id, register_name):
         """Download a collection given its ID.
@@ -68,4 +64,4 @@ class RemoteZipHandler(BaseRepositoryHandler):
         return True, None
 
     def file_url(self, relative_path):
-        return urlparse.urljoin(self.url, relative_path)
+        return urljoin(self.url, relative_path)

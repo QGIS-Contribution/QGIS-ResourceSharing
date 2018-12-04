@@ -2,7 +2,7 @@
 from qgis.testing import start_app, unittest
 import nose2
 
-from PyQt4.QtCore import QUrl
+from qgis.PyQt.QtCore import QUrl
 from resource_sharing.resource_handler.symbol_resolver_mixin import (
     resolve_path,
     fix_xml_node)
@@ -13,6 +13,13 @@ class TestSymbolResolverMixin(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         start_app()
+
+
+    def _to_str(self, buffer):
+        """For Py3 compat, this will transform a byte into string"""
+        if type(buffer) == 'str':
+            return buffer
+        return buffer.decode('utf-8')
 
     def test_fix_xml_node(self):
         """Test if fixing xml node works."""
@@ -33,7 +40,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
             </symbol>
         """
         collection_path = test_data_path('collections', 'test_collection')
-        fixed_xml = fix_xml_node(symbol_xml, collection_path, [])
+        fixed_xml = self._to_str(fix_xml_node(symbol_xml, collection_path, []))
         expected_xml = """<symbol alpha="1" clip_to_extent="1" name="fill_raster" type="fill">
                 <layer class="RasterFill" locked="0" pass="0">
                     <prop k="alpha" v="1" />
@@ -73,7 +80,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
 
         # Test case 3:  http url
         img_path = 'http://qgis.org/test/image.svg'
-        img_url = QUrl.fromLocalFile(img_path)
+        img_url = QUrl(img_path)
         fixed_path = resolve_path(
             img_url.toString(), collection_path, search_paths)
         self.assertEqual(fixed_path, img_path)

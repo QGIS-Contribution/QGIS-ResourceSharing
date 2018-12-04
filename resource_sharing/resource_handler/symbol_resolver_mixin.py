@@ -2,7 +2,7 @@
 import os
 import xml.etree.ElementTree as ET
 
-from PyQt4.QtCore import QFileInfo, QUrl, Qt, QFile
+from qgis.PyQt.QtCore import QFileInfo, QUrl, Qt, QFile
 from qgis.core import QgsApplication
 
 from resource_sharing.utilities import path_leaf
@@ -23,13 +23,13 @@ class SymbolResolverMixin(object):
         :param xml_path: The path to the style xml file.
         :type xml_path: str
         """
-        with open(xml_path, 'r') as xml_file:
+        with open(xml_path, 'rb') as xml_file:
             symbol_xml = xml_file.read()
 
         updated_xml = fix_xml_node(
             symbol_xml, self.collection_path, QgsApplication.svgPaths())
 
-        with open(xml_path, 'w') as xml_file:
+        with open(xml_path, 'wb') as xml_file:
             xml_file.write(updated_xml)
 
 
@@ -82,7 +82,7 @@ def resolve_path(path, collection_path, search_paths):
         return QFileInfo(path).canonicalFilePath()
 
     # It might be a url
-    if '://'in path:
+    if '://' in path:
         url = QUrl(path)
         if url.isValid() and url.scheme() != '':
             if url.scheme().lower() == 'file':

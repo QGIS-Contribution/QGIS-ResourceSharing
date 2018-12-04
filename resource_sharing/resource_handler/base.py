@@ -1,6 +1,8 @@
 # coding=utf-8
 import os
 
+from six import add_metaclass
+
 from resource_sharing.utilities import local_collection_path
 from resource_sharing import config
 
@@ -21,9 +23,9 @@ class ResourceHandlerMeta(type):
         super(ResourceHandlerMeta, cls).__init__(name, bases, dct)
 
 
+@add_metaclass(ResourceHandlerMeta)
 class BaseResourceHandler(object):
     """Abstract class of handler."""
-    __metaclass__ = ResourceHandlerMeta
 
     IS_DISABLED = True
 

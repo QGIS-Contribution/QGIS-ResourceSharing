@@ -25,11 +25,9 @@
 import sys
 import os
 
-from qgis.core import QgsApplication
-
 # Dulwich tries to call sys.argv while in QGIS, argv module is missing
 if not hasattr(sys, 'argv'):
-    sys.argv = QgsApplication.instance().argv()
+    sys.argv = []
 
 sys.path.append(os.path.dirname(__file__))
 

@@ -9,7 +9,6 @@ from qgis.core import QgsApplication
 from giturlparse import parse, validate
 from dulwich import porcelain
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
-from resource_sharing.network_manager import NetworkManager
 from resource_sharing.utilities import local_collection_path
 
 
@@ -60,15 +59,6 @@ class RemoteGitHandler(BaseRepositoryHandler):
     @property
     def git_repository(self):
         return self._git_repository
-
-    def fetch_metadata(self):
-        """Fetch metadata file from the repository."""
-        # Fetch the metadata
-        network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
-        status, description = network_manager.fetch()
-        if status:
-            self.metadata = network_manager.content
-        return status, description
 
     def download_collection(self, id, register_name):
         """Download a collection given its ID.

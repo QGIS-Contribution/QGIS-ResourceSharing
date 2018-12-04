@@ -17,6 +17,7 @@ from ext_libs.giturlparse import validate as git_validate
 from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
 from resource_sharing.exception import MetadataError
 from resource_sharing.version_compare import isCompatible
+from resource_sharing.network_manager import NetworkManager
 
 
 LOGGER = logging.getLogger('QGIS Resources Sharing')
@@ -123,8 +124,14 @@ class BaseRepositoryHandler(object):
         self._metadata = metadata
 
     def fetch_metadata(self):
-        """Fetch the content of the metadata."""
-        raise NotImplementedError
+        """Fetch metadata file from the url."""
+        # Download the metadata
+        network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
+        status, description = network_manager.fetch()
+        if status:
+            self.metadata = bytes(network_manager.content).decode('utf8')
+        return status, description
+
 
     def parse_metadata(self):
         """Parse str metadata to collection dict."""

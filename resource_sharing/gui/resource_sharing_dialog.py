@@ -50,6 +50,7 @@ except ImportError:
 
 
 from qgis.gui import QgsMessageBar
+from qgis.core import Qgis
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 from resource_sharing.repository_manager import RepositoryManager
@@ -234,7 +235,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add another repository with the same URL!'),
-                    QgsMessageBar.CRITICAL, 5)
+                    Qgis.Critical, 5)
                 return
 
         repo_name = dlg.line_edit_name.text()
@@ -254,16 +255,16 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr(
                         'Repository is successfully added'),
-                    QgsMessageBar.SUCCESS, 5)
+                    Qgis.Success, 5)
             else:
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add repository: %s') % description,
-                    QgsMessageBar.CRITICAL, 5)
+                    Qgis.Critical, 5)
         except Exception as e:
             self.message_bar.pushMessage(
                 self.tr('%s') % e,
-                QgsMessageBar.CRITICAL, 5)
+                Qgis.Critical, 5)
         finally:
             self.progress_dialog.hide()
 
@@ -291,7 +292,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.message_bar.pushMessage(
                 self.tr(
                     'You can not edit the official repositories!'),
-                QgsMessageBar.WARNING, 5)
+                Qgis.Warning, 5)
             return
 
         dlg = ManageRepositoryDialog(self)
@@ -312,7 +313,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr('Unable to add another repository with the same '
                             'URL!'),
-                    QgsMessageBar.CRITICAL, 5)
+                    Qgis.Critical, 5)
                 return
 
         new_name = dlg.line_edit_name.text()
@@ -337,14 +338,14 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             if status:
                 self.message_bar.pushMessage(
                     self.tr('Repository is successfully updated'),
-                    QgsMessageBar.SUCCESS, 5)
+                    Qgis.Success, 5)
             else:
                 self.message_bar.pushMessage(
                     self.tr('Unable to add repository: %s') % description,
-                    QgsMessageBar.CRITICAL, 5)
+                    Qgis.Critical, 5)
         except Exception as e:
             self.message_bar.pushMessage(
-                self.tr('%s') % e, QgsMessageBar.CRITICAL, 5)
+                self.tr('%s') % e, Qgis.Critical, 5)
         finally:
             self.progress_dialog.hide()
 
@@ -369,7 +370,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.message_bar.pushMessage(
                 self.tr(
                     'You can not remove the official repositories!'),
-                QgsMessageBar.WARNING, 5)
+                Qgis.Warning, 5)
             return
 
         warning = self.tr('Are you sure you want to remove the following '
@@ -388,7 +389,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         if installed_collections:
             message = ('You have some installed collections from this '
                        'repository. Please uninstall them first!')
-            self.message_bar.pushMessage(message, QgsMessageBar.WARNING, 5)
+            self.message_bar.pushMessage(message, Qgis.Warning, 5)
         else:
             self.repository_manager.remove_directory(repo_name)
             # Reload data and widget
@@ -413,17 +414,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     self.message_bar.pushMessage(
                         self.tr(
                             'Repository %s is successfully reloaded') %
-                        repo_name, QgsMessageBar.INFO, 5)
+                        repo_name, Qgis.Info, 5)
                 else:
                     self.message_bar.pushMessage(
                         self.tr(
                             'Unable to reload %s: %s') % (
                             repo_name, description),
-                        QgsMessageBar.CRITICAL, 5)
+                        Qgis.Critical, 5)
             except Exception as e:
                 self.message_bar.pushMessage(
                     self.tr('%s') % e,
-                    QgsMessageBar.CRITICAL, 5)
+                    Qgis.Critical, 5)
 
         self.progress_dialog.hide()
         # Reload data and widget

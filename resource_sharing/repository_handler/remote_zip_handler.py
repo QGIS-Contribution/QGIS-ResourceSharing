@@ -32,15 +32,6 @@ class RemoteZipHandler(BaseRepositoryHandler):
                 return True
         return False
 
-    def fetch_metadata(self):
-        """Fetch metadata file from the url."""
-        # Download the metadata
-        network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
-        status, description = network_manager.fetch()
-        if status:
-            self.metadata = network_manager.content
-        return status, description
-
     def download_collection(self, id, register_name):
         """Download a collection given its ID.
 

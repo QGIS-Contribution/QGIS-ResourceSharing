@@ -26,7 +26,7 @@ except ImportError: # QGIS 3.x
 from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 try:
     from .utilities import test_data_path
-except SystemError:
+except ImportError:
     from test.utilities import test_data_path
 
 

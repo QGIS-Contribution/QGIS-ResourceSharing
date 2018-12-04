@@ -43,6 +43,7 @@ class ResourceSharingDialogTest(unittest.TestCase):
         """Runs after each test."""
         self.dialog = None
 
+    @unittest.skip("No please.")
     def test_dialog_help(self):
         """Test we can click Help."""
         button = self.dialog.button_box.button(QDialogButtonBox.Help)

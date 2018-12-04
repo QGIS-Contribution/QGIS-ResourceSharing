@@ -3,10 +3,7 @@ import os
 
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.PyQt.QtCore import QFile, QIODevice
-try:
-    from qgis.core import QgsSymbolLayerV2Utils as QgsSymbolLayerUtils
-except ImportError:
-    from qgis.core import QgsSymbolLayerUtils
+from qgis.core import QgsSymbolLayerUtils, QgsReadWriteContext, QgsProject
 
 
 class SymbolXMLExtractor(object):
@@ -43,9 +40,11 @@ class SymbolXMLExtractor(object):
         self._symbols = []
         symbols_element = document_element.firstChildElement('symbols')
         symbol_element = symbols_element.firstChildElement()
+        context = QgsReadWriteContext()
+        context.setPathResolver(QgsProject.instance().pathResolver())
         while not symbol_element.isNull():
             if symbol_element.tagName() == 'symbol':
-                symbol = QgsSymbolLayerUtils.loadSymbol(symbol_element)
+                symbol = QgsSymbolLayerUtils.loadSymbol(symbol_element, context)
                 if symbol:
                     self._symbols.append({
                         'name': symbol_element.attribute('name'),

@@ -24,7 +24,10 @@ except ImportError: # QGIS 3.x
         QgsMarkerSymbol)
 
 from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
-from .utilities import test_data_path
+try:
+    from .utilities import test_data_path
+except SystemError:
+    from utilities import test_data_path
 
 
 class TestSymbolXMLExtractor(unittest.TestCase):
@@ -37,6 +40,7 @@ class TestSymbolXMLExtractor(unittest.TestCase):
         xml_path = test_data_path(
             'collections', 'test_collection', 'symbol', 'various_symbols.xml')
         extractor = SymbolXMLExtractor(xml_path)
+        self.assertTrue(extractor.parse_xml())
         # There are 9 symbols and 3 colorramps there
         expected_symbols = {
             'fill_raster': QgsFillSymbol,

@@ -8,14 +8,10 @@ except:
 import logging
 
 from six import add_metaclass
-try:
-    from ConfigParser import SafeConfigParser
-    from urlparse import urlparse
-    from qgis.core import QGis as Qgis
-except ImportError:
-    from configparser import SafeConfigParser
-    from urllib.parse import urlparse
-    from qgis.core import Qgis
+
+from configparser import ConfigParser
+from urllib.parse import urlparse
+from qgis.core import Qgis
 
 from ext_libs.giturlparse import validate as git_validate
 from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
@@ -139,14 +135,11 @@ class BaseRepositoryHandler(object):
 
         collections = []
 
-        try:  # Py3/Qt5
-            metadata_file = StringIO(self.metadata)
-        except:  # Py2/Q4
-            metadata_file = StringIO(bytes(self.metadata).decode('utf-8'))
+        metadata_file = StringIO(self.metadata)
 
         try:
-            parser = SafeConfigParser()
-            parser.readfp(metadata_file)
+            parser = ConfigParser()
+            parser.read_file(metadata_file)
             collections_str = parser.get('general', 'collections')
         except Exception as e:
             raise MetadataError('Error parsing metadata: %s' % e)

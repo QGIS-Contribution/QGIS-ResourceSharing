@@ -8,12 +8,7 @@ from resource_sharing.repository_handler import (
     BitBucketHandler,
     GogsHandler)
 
-try:
-    from ..utilities import test_data_path, test_repository_url
-except SystemError:
-    from test.utilities import test_data_path, test_repository_url
-
-
+from test.utilities import test_data_path, test_repository_url
 
 class TestBaseHandler(unittest.TestCase):
     @classmethod

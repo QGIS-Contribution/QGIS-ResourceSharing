@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import QUrl
 from resource_sharing.resource_handler.symbol_resolver_mixin import (
     resolve_path,
     fix_xml_node)
-from ..utilities import test_data_path
+from test.utilities import test_data_path
 
 
 class TestSymbolResolverMixin(unittest.TestCase):

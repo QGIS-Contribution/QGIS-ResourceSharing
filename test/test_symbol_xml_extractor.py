@@ -27,7 +27,7 @@ from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 try:
     from .utilities import test_data_path
 except SystemError:
-    from utilities import test_data_path
+    from test.utilities import test_data_path
 
 
 class TestSymbolXMLExtractor(unittest.TestCase):

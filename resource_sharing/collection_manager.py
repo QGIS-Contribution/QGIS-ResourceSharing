@@ -110,7 +110,7 @@ class CollectionManager(object):
         :rtype: dict
         """
         installed_collections = {}
-        for id, collection in config.COLLECTIONS.iteritems():
+        for id, collection in config.COLLECTIONS.items():
             if collection['status'] != COLLECTION_INSTALLED_STATUS:
                 continue
 

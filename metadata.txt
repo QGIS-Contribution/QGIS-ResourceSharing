@@ -5,22 +5,20 @@ qgisMaximumVersion=3.99
 description=Download collections shared by other users
 about=Developed as GSoC 2016 project, this plugin allows users to search for available collections and install them. Users can also create repositories to put the collections there. There are some options where to put the repository: Github, Bitbucket, local file system, or with https(s). Please read the documentation for more information.
 icon=resources/icon.png
-version=0.6.0
+version=0.8.0
 tags=symbol, style, svg, processing, collections, processing, maps, design, repository
 homepage=http://www.akbargumbira.com/qgis_resources_sharing/
 tracker=https://github.com/akbargumbira/qgis_resources_sharing/issues
 repository=https://github.com/akbargumbira/qgis_resources_sharing
-experimental=True
+experimental=False
 deprecated=False
-# changelog=
-
-# Author
 author=Akbar Gumbira
 email=akbargumbira@gmail.com
-
-# Changelog
 changelog=
-    0.6.0 - Experimental version for QGIS 3
+        0.8.0 - Fix issue #59 (deleting repositories does not work)
+        0.7.0 - Flip experimental flag
+              - Merge PR from havatv (issue #60 - avoid breaking on incompatible versions)
+        0.6.0 - Experimental version for QGIS 3
 	0.5.2 - Add support for gitlab and gogs repositories (PR by Salvatore Larosa - gh username: slarosa)
 	0.5.1 - Allow authors to add license details in the collection
 	0.5.1 - Fixed problem in QGIS < 2.12 as a result of using the new QgsAuthManager

@@ -174,7 +174,7 @@ class BaseRepositoryHandler(object):
                     '%s' % (
                         collection, Qgis.QGIS_VERSION, qgis_min_version,
                         qgis_max_version))
-                break
+                continue
 
             # Collection is compatible, continue parsing
             try:

@@ -15,7 +15,7 @@ deprecated=False
 author=Akbar Gumbira
 email=akbargumbira@gmail.com
 changelog=
-        0.9.0 - More fixes
+        0.9.0 - Support for R scripts
         0.8.0 - Fix issue #59 (deleting repositories does not work)
         0.7.0 - Flip experimental flag
               - Merge PR from havatv (issue #60 - avoid breaking on incompatible versions)

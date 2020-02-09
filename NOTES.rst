@@ -6,7 +6,7 @@ R script support (9 Februar 2020)
 
 R scripts that are placed in::
 
-  collections``/<collections registry name>/rscripts
+  collections/<collections registry name>/rscripts
 
 in a resource sharing repository will be imported into the default
 R script folder ``rscripts``, that is located in the QGIS Processing

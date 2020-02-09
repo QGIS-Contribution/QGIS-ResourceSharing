@@ -1,8 +1,8 @@
 Implementation addendum
 -----------------------
 
-R script support
-................
+R script support (9 Februar 2020)
+.................................
 
 R scripts that are placed in::
 

@@ -18,8 +18,8 @@ If that directory is in the Proccessing R Provider
 in the Processing Toolbox under R.
 
 The "QGIS Resources Sharing Repository" (https://github.com/qgis/QGIS-Resources)
-contains the QGIS 2 R online scripts, and serves as a
-demonstion.
+contains the QGIS 2 online R scripts (``qgis_rscripts`` -
+*QGIS R script collection*), and serves as a demonstion.
 
 
 Conversation Ale-Akbar from 15/07/2016

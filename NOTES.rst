@@ -1,6 +1,26 @@
 Implementation addendum
 -----------------------
 
+R script support
+................
+
+R scripts that are placed in::
+
+  collections``/<collections registry name>/rscripts
+
+will be imported into the default
+
+  processing/rscripts
+
+folder in user QGIS directory.
+If that directory is in the Proccessing R Provider
+``R scripts folder`` path, the scripts will become available
+in the Processing Toolbox under R.
+
+The "QGIS Resources Sharing Repository" (https://github.com/qgis/QGIS-Resources)
+contains the QGIS 2 R online scripts, and serves as a
+demonstion.
+
 
 Conversation Ale-Akbar from 15/07/2016
 .......................................

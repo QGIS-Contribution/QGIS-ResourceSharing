@@ -13,7 +13,8 @@ R script folder ``rscripts``, that is located in the QGIS Processing
 user folder (``.local/share/QGIS/QGIS3/profile/default/processing`` on Ubuntu).
 If that directory is in the Proccessing R Provider
 ``R scripts folder`` path, the scripts will become available
-in the Processing Toolbox under R.
+in the Processing Toolbox under ``R`` (if the *Processing R Provider*
+plugin is installed and configured).
 
 The "QGIS Resources Sharing Repository" (https://github.com/qgis/QGIS-Resources)
 contains the QGIS 2 online R scripts. The collection has the id ``qgis_rscripts``,

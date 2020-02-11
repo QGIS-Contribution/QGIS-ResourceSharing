@@ -1,6 +1,26 @@
 Implementation addendum
 -----------------------
 
+R script support (9 Februar 2020)
+.................................
+
+R scripts that are placed in::
+
+  collections/<collections registry id>/rscripts
+
+in a resource sharing repository will be imported into the default
+R script folder ``rscripts``, that is located in the QGIS Processing
+user folder (``.local/share/QGIS/QGIS3/profile/default/processing`` on Ubuntu).
+If that directory is in the Proccessing R Provider
+``R scripts folder`` path, the scripts will become available
+in the Processing Toolbox under ``R`` (if the *Processing R Provider*
+plugin is installed and configured).
+
+The "QGIS Resources Sharing Repository" (https://github.com/qgis/QGIS-Resources)
+contains the QGIS 2 online R scripts. The collection has the id ``qgis_rscripts``,
+and the name is *QGIS R script collection*. It can be used for testing and as
+a "template" for creating new R script collections.
+
 
 Conversation Ale-Akbar from 15/07/2016
 .......................................

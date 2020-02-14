@@ -65,7 +65,8 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
     def refresh_script_provider(self):
         """Refresh the processing script provider."""
-        QgsApplication.processingRegistry().providerById("script").refreshAlgorithms()
+        if QgsApplication.processingRegistry().providerById("script") is not None:
+             QgsApplication.processingRegistry().providerById("script").refreshAlgorithms()
 
     def scripts_folder(self):
         """Return the default processing scripts folder."""

@@ -61,7 +61,9 @@ class RScriptHandler(BaseResourceHandler):
             self.refresh_Rscript_provider()
 
     def uninstall(self):
-        """Uninstall the processing scripts from processing toolbox."""
+        """Uninstall the r scripts from processing toolbox."""
+        if not os.path.exists(self.resource_dir):
+            return
         # Remove the R script files that are present in this collection
         for item in os.listdir(self.resource_dir):
             file_path = os.path.join(self.resource_dir, item)

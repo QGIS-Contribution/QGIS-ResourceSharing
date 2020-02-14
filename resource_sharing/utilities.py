@@ -65,7 +65,7 @@ def local_collection_path(id=None):
     If id is not passed, it will just return the root dir of the collections.
     """
     path = os.path.join(
-        QDir.homePath(),
+        QDir.toNativeSeparators(QDir.homePath()),
         'QGIS',
         'Resource Sharing')
     if id:

@@ -1,5 +1,8 @@
 # coding=utf-8
 import os
+# Use pathlib instead of os.path?
+# from pathlib import Path
+
 import ntpath
 
 from qgis.PyQt.QtCore import QDir
@@ -21,9 +24,12 @@ def resources_path(*args):
     :return: Absolute path to the resources folder.
     :rtype: str
     """
+    # path = Path(os.path.dirname(__file__))
     path = os.path.dirname(os.path.dirname(__file__))
+    # path = (path / 'resources').absolute
     path = os.path.abspath(os.path.join(path, 'resources'))
     for item in args:
+        # path = (path / item).absolute
         path = os.path.abspath(os.path.join(path, item))
 
     return path
@@ -38,9 +44,12 @@ def ui_path(*args):
     :return: Absolute path to the ui file.
     :rtype: str
     """
+    # path = Path(os.path.dirname(__file__))
     path = os.path.dirname(__file__)
+    # path = (path / 'gui' / 'ui').absolute
     path = os.path.abspath(os.path.join(path, 'gui', 'ui'))
     for item in args:
+        # path = (path / item).absolute
         path = os.path.abspath(os.path.join(path, item))
 
     return path
@@ -53,6 +62,7 @@ def repo_settings_group():
 
 def repositories_cache_path():
     """Get the path to the repositories cache."""
+    # return Path(QgsApplication.qgisSettingsDirPath()) / 'resource_sharing' / 'repositories_cache'
     return os.path.join(
         QgsApplication.qgisSettingsDirPath(),
         'resource_sharing',
@@ -64,6 +74,7 @@ def local_collection_path(id=None):
 
     If id is not passed, it will just return the root dir of the collections.
     """
+    # path = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
     path = os.path.join(
         QDir.toNativeSeparators(QDir.homePath()),
         'QGIS',
@@ -71,6 +82,7 @@ def local_collection_path(id=None):
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         dir_name = '%s (%s)' % (collection_name, id)
+        # path = path / dir_name
         path = os.path.join(path, dir_name)
     return path
 
@@ -100,6 +112,7 @@ def render_template(filename, context):
     :type context: dict
     """
     path = os.path.dirname(__file__)
+    # path = path / os.pardir / 'resources' / 'template').absolute()
     path = os.path.abspath(
         os.path.join(path, os.pardir, 'resources', 'template'))
     return jinja2.Environment(

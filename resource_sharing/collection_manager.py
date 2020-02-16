@@ -1,6 +1,8 @@
 # coding=utf-8
 import hashlib
 import os
+# Use pathlib instead of os.path?
+# from pathlib import Path
 import shutil
 import logging
 import traceback
@@ -165,8 +167,17 @@ class CollectionManager(object):
 
         # Remove the collection directory
         collection_dir = local_collection_path(collection_id)
+        # if collection_dir.exists():
         if os.path.exists(collection_dir):
             shutil.rmtree(collection_dir)
 
         config.COLLECTIONS[collection_id]['status'] = \
             COLLECTION_NOT_INSTALLED_STATUS
+
+        # Should items from other installed collections be reinstalled
+        # "automatically"?
+        # Relevant if an item in another installed collection has the same
+        # file name as one of the files that have been removed (and is
+        # installed in the same directory).
+        # for coll_id in config.COLLECTIONS:
+        #     install(self, coll_id)

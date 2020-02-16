@@ -1,5 +1,7 @@
 # coding=utf-8
 import os
+# Use pathlib instead of os.path?
+# from pathlib import Path
 
 from six import add_metaclass
 
@@ -57,6 +59,7 @@ class BaseResourceHandler(object):
     @property
     def resource_dir(self):
         """The root of the resource dir from this type of the resource."""
+        # resource_dir = local_collection_path(self.collection_id) / self.dir_name()
         resource_dir = os.path.join(
             local_collection_path(self.collection_id), self.dir_name())
         return resource_dir

@@ -1,3 +1,6 @@
+**THIS REPOSITORY HAS BEEN MOVED TO https://github.com/QGIS-Contribution/Resource_Sharing UNDER QGIS CONTRIB** 
+
+
 QGIS Resources Sharing Plugin
 ==============================
 QGIS Resources Sharing allows you to share collections (set of resources: 

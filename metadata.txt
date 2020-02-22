@@ -1,24 +1,20 @@
 [general]
 name=QGIS Resource Sharing
+email=akbargumbira@gmail.com
+author=Akbar Gumbira
 qgisMinimumVersion=3.0
-qgisMaximumVersion=3.99
 description=Download collections shared by other users
 about=Developed as GSoC 2016 project, this plugin allows users to search for available collections and install them. Users can also create repositories to put the collections there. There are some options where to put the repository: Github, Bitbucket, local file system, or with https(s). Please read the documentation for more information.
-icon=resources/icon.png
 version=0.6.0
-tags=symbol, style, svg, processing, collections, processing, maps, design, repository
-homepage=http://www.akbargumbira.com/qgis_resources_sharing/
 tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing.git
+
+qgisMaximumVersion=3.99
+tags=symbol,style,svg,processing,script,R,collections,maps,design,repository
+homepage=http://www.akbargumbira.com/qgis_resources_sharing/
 experimental=True
 deprecated=False
-# changelog=
-
-# Author
-author=Akbar Gumbira
-email=akbargumbira@gmail.com
-
-# Changelog
+icon=resources/icon.png
 changelog=
     0.6.0 - Experimental version for QGIS 3
 	0.5.2 - Add support for gitlab and gogs repositories (PR by Salvatore Larosa - gh username: slarosa)

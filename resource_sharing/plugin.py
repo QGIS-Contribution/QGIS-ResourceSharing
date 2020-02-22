@@ -168,7 +168,7 @@ class Plugin:
             text=self.tr(u'Resource Sharing'),
             callback=self.run,
             parent=self.iface.mainWindow(),
-            add_to_toolbar=False)
+            add_to_toolbar=True)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""

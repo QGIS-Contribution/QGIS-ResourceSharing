@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Installing a Collection"
+title: "Installing a collection"
 category: user
 date: 2016-08-09 11:13:13
 order: 2

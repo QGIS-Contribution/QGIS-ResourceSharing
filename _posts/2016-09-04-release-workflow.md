@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Release Workflow"
+title: "Release workflow"
 category: dev
 date: 2016-09-04 19:32:12
 order: 3

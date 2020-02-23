@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Repository Examples"
+title: "Repository examples"
 category: author
 date: 2016-08-19 11:24:17
 order: 6

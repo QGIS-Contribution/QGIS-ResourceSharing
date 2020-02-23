@@ -3,11 +3,13 @@ import logging
 
 from qgis.core import QgsMessageLog, Qgis
 
+LOGGERNAME = 'QGIS Resource sharing'
 
 def setup_logger():
     """Setup logger for the plugin. Should be called only once."""
-    logger = logging.getLogger('QGIS Resources Sharing')
-    logger.setLevel(logging.DEBUG)
+    logger = logging.getLogger(LOGGERNAME)
+    # logger.setLevel(logging.DEBUG)  # Development
+    logger.setLevel(logging.INFO)  # Deploy
     # Add handler for qgis logger once
     qgis_handler = QgisLogger()
 
@@ -39,7 +41,16 @@ class QgisLogger(logging.Handler):
         This version is intended to be implemented by subclasses and so
         raises a NotImplementedError.
         """
+        qgislevel = Qgis.Info  # for NOTSET, DEBUG and INFO
+        # Mapping CRITICAL and ERROR to Qgis.Critical:
+        if record.levelno == logging.CRITICAL:
+            qgislevel = Qgis.Critical
+        elif record.levelno == logging.ERROR:
+            qgislevel = Qgis.Critical
+        elif record.levelno == logging.WARNING:
+            qgislevel = Qgis.Warning
+
         QgsMessageLog.logMessage(
             record.getMessage(),
-            'QGIS Resource Sharing',
-            level=Qgis.Critical)
+            LOGGERNAME,
+            level=qgislevel)

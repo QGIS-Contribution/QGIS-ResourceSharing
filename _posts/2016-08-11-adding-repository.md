@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Adding a Repository"
+title: "Adding a repository"
 category: user
 date: 2016-08-11 23:11:10
 order: 3

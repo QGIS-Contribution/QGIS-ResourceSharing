@@ -2,6 +2,7 @@
 import os
 # Use pathlib instead of os.path?
 # from pathlib import Path
+import logging
 
 import ntpath
 
@@ -13,6 +14,8 @@ except ImportError:
 
 from resource_sharing import config
 import jinja2
+
+LOGGER = logging.getLogger('QGIS Resources Sharing')
 
 
 def resources_path(*args):
@@ -94,6 +97,11 @@ def local_collection_path(id=None):
         settings.setValue(local_collection_root_dir_key(),
                           path)
     settings.endGroup()
+    # If the directory does not exist, create it!
+    if not os.path.exists(path):
+            LOGGER.debug('coll_mgr - creating local collection dir: ' +
+                         str(path))
+            os.makedirs(path)
 
     # # path = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
     # path = os.path.join(

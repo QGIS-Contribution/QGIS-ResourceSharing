@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Repository Structure"
+title: "Repository structure"
 category: author
 date: 2016-07-22 17:04:29
 order: 3

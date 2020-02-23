@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Publishing Your Repository"
+title: "Publishing your repository"
 category: author
 date: 2016-08-10 14:18:42
 order: 5

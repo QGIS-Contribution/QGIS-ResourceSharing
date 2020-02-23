@@ -1,12 +1,12 @@
 ---
 layout: page
-title: "Repository Example"
+title: "Repository Examples"
 category: author
 date: 2016-08-19 11:24:17
 order: 6
 ---
-Below is a list of correctly structured repositories that you can check when 
-you want to creaet a repository:
+Below is a list of correctly structured repositories that you can
+have a look at when you want to create a repository:
 
 * [QGIS Official Repository](https://github.com/qgis/QGIS-Resources)
 * [Richard Duivenvoorde Repository](https://github.com/rduivenvoorde/qgis-styles)

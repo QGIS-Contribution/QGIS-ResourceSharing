@@ -60,6 +60,11 @@ def repo_settings_group():
     return '/ResourceSharing/repository'
 
 
+def resource_sharing_group():
+    """Get the settings group for the local collection directorys."""
+    return '/ResourceSharing'
+
+
 def repositories_cache_path():
     """Get the path to the repositories cache."""
     # return Path(QgsApplication.qgisSettingsDirPath()) / 'resource_sharing' / 'repositories_cache'
@@ -69,20 +74,52 @@ def repositories_cache_path():
         'repositories_cache')
 
 
+def local_collection_root_dir_key():
+    """The QSettings key for the local collections root dir."""
+    return 'localCollectionDir'
+
+
 def local_collection_path(id=None):
     """Get the path to the local collection dir.
 
     If id is not passed, it will just return the root dir of the collections.
     """
-    # path = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
+    settings = QSettings()
+    settings.beginGroup(resource_sharing_group())
+    if settings.contains(local_collection_root_dir_key()):
+        path = settings.value(local_collection_root_dir_key())   
+    else:
+        path = default_local_collection_root_dir()
+        LOGGER.info('Setting the collection path to ' + path)
+        settings.setValue(local_collection_root_dir_key(),
+                          path)
+    settings.endGroup()
+
+    # # path = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
+    # path = os.path.join(
+    #     QDir.toNativeSeparators(QDir.homePath()),
+    #     'QGIS',
+    #     'Resource Sharing')
+    if id:
+        collection_name = config.COLLECTIONS[id]['name']
+        dir_name = '%s (%s)' % (collection_name, id)
+        # path = path / dir_name
+        path = os.path.join(path, dir_name)
+    return path
+
+
+def old_local_collection_path(id=None):
+    """Get the path to the old local collection dir.
+    (in case we would like to help the users migrate)
+    If id is not passed, it will just return the root dir of the collections.
+    """
     path = os.path.join(
-        QDir.toNativeSeparators(QDir.homePath()),
+        QDir.homePath(),
         'QGIS',
         'Resource Sharing')
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         dir_name = '%s (%s)' % (collection_name, id)
-        # path = path / dir_name
         path = os.path.join(path, dir_name)
     return path
 

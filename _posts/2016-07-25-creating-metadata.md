@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Creating Metadata"
+title: "Creating metadata"
 category: author
 date: 2016-07-25 14:58:04
 order: 4

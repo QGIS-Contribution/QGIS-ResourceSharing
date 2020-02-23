@@ -6,12 +6,15 @@ date: 2016-09-04 19:32:12
 order: 3
 ---
 
-To release the plugin, please follow these steps:
+Follow these steps to release the plugin:
 
-* Update ```metadata.txt``` changing the version and add changelog
-* The working branch to be released should be ```master``` branch. If you want to release from the ```develop``` branch (in case that you don't have any new features in develop that you want to release), please make a PR to ```master``` branch first. 
-* Run ```make release```. This will create a package, release tag version to github, and publish the plugin to ```plugin.qgis.org```.
-* Voila, the new version of the plugin should be published! Please check in your QGIS if you can upgrade the plugin without problems.
-* Make a release on Github and highlight all the new features and fixes on the new version
-
-
+* Update ```metadata.txt``` changing the version and add updating the changelog
+* The branch to release should be ```master```.
+  If you want to release from the ```develop``` branch, please make a PR
+  to the ```master``` branch first. 
+* Run ```make release```. This will create a package, add a GitHub version release
+  tag, and publish the plugin to ```plugin.qgis.org```.
+* Voila, the new version of the plugin should be published!
+  Please check if you can upgrade the plugin in QGIS without problems.
+* Make a release on Github and highlight all the new features and fixes of
+  the new version.

@@ -7,7 +7,8 @@ order: 2
 ---
 We are using Jekyll for the documentation (i.e this website).
 If you want to contribute to the documentation, it is availalbe in the
-```gh-pages``` branch (the documentation is hosted on Github pages). 
+```gh-pages``` branch (the documentation is hosted on
+[GitHub pages](https://pages.github.com/)). 
  
 The documentation is divided into 3 categories: for users, for authors,
 and for developers.

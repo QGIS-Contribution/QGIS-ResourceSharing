@@ -19,9 +19,9 @@ codeurl: 'https://github.com/QGIS-Contribution/QGIS-ResourceSharing'
 
 # Default categories (in order) to appear in the navigation
 sections: [
-    ['user', 'For Users'],
-    ['author', 'For Authors'],
-    ['dev', 'For Developers'],
+    ['user', 'For users'],
+    ['author', 'For authors'],
+    ['dev', 'For developers'],
     ['tut', 'Tutorial'],
     ['ref', 'Reference'],
     ['post', 'Posts']

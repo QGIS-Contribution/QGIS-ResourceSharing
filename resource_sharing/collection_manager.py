@@ -20,7 +20,7 @@ from resource_sharing.utilities import (
 from resource_sharing.repository_handler import BaseRepositoryHandler
 from resource_sharing.resource_handler import BaseResourceHandler
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class CollectionInstaller(QObject):

@@ -1,38 +1,37 @@
 ---
 layout: page
-title: "Creating Repository"
+title: "Creating a Repository"
 category: author
 date: 2016-08-09 11:13:38
 order: 1
 ---
 #### Preparing the Repository
-In order for the tools to parse the repository correctly, you need to prepare
- the repository to have a certain structure. This is what you need to do:
+In order for the tools to parse the repository correctly, the repository
+must have a certain structure. This is what you need to do:
   
-  * The repository has to follow the structure. Please go to [this page]({{ 
-  site.baseurl }}/author/repository-structure.html) that explains about it
-  * Create the correct metadata for the repository. For that, please read 
-  [this page]({{ site.baseurl }}/author/creating-metadata.html)
-  * Once you have it prepared, you can check if the repository is all good by
-   trying it using file system handler. In the plugin, go to ```Settings``` 
-   tab and add a new repository pointing to the root of the repository in 
-   your local file system. The repository URL might look like 
-   this on Linux: ```file:///home/pointing/to/repository_root``` or in Windows
-    it looks more like this: ```file://C:/home/pointing/to/repository_root```
+  * Go to [this page]({{site.baseurl }}/author/repository-structure.html)
+    to get information about the structure.
+  * Create correct metadata for the repository (consult
+    [this page]({{ site.baseurl }}/author/creating-metadata.html)).
+  * When you have prepared your repository, you can check if the repository
+    is all good by trying it using the file system handler.
+    In the plugin, go to the ```Settings``` tab and add a new repository
+    pointing to the root of the repository in your local file system.
+    The repository URL looks like this on Linux:
+    ```file:///home/pointing/to/repository_root``` and like this:
+    ```file://C:/home/pointing/to/repository_root``` on Windows.
 
 #### Where can you  share it?
-There are some options where you can put your repository: on Github, 
-Bitbucket (they need to be public repositories), local file system 
-(if you want to share the collections with your colleagues on the network), 
-or in your own server with http(s) protocol.
-
+These are the options for sharing: on Github, Bitbucket (they need to be
+public repositories), local file system (if you want to share the
+collections with your colleagues on the network), or in your own server
+with the HTTP(S) protocol.
 
 **Github and Bitbucket**
 
-So you decided to put your repositories on this platform. There is nothing 
-complicated here if you are already familiar with git. After preparing the 
-repository in your local machine, you can make it as git repository like 
-usual. In general, you can do:
+There is nothing complicated here if you are already familiar with git.
+After preparing the repository on your local machine, you can make it
+into a git repository as usual. In general, you can do:
 
 ```
 cd <repository root>
@@ -43,34 +42,42 @@ git remote add origin <remote repository URL>
 git push origin master
 ```
 
-Note that right now you need to use branch ```master``` for your repository.
+Note that you currently need to use the ```master``` branch
+for your repository.
 
 
 **Local File System**
 
-Well, this one is even simpler. After preparing the repository, you can use 
+This is even simpler. After preparing the repository, you can use 
 it right away. In the ```Settings``` tab, try to add a repository with URL 
-pointing to the repository root in your local machine. It's as simple as that. If there is a problem with metadata or other issues when adding the 
+pointing to the repository root in your local machine.
+It's as simple as that.
+If there is a problem with metadata or other issues when adding the 
 repository, the tools will tell you.
 
 
 **Your Own Server**
 
-This option could be useful in some cases e.g you want to make private 
-collections available for your customers. There are some additional 
-requirements that you need to be aware of if you choose this option:
+This option could be useful in some cases, e.g. if you want to make private 
+collections available for your customers.
+There are some additional requirements that you need to be aware of if you
+choose this option:
 
-  * The URL structure of the repository. Let's say your base repository URL 
-  is ```http://www.akbargumbira.com/repository```. You need to put the 
-  metadata available on this URL: ```http://www.akbargumbira
-  .com/repository/metadata.ini```
+  * The URL structure of the repository. If your base repository URL 
+    is ```http://www.akbargumbira.com/repository```, you must make the 
+    metadata available on:
+    ```http://www.akbargumbira.com/repository/metadata.ini```
   * The collections must be in zip format. For example, if you have a 
-  collection named ```test_collection```, the collection must exist in: 
-  ```http://www.akbargumbira.com/repository/collections/test_collection.zip```
+    collection named ```test_collection```, the collection must exist in: 
+    ```http://www.akbargumbira.com/repository/collections/test_collection.zip```
   * The preview images are relative to the collection base URL. As an example,
-   if you define the preview images in the metadata ```preview=preview/prev1.png, preview/prev2.png```, it is needed that you have to make the previews 
-  available for collection ```test_collection``` in this URL: ```http://www.akbargumbira.com/repository/collections/test_collection/preview/prev1.png``` and ```http://www.akbargumbira.com/repository/collections/test_collection/preview/prev2.png```
+   if you define the preview images in the metadata
+   (```preview=preview/prev1.png, preview/prev2.png```), you have to make the
+   previews available for collection ```test_collection``` in this URL:
+   ```http://www.akbargumbira.com/repository/collections/test_collection/preview/prev1.png```
+   and
+   ```http://www.akbargumbira.com/repository/collections/test_collection/preview/prev2.png```
 
-You can also put authentication to this repository as you wish. In the 
-plugin, users can configure authentication details so that they will be able 
-to fetch the repository and the collections inside.
+You can also use authentication for this repository.
+In the  plugin, users can configure authentication details so that they will
+be able to fetch the repository and the collections inside.

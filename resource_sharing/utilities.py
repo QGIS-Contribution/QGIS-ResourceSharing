@@ -82,6 +82,12 @@ def local_collection_root_dir_key():
     return 'localCollectionDir'
 
 
+def default_local_collection_root_dir():
+    return os.path.join(QgsApplication.qgisSettingsDirPath(),
+                        'resource_sharing',
+                        'collections')
+
+
 def local_collection_path(id=None):
     """Get the path to the local collection dir.
 

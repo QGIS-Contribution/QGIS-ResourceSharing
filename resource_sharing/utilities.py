@@ -6,7 +6,7 @@ import logging
 
 import ntpath
 
-from qgis.PyQt.QtCore import QDir
+from qgis.PyQt.QtCore import QDir, QSettings
 try:
     from qgis.core import QgsApplication, QGis as Qgis
 except ImportError:

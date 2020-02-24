@@ -96,9 +96,16 @@ def local_collection_path(id=None):
     settings = QSettings()
     settings.beginGroup(resource_sharing_group())
     if settings.contains(local_collection_root_dir_key()):
+        # The path is defined in the settings - use it
         path = settings.value(local_collection_root_dir_key())   
     else:
-        path = default_local_collection_root_dir()
+        # The path is not defined in the settings
+        if os.path.exists(old_local_collection_path()):
+            # The pre-version 0.10 directory exists - so use it
+            path = old_local_collection_path()
+        else:
+            # Use the new default directory
+            path = default_local_collection_root_dir()
         LOGGER.info('Setting the collection path to ' + path)
         settings.setValue(local_collection_root_dir_key(),
                           path)

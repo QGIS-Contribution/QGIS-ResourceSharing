@@ -12,7 +12,7 @@ from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
 from qgis.core import QgsMessageLog
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class writeOut():

@@ -20,7 +20,7 @@ from resource_sharing.version_compare import isCompatible
 from resource_sharing.network_manager import NetworkManager
 
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class RepositoryHandlerMeta(type):

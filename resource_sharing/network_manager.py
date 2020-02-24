@@ -11,7 +11,7 @@ except ImportError:
 
 from resource_sharing.utilities import qgis_version
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class NetworkManager(object):

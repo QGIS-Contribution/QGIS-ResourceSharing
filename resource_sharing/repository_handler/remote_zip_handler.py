@@ -15,7 +15,7 @@ from resource_sharing.utilities import local_collection_path
 from resource_sharing.network_manager import NetworkManager
 
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class RemoteZipHandler(BaseRepositoryHandler):

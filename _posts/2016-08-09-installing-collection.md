@@ -43,6 +43,10 @@ available for use in the Processing Toolbox under the ```Scripts``` menu.
 
 ![Processing Toolbox]({{ site.baseurl }}/assets/processing_toolbox.png)
 
+#### Processing Model
+After the installation, the processing models in the collection will be 
+available for use in the Processing Toolbox under the ```Models``` menu.
+
 #### R Script
 After the installation, the R scripts in the collection will be available for use
 in the Processing Toolbox under the ```R``` menu.

@@ -18,6 +18,7 @@ Images | SVG files or other image files that can be used for svg marker or raste
 Symbols | In the form of XML that could contain marker, line, fill, or colorramp
 Styles | In the form of QML file
 Processing scripts | Python processing scripts
+Models | Models for the Graphical modeler
 R scripts | Scripts for running R scripts from the Processing Toolbox in QGIS
 
 Note that you can actually put other QGIS resources in the repository 

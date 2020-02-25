@@ -7,7 +7,7 @@ import shutil
 from processing.tools.system import userFolder, mkdir
 
 # Worth a try? Should probably be present if the Processing R
-# plugin is installed.
+# Provider plugin is installed.
 #from processing_r.processing.utils import RUtils
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
@@ -53,13 +53,13 @@ class RScriptHandler(BaseResourceHandler):
 
         valid = 0
         for R_file in R_files:
-            # Install the processing file silently
+            # Install the R script file silently
             try:
                 shutil.copy(R_file, self.RScripts_folder())
                 valid += 1
             except OSError as e:
-                QgsMessageLog.logMessage("Could not copy script '{}'\n{}".format(processing_file, str(e)),
-                                             "Processing",
+                QgsMessageLog.logMessage("Could not copy script '{}'\n{}".format(R_file, str(e)),
+                                             "QGIS Resource Sharing",
                                              Qgis.Warning)
 
         if valid > 0:
@@ -82,7 +82,7 @@ class RScriptHandler(BaseResourceHandler):
         self.refresh_Rscript_provider()
 
     def refresh_Rscript_provider(self):
-        """Refresh the processing script provider."""
+        """Refresh the R script provider."""
         if QgsApplication.processingRegistry().providerById("r") is not None:
             QgsApplication.processingRegistry().providerById("r").refreshAlgorithms()
 

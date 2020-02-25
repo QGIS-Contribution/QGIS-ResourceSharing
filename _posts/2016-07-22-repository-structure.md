@@ -8,7 +8,8 @@ order: 3
 
 In order for the plugin to be able to read the repository correctly, the 
 repository must have a specific structure. Generally the structure looks like
- this:
+this (models and R scripts are missing, but are at the same level as *image*,
+*processing*, *svg* and *symbol*):
 
 ![Repo structure]({{ site.baseurl }}/assets/repo_structure.png)
 

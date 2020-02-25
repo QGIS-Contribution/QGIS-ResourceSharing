@@ -7,9 +7,10 @@ order: 3
 ---
 
 In order for the plugin to be able to read the repository correctly, the 
-repository must have a specific structure. Generally the structure looks like
-this (models and R scripts are missing, but are at the same level as *image*,
-*processing*, *svg* and *symbol*):
+repository must have a specific structure.
+The general structure is shown in the illustration below.
+Note that in the diagram, the ``models`` and ``rscripts`` folders are missing.
+They are at the same level as ``image``, ``processing``, ``svg`` and ``symbol``.
 
 ![Repo structure]({{ site.baseurl }}/assets/repo_structure.png)
 

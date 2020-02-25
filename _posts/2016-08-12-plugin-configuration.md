@@ -6,8 +6,7 @@ date: 2016-08-12 17:11:10
 order: 4
 ---
 
-Local collections directory
----------------------------
+***Local collections directory***
 
 The location of the local file system directory that contains the installed
 collections is controlled in settings: ``localCollectionDir`` under ``Resource Sharing``.

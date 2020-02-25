@@ -1,0 +1,1 @@
+../_posts/2016-08-12-plugin-configuration.md

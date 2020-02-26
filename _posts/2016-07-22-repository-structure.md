@@ -16,8 +16,8 @@ this:
     └── collections
         └── [Collection register id] (the id string used in "collections" in metadata.ini)
             ├── image (optional, containing all kinds of image files)
-            ├── processing (optional, containing Python Processing scripts)
             ├── models (optional, containing Processing models)
+            ├── processing (optional, containing Python Processing scripts)
             ├── rscripts (optional, containing R scripts)
             ├── svg (optional, containing SVG files)
             └── symbol (optional, containing symbol definition XML files)

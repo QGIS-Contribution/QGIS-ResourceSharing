@@ -157,9 +157,7 @@ class Plugin:
             # else:
             #     self.iface.addPluginToMenu(self.menuName, action)
             self.iface.addPluginToMenu(self.menuName, action)
-            
         self.actions.append(action)
-
         return action
 
     def initGui(self):

@@ -47,7 +47,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
                 except OSError as e:
                     QgsMessageLog.logMessage("Could not copy script '" +
                                              str(processing_file) + "'\n" +
-                                             str(e), "Processing",
+                                             str(e), "QGIS Resource Sharing",
                                              Qgis.Warning)
         if valid > 0:
             self.refresh_script_provider()

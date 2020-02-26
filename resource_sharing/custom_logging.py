@@ -24,11 +24,10 @@ def setup_logger():
 
 
 class QgisLogger(logging.Handler):
-    """A custom logger to emit the log to qgis message log."""
+    """A custom logger to emit the log to the QGIS message log."""
 
     def __init__(self):
         logging.Handler.__init__(self)
-
         fmt = '%(asctime)s %(filename)-18s %(levelname)-8s: %(message)s'
         fmt_date = '%Y-%m-%dT%T%Z'
         formatter = logging.Formatter(fmt, fmt_date)
@@ -37,16 +36,13 @@ class QgisLogger(logging.Handler):
     def emit(self, record):
         """
         Do whatever it takes to actually log the specified logging record.
-
-        This version is intended to be implemented by subclasses and so
-        raises a NotImplementedError.
         """
         qgislevel = Qgis.Info  # for NOTSET, DEBUG and INFO
-        # Mapping CRITICAL and ERROR to Qgis.Critical:
+        # Mapping CRITICAL to Qgis.Critical and ERROR to Qgis.Warning:
         if record.levelno == logging.CRITICAL:
             qgislevel = Qgis.Critical
         elif record.levelno == logging.ERROR:
-            qgislevel = Qgis.Critical
+            qgislevel = Qgis.Warning
         elif record.levelno == logging.WARNING:
             qgislevel = Qgis.Warning
 

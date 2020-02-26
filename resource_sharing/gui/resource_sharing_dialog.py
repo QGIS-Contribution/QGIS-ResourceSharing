@@ -51,6 +51,7 @@ except ImportError:
 
 from qgis.gui import QgsMessageBar
 from qgis.core import Qgis
+from qgis.core import QgsSettings
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 from resource_sharing.repository_manager import RepositoryManager
@@ -285,7 +286,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             return
 
         # Check if it's the approved online dir repository
-        settings = QSettings()
+        # settings = QSettings()
+        settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
         if settings.value(repo_name + '/url') in \
                 self.repository_manager._online_directories.values():

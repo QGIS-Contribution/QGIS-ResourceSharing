@@ -104,6 +104,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                     self.url, local_repo_dir,
                     errstream=writeOut
                 )
+                repo.close()  # To avoid WinErr 32
             except Exception as e:
                 # Try to clone with https if it's ssh url
                 git_parsed = parse(self.url)
@@ -112,6 +113,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                         repo = porcelain.clone(
                             git_parsed.url2https, local_repo_dir,
                             errstream=writeOut)
+                        repo.close()  # To avoid WinErr 32
                     except Exception as e:
                         error_message = 'Error: %s' % str(e)
                         LOGGER.exception(traceback.format_exc())

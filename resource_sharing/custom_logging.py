@@ -5,6 +5,7 @@ from qgis.core import QgsMessageLog, Qgis
 
 LOGGERNAME = 'QGIS Resource sharing'
 
+
 def setup_logger():
     """Setup logger for the plugin. Should be called only once."""
     logger = logging.getLogger(LOGGERNAME)
@@ -12,7 +13,6 @@ def setup_logger():
     logger.setLevel(logging.INFO)  # Deploy
     # Add handler for qgis logger once
     qgis_handler = QgisLogger()
-
     is_registered = False
     handler_class_name = qgis_handler.__class__.__name__
     for logger_handler in logger.handlers:

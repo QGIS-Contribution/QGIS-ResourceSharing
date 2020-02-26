@@ -4,10 +4,10 @@ import fnmatch
 import shutil
 
 from processing.script import ScriptUtils
-
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
 from qgis.core import QgsApplication, QgsMessageLog, Qgis
+
 
 class ProcessingScriptHandler(BaseResourceHandler):
     """Concrete class handler for processing script resource."""
@@ -45,10 +45,9 @@ class ProcessingScriptHandler(BaseResourceHandler):
                     shutil.copy(processing_file, self.scripts_folder())
                     valid += 1
                 except OSError as e:
-                    QgsMessageLog.logMessage("Could not copy script '{}'\n{}".format(processing_file, str(e)),
-                                             "Processing",
-                                             Qgis.Warning)
-
+                    QgsMessageLog.logMessage("Could not copy script '" +
+                                             str(processing_file) + "'\n" + str(e),
+                                             "Processing", Qgis.Warning)
         if valid > 0:
             self.refresh_script_provider()
 
@@ -65,8 +64,9 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
     def refresh_script_provider(self):
         """Refresh the processing script provider."""
-        if QgsApplication.processingRegistry().providerById("script") is not None:
-             QgsApplication.processingRegistry().providerById("script").refreshAlgorithms()
+        script_pr = QgsApplication.processingRegistry().providerById("script")
+        if script_pr is not None:
+             script_pr.refreshAlgorithms()
 
     def scripts_folder(self):
         """Return the default processing scripts folder."""

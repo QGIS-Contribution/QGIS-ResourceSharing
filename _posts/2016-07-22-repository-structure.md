@@ -40,7 +40,10 @@ this:
             ├── symbol (optional, containing symbol definition XML files)
             └── lisence file (encouraged
         
-To see an example of a repository, check this github repository [Test Repository](https://github.com/akbargumbira/qgis_resources_data/)
+Check the
+[QGIS Resources Repository](https://github.com/QGIS/QGIS-Resources) and
+[this test repository](https://github.com/akbargumbira/qgis_resources_data/)
+for github repository examples.
 
               
               

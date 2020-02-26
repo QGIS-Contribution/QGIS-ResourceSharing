@@ -10,13 +10,13 @@ from processing.tools.system import userFolder, mkdir
 # Provider plugin is installed.
 # from processing_r.processing.utils import RUtils
 
-
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
 from qgis.core import QgsApplication, QgsMessageLog, Qgis
 
 R_SCRIPTS_FOLDER = 'R_SCRIPTS_FOLDER'
 RSCRIPTS = 'rscripts'
+
 
 class RScriptHandler(BaseResourceHandler):
     """Handler for R script resources."""

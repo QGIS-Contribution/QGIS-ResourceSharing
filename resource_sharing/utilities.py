@@ -7,6 +7,7 @@ import logging
 import ntpath
 
 from qgis.PyQt.QtCore import QDir, QSettings
+from qgis.core import QgsSettings
 try:
     from qgis.core import QgsApplication, QGis as Qgis
 except ImportError:
@@ -15,7 +16,7 @@ except ImportError:
 from resource_sharing import config
 import jinja2
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 def resources_path(*args):
@@ -64,7 +65,7 @@ def repo_settings_group():
 
 
 def resource_sharing_group():
-    """Get the settings group for the local collection directorys."""
+    """Get the settings group for the local collection directories."""
     return '/ResourceSharing'
 
 
@@ -94,7 +95,8 @@ def local_collection_path(id=None):
 
     If id is not passed, it will just return the root dir of the collections.
     """
-    settings = QSettings()
+    #settings = QSettings()
+    settings = QgsSettings()
     settings.beginGroup(resource_sharing_group())
     if settings.contains(local_collection_root_dir_key()):
         # The path is defined in the settings - use it

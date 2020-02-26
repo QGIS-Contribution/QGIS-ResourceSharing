@@ -14,7 +14,7 @@ this:
     ├── README (encouraged)
     ├── metadata.ini (required)
     └── collections
-        └── [Collection register name] (the name registered in metadata)
+        └── [Collection register id] (the id string used in "collections" in metadata.ini)
             ├── image (optional, containing all kinds of image files)
             ├── processing (optional, containing Python Processing scripts)
             ├── models (optional, containing Processing models)

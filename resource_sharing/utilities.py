@@ -95,7 +95,7 @@ def local_collection_path(id=None):
 
     If id is not passed, it will just return the root dir of the collections.
     """
-    #settings = QSettings()
+    # settings = QSettings()
     settings = QgsSettings()
     settings.beginGroup(resource_sharing_group())
     if settings.contains(local_collection_root_dir_key()):

@@ -44,7 +44,8 @@ class SymbolXMLExtractor(object):
         context.setPathResolver(QgsProject.instance().pathResolver())
         while not symbol_element.isNull():
             if symbol_element.tagName() == 'symbol':
-                symbol = QgsSymbolLayerUtils.loadSymbol(symbol_element, context)
+                symbol = QgsSymbolLayerUtils.loadSymbol(symbol_element,
+                                                        context)
                 if symbol:
                     self._symbols.append({
                         'name': symbol_element.attribute('name'),

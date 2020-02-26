@@ -60,7 +60,7 @@ class RScriptHandler(BaseResourceHandler):
                 valid += 1
             except OSError as e:
                 QgsMessageLog.logMessage("Could not copy script '" +
-                                         str(R_file) + '\n" + str(e),
+                                         str(R_file) + "'\n" + str(e),
                                          "QGIS Resource Sharing",
                                          Qgis.Warning)
         if valid > 0:

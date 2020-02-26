@@ -13,6 +13,7 @@ from qgis.core import QgsApplication, QgsMessageLog, Qgis
 MODELS_FOLDER = 'models'
 MODELS = 'models'  # Directory name
 
+
 class ModelHandler(BaseResourceHandler):
     """Handler for model resources."""
     IS_DISABLED = False
@@ -44,8 +45,8 @@ class ModelHandler(BaseResourceHandler):
             file_path = os.path.join(self.resource_dir, item)
             if fnmatch.fnmatch(file_path, '*.model3'):
                 model_files.append(file_path)
-            #if fnmatch.fnmatch(file_path, '*.rsx.help'):
-            #    model_files.append(file_path)
+            # if fnmatch.fnmatch(file_path, '*.rsx.help'):
+            #     model_files.append(file_path)
 
         valid = 0
         for model_file in model_files:
@@ -54,9 +55,9 @@ class ModelHandler(BaseResourceHandler):
                 shutil.copy(model_file, self.Models_folder())
                 valid += 1
             except OSError as e:
-                QgsMessageLog.logMessage("Could not copy model '{}':\n{}".format(model_file, str(e)),
-                                             "Processing",
-                                             Qgis.Warning)
+                QgsMessageLog.logMessage("Could not copy model " +
+                                         str(model_file) + ':\n' + str(e),
+                                         "Processing", Qgis.Warning)
 
         if valid > 0:
             self.refresh_Model_provider()
@@ -79,8 +80,9 @@ class ModelHandler(BaseResourceHandler):
 
     def refresh_Model_provider(self):
         """Refresh the processing model provider."""
-        if QgsApplication.processingRegistry().providerById("model") is not None:
-            QgsApplication.processingRegistry().providerById("model").refreshAlgorithms()
+        mod_prov = QgsApplication.processingRegistry().providerById("model")
+        if (mod_prov is not None):
+            mod_prov.refreshAlgorithms()
 
     def default_models_folder(self):
         """Return the default models folder."""
@@ -94,4 +96,3 @@ class ModelHandler(BaseResourceHandler):
         """Return the default models folder."""
         # Local:
         return self.default_models_folder()
-

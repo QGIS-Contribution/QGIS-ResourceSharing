@@ -15,21 +15,21 @@ this:
     ├── metadata.ini (required)
     └── collections
         ├── [Collection1 register id] (the id string used in "collections" in metadata.ini)
-        |   ├── image (optional, containing all kinds of image files)
-        |   ├── models (optional, containing Processing models)
-        |   ├── processing (optional, containing Python Processing scripts)
-        |   ├── rscripts (optional, containing R scripts)
-        |   ├── svg (optional, containing SVG files)
-        |   ├── symbol (optional, containing symbol definition XML files)
-        |   └── lisence file (encouraged
+        │   ├── image (optional, containing all kinds of image files)
+        │   ├── models (optional, containing Processing models)
+        │   ├── processing (optional, containing Python Processing scripts)
+        │   ├── rscripts (optional, containing R scripts)
+        │   ├── svg (optional, containing SVG files)
+        │   ├── symbol (optional, containing symbol definition XML files)
+        │   └── lisence file (encouraged
         ├── [Collection2 register id] (the id string used in "collections" in metadata.ini)
-        |   ├── image (optional, containing all kinds of image files)
-        |   ├── models (optional, containing Processing models)
-        |   ├── processing (optional, containing Python Processing scripts)
-        |   ├── rscripts (optional, containing R scripts)
-        |   ├── svg (optional, containing SVG files)
-        |   ├── symbol (optional, containing symbol definition XML files)
-        |   └── lisence file (encouraged
+        │   ├── image (optional, containing all kinds of image files)
+        │   ├── models (optional, containing Processing models)
+        │   ├── processing (optional, containing Python Processing scripts)
+        │   ├── rscripts (optional, containing R scripts)
+        │   ├── svg (optional, containing SVG files)
+        │   ├── symbol (optional, containing symbol definition XML files)
+        │   └── lisence file (encouraged
         ├── ...
         └── [CollectionN register id] (the id string used in "collections" in metadata.ini)
             ├── image (optional, containing all kinds of image files)

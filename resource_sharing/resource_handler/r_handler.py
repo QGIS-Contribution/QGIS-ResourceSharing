@@ -8,7 +8,8 @@ from processing.tools.system import userFolder, mkdir
 
 # Worth a try? Should probably be present if the Processing R
 # Provider plugin is installed.
-#from processing_r.processing.utils import RUtils
+# from processing_r.processing.utils import RUtils
+
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
@@ -58,10 +59,10 @@ class RScriptHandler(BaseResourceHandler):
                 shutil.copy(R_file, self.RScripts_folder())
                 valid += 1
             except OSError as e:
-                QgsMessageLog.logMessage("Could not copy script '{}'\n{}".format(R_file, str(e)),
-                                             "QGIS Resource Sharing",
-                                             Qgis.Warning)
-
+                QgsMessageLog.logMessage("Could not copy script '" +
+                                         str(R_file) + '\n" + str(e),
+                                         "QGIS Resource Sharing",
+                                         Qgis.Warning)
         if valid > 0:
             self.refresh_Rscript_provider()
 
@@ -83,8 +84,9 @@ class RScriptHandler(BaseResourceHandler):
 
     def refresh_Rscript_provider(self):
         """Refresh the R script provider."""
-        if QgsApplication.processingRegistry().providerById("r") is not None:
-            QgsApplication.processingRegistry().providerById("r").refreshAlgorithms()
+        r_provider = QgsApplication.processingRegistry().providerById("r")
+        if r_provider is not None:
+            r_provider.refreshAlgorithms()
 
     def default_rscripts_folder(self):
         """Return the default R scripts folder."""
@@ -97,7 +99,6 @@ class RScriptHandler(BaseResourceHandler):
     def RScripts_folder(self):
         """Return the default R scripts folder."""
         # Perphaps better to use RUtils.default_scripts_folder()?
-        #return RUtils.default_scripts_folder()
+        # return RUtils.default_scripts_folder()
         # Local:
         return self.default_rscripts_folder()
-

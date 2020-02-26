@@ -55,9 +55,9 @@ class ModelHandler(BaseResourceHandler):
                 shutil.copy(model_file, self.Models_folder())
                 valid += 1
             except OSError as e:
-                QgsMessageLog.logMessage("Could not copy model " +
-                                         str(model_file) + ':\n' + str(e),
-                                         "Processing", Qgis.Warning)
+                QgsMessageLog.logMessage("Could not copy model '" +
+                                         str(model_file) + "':\n" + str(e),
+                                         "QGIS Resource Sharing", Qgis.Warning)
 
         if valid > 0:
             self.refresh_Model_provider()

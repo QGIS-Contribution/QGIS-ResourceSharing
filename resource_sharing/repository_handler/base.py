@@ -2,7 +2,7 @@
 """This module contains the base class of repository handler."""
 try:
     from io import StringIO
-except:
+except ImportError as error:
     from StringIO import StringIO
 
 import logging
@@ -131,7 +131,6 @@ class BaseRepositoryHandler(object):
         if status:
             self.metadata = bytes(network_manager.content).decode('utf8')
         return status, description
-
 
     def parse_metadata(self):
         """Parse str metadata to collection dict."""

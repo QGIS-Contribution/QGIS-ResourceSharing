@@ -22,7 +22,7 @@ this:
         │   ├── rscripts (optional, containing R scripts)
         │   ├── svg (optional, containing SVG files)
         │   ├── symbol (optional, containing symbol definition XML files)
-        │   └── lisence file (encouraged
+        │   └── lisence file (encouraged)
         ├── [Collection2 register id] (the id string used in "collections" in metadata.ini)
         │   ├── image (optional, containing all kinds of image files)
         │   ├── models (optional, containing Processing models)
@@ -31,7 +31,7 @@ this:
         │   ├── rscripts (optional, containing R scripts)
         │   ├── svg (optional, containing SVG files)
         │   ├── symbol (optional, containing symbol definition XML files)
-        │   └── lisence file (encouraged
+        │   └── lisence file (encouraged)
         ├── ...
         └── [CollectionN register id] (the id string used in "collections" in metadata.ini)
             ├── image (optional, containing all kinds of image files)
@@ -40,7 +40,7 @@ this:
             ├── rscripts (optional, containing R scripts)
             ├── svg (optional, containing SVG files)
             ├── symbol (optional, containing symbol definition XML files)
-            └── lisence file (encouraged
+            └── lisence file (encouraged)
         
 Check the
 [QGIS Resources Repository](https://github.com/QGIS/QGIS-Resources) and

@@ -7,15 +7,43 @@ order: 3
 ---
 
 In order for the plugin to be able to read the repository correctly, the 
-repository must have a specific structure.
-The general structure is shown in the illustration below.
-Note that in the diagram, the ``models`` and ``rscripts`` folders are missing.
-They are at the same level as ``image``, ``processing``, ``svg`` and ``symbol``.
+repository must have a specific structure. Generally the structure looks like
+this:
 
-![Repo structure]({{ site.baseurl }}/assets/repo_structure.png)
-
-
-To see an example of a repository, check this github repository [Test Repository](https://github.com/akbargumbira/qgis_resources_data/)
+    Repository root
+    ├── README (encouraged)
+    ├── metadata.ini (required)
+    └── collections
+        ├── [Collection1 register id] (the id string used in "collections" in metadata.ini)
+        │   ├── image (optional, containing all kinds of image files)
+        │   ├── models (optional, containing Processing models)
+        │   ├── processing (optional, containing Python Processing scripts)
+        │   ├── rscripts (optional, containing R scripts)
+        │   ├── svg (optional, containing SVG files)
+        │   ├── symbol (optional, containing symbol definition XML files)
+        │   └── lisence file (encouraged
+        ├── [Collection2 register id] (the id string used in "collections" in metadata.ini)
+        │   ├── image (optional, containing all kinds of image files)
+        │   ├── models (optional, containing Processing models)
+        │   ├── processing (optional, containing Python Processing scripts)
+        │   ├── rscripts (optional, containing R scripts)
+        │   ├── svg (optional, containing SVG files)
+        │   ├── symbol (optional, containing symbol definition XML files)
+        │   └── lisence file (encouraged
+        ├── ...
+        └── [CollectionN register id] (the id string used in "collections" in metadata.ini)
+            ├── image (optional, containing all kinds of image files)
+            ├── models (optional, containing Processing models)
+            ├── processing (optional, containing Python Processing scripts)
+            ├── rscripts (optional, containing R scripts)
+            ├── svg (optional, containing SVG files)
+            ├── symbol (optional, containing symbol definition XML files)
+            └── lisence file (encouraged
+        
+Check the
+[QGIS Resources Repository](https://github.com/QGIS/QGIS-Resources) and
+[this test repository](https://github.com/akbargumbira/qgis_resources_data/)
+for github repository examples.
 
               
               

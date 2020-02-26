@@ -46,8 +46,9 @@ class ProcessingScriptHandler(BaseResourceHandler):
                     valid += 1
                 except OSError as e:
                     QgsMessageLog.logMessage("Could not copy script '" +
-                                             str(processing_file) + "'\n" + str(e),
-                                             "Processing", Qgis.Warning)
+                                             str(processing_file) + "'\n" +
+                                             str(e), "Processing",
+                                             Qgis.Warning)
         if valid > 0:
             self.refresh_script_provider()
 
@@ -66,7 +67,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
         """Refresh the processing script provider."""
         script_pr = QgsApplication.processingRegistry().providerById("script")
         if script_pr is not None:
-             script_pr.refreshAlgorithms()
+            script_pr.refreshAlgorithms()
 
     def scripts_folder(self):
         """Return the default processing scripts folder."""

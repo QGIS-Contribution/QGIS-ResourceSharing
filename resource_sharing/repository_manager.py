@@ -95,7 +95,22 @@ class RepositoryManager(QObject):
             with open(directory_file.fileName()) as csv_file:
                 reader = csv.DictReader(csv_file, fieldnames=('name', 'url'))
                 for row in reader:
-                    self._online_directories[row['name']] = row['url'].strip()
+                    # self._online_directories[row['name']] = row['url'].strip()
+                    repName = row['name']
+                    repUrl = row['url']
+                    # Check name and URL for None before stripping and adding
+                    if repName is not None and repUrl is not None:
+                        self._online_directories[row['name']] = repUrl.strip()
+                    else:
+                        if repName is None:
+                            # No name
+                            raise Exception("Missing name for repository"
+                                            " - not added")
+                        else:
+                            # No URL
+                            raise Exception("Missing URL for repository '" +
+                                            str(row['name']) +
+                                            "' - not added")
             # Save it to cache
             # settings = QSettings()
             settings = QgsSettings()

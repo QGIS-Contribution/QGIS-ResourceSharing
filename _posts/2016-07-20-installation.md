@@ -36,3 +36,10 @@ There are 2 ways to get the plugin:
   
 * Use git: clone the repository in the plugin directory, or clone in
   your preferred location and add a symbolic link in the local plugins directory.
+
+#### Locating and starting the plugin in the QGIS GUI
+The plugin has its own toolbar (*Resource Sharing*, with only one action).
+You can enable / disable the toolbar in *View-> Toolbars*, and move it
+(drag and drop) to a convenient location in the GUI.
+The plugin can also be started from the *Web* menu (*Web-> Resource Sharing*)
+and a submenu of the *Plugins* menu (*Plugins-> Resource Sharing -> Resource Sharing*).

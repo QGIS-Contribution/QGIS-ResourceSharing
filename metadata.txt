@@ -5,7 +5,7 @@ author=Akbar Gumbira, Håvard Tveite
 qgisMinimumVersion=3.0
 description=Download shared collections
 about=Search for published collections (symbology (SVG, images, styles), Processing scripts, Processing models and R scripts) and install them for use with QGIS. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S).
-version=0.10.0
+version=0.11.0
 tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing.git
 
@@ -16,6 +16,8 @@ experimental=False
 deprecated=False
 icon=resources/icon.png
 changelog=
+        0.11.0 - Check for missing repository name and URL in directory (#64)
+	       - Correct link to documentation
         0.10.0 - Added support for Processing models (#42)
 	       - Make the plugin available from the web menu (#68)
 	       - Allow specification of the file system location of the local collections folder (#51)

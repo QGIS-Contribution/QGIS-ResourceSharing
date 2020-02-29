@@ -5,19 +5,20 @@ category: user
 date: 2016-08-09 11:13:13
 order: 2
 ---
-Now that you have the **QGIS Resource Sharing** plugin installed, you can browse 
-the available collections (from the repositories registered in the 
-```Settings``` tab) and install them on your local machine.
+Now that you have the **QGIS Resource Sharing** plugin installed,
+you can browse the available collections (from the repositories
+registered in the ```Settings``` tab) and install them on your
+local machine.
 To install a collection, you select the collection you want to install
 and click the ```Install``` button below the collection description.
-The resources in the collection will be installed (the location depends
-to their type).
+The resources in the collection will be installed (the location
+in the file system depends on their type).
 
 #### SVG
-If the collection contains SVGs, they will be added and the path will be
-included in your QGIS SVG search path.
+If the collection contains SVGs, they will be added, and the path
+will be included in your QGIS SVG search path.
 The SVGs will be available when editing symbols (under the
-```Resource Sharing``` section in **SVG Groups**).
+``User Symbols`` section in **SVG Groups**).
 
 ![SVG Group]({{ site.baseurl }}/assets/svg_group.png)
   

@@ -7,7 +7,8 @@
         begin                : 2016-05-29
         git sha              : $Format:%H$
         copyright            : (C) 2016 by Akbar Gumbira
-        email                : akbargumbira@gmail.com
+        copyright            : (C) 2020 by Håvard Tveite
+        email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
 /***************************************************************************
@@ -591,7 +592,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
     def open_help(self):
         """Open help."""
-        doc_url = QUrl('http://www.akbargumbira.com/qgis_resources_sharing')
+        doc_url = QUrl('http://qgis-contribution.github.io/QGIS-ResourceSharing/')
         QDesktopServices.openUrl(doc_url)
 
     def show_progress_dialog(self, text):

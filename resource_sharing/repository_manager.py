@@ -1,4 +1,6 @@
 # coding=utf-8
+import logging
+
 import csv
 import os
 import pickle
@@ -14,6 +16,8 @@ from resource_sharing.collection_manager import CollectionManager
 from resource_sharing.config import COLLECTION_INSTALLED_STATUS
 from resource_sharing import config
 from resource_sharing.exception import MetadataError
+
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class RepositoryManager(QObject):
@@ -104,13 +108,13 @@ class RepositoryManager(QObject):
                     else:
                         if repName is None:
                             # No name
-                            raise Exception("Missing name for repository"
+                            LOGGER.warning("Missing name for repository"
                                             " - not added")
                         else:
                             # No URL
-                            raise Exception("Missing URL for repository '" +
+                            LOGGER.warning("Missing URL for repository" +
                                             str(row['name']) +
-                                            "' - not added")
+                                            " - not added")
             # Save it to cache
             # settings = QSettings()
             settings = QgsSettings()

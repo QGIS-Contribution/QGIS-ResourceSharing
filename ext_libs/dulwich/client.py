@@ -144,9 +144,7 @@ COMMON_CAPABILITIES = [CAPABILITY_OFS_DELTA, CAPABILITY_SIDE_BAND_64K]
 UPLOAD_CAPABILITIES = ([CAPABILITY_THIN_PACK, CAPABILITY_MULTI_ACK,
                         CAPABILITY_MULTI_ACK_DETAILED, CAPABILITY_SHALLOW]
                        + COMMON_CAPABILITIES)
-RECEIVE_CAPABILITIES = (
-    [CAPABILITY_REPORT_STATUS, CAPABILITY_DELETE_REFS]
-    + COMMON_CAPABILITIES)
+RECEIVE_CAPABILITIES = [CAPABILITY_REPORT_STATUS] + COMMON_CAPABILITIES
 
 
 class ReportStatusParser(object):
@@ -551,7 +549,7 @@ class GitClient(object):
                 else:
                     proto.write_pkt_line(
                         old_sha1 + b' ' + new_sha1 + b' ' + refname + b'\0' +
-                        b' '.join(sorted(capabilities)))
+                        b' '.join(capabilities))
                     sent_capabilities = True
             if new_sha1 not in have and new_sha1 != ZERO_SHA:
                 want.append(new_sha1)
@@ -631,7 +629,7 @@ class GitClient(object):
         """
         assert isinstance(wants, list) and isinstance(wants[0], bytes)
         proto.write_pkt_line(COMMAND_WANT + b' ' + wants[0] + b' ' +
-                             b' '.join(sorted(capabilities)) + b'\n')
+                             b' '.join(capabilities) + b'\n')
         for want in wants[1:]:
             proto.write_pkt_line(COMMAND_WANT + b' ' + want + b'\n')
         if depth not in (0, None) or getattr(graph_walker, 'shallow', None):
@@ -641,9 +639,8 @@ class GitClient(object):
                     "depth")
             for sha in graph_walker.shallow:
                 proto.write_pkt_line(COMMAND_SHALLOW + b' ' + sha + b'\n')
-            if depth is not None:
-                proto.write_pkt_line(COMMAND_DEEPEN + b' ' +
-                                     str(depth).encode('ascii') + b'\n')
+            proto.write_pkt_line(COMMAND_DEEPEN + b' ' +
+                                 str(depth).encode('ascii') + b'\n')
             proto.write_pkt_line(None)
             if can_read is not None:
                 (new_shallow, new_unshallow) = _read_shallow_updates(proto)

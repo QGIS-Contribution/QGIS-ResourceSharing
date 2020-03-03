@@ -70,7 +70,6 @@ from dulwich.hooks import (
     PreCommitShellHook,
     PostCommitShellHook,
     CommitMsgShellHook,
-    PostReceiveShellHook,
     )
 
 from dulwich.line_ending import BlobNormalizer
@@ -956,7 +955,6 @@ class Repo(BaseRepo):
         self.hooks['pre-commit'] = PreCommitShellHook(self.controldir())
         self.hooks['commit-msg'] = CommitMsgShellHook(self.controldir())
         self.hooks['post-commit'] = PostCommitShellHook(self.controldir())
-        self.hooks['post-receive'] = PostReceiveShellHook(self.controldir())
 
     def _write_reflog(self, ref, old_sha, new_sha, committer, timestamp,
                       timezone, message):

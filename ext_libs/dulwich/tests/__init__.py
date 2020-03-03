@@ -112,7 +112,6 @@ def self_test_suite():
         'hooks',
         'ignore',
         'index',
-        'lfs',
         'line_ending',
         'lru_cache',
         'mailmap',

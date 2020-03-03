@@ -1,5 +1,5 @@
 # __init__.py -- Fast export/import functionality
-# Copyright (C) 2010-2013 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2010-2013 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -30,18 +30,20 @@ from dulwich.objects import (
     Blob,
     Commit,
     Tag,
+    ZERO_SHA,
     )
 from fastimport import __version__ as fastimport_version
-if fastimport_version <= (0, 9, 5) and sys.version_info[0] == 3 and sys.version_info[1] < 5:
+if (fastimport_version <= (0, 9, 5) and
+        sys.version_info[0] == 3 and sys.version_info[1] < 5):
     raise ImportError("Older versions of fastimport don't support python3<3.5")
-from fastimport import (
+from fastimport import (  # noqa: E402
     commands,
     errors as fastimport_errors,
     parser,
     processor,
     )
 
-import stat
+import stat  # noqa: E402
 
 
 def split_email(text):
@@ -62,7 +64,7 @@ class GitFastExporter(object):
         self.outf.write(getattr(cmd, "__bytes__", cmd.__repr__)() + b"\n")
 
     def _allocate_marker(self):
-        self._marker_idx+=1
+        self._marker_idx += 1
         return ("%d" % (self._marker_idx,)).encode('ascii')
 
     def _export_blob(self, blob):
@@ -77,7 +79,7 @@ class GitFastExporter(object):
 
     def _iter_files(self, base_tree, new_tree):
         for ((old_path, new_path), (old_mode, new_mode),
-            (old_hexsha, new_hexsha)) in \
+             (old_hexsha, new_hexsha)) in \
                 self.store.tree_changes(base_tree, new_tree):
             if new_path is None:
                 yield commands.FileDeleteCommand(old_path)
@@ -104,7 +106,8 @@ class GitFastExporter(object):
             merges = []
         author, author_email = split_email(commit.author)
         committer, committer_email = split_email(commit.committer)
-        cmd = commands.CommitCommand(ref, marker,
+        cmd = commands.CommitCommand(
+            ref, marker,
             (author, author_email, commit.author_time, commit.author_timezone),
             (committer, committer_email, commit.commit_time,
                 commit.commit_timezone),
@@ -126,9 +129,14 @@ class GitImportProcessor(processor.ImportProcessor):
     def __init__(self, repo, params=None, verbose=False, outf=None):
         processor.ImportProcessor.__init__(self, params, verbose)
         self.repo = repo
-        self.last_commit = None
+        self.last_commit = ZERO_SHA
         self.markers = {}
         self._contents = {}
+
+    def lookup_object(self, objectish):
+        if objectish.startswith(b":"):
+            return self.markers[objectish[1:]]
+        return objectish
 
     def import_stream(self, stream):
         p = parser.ImportParser(stream)
@@ -165,6 +173,7 @@ class GitImportProcessor(processor.ImportProcessor):
         commit.message = cmd.message
         commit.parents = []
         if cmd.from_:
+            cmd.from_ = self.lookup_object(cmd.from_)
             self._reset_base(cmd.from_)
         for filecmd in cmd.iter_files():
             if filecmd.name == b"filemodify":
@@ -173,9 +182,7 @@ class GitImportProcessor(processor.ImportProcessor):
                     self.repo.object_store.add(blob)
                     blob_id = blob.id
                 else:
-                    assert filecmd.dataref.startswith(b":"), \
-                        "non-marker refs not supported yet (%r)" % filecmd.dataref
-                    blob_id = self.markers[filecmd.dataref[1:]]
+                    blob_id = self.lookup_object(filecmd.dataref)
                 self._contents[filecmd.path] = (filecmd.mode, blob_id)
             elif filecmd.name == b"filedelete":
                 del self._contents[filecmd.path]
@@ -190,12 +197,14 @@ class GitImportProcessor(processor.ImportProcessor):
                 self._contents = {}
             else:
                 raise Exception("Command %s not supported" % filecmd.name)
-        commit.tree = commit_tree(self.repo.object_store,
+        commit.tree = commit_tree(
+            self.repo.object_store,
             ((path, hexsha, mode) for (path, (mode, hexsha)) in
                 self._contents.items()))
-        if self.last_commit is not None:
+        if self.last_commit != ZERO_SHA:
             commit.parents.append(self.last_commit)
-        commit.parents += cmd.merges
+        for merge in cmd.merges:
+            commit.parents.append(self.lookup_object(merge))
         self.repo.object_store.add_object(commit)
         self.repo[cmd.ref] = commit.id
         self.last_commit = commit.id
@@ -209,17 +218,22 @@ class GitImportProcessor(processor.ImportProcessor):
     def _reset_base(self, commit_id):
         if self.last_commit == commit_id:
             return
-        self.last_commit = commit_id
         self._contents = {}
-        tree_id = self.repo[commit_id].tree
-        for (path, mode, hexsha) in (
-                self.repo.object_store.iter_tree_contents(tree_id)):
-            self._contents[path] = (mode, hexsha)
+        self.last_commit = commit_id
+        if commit_id != ZERO_SHA:
+            tree_id = self.repo[commit_id].tree
+            for (path, mode, hexsha) in (
+                    self.repo.object_store.iter_tree_contents(tree_id)):
+                self._contents[path] = (mode, hexsha)
 
     def reset_handler(self, cmd):
         """Process a ResetCommand."""
-        self._reset_base(cmd.from_)
-        self.repo.refs[cmd.ref] = cmd.from_
+        if cmd.from_ is None:
+            from_ = ZERO_SHA
+        else:
+            from_ = self.lookup_object(cmd.from_)
+        self._reset_base(from_)
+        self.repo.refs[cmd.ref] = from_
 
     def tag_handler(self, cmd):
         """Process a TagCommand."""

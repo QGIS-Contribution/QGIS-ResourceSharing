@@ -1,5 +1,5 @@
 # test_client.py -- Tests for the git protocol, client side
-# Copyright (C) 2009 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2009 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -19,9 +19,11 @@
 #
 
 from io import BytesIO
+import base64
 import sys
 import shutil
 import tempfile
+import warnings
 
 try:
     from urllib import quote as urlquote
@@ -33,21 +35,34 @@ try:
 except ImportError:
     import urllib.parse as urlparse
 
+import urllib3
+
 import dulwich
 from dulwich import (
     client,
     )
 from dulwich.client import (
+    InvalidWants,
     LocalGitClient,
     TraditionalGitClient,
     TCPGitClient,
     SSHGitClient,
     HttpGitClient,
+    FetchPackResult,
     ReportStatusParser,
     SendPackError,
+    StrangeHostname,
+    SubprocessSSHVendor,
+    PLinkSSHVendor,
     UpdateRefsError,
+    check_wants,
+    default_urllib3_manager,
     get_transport_and_path,
     get_transport_and_path_from_url,
+    parse_rsync_url,
+    )
+from dulwich.config import (
+    ConfigDict,
     )
 from dulwich.tests import (
     TestCase,
@@ -57,6 +72,8 @@ from dulwich.protocol import (
     Protocol,
     )
 from dulwich.pack import (
+    pack_objects_to_data,
+    write_pack_data,
     write_pack_objects,
     )
 from dulwich.objects import (
@@ -71,6 +88,7 @@ from dulwich.tests import skipIf
 from dulwich.tests.utils import (
     open_repo,
     tear_down_repo,
+    setup_warning_catcher,
     )
 
 
@@ -83,7 +101,24 @@ class DummyClient(TraditionalGitClient):
         TraditionalGitClient.__init__(self)
 
     def _connect(self, service, path):
-        return Protocol(self.read, self.write), self.can_read
+        return Protocol(self.read, self.write), self.can_read, None
+
+
+class DummyPopen():
+
+    def __init__(self, *args, **kwards):
+        self.stdin = BytesIO(b"stdin")
+        self.stdout = BytesIO(b"stdout")
+        self.stderr = BytesIO(b"stderr")
+        self.returncode = 0
+        self.args = args
+        self.kwargs = kwards
+
+    def communicate(self, *args, **kwards):
+        return ('Running', '')
+
+    def wait(self, *args, **kwards):
+        return False
 
 
 # TODO(durin42): add unit-level tests of GitClient
@@ -97,14 +132,16 @@ class GitClientTests(TestCase):
                                   self.rout.write)
 
     def test_caps(self):
-        agent_cap = ('agent=dulwich/%d.%d.%d' % dulwich.__version__).encode('ascii')
+        agent_cap = (
+            'agent=dulwich/%d.%d.%d' % dulwich.__version__).encode('ascii')
         self.assertEqual(set([b'multi_ack', b'side-band-64k', b'ofs-delta',
-                               b'thin-pack', b'multi_ack_detailed',
-                               agent_cap]),
-                          set(self.client._fetch_capabilities))
-        self.assertEqual(set([b'ofs-delta', b'report-status', b'side-band-64k',
+                              b'thin-pack', b'multi_ack_detailed', b'shallow',
                               agent_cap]),
-                          set(self.client._send_capabilities))
+                         set(self.client._fetch_capabilities))
+        self.assertEqual(
+            set([b'delete-refs', b'ofs-delta', b'report-status',
+                 b'side-band-64k', agent_cap]),
+            set(self.client._send_capabilities))
 
     def test_archive_ack(self):
         self.rin.write(
@@ -117,34 +154,44 @@ class GitClientTests(TestCase):
     def test_fetch_empty(self):
         self.rin.write(b'0000')
         self.rin.seek(0)
+
         def check_heads(heads):
-            self.assertIs(heads, None)
+            self.assertEqual(heads, {})
             return []
         ret = self.client.fetch_pack(b'/', check_heads, None, None)
-        self.assertIs(None, ret)
+        self.assertEqual({}, ret.refs)
+        self.assertEqual({}, ret.symrefs)
 
     def test_fetch_pack_ignores_magic_ref(self):
         self.rin.write(
-            b'00000000000000000000000000000000000000000000 capabilities^{}\x00 multi_ack '
+            b'00000000000000000000000000000000000000000000 capabilities^{}'
+            b'\x00 multi_ack '
             b'thin-pack side-band side-band-64k ofs-delta shallow no-progress '
             b'include-tag\n'
             b'0000')
         self.rin.seek(0)
+
         def check_heads(heads):
-            self.assertEquals({}, heads)
+            self.assertEqual({}, heads)
             return []
         ret = self.client.fetch_pack(b'bla', check_heads, None, None, None)
-        self.assertIs(None, ret)
+        self.assertEqual({}, ret.refs)
+        self.assertEqual({}, ret.symrefs)
         self.assertEqual(self.rout.getvalue(), b'0000')
 
     def test_fetch_pack_none(self):
         self.rin.write(
-            b'008855dcc6bf963f922e1ed5c4bbaaefcfacef57b1d7 HEAD.multi_ack '
+            b'008855dcc6bf963f922e1ed5c4bbaaefcfacef57b1d7 HEAD\x00multi_ack '
             b'thin-pack side-band side-band-64k ofs-delta shallow no-progress '
             b'include-tag\n'
             b'0000')
         self.rin.seek(0)
-        self.client.fetch_pack(b'bla', lambda heads: [], None, None, None)
+        ret = self.client.fetch_pack(
+                b'bla', lambda heads: [], None, None, None)
+        self.assertEqual(
+                {b'HEAD': b'55dcc6bf963f922e1ed5c4bbaaefcfacef57b1d7'},
+                ret.refs)
+        self.assertEqual({}, ret.symrefs)
         self.assertEqual(self.rout.getvalue(), b'0000')
 
     def test_send_pack_no_sideband64k_with_update_ref_error(self):
@@ -157,7 +204,7 @@ class GitClientTests(TestCase):
                 b"ng refs/foo/bar pre-receive hook declined",
                 b'']
         for pkt in pkts:
-            if pkt ==  b'':
+            if pkt == b'':
                 self.rin.write(b"0000")
             else:
                 self.rin.write(("%04x" % (len(pkt)+4)).encode('ascii') + pkt)
@@ -173,15 +220,15 @@ class GitClientTests(TestCase):
         commit.encoding = b'UTF-8'
         commit.message = b'test message'
 
-        def determine_wants(refs):
+        def update_refs(refs):
             return {b'refs/foo/bar': commit.id, }
 
-        def generate_pack_contents(have, want):
-            return [(commit, None), (tree, ''), ]
+        def generate_pack_data(have, want, ofs_delta=False):
+            return pack_objects_to_data([(commit, None), (tree, ''), ])
 
         self.assertRaises(UpdateRefsError,
                           self.client.send_pack, "blah",
-                          determine_wants, generate_pack_contents)
+                          update_refs, generate_pack_data)
 
     def test_send_pack_none(self):
         self.rin.write(
@@ -191,15 +238,16 @@ class GitClientTests(TestCase):
             b'0000')
         self.rin.seek(0)
 
-        def determine_wants(refs):
+        def update_refs(refs):
             return {
-                b'refs/heads/master': b'310ca9477129b8586fa2afc779c1f57cf64bba6c'
+                b'refs/heads/master':
+                    b'310ca9477129b8586fa2afc779c1f57cf64bba6c'
             }
 
-        def generate_pack_contents(have, want):
-            return {}
+        def generate_pack_data(have, want, ofs_delta=False):
+            return 0, []
 
-        self.client.send_pack(b'/', determine_wants, generate_pack_contents)
+        self.client.send_pack(b'/', update_refs, generate_pack_data)
         self.assertEqual(self.rout.getvalue(), b'0000')
 
     def test_send_pack_keep_and_delete(self):
@@ -212,21 +260,18 @@ class GitClientTests(TestCase):
             b'0000')
         self.rin.seek(0)
 
-        def determine_wants(refs):
+        def update_refs(refs):
             return {b'refs/heads/master': b'0' * 40}
 
-        def generate_pack_contents(have, want):
-            return {}
+        def generate_pack_data(have, want, ofs_delta=False):
+            return 0, []
 
-        self.client.send_pack(b'/', determine_wants, generate_pack_contents)
-        self.assertIn(
+        self.client.send_pack(b'/', update_refs, generate_pack_data)
+        self.assertEqual(
             self.rout.getvalue(),
-            [b'007f310ca9477129b8586fa2afc779c1f57cf64bba6c '
-             b'0000000000000000000000000000000000000000 '
-             b'refs/heads/master\x00report-status ofs-delta0000',
-             b'007f310ca9477129b8586fa2afc779c1f57cf64bba6c '
-             b'0000000000000000000000000000000000000000 '
-             b'refs/heads/master\x00ofs-delta report-status0000'])
+            b'008b310ca9477129b8586fa2afc779c1f57cf64bba6c '
+            b'0000000000000000000000000000000000000000 '
+            b'refs/heads/master\x00delete-refs ofs-delta report-status0000')
 
     def test_send_pack_delete_only(self):
         self.rin.write(
@@ -237,21 +282,18 @@ class GitClientTests(TestCase):
             b'0000')
         self.rin.seek(0)
 
-        def determine_wants(refs):
+        def update_refs(refs):
             return {b'refs/heads/master': b'0' * 40}
 
-        def generate_pack_contents(have, want):
-            return {}
+        def generate_pack_data(have, want, ofs_delta=False):
+            return 0, []
 
-        self.client.send_pack(b'/', determine_wants, generate_pack_contents)
-        self.assertIn(
+        self.client.send_pack(b'/', update_refs, generate_pack_data)
+        self.assertEqual(
             self.rout.getvalue(),
-            [b'007f310ca9477129b8586fa2afc779c1f57cf64bba6c '
-             b'0000000000000000000000000000000000000000 '
-             b'refs/heads/master\x00report-status ofs-delta0000',
-             b'007f310ca9477129b8586fa2afc779c1f57cf64bba6c '
-             b'0000000000000000000000000000000000000000 '
-             b'refs/heads/master\x00ofs-delta report-status0000'])
+            b'008b310ca9477129b8586fa2afc779c1f57cf64bba6c '
+            b'0000000000000000000000000000000000000000 '
+            b'refs/heads/master\x00delete-refs ofs-delta report-status0000')
 
     def test_send_pack_new_ref_only(self):
         self.rin.write(
@@ -262,29 +304,26 @@ class GitClientTests(TestCase):
             b'0000')
         self.rin.seek(0)
 
-        def determine_wants(refs):
+        def update_refs(refs):
             return {
                 b'refs/heads/blah12':
                 b'310ca9477129b8586fa2afc779c1f57cf64bba6c',
-                b'refs/heads/master': b'310ca9477129b8586fa2afc779c1f57cf64bba6c'
+                b'refs/heads/master':
+                    b'310ca9477129b8586fa2afc779c1f57cf64bba6c'
             }
 
-        def generate_pack_contents(have, want):
-            return {}
+        def generate_pack_data(have, want, ofs_delta=False):
+            return 0, []
 
         f = BytesIO()
         write_pack_objects(f, {})
-        self.client.send_pack('/', determine_wants, generate_pack_contents)
-        self.assertIn(
+        self.client.send_pack('/', update_refs, generate_pack_data)
+        self.assertEqual(
             self.rout.getvalue(),
-            [b'007f0000000000000000000000000000000000000000 '
-             b'310ca9477129b8586fa2afc779c1f57cf64bba6c '
-             b'refs/heads/blah12\x00report-status ofs-delta0000' +
-             f.getvalue(),
-             b'007f0000000000000000000000000000000000000000 '
-             b'310ca9477129b8586fa2afc779c1f57cf64bba6c '
-             b'refs/heads/blah12\x00ofs-delta report-status0000' +
-             f.getvalue()])
+            b'008b0000000000000000000000000000000000000000 '
+            b'310ca9477129b8586fa2afc779c1f57cf64bba6c '
+            b'refs/heads/blah12\x00delete-refs ofs-delta report-status0000' +
+            f.getvalue())
 
     def test_send_pack_new_ref(self):
         self.rin.write(
@@ -305,24 +344,24 @@ class GitClientTests(TestCase):
         commit.encoding = b'UTF-8'
         commit.message = b'test message'
 
-        def determine_wants(refs):
+        def update_refs(refs):
             return {
                 b'refs/heads/blah12': commit.id,
-                b'refs/heads/master': b'310ca9477129b8586fa2afc779c1f57cf64bba6c'
+                b'refs/heads/master':
+                    b'310ca9477129b8586fa2afc779c1f57cf64bba6c'
             }
 
-        def generate_pack_contents(have, want):
-            return [(commit, None), (tree, b''), ]
+        def generate_pack_data(have, want, ofs_delta=False):
+            return pack_objects_to_data([(commit, None), (tree, b''), ])
 
         f = BytesIO()
-        write_pack_objects(f, generate_pack_contents(None, None))
-        self.client.send_pack(b'/', determine_wants, generate_pack_contents)
-        self.assertIn(
+        write_pack_data(f, *generate_pack_data(None, None))
+        self.client.send_pack(b'/', update_refs, generate_pack_data)
+        self.assertEqual(
             self.rout.getvalue(),
-            [b'007f0000000000000000000000000000000000000000 ' + commit.id +
-             b' refs/heads/blah12\x00report-status ofs-delta0000' + f.getvalue(),
-             b'007f0000000000000000000000000000000000000000 ' + commit.id +
-             b' refs/heads/blah12\x00ofs-delta report-status0000' + f.getvalue()])
+            b'008b0000000000000000000000000000000000000000 ' + commit.id +
+            b' refs/heads/blah12\x00delete-refs ofs-delta report-status0000' +
+            f.getvalue())
 
     def test_send_pack_no_deleteref_delete_only(self):
         pkts = [b'310ca9477129b8586fa2afc779c1f57cf64bba6c refs/heads/master'
@@ -336,15 +375,15 @@ class GitClientTests(TestCase):
                 self.rin.write(("%04x" % (len(pkt)+4)).encode('ascii') + pkt)
         self.rin.seek(0)
 
-        def determine_wants(refs):
+        def update_refs(refs):
             return {b'refs/heads/master': b'0' * 40}
 
-        def generate_pack_contents(have, want):
-            return {}
+        def generate_pack_data(have, want, ofs_delta=False):
+            return 0, []
 
         self.assertRaises(UpdateRefsError,
                           self.client.send_pack, b"/",
-                          determine_wants, generate_pack_contents)
+                          update_refs, generate_pack_data)
         self.assertEqual(self.rout.getvalue(), b'0000')
 
 
@@ -370,7 +409,7 @@ class TestGetTransportAndPath(TestCase):
         self.assertEqual('foo.com', c.host)
         self.assertEqual(None, c.port)
         self.assertEqual(None, c.username)
-        self.assertEqual('bar/baz', path)
+        self.assertEqual('/bar/baz', path)
 
     def test_ssh_explicit(self):
         c, path = get_transport_and_path('ssh://foo.com/bar/baz')
@@ -378,7 +417,7 @@ class TestGetTransportAndPath(TestCase):
         self.assertEqual('foo.com', c.host)
         self.assertEqual(None, c.port)
         self.assertEqual(None, c.username)
-        self.assertEqual('bar/baz', path)
+        self.assertEqual('/bar/baz', path)
 
     def test_ssh_port_explicit(self):
         c, path = get_transport_and_path(
@@ -386,7 +425,7 @@ class TestGetTransportAndPath(TestCase):
         self.assertTrue(isinstance(c, SSHGitClient))
         self.assertEqual('foo.com', c.host)
         self.assertEqual(1234, c.port)
-        self.assertEqual('bar/baz', path)
+        self.assertEqual('/bar/baz', path)
 
     def test_username_and_port_explicit_unknown_scheme(self):
         c, path = get_transport_and_path(
@@ -402,19 +441,19 @@ class TestGetTransportAndPath(TestCase):
         self.assertEqual('git', c.username)
         self.assertEqual('server', c.host)
         self.assertEqual(7999, c.port)
-        self.assertEqual('dply/stuff.git', path)
+        self.assertEqual('/dply/stuff.git', path)
 
-    def test_ssh_abspath_explicit(self):
+    def test_ssh_abspath_doubleslash(self):
         c, path = get_transport_and_path('git+ssh://foo.com//bar/baz')
         self.assertTrue(isinstance(c, SSHGitClient))
         self.assertEqual('foo.com', c.host)
         self.assertEqual(None, c.port)
         self.assertEqual(None, c.username)
-        self.assertEqual('/bar/baz', path)
+        self.assertEqual('//bar/baz', path)
 
-    def test_ssh_port_abspath_explicit(self):
+    def test_ssh_port(self):
         c, path = get_transport_and_path(
-            'git+ssh://foo.com:1234//bar/baz')
+            'git+ssh://foo.com:1234/bar/baz')
         self.assertTrue(isinstance(c, SSHGitClient))
         self.assertEqual('foo.com', c.host)
         self.assertEqual(1234, c.port)
@@ -501,6 +540,28 @@ class TestGetTransportAndPath(TestCase):
         self.assertEqual('user', c._username)
         self.assertEqual('passwd', c._password)
 
+    def test_http_auth_with_username(self):
+        url = 'https://github.com/jelmer/dulwich'
+
+        c, path = get_transport_and_path(
+                url, username='user2', password='blah')
+
+        self.assertTrue(isinstance(c, HttpGitClient))
+        self.assertEqual('/jelmer/dulwich', path)
+        self.assertEqual('user2', c._username)
+        self.assertEqual('blah', c._password)
+
+    def test_http_auth_with_username_and_in_url(self):
+        url = 'https://user:passwd@github.com/jelmer/dulwich'
+
+        c, path = get_transport_and_path(
+                url, username='user2', password='blah')
+
+        self.assertTrue(isinstance(c, HttpGitClient))
+        self.assertEqual('/jelmer/dulwich', path)
+        self.assertEqual('user', c._username)
+        self.assertEqual('passwd', c._password)
+
     def test_http_no_auth(self):
         url = 'https://github.com/jelmer/dulwich'
 
@@ -534,7 +595,7 @@ class TestGetTransportAndPathFromUrl(TestCase):
         self.assertEqual('foo.com', c.host)
         self.assertEqual(None, c.port)
         self.assertEqual(None, c.username)
-        self.assertEqual('bar/baz', path)
+        self.assertEqual('/bar/baz', path)
 
     def test_ssh_port_explicit(self):
         c, path = get_transport_and_path_from_url(
@@ -542,45 +603,58 @@ class TestGetTransportAndPathFromUrl(TestCase):
         self.assertTrue(isinstance(c, SSHGitClient))
         self.assertEqual('foo.com', c.host)
         self.assertEqual(1234, c.port)
-        self.assertEqual('bar/baz', path)
+        self.assertEqual('/bar/baz', path)
 
-    def test_ssh_abspath_explicit(self):
-        c, path = get_transport_and_path_from_url('git+ssh://foo.com//bar/baz')
+    def test_ssh_homepath(self):
+        c, path = get_transport_and_path_from_url(
+            'git+ssh://foo.com/~/bar/baz')
         self.assertTrue(isinstance(c, SSHGitClient))
         self.assertEqual('foo.com', c.host)
         self.assertEqual(None, c.port)
         self.assertEqual(None, c.username)
-        self.assertEqual('/bar/baz', path)
+        self.assertEqual('/~/bar/baz', path)
 
-    def test_ssh_port_abspath_explicit(self):
+    def test_ssh_port_homepath(self):
         c, path = get_transport_and_path_from_url(
-            'git+ssh://foo.com:1234//bar/baz')
+            'git+ssh://foo.com:1234/~/bar/baz')
         self.assertTrue(isinstance(c, SSHGitClient))
         self.assertEqual('foo.com', c.host)
         self.assertEqual(1234, c.port)
-        self.assertEqual('/bar/baz', path)
+        self.assertEqual('/~/bar/baz', path)
 
     def test_ssh_host_relpath(self):
-        self.assertRaises(ValueError, get_transport_and_path_from_url,
+        self.assertRaises(
+            ValueError, get_transport_and_path_from_url,
             'foo.com:bar/baz')
 
     def test_ssh_user_host_relpath(self):
-        self.assertRaises(ValueError, get_transport_and_path_from_url,
+        self.assertRaises(
+            ValueError, get_transport_and_path_from_url,
             'user@foo.com:bar/baz')
 
     def test_local_path(self):
-        self.assertRaises(ValueError, get_transport_and_path_from_url,
+        self.assertRaises(
+            ValueError, get_transport_and_path_from_url,
             'foo.bar/baz')
 
     def test_error(self):
         # Need to use a known urlparse.uses_netloc URL scheme to get the
         # expected parsing of the URL on Python versions less than 2.6.5
-        self.assertRaises(ValueError, get_transport_and_path_from_url,
+        self.assertRaises(
+            ValueError, get_transport_and_path_from_url,
             'prospero://bar/baz')
 
     def test_http(self):
         url = 'https://github.com/jelmer/dulwich'
         c, path = get_transport_and_path_from_url(url)
+        self.assertTrue(isinstance(c, HttpGitClient))
+        self.assertEqual('https://github.com', c.get_url(b'/'))
+        self.assertEqual('/jelmer/dulwich', path)
+
+    def test_http_port(self):
+        url = 'https://github.com:9090/jelmer/dulwich'
+        c, path = get_transport_and_path_from_url(url)
+        self.assertEqual('https://github.com:9090', c.get_url(b'/'))
         self.assertTrue(isinstance(c, HttpGitClient))
         self.assertEqual('/jelmer/dulwich', path)
 
@@ -597,17 +671,20 @@ class TestSSHVendor(object):
         self.command = ""
         self.username = None
         self.port = None
+        self.password = None
+        self.key_filename = None
 
-    def run_command(self, host, command, username=None, port=None):
-        if not isinstance(command, bytes):
-            raise TypeError(command)
-
+    def run_command(self, host, command, username=None, port=None,
+                    password=None, key_filename=None):
         self.host = host
         self.command = command
         self.username = username
         self.port = port
+        self.password = password
+        self.key_filename = key_filename
 
-        class Subprocess: pass
+        class Subprocess:
+            pass
         setattr(Subprocess, 'read', lambda: None)
         setattr(Subprocess, 'write', lambda: None)
         setattr(Subprocess, 'close', lambda: None)
@@ -645,20 +722,22 @@ class SSHGitClientTests(TestCase):
         self.assertEqual('ssh://user@git.samba.org:2222/tmp/repo.git', url)
 
     def test_default_command(self):
-        self.assertEqual(b'git-upload-pack',
-                self.client._get_cmd_path(b'upload-pack'))
+        self.assertEqual(
+            b'git-upload-pack',
+            self.client._get_cmd_path(b'upload-pack'))
 
     def test_alternative_command_path(self):
         self.client.alternative_paths[b'upload-pack'] = (
             b'/usr/lib/git/git-upload-pack')
-        self.assertEqual(b'/usr/lib/git/git-upload-pack',
+        self.assertEqual(
+            b'/usr/lib/git/git-upload-pack',
             self.client._get_cmd_path(b'upload-pack'))
 
     def test_alternative_command_path_spaces(self):
         self.client.alternative_paths[b'upload-pack'] = (
             b'/usr/lib/git/git-upload-pack -ibla')
         self.assertEqual(b"/usr/lib/git/git-upload-pack -ibla",
-            self.client._get_cmd_path(b'upload-pack'))
+                         self.client._get_cmd_path(b'upload-pack'))
 
     def test_connect(self):
         server = self.server
@@ -670,11 +749,11 @@ class SSHGitClientTests(TestCase):
         client._connect(b"command", b"/path/to/repo")
         self.assertEqual(b"username", server.username)
         self.assertEqual(1337, server.port)
-        self.assertEqual(b"git-command '/path/to/repo'", server.command)
+        self.assertEqual("git-command '/path/to/repo'", server.command)
 
         client._connect(b"relative-command", b"/~/path/to/repo")
-        self.assertEqual(b"git-relative-command '~/path/to/repo'",
-                          server.command)
+        self.assertEqual("git-relative-command '~/path/to/repo'",
+                         server.command)
 
 
 class ReportStatusParserTests(TestCase):
@@ -715,7 +794,7 @@ class LocalGitClientTests(TestCase):
         t = MemoryRepo()
         s = open_repo('a.git')
         self.addCleanup(tear_down_repo, s)
-        self.assertEqual(s.get_refs(), c.fetch(s.path, t))
+        self.assertEqual(s.get_refs(), c.fetch(s.path, t).refs)
 
     def test_fetch_empty(self):
         c = LocalGitClient()
@@ -723,16 +802,22 @@ class LocalGitClientTests(TestCase):
         self.addCleanup(tear_down_repo, s)
         out = BytesIO()
         walker = {}
-        ret = c.fetch_pack(s.path, lambda heads: [], graph_walker=walker,
-            pack_data=out.write)
+        ret = c.fetch_pack(
+            s.path, lambda heads: [], graph_walker=walker, pack_data=out.write)
         self.assertEqual({
             b'HEAD': b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
             b'refs/heads/master': b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
             b'refs/tags/mytag': b'28237f4dc30d0d462658d6b937b08a0f0b6ef55a',
-            b'refs/tags/mytag-packed': b'b0931cadc54336e78a1d980420e3268903b57a50'
-            }, ret)
-        self.assertEqual(b"PACK\x00\x00\x00\x02\x00\x00\x00\x00\x02\x9d\x08"
-            b"\x82;\xd8\xa8\xea\xb5\x10\xadj\xc7\\\x82<\xfd>\xd3\x1e", out.getvalue())
+            b'refs/tags/mytag-packed':
+                b'b0931cadc54336e78a1d980420e3268903b57a50'
+            }, ret.refs)
+        self.assertEqual(
+                {b'HEAD': b'refs/heads/master'},
+                ret.symrefs)
+        self.assertEqual(
+                b"PACK\x00\x00\x00\x02\x00\x00\x00\x00\x02\x9d\x08"
+                b"\x82;\xd8\xa8\xea\xb5\x10\xadj\xc7\\\x82<\xfd>\xd3\x1e",
+                out.getvalue())
 
     def test_fetch_pack_none(self):
         c = LocalGitClient()
@@ -740,11 +825,21 @@ class LocalGitClientTests(TestCase):
         self.addCleanup(tear_down_repo, s)
         out = BytesIO()
         walker = MemoryRepo().get_graph_walker()
-        c.fetch_pack(s.path,
+        ret = c.fetch_pack(
+            s.path,
             lambda heads: [b"a90fa2d900a17e99b433217e988c4eb4a2e9a097"],
             graph_walker=walker, pack_data=out.write)
+        self.assertEqual({b'HEAD': b'refs/heads/master'}, ret.symrefs)
+        self.assertEqual({
+            b'HEAD': b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
+            b'refs/heads/master': b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
+            b'refs/tags/mytag': b'28237f4dc30d0d462658d6b937b08a0f0b6ef55a',
+            b'refs/tags/mytag-packed':
+            b'b0931cadc54336e78a1d980420e3268903b57a50'
+            }, ret.refs)
         # Hardcoding is not ideal, but we'll fix that some other day..
-        self.assertTrue(out.getvalue().startswith(b'PACK\x00\x00\x00\x02\x00\x00\x00\x07'))
+        self.assertTrue(out.getvalue().startswith(
+                b'PACK\x00\x00\x00\x02\x00\x00\x00\x07'))
 
     def test_send_pack_without_changes(self):
         local = open_repo('a.git')
@@ -773,12 +868,12 @@ class LocalGitClientTests(TestCase):
         self.assertDictEqual(local.refs.as_dict(), refs)
 
     def send_and_verify(self, branch, local, target):
-        """Send a branch from local to remote repository and verify it worked."""
+        """Send branch from local to remote repository and verify it worked."""
         client = LocalGitClient()
         ref_name = b"refs/heads/" + branch
         new_refs = client.send_pack(target.path,
-                                    lambda _: { ref_name: local.refs[ref_name] },
-                                    local.object_store.generate_pack_contents)
+                                    lambda _: {ref_name: local.refs[ref_name]},
+                                    local.object_store.generate_pack_data)
 
         self.assertEqual(local.refs[ref_name], new_refs[ref_name])
 
@@ -789,12 +884,28 @@ class LocalGitClientTests(TestCase):
 
 class HttpGitClientTests(TestCase):
 
+    @staticmethod
+    def b64encode(s):
+        """Python 2/3 compatible Base64 encoder. Returns string."""
+        try:
+            return base64.b64encode(s)
+        except TypeError:
+            return base64.b64encode(s.encode('latin1')).decode('ascii')
+
     def test_get_url(self):
         base_url = 'https://github.com/jelmer/dulwich'
         path = '/jelmer/dulwich'
         c = HttpGitClient(base_url)
 
         url = c.get_url(path)
+        self.assertEqual('https://github.com/jelmer/dulwich', url)
+
+    def test_get_url_bytes_path(self):
+        base_url = 'https://github.com/jelmer/dulwich'
+        path_bytes = b'/jelmer/dulwich'
+        c = HttpGitClient(base_url)
+
+        url = c.get_url(path_bytes)
         self.assertEqual('https://github.com/jelmer/dulwich', url)
 
     def test_get_url_with_username_and_passwd(self):
@@ -811,12 +922,12 @@ class HttpGitClientTests(TestCase):
         c = HttpGitClient(url, config=None, username='user', password='passwd')
         self.assertEqual('user', c._username)
         self.assertEqual('passwd', c._password)
-        [pw_handler] = [
-            h for h in c.opener.handlers if getattr(h, 'passwd', None) is not None]
-        self.assertEqual(
-            ('user', 'passwd'),
-            pw_handler.passwd.find_user_password(
-                None, 'https://github.com/jelmer/dulwich'))
+
+        basic_auth = c.pool_manager.headers['authorization']
+        auth_string = '%s:%s' % ('user', 'passwd')
+        b64_credentials = self.b64encode(auth_string)
+        expected_basic_auth = 'Basic %s' % b64_credentials
+        self.assertEqual(basic_auth, expected_basic_auth)
 
     def test_init_no_username_passwd(self):
         url = 'https://github.com/jelmer/dulwich'
@@ -824,9 +935,7 @@ class HttpGitClientTests(TestCase):
         c = HttpGitClient(url, config=None)
         self.assertIs(None, c._username)
         self.assertIs(None, c._password)
-        pw_handler = [
-            h for h in c.opener.handlers if getattr(h, 'passwd', None) is not None]
-        self.assertEqual(0, len(pw_handler))
+        self.assertNotIn('authorization', c.pool_manager.headers)
 
     def test_from_parsedurl_on_url_with_quoted_credentials(self):
         original_username = 'john|the|first'
@@ -843,12 +952,92 @@ class HttpGitClientTests(TestCase):
         c = HttpGitClient.from_parsedurl(urlparse.urlparse(url))
         self.assertEqual(original_username, c._username)
         self.assertEqual(original_password, c._password)
-        [pw_handler] = [
-            h for h in c.opener.handlers if getattr(h, 'passwd', None) is not None]
-        self.assertEqual(
-            (original_username, original_password),
-            pw_handler.passwd.find_user_password(
-                None, 'https://github.com/jelmer/dulwich'))
+
+        basic_auth = c.pool_manager.headers['authorization']
+        auth_string = '%s:%s' % (original_username, original_password)
+        b64_credentials = self.b64encode(auth_string)
+        expected_basic_auth = 'Basic %s' % str(b64_credentials)
+        self.assertEqual(basic_auth, expected_basic_auth)
+
+    def test_url_redirect_location(self):
+
+        from urllib3.response import HTTPResponse
+
+        test_data = {
+            'https://gitlab.com/inkscape/inkscape/': {
+                'redirect_url': 'https://gitlab.com/inkscape/inkscape.git/',
+                'refs_data': (b'001e# service=git-upload-pack\n00000032'
+                              b'fb2bebf4919a011f0fd7cec085443d0031228e76 '
+                              b'HEAD\n0000')
+            },
+            'https://github.com/jelmer/dulwich/': {
+                'redirect_url': 'https://github.com/jelmer/dulwich/',
+                'refs_data': (b'001e# service=git-upload-pack\n00000032'
+                              b'3ff25e09724aa4d86ea5bca7d5dd0399a3c8bfcf '
+                              b'HEAD\n0000')
+            }
+        }
+
+        tail = 'info/refs?service=git-upload-pack'
+
+        # we need to mock urllib3.PoolManager as this test will fail
+        # otherwise without an active internet connection
+        class PoolManagerMock():
+
+            def __init__(self):
+                self.headers = {}
+
+            def request(self, method, url, fields=None, headers=None,
+                        redirect=True):
+                base_url = url[:-len(tail)]
+                redirect_base_url = test_data[base_url]['redirect_url']
+                redirect_url = redirect_base_url + tail
+                headers = {
+                    'Content-Type':
+                    'application/x-git-upload-pack-advertisement'
+                }
+                body = test_data[base_url]['refs_data']
+                # urllib3 handles automatic redirection by default
+                status = 200
+                request_url = redirect_url
+                # simulate urllib3 behavior when redirect parameter is False
+                if redirect is False:
+                    request_url = url
+                    if redirect_base_url != base_url:
+                        body = ''
+                        headers['location'] = redirect_url
+                        status = 301
+                return HTTPResponse(body=body,
+                                    headers=headers,
+                                    request_method=method,
+                                    request_url=request_url,
+                                    status=status)
+
+        pool_manager = PoolManagerMock()
+
+        for base_url in test_data.keys():
+            # instantiate HttpGitClient with mocked pool manager
+            c = HttpGitClient(base_url, pool_manager=pool_manager,
+                              config=None)
+            # call method that detects url redirection
+            _, _, processed_url = c._discover_references(b'git-upload-pack',
+                                                         base_url)
+
+            # send the same request as the method above without redirection
+            resp = c.pool_manager.request('GET', base_url + tail,
+                                          redirect=False)
+
+            # check expected behavior of urllib3
+            redirect_location = resp.get_redirect_location()
+            if resp.status == 200:
+                self.assertFalse(redirect_location)
+
+            if redirect_location:
+                # check that url redirection has been correctly detected
+                self.assertEqual(processed_url, redirect_location[:-len(tail)])
+            else:
+                # check also the no redirection case
+                self.assertEqual(processed_url, base_url)
 
 
 class TCPGitClientTests(TestCase):
@@ -865,7 +1054,242 @@ class TCPGitClientTests(TestCase):
         host = 'github.com'
         path = '/jelmer/dulwich'
         port = 9090
-        c = TCPGitClient(host, port=9090)
+        c = TCPGitClient(host, port=port)
 
         url = c.get_url(path)
         self.assertEqual('git://github.com:9090/jelmer/dulwich', url)
+
+
+class DefaultUrllib3ManagerTest(TestCase):
+
+    def test_no_config(self):
+        manager = default_urllib3_manager(config=None)
+        self.assertEqual(manager.connection_pool_kw['cert_reqs'],
+                         'CERT_REQUIRED')
+
+    def test_config_no_proxy(self):
+        manager = default_urllib3_manager(config=ConfigDict())
+        self.assertNotIsInstance(manager, urllib3.ProxyManager)
+
+    def test_config_ssl(self):
+        config = ConfigDict()
+        config.set(b'http', b'sslVerify', b'true')
+        manager = default_urllib3_manager(config=config)
+        self.assertEqual(manager.connection_pool_kw['cert_reqs'],
+                         'CERT_REQUIRED')
+
+    def test_config_no_ssl(self):
+        config = ConfigDict()
+        config.set(b'http', b'sslVerify', b'false')
+        manager = default_urllib3_manager(config=config)
+        self.assertEqual(manager.connection_pool_kw['cert_reqs'],
+                         'CERT_NONE')
+
+    def test_config_proxy(self):
+        config = ConfigDict()
+        config.set(b'http', b'proxy', b'http://localhost:3128/')
+        manager = default_urllib3_manager(config=config)
+
+        self.assertIsInstance(manager, urllib3.ProxyManager)
+        self.assertTrue(hasattr(manager, 'proxy'))
+        self.assertEqual(manager.proxy.scheme, 'http')
+        self.assertEqual(manager.proxy.host, 'localhost')
+        self.assertEqual(manager.proxy.port, 3128)
+
+    def test_config_no_verify_ssl(self):
+        manager = default_urllib3_manager(config=None, cert_reqs="CERT_NONE")
+        self.assertEqual(manager.connection_pool_kw['cert_reqs'], 'CERT_NONE')
+
+
+class SubprocessSSHVendorTests(TestCase):
+
+    def setUp(self):
+        # Monkey Patch client subprocess popen
+        self._orig_popen = dulwich.client.subprocess.Popen
+        dulwich.client.subprocess.Popen = DummyPopen
+
+    def tearDown(self):
+        dulwich.client.subprocess.Popen = self._orig_popen
+
+    def test_run_command_dashes(self):
+        vendor = SubprocessSSHVendor()
+        self.assertRaises(StrangeHostname, vendor.run_command, '--weird-host',
+                          'git-clone-url')
+
+    def test_run_command_password(self):
+        vendor = SubprocessSSHVendor()
+        self.assertRaises(NotImplementedError, vendor.run_command, 'host',
+                          'git-clone-url', password='12345')
+
+    def test_run_command_password_and_privkey(self):
+        vendor = SubprocessSSHVendor()
+        self.assertRaises(NotImplementedError, vendor.run_command,
+                          'host', 'git-clone-url',
+                          password='12345', key_filename='/tmp/id_rsa')
+
+    def test_run_command_with_port_username_and_privkey(self):
+        expected = ['ssh', '-x', '-p', '2200',
+                    '-i', '/tmp/id_rsa', 'user@host', 'git-clone-url']
+
+        vendor = SubprocessSSHVendor()
+        command = vendor.run_command(
+            'host', 'git-clone-url',
+            username='user', port='2200',
+            key_filename='/tmp/id_rsa')
+
+        args = command.proc.args
+
+        self.assertListEqual(expected, args[0])
+
+
+class PLinkSSHVendorTests(TestCase):
+
+    def setUp(self):
+        # Monkey Patch client subprocess popen
+        self._orig_popen = dulwich.client.subprocess.Popen
+        dulwich.client.subprocess.Popen = DummyPopen
+
+    def tearDown(self):
+        dulwich.client.subprocess.Popen = self._orig_popen
+
+    def test_run_command_dashes(self):
+        vendor = PLinkSSHVendor()
+        self.assertRaises(StrangeHostname, vendor.run_command, '--weird-host',
+                          'git-clone-url')
+
+    def test_run_command_password_and_privkey(self):
+        vendor = PLinkSSHVendor()
+
+        warnings.simplefilter("always", UserWarning)
+        self.addCleanup(warnings.resetwarnings)
+        warnings_list, restore_warnings = setup_warning_catcher()
+        self.addCleanup(restore_warnings)
+
+        command = vendor.run_command(
+                'host', 'git-clone-url', password='12345',
+                key_filename='/tmp/id_rsa')
+
+        expected_warning = UserWarning(
+            'Invoking PLink with a password exposes the password in the '
+            'process list.')
+
+        for w in warnings_list:
+            if (type(w) == type(expected_warning) and
+                    w.args == expected_warning.args):
+                break
+        else:
+            raise AssertionError(
+                'Expected warning %r not in %r' %
+                (expected_warning, warnings_list))
+
+        args = command.proc.args
+
+        if sys.platform == 'win32':
+            binary = ['plink.exe', '-ssh']
+        else:
+            binary = ['plink', '-ssh']
+        expected = binary + [
+                '-pw', '12345', '-i', '/tmp/id_rsa', 'host', 'git-clone-url']
+        self.assertListEqual(expected, args[0])
+
+    def test_run_command_password(self):
+        if sys.platform == 'win32':
+            binary = ['plink.exe', '-ssh']
+        else:
+            binary = ['plink', '-ssh']
+        expected = binary + ['-pw', '12345', 'host', 'git-clone-url']
+
+        vendor = PLinkSSHVendor()
+
+        warnings.simplefilter("always", UserWarning)
+        self.addCleanup(warnings.resetwarnings)
+        warnings_list, restore_warnings = setup_warning_catcher()
+        self.addCleanup(restore_warnings)
+
+        command = vendor.run_command('host', 'git-clone-url', password='12345')
+
+        expected_warning = UserWarning(
+            'Invoking PLink with a password exposes the password in the '
+            'process list.')
+
+        for w in warnings_list:
+            if (type(w) == type(expected_warning) and
+                    w.args == expected_warning.args):
+                break
+        else:
+            raise AssertionError(
+                'Expected warning %r not in %r' %
+                (expected_warning, warnings_list))
+
+        args = command.proc.args
+
+        self.assertListEqual(expected, args[0])
+
+    def test_run_command_with_port_username_and_privkey(self):
+        if sys.platform == 'win32':
+            binary = ['plink.exe', '-ssh']
+        else:
+            binary = ['plink', '-ssh']
+        expected = binary + [
+            '-P', '2200', '-i', '/tmp/id_rsa',
+            'user@host', 'git-clone-url']
+
+        vendor = PLinkSSHVendor()
+        command = vendor.run_command(
+            'host', 'git-clone-url',
+            username='user', port='2200',
+            key_filename='/tmp/id_rsa')
+
+        args = command.proc.args
+
+        self.assertListEqual(expected, args[0])
+
+
+class RsyncUrlTests(TestCase):
+
+    def test_simple(self):
+        self.assertEqual(
+                parse_rsync_url('foo:bar/path'),
+                (None, 'foo', 'bar/path'))
+        self.assertEqual(
+                parse_rsync_url('user@foo:bar/path'),
+                ('user', 'foo', 'bar/path'))
+
+    def test_path(self):
+        self.assertRaises(ValueError, parse_rsync_url, '/path')
+
+
+class CheckWantsTests(TestCase):
+
+    def test_fine(self):
+        check_wants(
+            [b'2f3dc7a53fb752a6961d3a56683df46d4d3bf262'],
+            {b'refs/heads/blah': b'2f3dc7a53fb752a6961d3a56683df46d4d3bf262'})
+
+    def test_missing(self):
+        self.assertRaises(
+            InvalidWants, check_wants,
+            [b'2f3dc7a53fb752a6961d3a56683df46d4d3bf262'],
+            {b'refs/heads/blah': b'3f3dc7a53fb752a6961d3a56683df46d4d3bf262'})
+
+    def test_annotated(self):
+        self.assertRaises(
+            InvalidWants, check_wants,
+            [b'2f3dc7a53fb752a6961d3a56683df46d4d3bf262'],
+            {b'refs/heads/blah': b'3f3dc7a53fb752a6961d3a56683df46d4d3bf262',
+             b'refs/heads/blah^{}':
+                b'2f3dc7a53fb752a6961d3a56683df46d4d3bf262'})
+
+
+class FetchPackResultTests(TestCase):
+
+    def test_eq(self):
+        self.assertEqual(
+            FetchPackResult(
+                 {b'refs/heads/master':
+                  b'2f3dc7a53fb752a6961d3a56683df46d4d3bf262'}, {},
+                 b'user/agent'),
+            FetchPackResult(
+                {b'refs/heads/master':
+                 b'2f3dc7a53fb752a6961d3a56683df46d4d3bf262'}, {},
+                b'user/agent'))

@@ -36,9 +36,12 @@ class Hook(object):
     def execute(self, *args):
         """Execute the hook with the given args
 
-        :param args: argument list to hook
-        :raise HookError: hook execution failure
-        :return: a hook may return a useful value
+        Args:
+          args: argument list to hook
+        Raises:
+          HookError: hook execution failure
+        Returns:
+          a hook may return a useful value
         """
         raise NotImplementedError(self.execute)
 
@@ -52,20 +55,23 @@ class ShellHook(Hook):
     """
 
     def __init__(self, name, path, numparam,
-                 pre_exec_callback=None, post_exec_callback=None):
+                 pre_exec_callback=None, post_exec_callback=None,
+                 cwd=None):
         """Setup shell hook definition
 
-        :param name: name of hook for error messages
-        :param path: absolute path to executable file
-        :param numparam: number of requirements parameters
-        :param pre_exec_callback: closure for setup before execution
+        Args:
+          name: name of hook for error messages
+          path: absolute path to executable file
+          numparam: number of requirements parameters
+          pre_exec_callback: closure for setup before execution
             Defaults to None. Takes in the variable argument list from the
             execute functions and returns a modified argument list for the
             shell hook.
-        :param post_exec_callback: closure for cleanup after execution
+          post_exec_callback: closure for cleanup after execution
             Defaults to None. Takes in a boolean for hook success and the
             modified argument list and returns the final hook return value
             if applicable
+          cwd: working directory to switch to when executing the hook
         """
         self.name = name
         self.filepath = path
@@ -73,6 +79,8 @@ class ShellHook(Hook):
 
         self.pre_exec_callback = pre_exec_callback
         self.post_exec_callback = post_exec_callback
+
+        self.cwd = cwd
 
         if sys.version_info[0] == 2 and sys.platform == 'win32':
             # Python 2 on windows does not support unicode file paths
@@ -91,7 +99,7 @@ class ShellHook(Hook):
             args = self.pre_exec_callback(*args)
 
         try:
-            ret = subprocess.call([self.filepath] + list(args))
+            ret = subprocess.call([self.filepath] + list(args), cwd=self.cwd)
             if ret != 0:
                 if (self.post_exec_callback is not None):
                     self.post_exec_callback(0, *args)
@@ -110,7 +118,7 @@ class PreCommitShellHook(ShellHook):
     def __init__(self, controldir):
         filepath = os.path.join(controldir, 'hooks', 'pre-commit')
 
-        ShellHook.__init__(self, 'pre-commit', filepath, 0)
+        ShellHook.__init__(self, 'pre-commit', filepath, 0, cwd=controldir)
 
 
 class PostCommitShellHook(ShellHook):
@@ -119,14 +127,16 @@ class PostCommitShellHook(ShellHook):
     def __init__(self, controldir):
         filepath = os.path.join(controldir, 'hooks', 'post-commit')
 
-        ShellHook.__init__(self, 'post-commit', filepath, 0)
+        ShellHook.__init__(self, 'post-commit', filepath, 0, cwd=controldir)
 
 
 class CommitMsgShellHook(ShellHook):
     """commit-msg shell hook
 
-    :param args[0]: commit message
-    :return: new commit message or None
+    Args:
+      args[0]: commit message
+    Returns:
+      new commit message or None
     """
 
     def __init__(self, controldir):
@@ -149,4 +159,44 @@ class CommitMsgShellHook(ShellHook):
             os.unlink(args[0])
 
         ShellHook.__init__(self, 'commit-msg', filepath, 1,
-                           prepare_msg, clean_msg)
+                           prepare_msg, clean_msg, controldir)
+
+
+class PostReceiveShellHook(ShellHook):
+    """post-receive shell hook"""
+
+    def __init__(self, controldir):
+        self.controldir = controldir
+        filepath = os.path.join(controldir, 'hooks', 'post-receive')
+        ShellHook.__init__(self, 'post-receive', filepath, 0)
+
+    def execute(self, client_refs):
+        # do nothing if the script doesn't exist
+        if not os.path.exists(self.filepath):
+            return None
+
+        try:
+            env = os.environ.copy()
+            env['GIT_DIR'] = self.controldir
+
+            p = subprocess.Popen(
+                self.filepath,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=env
+            )
+
+            # client_refs is a list of (oldsha, newsha, ref)
+            in_data = '\n'.join([' '.join(ref) for ref in client_refs])
+
+            out_data, err_data = p.communicate(in_data)
+
+            if (p.returncode != 0) or err_data:
+                err_fmt = "post-receive exit code: %d\n" \
+                    + "stdout:\n%s\nstderr:\n%s"
+                err_msg = err_fmt % (p.returncode, out_data, err_data)
+                raise HookError(err_msg)
+            return out_data
+        except OSError as err:
+            raise HookError(repr(err))

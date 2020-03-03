@@ -26,6 +26,8 @@
 import posixpath
 import stat
 import tarfile
+import struct
+from os import SEEK_END
 from io import BytesIO
 from contextlib import closing
 
@@ -34,9 +36,11 @@ class ChunkedBytesIO(object):
     """Turn a list of bytestrings into a file-like object.
 
     This is similar to creating a `BytesIO` from a concatenation of the
-    bytestring list, but saves memory by NOT creating one giant bytestring first::
+    bytestring list, but saves memory by NOT creating one giant bytestring
+    first::
 
-        BytesIO(b''.join(list_of_bytestrings)) =~= ChunkedBytesIO(list_of_bytestrings)
+        BytesIO(b''.join(list_of_bytestrings)) =~= ChunkedBytesIO(
+            list_of_bytestrings)
     """
     def __init__(self, contents):
         self.contents = contents
@@ -64,32 +68,48 @@ class ChunkedBytesIO(object):
         return b''.join(buf)
 
 
-def tar_stream(store, tree, mtime, format=''):
+def tar_stream(store, tree, mtime, prefix=b'', format=''):
     """Generate a tar stream for the contents of a Git tree.
 
     Returns a generator that lazily assembles a .tar.gz archive, yielding it in
     pieces (bytestrings). To obtain the complete .tar.gz binary file, simply
     concatenate these chunks.
 
-    :param store: Object store to retrieve objects from
-    :param tree: Tree object for the tree root
-    :param mtime: UNIX timestamp that is assigned as the modification time for
-        all files
-    :param format: Optional compression format for tarball
-    :return: Bytestrings
+    Args:
+      store: Object store to retrieve objects from
+      tree: Tree object for the tree root
+      mtime: UNIX timestamp that is assigned as the modification time for
+        all files, and the gzip header modification time if format='gz'
+      format: Optional compression format for tarball
+    Returns:
+      Bytestrings
     """
     buf = BytesIO()
     with closing(tarfile.open(None, "w:%s" % format, buf)) as tar:
-        for entry_abspath, entry in _walk_tree(store, tree):
+        if format == 'gz':
+            # Manually correct the gzip header file modification time so that
+            # archives created from the same Git tree are always identical.
+            # The gzip header file modification time is not currenctly
+            # accessible from the tarfile API, see:
+            # https://bugs.python.org/issue31526
+            buf.seek(0)
+            assert buf.read(2) == b'\x1f\x8b', 'Invalid gzip header'
+            buf.seek(4)
+            buf.write(struct.pack('<L', mtime))
+            buf.seek(0, SEEK_END)
+
+        for entry_abspath, entry in _walk_tree(store, tree, prefix):
             try:
                 blob = store[entry.sha]
             except KeyError:
-                # Entry probably refers to a submodule, which we don't yet support.
+                # Entry probably refers to a submodule, which we don't yet
+                # support.
                 continue
             data = ChunkedBytesIO(blob.chunked)
 
             info = tarfile.TarInfo()
-            info.name = entry_abspath.decode('ascii') # tarfile only works with ascii.
+            # tarfile only works with ascii.
+            info.name = entry_abspath.decode('ascii')
             info.size = blob.raw_length()
             info.mode = entry.mode
             info.mtime = mtime

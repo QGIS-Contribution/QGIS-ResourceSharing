@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2009 Jelmer Vernooij <jelmer@samba.org>
+ * Copyright (C) 2009 Jelmer Vernooij <jelmer@jelmer.uk>
  *
  * Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
  * General Public License as public by the Free Software Foundation; version 2.0
@@ -18,13 +18,14 @@
  * License, Version 2.0.
  */
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <stdint.h>
 
 #if PY_MAJOR_VERSION >= 3
 #define PyInt_FromLong PyLong_FromLong
 #define PyString_AS_STRING PyBytes_AS_STRING
-#define PyString_AsString PyBytes_AsString
+#define PyString_AS_STRING PyBytes_AS_STRING
 #define PyString_Check PyBytes_Check
 #define PyString_CheckExact PyBytes_CheckExact
 #define PyString_FromStringAndSize PyBytes_FromStringAndSize
@@ -133,7 +134,7 @@ static PyObject *py_apply_delta(PyObject *self, PyObject *args)
 		Py_DECREF(py_delta);
 		return NULL;
 	}
-	out = (uint8_t *)PyString_AsString(ret);
+	out = (uint8_t *)PyString_AS_STRING(ret);
 	while (index < delta_len) {
 		uint8_t cmd = delta[index];
 		index++;
@@ -205,7 +206,7 @@ static PyObject *py_bisect_find_sha(PyObject *self, PyObject *args)
 {
 	PyObject *unpack_name;
 	char *sha;
-	int sha_len;
+	Py_ssize_t sha_len;
 	int start, end;
 #if PY_MAJOR_VERSION >= 3
 	if (!PyArg_ParseTuple(args, "iiy#O", &start, &end,
@@ -227,7 +228,7 @@ static PyObject *py_bisect_find_sha(PyObject *self, PyObject *args)
 
 	while (start <= end) {
 		PyObject *file_sha;
-		int i = (start + end)/2;
+		Py_ssize_t i = (start + end)/2;
 		int cmp;
 		file_sha = PyObject_CallFunction(unpack_name, "i", i);
 		if (file_sha == NULL) {
@@ -238,7 +239,7 @@ static PyObject *py_bisect_find_sha(PyObject *self, PyObject *args)
 			Py_DECREF(file_sha);
 			return NULL;
 		}
-		cmp = memcmp(PyString_AsString(file_sha), sha, 20);
+		cmp = memcmp(PyString_AS_STRING(file_sha), sha, 20);
 		Py_DECREF(file_sha);
 		if (cmp < 0)
 			start = i + 1;
@@ -264,15 +265,6 @@ moduleinit(void)
 	PyObject *m;
 	PyObject *errors_module;
 
-	errors_module = PyImport_ImportModule("dulwich.errors");
-	if (errors_module == NULL)
-		return NULL;
-
-	PyExc_ApplyDeltaError = PyObject_GetAttrString(errors_module, "ApplyDeltaError");
-	Py_DECREF(errors_module);
-	if (PyExc_ApplyDeltaError == NULL)
-		return NULL;
-
 #if PY_MAJOR_VERSION >= 3
 	static struct PyModuleDef moduledef = {
 	  PyModuleDef_HEAD_INIT,
@@ -285,6 +277,18 @@ moduleinit(void)
 	  NULL,            /* m_clear*/
 	  NULL,            /* m_free */
 	};
+#endif
+
+	errors_module = PyImport_ImportModule("dulwich.errors");
+	if (errors_module == NULL)
+		return NULL;
+
+	PyExc_ApplyDeltaError = PyObject_GetAttrString(errors_module, "ApplyDeltaError");
+	Py_DECREF(errors_module);
+	if (PyExc_ApplyDeltaError == NULL)
+		return NULL;
+
+#if PY_MAJOR_VERSION >= 3
 	m = PyModule_Create(&moduledef);
 #else
 	m = Py_InitModule3("_pack", py_pack_methods, NULL);

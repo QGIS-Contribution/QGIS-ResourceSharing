@@ -1,6 +1,6 @@
 # errors.py -- errors for dulwich
 # Copyright (C) 2007 James Westby <jw+debian@jameswestby.net>
-# Copyright (C) 2009-2012 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2009-2012 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -36,11 +36,12 @@ class ChecksumMismatch(Exception):
         self.got = got
         self.extra = extra
         if self.extra is None:
-            Exception.__init__(self,
-                "Checksum mismatch: Expected %s, got %s" % (expected, got))
+            Exception.__init__(
+                self, "Checksum mismatch: Expected %s, got %s" %
+                (expected, got))
         else:
-            Exception.__init__(self,
-                "Checksum mismatch: Expected %s, got %s; %s" %
+            Exception.__init__(
+                self, "Checksum mismatch: Expected %s, got %s; %s" %
                 (expected, got, extra))
 
 
@@ -120,23 +121,20 @@ class GitProtocolError(Exception):
 class SendPackError(GitProtocolError):
     """An error occurred during send_pack."""
 
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)
-
 
 class UpdateRefsError(GitProtocolError):
     """The server reported errors updating refs."""
 
     def __init__(self, *args, **kwargs):
         self.ref_status = kwargs.pop('ref_status')
-        Exception.__init__(self, *args, **kwargs)
+        super(UpdateRefsError, self).__init__(*args, **kwargs)
 
 
 class HangupException(GitProtocolError):
     """Hangup exception."""
 
     def __init__(self):
-        Exception.__init__(self,
+        super(HangupException, self).__init__(
             "The remote server unexpectedly closed the connection.")
 
 
@@ -148,7 +146,8 @@ class UnexpectedCommandError(GitProtocolError):
             command = 'flush-pkt'
         else:
             command = 'command %s' % command
-        GitProtocolError.__init__(self, 'Protocol got unexpected %s' % command)
+        super(UnexpectedCommandError, self).__init__(
+            'Protocol got unexpected %s' % command)
 
 
 class FileFormatException(Exception):
@@ -161,6 +160,10 @@ class PackedRefsException(FileFormatException):
 
 class ObjectFormatException(FileFormatException):
     """Indicates an error parsing an object."""
+
+
+class EmptyFileException(FileFormatException):
+    """An unexpectedly empty file was encountered."""
 
 
 class NoIndexPresent(Exception):

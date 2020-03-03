@@ -1,5 +1,5 @@
 # objectspec.py -- Object specification
-# Copyright (C) 2014 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2014 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -30,22 +30,43 @@ def to_bytes(text):
 def parse_object(repo, objectish):
     """Parse a string referring to an object.
 
-    :param repo: A `Repo` object
-    :param objectish: A string referring to an object
-    :return: A git object
-    :raise KeyError: If the object can not be found
+    Args:
+      repo: A `Repo` object
+      objectish: A string referring to an object
+    Returns: A git object
+    Raises:
+      KeyError: If the object can not be found
     """
     objectish = to_bytes(objectish)
     return repo[objectish]
 
 
+def parse_tree(repo, treeish):
+    """Parse a string referring to a tree.
+
+    Args:
+      repo: A `Repo` object
+      treeish: A string referring to a tree
+    Returns: A git object
+    Raises:
+      KeyError: If the object can not be found
+    """
+    treeish = to_bytes(treeish)
+    o = repo[treeish]
+    if o.type_name == b"commit":
+        return repo[o.tree]
+    return o
+
+
 def parse_ref(container, refspec):
     """Parse a string referring to a reference.
 
-    :param container: A RefsContainer object
-    :param refspec: A string referring to a ref
-    :return: A ref
-    :raise KeyError: If the ref can not be found
+    Args:
+      container: A RefsContainer object
+      refspec: A string referring to a ref
+    Returns: A ref
+    Raises:
+      KeyError: If the ref can not be found
     """
     refspec = to_bytes(refspec)
     possible_refs = [
@@ -59,25 +80,26 @@ def parse_ref(container, refspec):
     for ref in possible_refs:
         if ref in container:
             return ref
-    else:
-        raise KeyError(refspec)
+    raise KeyError(refspec)
 
 
 def parse_reftuple(lh_container, rh_container, refspec):
     """Parse a reftuple spec.
 
-    :param lh_container: A RefsContainer object
-    :param hh_container: A RefsContainer object
-    :param refspec: A string
-    :return: A tuple with left and right ref
-    :raise KeyError: If one of the refs can not be found
+    Args:
+      lh_container: A RefsContainer object
+      hh_container: A RefsContainer object
+      refspec: A string
+    Returns: A tuple with left and right ref
+    Raises:
+      KeyError: If one of the refs can not be found
     """
+    refspec = to_bytes(refspec)
     if refspec.startswith(b"+"):
         force = True
         refspec = refspec[1:]
     else:
         force = False
-    refspec = to_bytes(refspec)
     if b":" in refspec:
         (lh, rh) = refspec.split(b":")
     else:
@@ -93,7 +115,7 @@ def parse_reftuple(lh_container, rh_container, refspec):
             rh = parse_ref(rh_container, rh)
         except KeyError:
             # TODO: check force?
-            if not b"/" in rh:
+            if b"/" not in rh:
                 rh = b"refs/heads/" + rh
     return (lh, rh, force)
 
@@ -101,11 +123,13 @@ def parse_reftuple(lh_container, rh_container, refspec):
 def parse_reftuples(lh_container, rh_container, refspecs):
     """Parse a list of reftuple specs to a list of reftuples.
 
-    :param lh_container: A RefsContainer object
-    :param hh_container: A RefsContainer object
-    :param refspecs: A list of refspecs or a string
-    :return: A list of refs
-    :raise KeyError: If one of the refs can not be found
+    Args:
+      lh_container: A RefsContainer object
+      hh_container: A RefsContainer object
+      refspecs: A list of refspecs or a string
+    Returns: A list of refs
+    Raises:
+      KeyError: If one of the refs can not be found
     """
     if not isinstance(refspecs, list):
         refspecs = [refspecs]
@@ -119,10 +143,12 @@ def parse_reftuples(lh_container, rh_container, refspecs):
 def parse_refs(container, refspecs):
     """Parse a list of refspecs to a list of refs.
 
-    :param container: A RefsContainer object
-    :param refspecs: A list of refspecs or a string
-    :return: A list of refs
-    :raise KeyError: If one of the refs can not be found
+    Args:
+      container: A RefsContainer object
+      refspecs: A list of refspecs or a string
+    Returns: A list of refs
+    Raises:
+      KeyError: If one of the refs can not be found
     """
     # TODO: Support * in refspecs
     if not isinstance(refspecs, list):
@@ -136,28 +162,73 @@ def parse_refs(container, refspecs):
 def parse_commit_range(repo, committishs):
     """Parse a string referring to a range of commits.
 
-    :param repo: A `Repo` object
-    :param committishs: A string referring to a range of commits.
-    :return: An iterator over `Commit` objects
-    :raise KeyError: When the reference commits can not be found
-    :raise ValueError: If the range can not be parsed
+    Args:
+      repo: A `Repo` object
+      committishs: A string referring to a range of commits.
+    Returns: An iterator over `Commit` objects
+    Raises:
+      KeyError: When the reference commits can not be found
+      ValueError: If the range can not be parsed
     """
     committishs = to_bytes(committishs)
     # TODO(jelmer): Support more than a single commit..
     return iter([parse_commit(repo, committishs)])
 
 
+class AmbiguousShortId(Exception):
+    """The short id is ambiguous."""
+
+    def __init__(self, prefix, options):
+        self.prefix = prefix
+        self.options = options
+
+
+def scan_for_short_id(object_store, prefix):
+    """Scan an object store for a short id."""
+    # TODO(jelmer): This could short-circuit looking for objects
+    # starting with a certain prefix.
+    ret = []
+    for object_id in object_store:
+        if object_id.startswith(prefix):
+            ret.append(object_store[object_id])
+    if not ret:
+        raise KeyError(prefix)
+    if len(ret) == 1:
+        return ret[0]
+    raise AmbiguousShortId(prefix, ret)
+
+
 def parse_commit(repo, committish):
     """Parse a string referring to a single commit.
 
-    :param repo: A` Repo` object
-    :param commitish: A string referring to a single commit.
-    :return: A Commit object
-    :raise KeyError: When the reference commits can not be found
-    :raise ValueError: If the range can not be parsed
+    Args:
+      repo: A` Repo` object
+      commitish: A string referring to a single commit.
+    Returns: A Commit object
+    Raises:
+      KeyError: When the reference commits can not be found
+      ValueError: If the range can not be parsed
     """
     committish = to_bytes(committish)
-    return repo[committish] # For now..
+    try:
+        return repo[committish]
+    except KeyError:
+        pass
+    try:
+        return repo[parse_ref(repo, committish)]
+    except KeyError:
+        pass
+    if len(committish) >= 4 and len(committish) < 40:
+        try:
+            int(committish, 16)
+        except ValueError:
+            pass
+        else:
+            try:
+                return scan_for_short_id(repo.object_store, committish)
+            except KeyError:
+                pass
+    raise KeyError(committish)
 
 
 # TODO: parse_path_in_tree(), which handles e.g. v1.0:Documentation

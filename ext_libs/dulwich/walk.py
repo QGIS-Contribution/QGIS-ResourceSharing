@@ -21,8 +21,6 @@
 """General implementation of walking commits and their contents."""
 
 
-from collections import defaultdict
-
 import collections
 import heapq
 from itertools import chain
@@ -35,6 +33,9 @@ from dulwich.diff_tree import (
     )
 from dulwich.errors import (
     MissingCommitError,
+    )
+from dulwich.objects import (
+    Tag,
     )
 
 ORDER_DATE = 'date'
@@ -59,12 +60,13 @@ class WalkEntry(object):
     def changes(self, path_prefix=None):
         """Get the tree changes for this entry.
 
-        :param path_prefix: Portion of the path in the repository to
+        Args:
+          path_prefix: Portion of the path in the repository to
             use to filter changes. Must be a directory name. Must be
             a full, valid, path reference (no partial names or wildcards).
-        :return: For commits with up to one parent, a list of TreeChange
-            objects; if the commit has no parents, these will be relative to the
-            empty tree. For merge commits, a list of lists of TreeChange
+        Returns: For commits with up to one parent, a list of TreeChange
+            objects; if the commit has no parents, these will be relative to
+            the empty tree. For merge commits, a list of lists of TreeChange
             objects; see dulwich.diff.tree_changes_for_merge.
         """
         cached = self._changes.get(path_prefix)
@@ -84,7 +86,8 @@ class WalkEntry(object):
                     parent = self._store[subtree_sha]
             else:
                 changes_func = tree_changes_for_merge
-                parent = [self._store[p].tree for p in self._get_parents(commit)]
+                parent = [
+                        self._store[p].tree for p in self._get_parents(commit)]
                 if path_prefix:
                     parent_trees = [self._store[p] for p in parent]
                     parent = []
@@ -136,15 +139,20 @@ class _CommitTimeQueue(object):
         for commit_id in chain(walker.include, walker.excluded):
             self._push(commit_id)
 
-    def _push(self, commit_id):
+    def _push(self, object_id):
         try:
-            commit = self._store[commit_id]
+            obj = self._store[object_id]
         except KeyError:
-            raise MissingCommitError(commit_id)
-        if commit_id not in self._pq_set and commit_id not in self._done:
+            raise MissingCommitError(object_id)
+        if isinstance(obj, Tag):
+            self._push(obj.object[1])
+            return
+        # TODO(jelmer): What to do about non-Commit and non-Tag objects?
+        commit = obj
+        if commit.id not in self._pq_set and commit.id not in self._done:
             heapq.heappush(self._pq, (-commit.commit_time, commit))
-            self._pq_set.add(commit_id)
-            self._seen.add(commit_id)
+            self._pq_set.add(commit.id)
+            self._seen.add(commit.id)
 
     def _exclude_parents(self, commit):
         excluded = self._excluded
@@ -183,20 +191,20 @@ class _CommitTimeQueue(object):
                                     for _, c in self._pq):
                     _, n = self._pq[0]
                     if self._last and n.commit_time >= self._last.commit_time:
-                        # If the next commit is newer than the last one, we need
-                        # to keep walking in case its parents (which we may not
-                        # have seen yet) are excluded. This gives the excluded
-                        # set a chance to "catch up" while the commit is still
-                        # in the Walker's output queue.
+                        # If the next commit is newer than the last one, we
+                        # need to keep walking in case its parents (which we
+                        # may not have seen yet) are excluded. This gives the
+                        # excluded set a chance to "catch up" while the commit
+                        # is still in the Walker's output queue.
                         reset_extra_commits = True
                     else:
                         reset_extra_commits = False
 
             if (self._min_time is not None and
-                commit.commit_time < self._min_time):
+                    commit.commit_time < self._min_time):
                 # We want to stop walking at min_time, but commits at the
-                # boundary may be out of order with respect to their parents. So
-                # we walk _MAX_EXTRA_COMMITS more commits once we hit this
+                # boundary may be out of order with respect to their parents.
+                # So we walk _MAX_EXTRA_COMMITS more commits once we hit this
                 # boundary.
                 reset_extra_commits = False
 
@@ -231,26 +239,27 @@ class Walker(object):
                  queue_cls=_CommitTimeQueue):
         """Constructor.
 
-        :param store: ObjectStore instance for looking up objects.
-        :param include: Iterable of SHAs of commits to include along with their
+        Args:
+          store: ObjectStore instance for looking up objects.
+          include: Iterable of SHAs of commits to include along with their
             ancestors.
-        :param exclude: Iterable of SHAs of commits to exclude along with their
+          exclude: Iterable of SHAs of commits to exclude along with their
             ancestors, overriding includes.
-        :param order: ORDER_* constant specifying the order of results. Anything
-            other than ORDER_DATE may result in O(n) memory usage.
-        :param reverse: If True, reverse the order of output, requiring O(n)
+          order: ORDER_* constant specifying the order of results.
+            Anything other than ORDER_DATE may result in O(n) memory usage.
+          reverse: If True, reverse the order of output, requiring O(n)
             memory.
-        :param max_entries: The maximum number of entries to yield, or None for
+          max_entries: The maximum number of entries to yield, or None for
             no limit.
-        :param paths: Iterable of file or subtree paths to show entries for.
-        :param rename_detector: diff.RenameDetector object for detecting
+          paths: Iterable of file or subtree paths to show entries for.
+          rename_detector: diff.RenameDetector object for detecting
             renames.
-        :param follow: If True, follow path across renames/copies. Forces a
+          follow: If True, follow path across renames/copies. Forces a
             default rename_detector.
-        :param since: Timestamp to list commits after.
-        :param until: Timestamp to list commits before.
-        :param get_parents: Method to retrieve the parents of a commit
-        :param queue_cls: A class to use for a queue of commits, supporting the
+          since: Timestamp to list commits after.
+          until: Timestamp to list commits before.
+          get_parents: Method to retrieve the parents of a commit
+          queue_cls: A class to use for a queue of commits, supporting the
             iterator protocol. The constructor takes a single argument, the
             Walker.
         """
@@ -259,7 +268,9 @@ class Walker(object):
         if order not in ALL_ORDERS:
             raise ValueError('Unknown walk order %s' % order)
         self.store = store
-        if not isinstance(include, list):
+        if isinstance(include, bytes):
+            # TODO(jelmer): Really, this should require a single type.
+            # Print deprecation warning here?
             include = [include]
         self.include = include
         self.excluded = set(exclude or [])
@@ -308,9 +319,10 @@ class Walker(object):
     def _should_return(self, entry):
         """Determine if a walk entry should be returned..
 
-        :param entry: The WalkEntry to consider.
-        :return: True if the WalkEntry should be returned by this walk, or False
-            otherwise (e.g. if it doesn't match any requested paths).
+        Args:
+          entry: The WalkEntry to consider.
+        Returns: True if the WalkEntry should be returned by this walk, or
+            False otherwise (e.g. if it doesn't match any requested paths).
         """
         commit = entry.commit
         if self.since is not None and commit.commit_time < self.since:
@@ -355,10 +367,11 @@ class Walker(object):
     def _reorder(self, results):
         """Possibly reorder a results iterator.
 
-        :param results: An iterator of WalkEntry objects, in the order returned
+        Args:
+          results: An iterator of WalkEntry objects, in the order returned
             from the queue_cls.
-        :return: An iterator or list of WalkEntry objects, in the order required
-            by the Walker.
+        Returns: An iterator or list of WalkEntry objects, in the order
+            required by the Walker.
         """
         if self.order == ORDER_TOPO:
             results = _topo_reorder(results, self.get_parents)
@@ -376,14 +389,15 @@ def _topo_reorder(entries, get_parents=lambda commit: commit.parents):
     This works best assuming the entries are already in almost-topological
     order, e.g. in commit time order.
 
-    :param entries: An iterable of WalkEntry objects.
-    :param get_parents: Optional function for getting the parents of a commit.
-    :return: iterator over WalkEntry objects from entries in FIFO order, except
+    Args:
+      entries: An iterable of WalkEntry objects.
+      get_parents: Optional function for getting the parents of a commit.
+    Returns: iterator over WalkEntry objects from entries in FIFO order, except
         where a parent would be yielded before any of its children.
     """
     todo = collections.deque()
     pending = {}
-    num_children = defaultdict(int)
+    num_children = collections.defaultdict(int)
     for entry in entries:
         todo.append(entry)
         for p in get_parents(entry.commit):

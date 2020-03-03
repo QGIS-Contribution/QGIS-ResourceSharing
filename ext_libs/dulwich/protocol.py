@@ -1,6 +1,6 @@
 # protocol.py -- Shared parts of the git protocols
 # Copyright (C) 2008 John Carr <john.carr@unrouted.co.uk>
-# Copyright (C) 2008-2012 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2008-2012 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -48,6 +48,10 @@ SIDE_BAND_CHANNEL_PROGRESS = 2
 # fatal error message just before stream aborts
 SIDE_BAND_CHANNEL_FATAL = 3
 
+CAPABILITY_ATOMIC = b'atomic'
+CAPABILITY_DEEPEN_SINCE = b'deepen-since'
+CAPABILITY_DEEPEN_NOT = b'deepen-not'
+CAPABILITY_DEEPEN_RELATIVE = b'deepen-relative'
 CAPABILITY_DELETE_REFS = b'delete-refs'
 CAPABILITY_INCLUDE_TAG = b'include-tag'
 CAPABILITY_MULTI_ACK = b'multi_ack'
@@ -58,13 +62,39 @@ CAPABILITY_OFS_DELTA = b'ofs-delta'
 CAPABILITY_QUIET = b'quiet'
 CAPABILITY_REPORT_STATUS = b'report-status'
 CAPABILITY_SHALLOW = b'shallow'
+CAPABILITY_SIDE_BAND = b'side-band'
 CAPABILITY_SIDE_BAND_64K = b'side-band-64k'
 CAPABILITY_THIN_PACK = b'thin-pack'
 CAPABILITY_AGENT = b'agent'
+CAPABILITY_SYMREF = b'symref'
 
 # Magic ref that is used to attach capabilities to when
 # there are no refs. Should always be ste to ZERO_SHA.
 CAPABILITIES_REF = b'capabilities^{}'
+
+COMMON_CAPABILITIES = [
+    CAPABILITY_OFS_DELTA,
+    CAPABILITY_SIDE_BAND,
+    CAPABILITY_SIDE_BAND_64K,
+    CAPABILITY_AGENT,
+    CAPABILITY_NO_PROGRESS]
+KNOWN_UPLOAD_CAPABILITIES = set(COMMON_CAPABILITIES + [
+    CAPABILITY_THIN_PACK,
+    CAPABILITY_MULTI_ACK,
+    CAPABILITY_MULTI_ACK_DETAILED,
+    CAPABILITY_INCLUDE_TAG,
+    CAPABILITY_DEEPEN_SINCE,
+    CAPABILITY_SYMREF,
+    CAPABILITY_SHALLOW,
+    CAPABILITY_DEEPEN_NOT,
+    CAPABILITY_DEEPEN_RELATIVE,
+    ])
+KNOWN_RECEIVE_CAPABILITIES = set(COMMON_CAPABILITIES + [
+    CAPABILITY_REPORT_STATUS,
+    CAPABILITY_DELETE_REFS,
+    CAPABILITY_QUIET,
+    CAPABILITY_ATOMIC,
+    ])
 
 
 def agent_string():
@@ -73,6 +103,25 @@ def agent_string():
 
 def capability_agent():
     return CAPABILITY_AGENT + b'=' + agent_string()
+
+
+def capability_symref(from_ref, to_ref):
+    return CAPABILITY_SYMREF + b'=' + from_ref + b':' + to_ref
+
+
+def extract_capability_names(capabilities):
+    return set(parse_capability(c)[0] for c in capabilities)
+
+
+def parse_capability(capability):
+    parts = capability.split(b'=', 1)
+    if len(parts) == 1:
+        return (parts[0], None)
+    return tuple(parts)
+
+
+def symref_capabilities(symrefs):
+    return [capability_symref(*k) for k in symrefs]
 
 
 COMMAND_DEEPEN = b'deepen'
@@ -100,8 +149,9 @@ class ProtocolFile(object):
 def pkt_line(data):
     """Wrap data in a pkt-line.
 
-    :param data: The data to wrap, as a str or None.
-    :return: The data prefixed with its length in pkt-line format; if data was
+    Args:
+      data: The data to wrap, as a str or None.
+    Returns: The data prefixed with its length in pkt-line format; if data was
         None, returns the flush-pkt ('0000').
     """
     if data is None:
@@ -114,8 +164,8 @@ class Protocol(object):
 
     Parts of the git wire protocol use 'pkt-lines' to communicate. A pkt-line
     consists of the length of the line as a 4-byte hex string, followed by the
-    payload data. The length includes the 4-byte header. The special line '0000'
-    indicates the end of a section of input and is called a 'flush-pkt'.
+    payload data. The length includes the 4-byte header. The special line
+    '0000' indicates the end of a section of input and is called a 'flush-pkt'.
 
     For details on the pkt-line format, see the cgit distribution:
         Documentation/technical/protocol-common.txt
@@ -143,7 +193,7 @@ class Protocol(object):
 
         This method may read from the readahead buffer; see unread_pkt_line.
 
-        :return: The next string from the stream, without the length prefix, or
+        Returns: The next string from the stream, without the length prefix, or
             None for a flush-pkt ('0000').
         """
         if self._readahead is None:
@@ -169,15 +219,17 @@ class Protocol(object):
         else:
             if len(pkt_contents) + 4 != size:
                 raise GitProtocolError(
-                    'Length of pkt read %04x does not match length prefix %04x' % (len(pkt_contents) + 4, size))
+                    'Length of pkt read %04x does not match length prefix %04x'
+                    % (len(pkt_contents) + 4, size))
             return pkt_contents
 
     def eof(self):
         """Test whether the protocol stream has reached EOF.
 
-        Note that this refers to the actual stream EOF and not just a flush-pkt.
+        Note that this refers to the actual stream EOF and not just a
+        flush-pkt.
 
-        :return: True if the stream is at EOF, False otherwise.
+        Returns: True if the stream is at EOF, False otherwise.
         """
         try:
             next_line = self.read_pkt_line()
@@ -192,8 +244,10 @@ class Protocol(object):
         This method can be used to unread a single pkt-line into a fixed
         readahead buffer.
 
-        :param data: The data to unread, without the length prefix.
-        :raise ValueError: If more than one pkt-line is unread.
+        Args:
+          data: The data to unread, without the length prefix.
+        Raises:
+          ValueError: If more than one pkt-line is unread.
         """
         if self._readahead is not None:
             raise ValueError('Attempted to unread multiple pkt-lines.')
@@ -202,7 +256,8 @@ class Protocol(object):
     def read_pkt_seq(self):
         """Read a sequence of pkt-lines from the remote git process.
 
-        :return: Yields each line of data up to but not including the next flush-pkt.
+        Returns: Yields each line of data up to but not including the next
+            flush-pkt.
         """
         pkt = self.read_pkt_line()
         while pkt:
@@ -212,7 +267,8 @@ class Protocol(object):
     def write_pkt_line(self, line):
         """Sends a pkt-line to the remote git process.
 
-        :param line: A string containing the data to send, without the length
+        Args:
+          line: A string containing the data to send, without the length
             prefix.
         """
         try:
@@ -247,8 +303,9 @@ class Protocol(object):
     def write_sideband(self, channel, blob):
         """Write multiplexed data to the sideband.
 
-        :param channel: An int specifying the channel to write to.
-        :param blob: A blob of data (as a string) to send on this channel.
+        Args:
+          channel: An int specifying the channel to write to.
+          blob: A blob of data (as a string) to send on this channel.
         """
         # a pktline can be a max of 65520. a sideband line can therefore be
         # 65520-5 = 65515
@@ -262,8 +319,9 @@ class Protocol(object):
 
         Only used for the TCP git protocol (git://).
 
-        :param cmd: The remote service to access.
-        :param args: List of arguments to send to remove service.
+        Args:
+          cmd: The remote service to access.
+          args: List of arguments to send to remove service.
         """
         self.write_pkt_line(cmd + b" " + b"".join([(a + b"\0") for a in args]))
 
@@ -272,7 +330,7 @@ class Protocol(object):
 
         Only used for the TCP git protocol (git://).
 
-        :return: A tuple of (command, [list of arguments]).
+        Returns: A tuple of (command, [list of arguments]).
         """
         line = self.read_pkt_line()
         splice_at = line.find(b" ")
@@ -291,14 +349,15 @@ class ReceivableProtocol(Protocol):
     to a read() method.
 
     If you want to read n bytes from the wire and block until exactly n bytes
-    (or EOF) are read, use read(n). If you want to read at most n bytes from the
-    wire but don't care if you get less, use recv(n). Note that recv(n) will
-    still block until at least one byte is read.
+    (or EOF) are read, use read(n). If you want to read at most n bytes from
+    the wire but don't care if you get less, use recv(n). Note that recv(n)
+    will still block until at least one byte is read.
     """
 
-    def __init__(self, recv, write, report_activity=None, rbufsize=_RBUFSIZE):
-        super(ReceivableProtocol, self).__init__(self.read, write,
-                                                 report_activity)
+    def __init__(self, recv, write, close=None, report_activity=None,
+                 rbufsize=_RBUFSIZE):
+        super(ReceivableProtocol, self).__init__(
+                self.read, write, close=close, report_activity=report_activity)
         self._recv = recv
         self._rbuf = BytesIO()
         self._rbufsize = rbufsize
@@ -310,7 +369,8 @@ class ReceivableProtocol(Protocol):
         #  - seek back to start rather than 0 in case some buffer has been
         #    consumed.
         #  - use SEEK_END instead of the magic number.
-        # Copyright (c) 2001-2010 Python Software Foundation; All Rights Reserved
+        # Copyright (c) 2001-2010 Python Software Foundation; All Rights
+        # Reserved
         # Licensed under the Python Software Foundation License.
         # TODO: see if buffer is more efficient than cBytesIO.
         assert size > 0
@@ -359,7 +419,7 @@ class ReceivableProtocol(Protocol):
             buf.write(data)
             buf_len += n
             del data  # explicit free
-            #assert buf_len == buf.tell()
+            # assert buf_len == buf.tell()
         buf.seek(start)
         return buf.read()
 
@@ -390,10 +450,11 @@ class ReceivableProtocol(Protocol):
 def extract_capabilities(text):
     """Extract a capabilities list from a string, if present.
 
-    :param text: String to extract from
-    :return: Tuple with text with capabilities removed and list of capabilities
+    Args:
+      text: String to extract from
+    Returns: Tuple with text with capabilities removed and list of capabilities
     """
-    if not b"\0" in text:
+    if b"\0" not in text:
         return text, []
     text, capabilities = text.rstrip().split(b"\0")
     return (text, capabilities.strip().split(b" "))
@@ -407,8 +468,9 @@ def extract_want_line_capabilities(text):
 
         want obj-id cap1 cap2 ...
 
-    :param text: Want line to extract from
-    :return: Tuple with text with capabilities removed and list of capabilities
+    Args:
+      text: Want line to extract from
+    Returns: Tuple with text with capabilities removed and list of capabilities
     """
     split_text = text.rstrip().split(b" ")
     if len(split_text) < 3:
@@ -428,16 +490,17 @@ def ack_type(capabilities):
 class BufferedPktLineWriter(object):
     """Writer that wraps its data in pkt-lines and has an independent buffer.
 
-    Consecutive calls to write() wrap the data in a pkt-line and then buffers it
-    until enough lines have been written such that their total length (including
-    length prefix) reach the buffer size.
+    Consecutive calls to write() wrap the data in a pkt-line and then buffers
+    it until enough lines have been written such that their total length
+    (including length prefix) reach the buffer size.
     """
 
     def __init__(self, write, bufsize=65515):
         """Initialize the BufferedPktLineWriter.
 
-        :param write: A write callback for the underlying writer.
-        :param bufsize: The internal buffer size, including length prefixes.
+        Args:
+          write: A write callback for the underlying writer.
+          bufsize: The internal buffer size, including length prefixes.
         """
         self._write = write
         self._bufsize = bufsize

@@ -32,54 +32,20 @@ This implementation is experimental and does not have any tests.
 
 import paramiko
 import paramiko.client
-import threading
+
 
 class _ParamikoWrapper(object):
-    STDERR_READ_N = 2048  # 2k
 
-    def __init__(self, client, channel, progress_stderr=None):
+    def __init__(self, client, channel):
         self.client = client
         self.channel = channel
-        self.progress_stderr = progress_stderr
-        self.should_monitor = bool(progress_stderr) or True
-        self.monitor_thread = None
-        self.stderr = b''
 
         # Channel must block
         self.channel.setblocking(True)
 
-        # Start
-        if self.should_monitor:
-            self.monitor_thread = threading.Thread(
-                target=self.monitor_stderr)
-            self.monitor_thread.start()
-
-    def monitor_stderr(self):
-        while self.should_monitor:
-            # Block and read
-            data = self.read_stderr(self.STDERR_READ_N)
-
-            # Socket closed
-            if not data:
-                self.should_monitor = False
-                break
-
-            # Emit data
-            if self.progress_stderr:
-                self.progress_stderr(data)
-
-            # Append to buffer
-            self.stderr += data
-
-    def stop_monitoring(self):
-        # Stop StdErr thread
-        if self.should_monitor:
-            self.should_monitor = False
-            self.monitor_thread.join()
-
-            # Get left over data
-            data = self.channel.in_stderr_buffer.empty()
-            self.stderr += data
+    @property
+    def stderr(self):
+        return self.channel.makefile_stderr()
 
     def can_read(self):
         return self.channel.recv_ready()
@@ -87,16 +53,13 @@ class _ParamikoWrapper(object):
     def write(self, data):
         return self.channel.sendall(data)
 
-    def read_stderr(self, n):
-        return self.channel.recv_stderr(n)
-
     def read(self, n=None):
         data = self.channel.recv(n)
         data_len = len(data)
 
         # Closed socket
         if not data:
-            return
+            return b''
 
         # Read more if needed
         if n and data_len < n:
@@ -106,28 +69,38 @@ class _ParamikoWrapper(object):
 
     def close(self):
         self.channel.close()
-        self.stop_monitoring()
 
 
 class ParamikoSSHVendor(object):
+    # http://docs.paramiko.org/en/2.4/api/client.html
 
-    def __init__(self):
-        self.ssh_kwargs = {}
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
 
-    def run_command(self, host, command, username=None, port=None,
-                    progress_stderr=None):
-        if not isinstance(command, bytes):
-            raise TypeError(command)
-        # Paramiko needs an explicit port. None is not valid
-        if port is None:
-            port = 22
+    def run_command(self, host, command,
+                    username=None, port=None,
+                    password=None, pkey=None,
+                    key_filename=None, **kwargs):
 
         client = paramiko.SSHClient()
 
+        connection_kwargs = {'hostname': host}
+        connection_kwargs.update(self.kwargs)
+        if username:
+            connection_kwargs['username'] = username
+        if port:
+            connection_kwargs['port'] = port
+        if password:
+            connection_kwargs['password'] = password
+        if pkey:
+            connection_kwargs['pkey'] = pkey
+        if key_filename:
+            connection_kwargs['key_filename'] = key_filename
+        connection_kwargs.update(kwargs)
+
         policy = paramiko.client.MissingHostKeyPolicy()
         client.set_missing_host_key_policy(policy)
-        client.connect(host, username=username, port=port,
-                       **self.ssh_kwargs)
+        client.connect(**connection_kwargs)
 
         # Open SSH session
         channel = client.get_transport().open_session()
@@ -135,5 +108,4 @@ class ParamikoSSHVendor(object):
         # Run commands
         channel.exec_command(command)
 
-        return _ParamikoWrapper(
-            client, channel, progress_stderr=progress_stderr)
+        return _ParamikoWrapper(client, channel)

@@ -37,8 +37,10 @@ from dulwich import objects
 from dulwich.config import Config
 from dulwich.errors import NotGitRepository
 from dulwich.repo import (
+    InvalidUserIdentity,
     Repo,
     MemoryRepo,
+    check_user_identity,
     )
 from dulwich.tests import (
     TestCase,
@@ -65,8 +67,10 @@ class CreateRepositoryTests(TestCase):
 
     def _check_repo_contents(self, repo, expect_bare):
         self.assertEqual(expect_bare, repo.bare)
-        self.assertFileContentsEqual(b'Unnamed repository', repo, 'description')
-        self.assertFileContentsEqual(b'', repo, os.path.join('info', 'exclude'))
+        self.assertFileContentsEqual(
+            b'Unnamed repository', repo, 'description')
+        self.assertFileContentsEqual(
+            b'', repo, os.path.join('info', 'exclude'))
         self.assertFileContentsEqual(None, repo, 'nonexistent file')
         barestr = b'bare = ' + str(expect_bare).lower().encode('ascii')
         with repo.get_named_file('config') as f:
@@ -77,7 +81,6 @@ class CreateRepositoryTests(TestCase):
         with repo.get_named_file('config') as f:
             config_text = f.read()
             self.assertTrue(barestr in config_text, "%r" % config_text)
-
 
     def test_create_memory(self):
         repo = MemoryRepo.init_bare([], {})
@@ -96,6 +99,31 @@ class CreateRepositoryTests(TestCase):
         repo = Repo.init(tmp_dir)
         self.assertEqual(os.path.join(tmp_dir, '.git'), repo._controldir)
         self._check_repo_contents(repo, False)
+
+    def test_create_disk_non_bare_mkdir(self):
+        tmp_dir = tempfile.mkdtemp()
+        target_dir = os.path.join(tmp_dir, "target")
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        repo = Repo.init(target_dir, mkdir=True)
+        self.assertEqual(os.path.join(target_dir, '.git'), repo._controldir)
+        self._check_repo_contents(repo, False)
+
+    def test_create_disk_bare_mkdir(self):
+        tmp_dir = tempfile.mkdtemp()
+        target_dir = os.path.join(tmp_dir, "target")
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        repo = Repo.init_bare(target_dir, mkdir=True)
+        self.assertEqual(target_dir, repo._controldir)
+        self._check_repo_contents(repo, True)
+
+
+class MemoryRepoTests(TestCase):
+
+    def test_set_description(self):
+        r = MemoryRepo.init_bare([], {})
+        description = b"Some description"
+        r.set_description(description)
+        self.assertEqual(description, r.get_description())
 
 
 class RepositoryRootTests(TestCase):
@@ -117,7 +145,7 @@ class RepositoryRootTests(TestCase):
         r = self.open_repo('a.git')
         r[b"refs/tags/foo"] = b'a90fa2d900a17e99b433217e988c4eb4a2e9a097'
         self.assertEqual(b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
-                          r[b"refs/tags/foo"].id)
+                         r[b"refs/tags/foo"].id)
 
     def test_getitem_unicode(self):
         r = self.open_repo('a.git')
@@ -159,7 +187,8 @@ class RepositoryRootTests(TestCase):
             b'HEAD': b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
             b'refs/heads/master': b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
             b'refs/tags/mytag': b'28237f4dc30d0d462658d6b937b08a0f0b6ef55a',
-            b'refs/tags/mytag-packed': b'b0931cadc54336e78a1d980420e3268903b57a50',
+            b'refs/tags/mytag-packed':
+                b'b0931cadc54336e78a1d980420e3268903b57a50',
             }, r.get_refs())
 
     def test_head(self):
@@ -225,14 +254,90 @@ class RepositoryRootTests(TestCase):
     def test_get_walker(self):
         r = self.open_repo('a.git')
         # include defaults to [r.head()]
-        self.assertEqual([e.commit.id for e in r.get_walker()],
-                         [r.head(), b'2a72d929692c41d8554c07f6301757ba18a65d91'])
         self.assertEqual(
-            [e.commit.id for e in r.get_walker([b'2a72d929692c41d8554c07f6301757ba18a65d91'])],
+            [e.commit.id for e in r.get_walker()],
+            [r.head(), b'2a72d929692c41d8554c07f6301757ba18a65d91'])
+        self.assertEqual(
+            [e.commit.id for e in
+                r.get_walker([b'2a72d929692c41d8554c07f6301757ba18a65d91'])],
             [b'2a72d929692c41d8554c07f6301757ba18a65d91'])
         self.assertEqual(
-            [e.commit.id for e in r.get_walker(b'2a72d929692c41d8554c07f6301757ba18a65d91')],
+            [e.commit.id for e in
+                r.get_walker(b'2a72d929692c41d8554c07f6301757ba18a65d91')],
             [b'2a72d929692c41d8554c07f6301757ba18a65d91'])
+
+    def assertFilesystemHidden(self, path):
+        if sys.platform != 'win32':
+            return
+        import ctypes
+        from ctypes.wintypes import DWORD, LPCWSTR
+        GetFileAttributesW = ctypes.WINFUNCTYPE(DWORD, LPCWSTR)(
+            ('GetFileAttributesW', ctypes.windll.kernel32))
+        self.assertTrue(2 & GetFileAttributesW(path))
+
+    def test_init_existing(self):
+        tmp_dir = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        t = Repo.init(tmp_dir)
+        self.addCleanup(t.close)
+        self.assertEqual(os.listdir(tmp_dir), ['.git'])
+        self.assertFilesystemHidden(os.path.join(tmp_dir, '.git'))
+
+    def test_init_mkdir(self):
+        tmp_dir = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        repo_dir = os.path.join(tmp_dir, 'a-repo')
+
+        t = Repo.init(repo_dir, mkdir=True)
+        self.addCleanup(t.close)
+        self.assertEqual(os.listdir(repo_dir), ['.git'])
+        self.assertFilesystemHidden(os.path.join(repo_dir, '.git'))
+
+    def test_init_mkdir_unicode(self):
+        repo_name = u'\xa7'
+        try:
+            repo_name.encode(sys.getfilesystemencoding())
+        except UnicodeEncodeError:
+            self.skipTest('filesystem lacks unicode support')
+        tmp_dir = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        repo_dir = os.path.join(tmp_dir, repo_name)
+
+        t = Repo.init(repo_dir, mkdir=True)
+        self.addCleanup(t.close)
+        self.assertEqual(os.listdir(repo_dir), ['.git'])
+        self.assertFilesystemHidden(os.path.join(repo_dir, '.git'))
+
+    @skipIf(sys.platform == 'win32', 'fails on Windows')
+    def test_fetch(self):
+        r = self.open_repo('a.git')
+        tmp_dir = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        t = Repo.init(tmp_dir)
+        self.addCleanup(t.close)
+        r.fetch(t)
+        self.assertIn(b'a90fa2d900a17e99b433217e988c4eb4a2e9a097', t)
+        self.assertIn(b'a90fa2d900a17e99b433217e988c4eb4a2e9a097', t)
+        self.assertIn(b'a90fa2d900a17e99b433217e988c4eb4a2e9a097', t)
+        self.assertIn(b'28237f4dc30d0d462658d6b937b08a0f0b6ef55a', t)
+        self.assertIn(b'b0931cadc54336e78a1d980420e3268903b57a50', t)
+
+    @skipIf(sys.platform == 'win32', 'fails on Windows')
+    def test_fetch_ignores_missing_refs(self):
+        r = self.open_repo('a.git')
+        missing = b'1234566789123456789123567891234657373833'
+        r.refs[b'refs/heads/blah'] = missing
+        tmp_dir = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        t = Repo.init(tmp_dir)
+        self.addCleanup(t.close)
+        r.fetch(t)
+        self.assertIn(b'a90fa2d900a17e99b433217e988c4eb4a2e9a097', t)
+        self.assertIn(b'a90fa2d900a17e99b433217e988c4eb4a2e9a097', t)
+        self.assertIn(b'a90fa2d900a17e99b433217e988c4eb4a2e9a097', t)
+        self.assertIn(b'28237f4dc30d0d462658d6b937b08a0f0b6ef55a', t)
+        self.assertIn(b'b0931cadc54336e78a1d980420e3268903b57a50', t)
+        self.assertNotIn(missing, t)
 
     def test_clone(self):
         r = self.open_repo('a.git')
@@ -243,8 +348,10 @@ class RepositoryRootTests(TestCase):
                 b'HEAD': b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
                 b'refs/remotes/origin/master':
                     b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
-                b'refs/heads/master': b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
-                b'refs/tags/mytag': b'28237f4dc30d0d462658d6b937b08a0f0b6ef55a',
+                b'refs/heads/master':
+                    b'a90fa2d900a17e99b433217e988c4eb4a2e9a097',
+                b'refs/tags/mytag':
+                    b'28237f4dc30d0d462658d6b937b08a0f0b6ef55a',
                 b'refs/tags/mytag-packed':
                     b'b0931cadc54336e78a1d980420e3268903b57a50',
                 }, t.refs.as_dict())
@@ -255,7 +362,8 @@ class RepositoryRootTests(TestCase):
             encoded_path = r.path
             if not isinstance(encoded_path, bytes):
                 encoded_path = encoded_path.encode(sys.getfilesystemencoding())
-            self.assertEqual(encoded_path, c.get((b'remote', b'origin'), b'url'))
+            self.assertEqual(encoded_path,
+                             c.get((b'remote', b'origin'), b'url'))
             self.assertEqual(
                 b'+refs/heads/*:refs/remotes/origin/*',
                 c.get((b'remote', b'origin'), b'fetch'))
@@ -289,6 +397,20 @@ class RepositoryRootTests(TestCase):
         tmp_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, tmp_dir)
         r.clone(tmp_dir, mkdir=False, bare=True)
+
+    def test_clone_bare(self):
+        r = self.open_repo('a.git')
+        tmp_dir = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        t = r.clone(tmp_dir, mkdir=False)
+        t.close()
+
+    def test_clone_checkout_and_bare(self):
+        r = self.open_repo('a.git')
+        tmp_dir = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        self.assertRaises(ValueError, r.clone, tmp_dir, mkdir=False,
+                          checkout=True, bare=True)
 
     def test_merge_history(self):
         r = self.open_repo('simple_merge.git')
@@ -330,12 +452,13 @@ class RepositoryRootTests(TestCase):
         rel = os.path.relpath(os.path.join(repo_dir, 'submodule'), temp_dir)
         os.symlink(os.path.join(rel, 'dotgit'), os.path.join(temp_dir, '.git'))
         with Repo(temp_dir) as r:
-            self.assertEqual(r.head(), b'a90fa2d900a17e99b433217e988c4eb4a2e9a097')
+            self.assertEqual(r.head(),
+                             b'a90fa2d900a17e99b433217e988c4eb4a2e9a097')
 
     def test_common_revisions(self):
         """
-        This test demonstrates that ``find_common_revisions()`` actually returns
-        common heads, not revisions; dulwich already uses
+        This test demonstrates that ``find_common_revisions()`` actually
+        returns common heads, not revisions; dulwich already uses
         ``find_common_revisions()`` in such a manner (see
         ``Repo.fetch_objects()``).
         """
@@ -348,17 +471,17 @@ class RepositoryRootTests(TestCase):
         # Re-create each-side of the merge in simple_merge.git.
         #
         # Since the trees and blobs are missing, the repository created is
-        # corrupted, but we're only checking for commits for the purpose of this
-        # test, so it's immaterial.
+        # corrupted, but we're only checking for commits for the purpose of
+        # this test, so it's immaterial.
         r1_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, r1_dir)
-        r1_commits = [b'ab64bbdcc51b170d21588e5c5d391ee5c0c96dfd', # HEAD
+        r1_commits = [b'ab64bbdcc51b170d21588e5c5d391ee5c0c96dfd',  # HEAD
                       b'60dacdc733de308bb77bb76ce0fb0f9b44c9769e',
                       b'0d89f20333fbb1d2f3a94da77f4981373d8f4310']
 
         r2_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, r2_dir)
-        r2_commits = [b'4cffe90e0a41ad3f5190079d7c8f036bde29cbe6', # HEAD
+        r2_commits = [b'4cffe90e0a41ad3f5190079d7c8f036bde29cbe6',  # HEAD
                       b'60dacdc733de308bb77bb76ce0fb0f9b44c9769e',
                       b'0d89f20333fbb1d2f3a94da77f4981373d8f4310']
 
@@ -392,8 +515,9 @@ exit 0
 """
 
         repo_dir = os.path.join(self.mkdtemp())
-        r = Repo.init(repo_dir)
         self.addCleanup(shutil.rmtree, repo_dir)
+        r = Repo.init(repo_dir)
+        self.addCleanup(r.close)
 
         pre_commit = os.path.join(r.controldir(), 'hooks', 'pre-commit')
 
@@ -432,8 +556,9 @@ exit 0
 """
 
         repo_dir = self.mkdtemp()
-        r = Repo.init(repo_dir)
         self.addCleanup(shutil.rmtree, repo_dir)
+        r = Repo.init(repo_dir)
+        self.addCleanup(r.close)
 
         commit_msg = os.path.join(r.controldir(), 'hooks', 'commit-msg')
 
@@ -464,9 +589,10 @@ exit 0
             self.skipTest('shell hook tests requires POSIX shell')
 
         repo_dir = self.mkdtemp()
+        self.addCleanup(shutil.rmtree, repo_dir)
 
         r = Repo.init(repo_dir)
-        self.addCleanup(shutil.rmtree, repo_dir)
+        self.addCleanup(r.close)
 
         (fd, path) = tempfile.mkstemp(dir=repo_dir)
         os.close(fd)
@@ -516,16 +642,30 @@ exit 1
             author=b'Test Author <test@nodomain.com>',
             commit_timestamp=12345, commit_timezone=0,
             author_timestamp=12345, author_timezone=0)
-        self.assertEqual(len(warnings_list), 1, warnings_list)
-        self.assertIsInstance(warnings_list[-1], UserWarning)
-        self.assertTrue("post-commit hook failed: " in str(warnings_list[-1]))
+        expected_warning = UserWarning(
+            'post-commit hook failed: Hook post-commit exited with '
+            'non-zero status',)
+        for w in warnings_list:
+            if (type(w) == type(expected_warning) and
+                    w.args == expected_warning.args):
+                break
+        else:
+            raise AssertionError(
+                'Expected warning %r not in %r' %
+                (expected_warning, warnings_list))
         self.assertEqual([commit_sha], r[commit_sha2].parents)
 
     def test_as_dict(self):
         def check(repo):
-            self.assertEqual(repo.refs.subkeys(b'refs/tags'), repo.refs.subkeys(b'refs/tags/'))
-            self.assertEqual(repo.refs.as_dict(b'refs/tags'), repo.refs.as_dict(b'refs/tags/'))
-            self.assertEqual(repo.refs.as_dict(b'refs/heads'), repo.refs.as_dict(b'refs/heads/'))
+            self.assertEqual(
+                repo.refs.subkeys(b'refs/tags'),
+                repo.refs.subkeys(b'refs/tags/'))
+            self.assertEqual(
+                repo.refs.as_dict(b'refs/tags'),
+                repo.refs.as_dict(b'refs/tags/'))
+            self.assertEqual(
+                repo.refs.as_dict(b'refs/heads'),
+                repo.refs.as_dict(b'refs/heads/'))
 
         bare = self.open_repo('a.git')
         tmp_dir = self.mkdtemp()
@@ -540,6 +680,7 @@ exit 1
         worktree_temp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, worktree_temp_dir)
         r = Repo.init(temp_dir)
+        self.addCleanup(r.close)
         root_sha = r.do_commit(
                 b'empty commit',
                 committer=b'Test Committer <test@nodomain.com>',
@@ -548,6 +689,7 @@ exit 1
                 author_timestamp=12345, author_timezone=0)
         r.refs[b'refs/heads/master'] = root_sha
         w = Repo._init_new_working_directory(worktree_temp_dir, r)
+        self.addCleanup(w.close)
         new_sha = w.do_commit(
                 b'new commit',
                 committer=b'Test Committer <test@nodomain.com>',
@@ -584,13 +726,36 @@ class BuildRepoRootTests(TestCase):
         with open(os.path.join(r.path, 'a'), 'wb') as f:
             f.write(b'file contents')
         r.stage(['a'])
-        commit_sha = r.do_commit(b'msg',
-                                 committer=b'Test Committer <test@nodomain.com>',
-                                 author=b'Test Author <test@nodomain.com>',
-                                 commit_timestamp=12345, commit_timezone=0,
-                                 author_timestamp=12345, author_timezone=0)
+        commit_sha = r.do_commit(
+                b'msg',
+                committer=b'Test Committer <test@nodomain.com>',
+                author=b'Test Author <test@nodomain.com>',
+                commit_timestamp=12345, commit_timezone=0,
+                author_timestamp=12345, author_timezone=0)
         self.assertEqual([], r[commit_sha].parents)
         self._root_commit = commit_sha
+
+    def test_get_shallow(self):
+        self.assertEqual(set(), self._repo.get_shallow())
+        with open(os.path.join(self._repo.path, '.git', 'shallow'), 'wb') as f:
+            f.write(b'a90fa2d900a17e99b433217e988c4eb4a2e9a097\n')
+        self.assertEqual({b'a90fa2d900a17e99b433217e988c4eb4a2e9a097'},
+                         self._repo.get_shallow())
+
+    def test_update_shallow(self):
+        self._repo.update_shallow(None, None)  # no op
+        self.assertEqual(set(), self._repo.get_shallow())
+        self._repo.update_shallow(
+                [b'a90fa2d900a17e99b433217e988c4eb4a2e9a097'],
+                None)
+        self.assertEqual(
+                {b'a90fa2d900a17e99b433217e988c4eb4a2e9a097'},
+                self._repo.get_shallow())
+        self._repo.update_shallow(
+                [b'a90fa2d900a17e99b433217e988c4eb4a2e9a097'],
+                [b'f9e39b120c68182a4ba35349f832d0e4e61f485c'])
+        self.assertEqual({b'a90fa2d900a17e99b433217e988c4eb4a2e9a097'},
+                         self._repo.get_shallow())
 
     def test_build_repo(self):
         r = self._repo
@@ -606,11 +771,12 @@ class BuildRepoRootTests(TestCase):
         with open(os.path.join(r.path, 'a'), 'wb') as f:
             f.write(b'new contents')
         r.stage(['a'])
-        commit_sha = r.do_commit(b'modified a',
-                                 committer=b'Test Committer <test@nodomain.com>',
-                                 author=b'Test Author <test@nodomain.com>',
-                                 commit_timestamp=12395, commit_timezone=0,
-                                 author_timestamp=12395, author_timezone=0)
+        commit_sha = r.do_commit(
+            b'modified a',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0)
         self.assertEqual([self._root_commit], r[commit_sha].parents)
         a_mode, a_id = tree_lookup_path(r.get_object, r[commit_sha].tree, b'a')
         self.assertEqual(stat.S_IFREG | 0o644, a_mode)
@@ -621,25 +787,55 @@ class BuildRepoRootTests(TestCase):
         r = self._repo
         os.symlink('a', os.path.join(r.path, 'b'))
         r.stage(['a', 'b'])
-        commit_sha = r.do_commit(b'Symlink b',
-                                 committer=b'Test Committer <test@nodomain.com>',
-                                 author=b'Test Author <test@nodomain.com>',
-                                 commit_timestamp=12395, commit_timezone=0,
-                                 author_timestamp=12395, author_timezone=0)
+        commit_sha = r.do_commit(
+            b'Symlink b',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0)
         self.assertEqual([self._root_commit], r[commit_sha].parents)
         b_mode, b_id = tree_lookup_path(r.get_object, r[commit_sha].tree, b'b')
         self.assertTrue(stat.S_ISLNK(b_mode))
         self.assertEqual(b'a', r[b_id].data)
 
+    def test_commit_merge_heads_file(self):
+        tmp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, tmp_dir)
+        r = Repo.init(tmp_dir)
+        with open(os.path.join(r.path, 'a'), 'w') as f:
+            f.write('initial text')
+        c1 = r.do_commit(
+            b'initial commit',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0)
+        with open(os.path.join(r.path, 'a'), 'w') as f:
+            f.write('merged text')
+        with open(os.path.join(r.path, '.git', 'MERGE_HEADS'), 'w') as f:
+            f.write('c27a2d21dd136312d7fa9e8baabb82561a1727d0\n')
+        r.stage(['a'])
+        commit_sha = r.do_commit(
+            b'deleted a',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0)
+        self.assertEqual([
+            c1,
+            b'c27a2d21dd136312d7fa9e8baabb82561a1727d0'],
+            r[commit_sha].parents)
+
     def test_commit_deleted(self):
         r = self._repo
         os.remove(os.path.join(r.path, 'a'))
         r.stage(['a'])
-        commit_sha = r.do_commit(b'deleted a',
-                                 committer=b'Test Committer <test@nodomain.com>',
-                                 author=b'Test Author <test@nodomain.com>',
-                                 commit_timestamp=12395, commit_timezone=0,
-                                 author_timestamp=12395, author_timezone=0)
+        commit_sha = r.do_commit(
+            b'deleted a',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0)
         self.assertEqual([self._root_commit], r[commit_sha].parents)
         self.assertEqual([], list(r.open_index()))
         tree = r[r[commit_sha].tree]
@@ -648,22 +844,37 @@ class BuildRepoRootTests(TestCase):
     def test_commit_follows(self):
         r = self._repo
         r.refs.set_symbolic_ref(b'HEAD', b'refs/heads/bla')
-        commit_sha = r.do_commit(b'commit with strange character',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             ref=b'HEAD')
+        commit_sha = r.do_commit(
+            b'commit with strange character',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            ref=b'HEAD')
         self.assertEqual(commit_sha, r[b'refs/heads/bla'].id)
 
     def test_commit_encoding(self):
         r = self._repo
-        commit_sha = r.do_commit(b'commit with strange character \xee',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             encoding=b"iso8859-1")
+        commit_sha = r.do_commit(
+            b'commit with strange character \xee',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            encoding=b"iso8859-1")
+        self.assertEqual(b"iso8859-1", r[commit_sha].encoding)
+
+    def test_commit_encoding_from_config(self):
+        r = self._repo
+        c = r.get_config()
+        c.set(('i18n',), 'commitEncoding', 'iso8859-1')
+        c.write_to_path()
+        commit_sha = r.do_commit(
+            b'commit with strange character \xee',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0)
         self.assertEqual(b"iso8859-1", r[commit_sha].encoding)
 
     def test_commit_config_identity(self):
@@ -672,6 +883,22 @@ class BuildRepoRootTests(TestCase):
         c = r.get_config()
         c.set((b"user", ), b"name", b"Jelmer")
         c.set((b"user", ), b"email", b"jelmer@apache.org")
+        c.write_to_path()
+        commit_sha = r.do_commit(b'message')
+        self.assertEqual(
+            b"Jelmer <jelmer@apache.org>",
+            r[commit_sha].author)
+        self.assertEqual(
+            b"Jelmer <jelmer@apache.org>",
+            r[commit_sha].committer)
+
+    def test_commit_config_identity_strips_than(self):
+        # commit falls back to the users' identity if it wasn't specified,
+        # and strips superfluous <>
+        r = self._repo
+        c = r.get_config()
+        c.set((b"user", ), b"name", b"Jelmer")
+        c.set((b"user", ), b"email", b"<jelmer@apache.org>")
         c.write_to_path()
         commit_sha = r.do_commit(b'message')
         self.assertEqual(
@@ -696,14 +923,41 @@ class BuildRepoRootTests(TestCase):
             b"Jelmer <jelmer@apache.org>",
             r[commit_sha].committer)
 
+    def overrideEnv(self, name, value):
+        def restore():
+            if oldval is not None:
+                os.environ[name] = oldval
+            else:
+                del os.environ[name]
+        oldval = os.environ.get(name)
+        os.environ[name] = value
+        self.addCleanup(restore)
+
+    def test_commit_config_identity_from_env(self):
+        # commit falls back to the users' identity if it wasn't specified
+        self.overrideEnv('GIT_COMMITTER_NAME', 'joe')
+        self.overrideEnv('GIT_COMMITTER_EMAIL', 'joe@example.com')
+        r = self._repo
+        c = r.get_config()
+        c.set((b"user", ), b"name", b"Jelmer")
+        c.set((b"user", ), b"email", b"jelmer@apache.org")
+        c.write_to_path()
+        commit_sha = r.do_commit(b'message')
+        self.assertEqual(
+            b"Jelmer <jelmer@apache.org>",
+            r[commit_sha].author)
+        self.assertEqual(
+            b"joe <joe@example.com>",
+            r[commit_sha].committer)
+
     def test_commit_fail_ref(self):
         r = self._repo
 
-        def set_if_equals(name, old_ref, new_ref):
+        def set_if_equals(name, old_ref, new_ref, **kwargs):
             return False
         r.refs.set_if_equals = set_if_equals
 
-        def add_if_new(name, new_ref):
+        def add_if_new(name, new_ref, **kwargs):
             self.fail('Unexpected call to add_if_new')
         r.refs.add_if_new = add_if_new
 
@@ -723,12 +977,13 @@ class BuildRepoRootTests(TestCase):
     def test_commit_branch(self):
         r = self._repo
 
-        commit_sha = r.do_commit(b'commit to branch',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             ref=b"refs/heads/new_branch")
+        commit_sha = r.do_commit(
+            b'commit to branch',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            ref=b"refs/heads/new_branch")
         self.assertEqual(self._root_commit, r[b"HEAD"].id)
         self.assertEqual(commit_sha, r[b"refs/heads/new_branch"].id)
         self.assertEqual([], r[commit_sha].parents)
@@ -736,30 +991,33 @@ class BuildRepoRootTests(TestCase):
 
         new_branch_head = commit_sha
 
-        commit_sha = r.do_commit(b'commit to branch 2',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             ref=b"refs/heads/new_branch")
+        commit_sha = r.do_commit(
+            b'commit to branch 2',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            ref=b"refs/heads/new_branch")
         self.assertEqual(self._root_commit, r[b"HEAD"].id)
         self.assertEqual(commit_sha, r[b"refs/heads/new_branch"].id)
         self.assertEqual([new_branch_head], r[commit_sha].parents)
 
     def test_commit_merge_heads(self):
         r = self._repo
-        merge_1 = r.do_commit(b'commit to branch 2',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             ref=b"refs/heads/new_branch")
-        commit_sha = r.do_commit(b'commit with merge',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             merge_heads=[merge_1])
+        merge_1 = r.do_commit(
+            b'commit to branch 2',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            ref=b"refs/heads/new_branch")
+        commit_sha = r.do_commit(
+            b'commit with merge',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            merge_heads=[merge_1])
         self.assertEqual(
             [self._root_commit, merge_1],
             r[commit_sha].parents)
@@ -769,12 +1027,13 @@ class BuildRepoRootTests(TestCase):
 
         old_shas = set(r.object_store)
         old_refs = r.get_refs()
-        commit_sha = r.do_commit(b'commit with no ref',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             ref=None)
+        commit_sha = r.do_commit(
+            b'commit with no ref',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            ref=None)
         new_shas = set(r.object_store) - old_shas
 
         # New sha is added, but no new refs
@@ -789,12 +1048,13 @@ class BuildRepoRootTests(TestCase):
 
         old_shas = set(r.object_store)
         old_refs = r.get_refs()
-        commit_sha = r.do_commit(b'commit with no ref',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             ref=None, merge_heads=[self._root_commit])
+        commit_sha = r.do_commit(
+            b'commit with no ref',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            ref=None, merge_heads=[self._root_commit])
         new_shas = set(r.object_store) - old_shas
 
         # New sha is added, but no new refs
@@ -804,12 +1064,25 @@ class BuildRepoRootTests(TestCase):
         self.assertEqual([self._root_commit], r[commit_sha].parents)
         self.assertEqual(old_refs, r.get_refs())
 
+    def test_stage_absolute(self):
+        r = self._repo
+        os.remove(os.path.join(r.path, 'a'))
+        self.assertRaises(ValueError, r.stage, [os.path.join(r.path, 'a')])
+
     def test_stage_deleted(self):
         r = self._repo
         os.remove(os.path.join(r.path, 'a'))
         r.stage(['a'])
         r.stage(['a'])  # double-stage a deleted path
 
+    def test_stage_directory(self):
+        r = self._repo
+        os.mkdir(os.path.join(r.path, 'c'))
+        r.stage(['c'])
+        self.assertEqual([b'a'], list(r.open_index()))
+
+    @skipIf(sys.platform == 'win32' and sys.version_info[:2] >= (3, 6),
+            'tries to implicitly decode as utf8')
     def test_commit_no_encode_decode(self):
         r = self._repo
         repo_path_bytes = r.path.encode(sys.getfilesystemencoding())
@@ -824,12 +1097,13 @@ class BuildRepoRootTests(TestCase):
             self.addCleanup(os.remove, full_path)
 
         r.stage(names)
-        commit_sha = r.do_commit(b'Files with different encodings',
-             committer=b'Test Committer <test@nodomain.com>',
-             author=b'Test Author <test@nodomain.com>',
-             commit_timestamp=12395, commit_timezone=0,
-             author_timestamp=12395, author_timezone=0,
-             ref=None, merge_heads=[self._root_commit])
+        commit_sha = r.do_commit(
+            b'Files with different encodings',
+            committer=b'Test Committer <test@nodomain.com>',
+            author=b'Test Author <test@nodomain.com>',
+            commit_timestamp=12395, commit_timezone=0,
+            author_timestamp=12395, author_timezone=0,
+            ref=None, merge_heads=[self._root_commit])
 
         for name, encoding in zip(names, encodings):
             mode, id = tree_lookup_path(r.get_object, r[commit_sha].tree, name)
@@ -848,3 +1122,19 @@ class BuildRepoRootTests(TestCase):
     def test_discover_notrepo(self):
         with self.assertRaises(NotGitRepository):
             Repo.discover('/')
+
+
+class CheckUserIdentityTests(TestCase):
+
+    def test_valid(self):
+        check_user_identity(b'Me <me@example.com>')
+
+    def test_invalid(self):
+        self.assertRaises(InvalidUserIdentity,
+                          check_user_identity, b'No Email')
+        self.assertRaises(InvalidUserIdentity,
+                          check_user_identity, b'Fullname <missing')
+        self.assertRaises(InvalidUserIdentity,
+                          check_user_identity, b'Fullname missing>')
+        self.assertRaises(InvalidUserIdentity,
+                          check_user_identity, b'Fullname >order<>')

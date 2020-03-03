@@ -46,7 +46,8 @@ from dulwich.tests.compat.utils import (
     run_git_or_fail,
     )
 
-_NON_DELTA_RE = re.compile(b'non delta: (?P<non_delta>\d+) objects')
+_NON_DELTA_RE = re.compile(b'non delta: (?P<non_delta>\\d+) objects')
+
 
 def _git_verify_pack_object_list(output):
     pack_shas = set()

@@ -1,6 +1,6 @@
 # web.py -- WSGI smart-http server
 # Copyright (C) 2010 Google, Inc.
-# Copyright (C) 2012 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2012 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -47,6 +47,7 @@ from dulwich.protocol import (
     ReceivableProtocol,
     )
 from dulwich.repo import (
+    NotGitRepository,
     Repo,
     )
 from dulwich.server import (
@@ -88,10 +89,11 @@ def date_time_string(timestamp=None):
 def url_prefix(mat):
     """Extract the URL prefix from a regex match.
 
-    :param mat: A regex match object.
-    :returns: The URL prefix, defined as the text before the match in the
-        original string. Normalized to start with one leading slash and end with
-        zero.
+    Args:
+      mat: A regex match object.
+    Returns: The URL prefix, defined as the text before the match in the
+        original string. Normalized to start with one leading slash and end
+        with zero.
     """
     return '/' + mat.string[:mat.start()].strip('/')
 
@@ -104,10 +106,11 @@ def get_repo(backend, mat):
 def send_file(req, f, content_type):
     """Send a file-like object to the request output.
 
-    :param req: The HTTPGitRequest object to send output to.
-    :param f: An open file-like object to send; will be closed.
-    :param content_type: The MIME type for the file.
-    :return: Iterator over the contents of the file, as chunks.
+    Args:
+      req: The HTTPGitRequest object to send output to.
+      f: An open file-like object to send; will be closed.
+      content_type: The MIME type for the file.
+    Returns: Iterator over the contents of the file, as chunks.
     """
     if f is None:
         yield req.not_found('File not found')
@@ -119,13 +122,10 @@ def send_file(req, f, content_type):
             if not data:
                 break
             yield data
-        f.close()
     except IOError:
-        f.close()
         yield req.error('Error reading file')
-    except:
+    finally:
         f.close()
-        raise
 
 
 def _url_to_path(url):
@@ -176,17 +176,24 @@ def get_idx_file(req, backend, mat):
 def get_info_refs(req, backend, mat):
     params = parse_qs(req.environ['QUERY_STRING'])
     service = params.get('service', [None])[0]
+    try:
+        repo = get_repo(backend, mat)
+    except NotGitRepository as e:
+        yield req.not_found(str(e))
+        return
     if service and not req.dumb:
         handler_cls = req.handlers.get(service.encode('ascii'), None)
         if handler_cls is None:
             yield req.forbidden('Unsupported service')
             return
         req.nocache()
-        write = req.respond(HTTP_OK, 'application/x-%s-advertisement' % service)
+        write = req.respond(
+            HTTP_OK, 'application/x-%s-advertisement' % service)
         proto = ReceivableProtocol(BytesIO().read, write)
         handler = handler_cls(backend, [url_prefix(mat)], proto,
                               http_req=req, advertise_refs=True)
-        handler.proto.write_pkt_line(b'# service=' + service.encode('ascii') + b'\n')
+        handler.proto.write_pkt_line(
+            b'# service=' + service.encode('ascii') + b'\n')
         handler.proto.write_pkt_line(None)
         handler.handle()
     else:
@@ -195,7 +202,6 @@ def get_info_refs(req, backend, mat):
         req.nocache()
         req.respond(HTTP_OK, 'text/plain')
         logger.info('Emulating dumb info/refs')
-        repo = get_repo(backend, mat)
         for text in generate_info_refs(repo):
             yield text
 
@@ -237,9 +243,16 @@ def handle_service_request(req, backend, mat):
     if handler_cls is None:
         yield req.forbidden('Unsupported service')
         return
+    try:
+        get_repo(backend, mat)
+    except NotGitRepository as e:
+        yield req.not_found(str(e))
+        return
     req.nocache()
     write = req.respond(HTTP_OK, 'application/x-%s-result' % service)
     proto = ReceivableProtocol(req.environ['wsgi.input'].read, write)
+    # TODO(jelmer): Find a way to pass in repo, rather than having handler_cls
+    # reopen.
     handler = handler_cls(backend, [url_prefix(mat)], proto, http_req=req)
     handler.handle()
 
@@ -323,9 +336,12 @@ class HTTPGitApplication(object):
       ('GET', re.compile('/objects/info/alternates$')): get_text_file,
       ('GET', re.compile('/objects/info/http-alternates$')): get_text_file,
       ('GET', re.compile('/objects/info/packs$')): get_info_packs,
-      ('GET', re.compile('/objects/([0-9a-f]{2})/([0-9a-f]{38})$')): get_loose_object,
-      ('GET', re.compile('/objects/pack/pack-([0-9a-f]{40})\\.pack$')): get_pack_file,
-      ('GET', re.compile('/objects/pack/pack-([0-9a-f]{40})\\.idx$')): get_idx_file,
+      ('GET', re.compile('/objects/([0-9a-f]{2})/([0-9a-f]{38})$')):
+      get_loose_object,
+      ('GET', re.compile('/objects/pack/pack-([0-9a-f]{40})\\.pack$')):
+      get_pack_file,
+      ('GET', re.compile('/objects/pack/pack-([0-9a-f]{40})\\.idx$')):
+      get_idx_file,
 
       ('POST', re.compile('/git-upload-pack$')): handle_service_request,
       ('POST', re.compile('/git-receive-pack$')): handle_service_request,
@@ -385,7 +401,8 @@ class GunzipFilter(object):
                 shutil.copyfileobj(environ['wsgi.input'], wsgi_input)
                 wsgi_input.seek(0)
 
-            environ['wsgi.input'] = gzip.GzipFile(filename=None, fileobj=wsgi_input, mode='r')
+            environ['wsgi.input'] = gzip.GzipFile(
+                filename=None, fileobj=wsgi_input, mode='r')
             del environ['HTTP_CONTENT_ENCODING']
             if 'CONTENT_LENGTH' in environ:
                 del environ['CONTENT_LENGTH']
@@ -456,7 +473,7 @@ class WSGIRequestHandlerLogger(WSGIRequestHandler):
         """Handle a single HTTP request"""
 
         self.raw_requestline = self.rfile.readline()
-        if not self.parse_request(): # An error code has been sent, just exit
+        if not self.parse_request():  # An error code has been sent, just exit
             return
 
         handler = ServerHandlerLogger(
@@ -470,7 +487,9 @@ class WSGIServerLogger(WSGIServer):
 
     def handle_error(self, request, client_address):
         """Handle an error. """
-        logger.exception('Exception happened during processing of request from %s' % str(client_address))
+        logger.exception(
+            'Exception happened during processing of request from %s' %
+            str(client_address))
 
 
 def main(argv=sys.argv):

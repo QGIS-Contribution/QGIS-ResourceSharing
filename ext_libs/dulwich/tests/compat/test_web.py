@@ -54,7 +54,8 @@ from dulwich.tests.compat.utils import (
     )
 
 
-@skipIf(sys.platform == 'win32', 'Broken on windows, with very long fail time.')
+@skipIf(sys.platform == 'win32',
+        'Broken on windows, with very long fail time.')
 class WebTests(ServerTests):
     """Base tests for web server tests.
 
@@ -78,7 +79,8 @@ class WebTests(ServerTests):
         return port
 
 
-@skipIf(sys.platform == 'win32', 'Broken on windows, with very long fail time.')
+@skipIf(sys.platform == 'win32',
+        'Broken on windows, with very long fail time.')
 class SmartWebTestCase(WebTests, CompatTestCase):
     """Test cases for smart HTTP server.
 
@@ -109,15 +111,17 @@ def patch_capabilities(handler, caps_removed):
     # Patch a handler's capabilities by specifying a list of them to be
     # removed, and return the original classmethod for restoration.
     original_capabilities = handler.capabilities
-    filtered_capabilities = tuple(
-        i for i in original_capabilities() if i not in caps_removed)
+    filtered_capabilities = [
+        i for i in original_capabilities() if i not in caps_removed]
+
     def capabilities(cls):
         return filtered_capabilities
     handler.capabilities = classmethod(capabilities)
     return original_capabilities
 
 
-@skipIf(sys.platform == 'win32', 'Broken on windows, with very long fail time.')
+@skipIf(sys.platform == 'win32',
+        'Broken on windows, with very long fail time.')
 class SmartWebSideBand64kTestCase(SmartWebTestCase):
     """Test cases for smart HTTP server with side-band-64k support."""
 
@@ -162,7 +166,8 @@ class SmartWebSideBand64kNoDoneTestCase(SmartWebTestCase):
         self.assertIn(b'no-done', caps)
 
 
-@skipIf(sys.platform == 'win32', 'Broken on windows, with very long fail time.')
+@skipIf(sys.platform == 'win32',
+        'Broken on windows, with very long fail time.')
 class DumbWebTestCase(WebTests, CompatTestCase):
     """Test cases for dumb HTTP server."""
 
@@ -199,4 +204,3 @@ class DumbWebTestCase(WebTests, CompatTestCase):
 
     def test_push_to_dulwich_issue_88_standard(self):
         raise SkipTest('Dumb web pushing not supported.')
-

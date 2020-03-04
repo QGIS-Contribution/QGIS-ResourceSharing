@@ -6,15 +6,28 @@ date: 2016-09-04 19:32:12
 order: 3
 ---
 
+Releasing a new version involves an upload to plugins.qgis.org, so in order
+to complete the workflow you must have a user with sufficient rights to do
+upload.
+
 Follow these steps to release the plugin:
 
-* Update ```metadata.txt``` changing the version and add updating the changelog
-* The branch to release should be ```master```.
-  If you want to release from the ```develop``` branch, please make a PR
-  to the ```master``` branch first. 
-* Run ```make release```. This will create a package, add a GitHub version release
-  tag, and publish the plugin to ```plugin.qgis.org```.
-* Voila, the new version of the plugin should be published!
-  Please check if you can upgrade the plugin in QGIS without problems.
-* Make a release on Github and highlight all the new features and fixes of
-  the new version.
+1. Update ```metadata.txt```:
+   * change the ``version``.
+     Example: ``version=0.11.1`` (for point release 11.1 of version 0)
+   * update the ``changelog`` (add information about the changes in the new
+     version).
+     Example:
+>      changelog=
+>          0.11.0 - Check for missing repository name and URL in directory (#64)
+> 	              - Correct link to documentation
+     to mention two changes, and refer issue (or PR) #64.
+2. The branch to release should be ```master```.
+   If you want to release from the ```develop``` branch, please make a PR
+   to the ```master``` branch first. 
+3. Run ```make release```. This will create a package, add a GitHub version release
+   tag, and publish the plugin to ```plugin.qgis.org```.
+4. Voila, the new version of the plugin should be published!
+   Please check if you can upgrade the plugin in QGIS without problems.
+5. Make a release on Github and highlight all the new features and fixes of
+   the new version.

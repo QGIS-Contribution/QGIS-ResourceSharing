@@ -15,8 +15,8 @@ The resources in the collection will be installed (the location
 in the file system depends on their type).
 
 #### SVG
-If the collection contains SVGs, they will be added, and the path
-will be included in your QGIS SVG search path.
+If the collection contains SVGs, they will be copied to your file
+system, and the path will be included in your QGIS SVG search path.
 The SVGs will be available when editing symbols (under the
 ``User Symbols`` section in **SVG Groups**).
 

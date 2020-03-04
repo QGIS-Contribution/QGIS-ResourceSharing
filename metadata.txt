@@ -1,5 +1,6 @@
 [general]
 name=QGIS Resource Sharing
+
 email=havard.tveite@nmbu.no
 author=Akbar Gumbira, Håvard Tveite
 qgisMinimumVersion=3.0

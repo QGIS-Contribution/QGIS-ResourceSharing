@@ -54,14 +54,16 @@ is, for later use.
 After the installation, the processing scripts in the collection will be 
 available for use in the Processing Toolbox under the ```Scripts``` menu.
 
-![Processing Toolbox]({{ site.baseurl }}/assets/processing_toolbox.png)
+![Processing Toolbox Scripts]({{ site.baseurl }}/assets/processing_toolbox_scipts.png)
 
 #### Processing Model
 After the installation, the processing models in the collection will be 
 available for use in the Processing Toolbox under the ```Models``` menu.
 
+![Processing Toolbox Models]({{ site.baseurl }}/assets/processing_toolbox_models.png)
+
 #### R Script
 After the installation, the R scripts in the collection will be available for use
 in the Processing Toolbox under the ```R``` menu.
 
-![Processing Toolbox]({{ site.baseurl }}/assets/processing_toolbox_r.png)
+![Processing Toolbox R]({{ site.baseurl }}/assets/processing_toolbox_r.png)

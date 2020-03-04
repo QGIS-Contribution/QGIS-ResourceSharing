@@ -6,11 +6,23 @@ date: 2016-08-09 11:13:13
 order: 2
 ---
 Now that you have the **QGIS Resource Sharing** plugin installed,
-you can browse the available collections (from the repositories
+you can browse available collections (from the repositories
 registered in the ```Settings``` tab) and install them on your
 local machine.
-To install a collection, you select the collection you want to install
-and click the ```Install``` button below the collection description.
+
+The first time you use the plugin, there will not be any
+collections to be found in the ``All`` tab.
+But once you have loaded the available repositories, the
+collections will be there.
+Loadin the repositories is done by pushing the
+``Reload Repositories`` button in the ``Settings`` tab.
+
+It is a good idea to ***reload*** the repositories now and then,
+so that your local copies are kept up-to-date.
+
+To install a collection, you go to the ``All`` tab, select it
+and click the ```Install``` button (below the collection
+description).
 The resources in the collection will be installed (the location
 in the file system depends on their type).
 
@@ -23,7 +35,7 @@ The SVGs will be available when editing symbols (under the
 ![SVG Group]({{ site.baseurl }}/assets/svg_group.png)
   
 #### Symbol
-The symbols and colorramps from the collection (defined by the XML 
+The symbols and colorramps from the collection (defined by an XML 
 file) will become available in the Style Manager. 
 
 ![Style Manager]({{ site.baseurl }}/assets/style_manager.png)
@@ -51,3 +63,5 @@ available for use in the Processing Toolbox under the ```Models``` menu.
 #### R Script
 After the installation, the R scripts in the collection will be available for use
 in the Processing Toolbox under the ```R``` menu.
+
+![Processing Toolbox]({{ site.baseurl }}/assets/processing_toolbox_r.png)

@@ -22,11 +22,17 @@ Follow these steps to release the plugin:
 >          0.11.0 - Check for missing repository name and URL in directory (#64)
 > 	              - Correct link to documentation
      to mention two changes, and refer issue (or PR) #64.
-2. The branch to release should be ```master```.
+2. The branch to release should be ```master```, so make sure you are on the
+   master branch before proceeding to the next step.
+   
    If you want to release from the ```develop``` branch, please make a PR
-   to the ```master``` branch first. 
-3. Run ```make release```. This will create a package, add a GitHub version release
-   tag, and publish the plugin to ```plugin.qgis.org```.
+   to the ```master``` branch first.
+3. Run ```make release```.
+
+   This will create a package from the current branch,
+   add a GitHub version release tag, and publish the plugin to
+   ``plugin.qgis.org``.
+   You will be asked for your ``plugins.qgis.org`` id and password.   
 4. Voila, the new version of the plugin should be published!
    Please check if you can upgrade the plugin in QGIS without problems.
 5. Make a release on Github and highlight all the new features and fixes of

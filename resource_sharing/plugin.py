@@ -66,10 +66,10 @@ class Plugin:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Resource Sharing')
+        self.menuName = self.tr(u'&Resource Sharing')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'QgsResourceSharing')
-        self.toolbar.setObjectName(u'QgsResourceSharing')
+        self.toolbar = self.iface.addToolBar(self.menuName)
+        self.toolbar.setObjectName(u'Resource Sharing')
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -151,12 +151,13 @@ class Plugin:
             self.toolbar.addAction(action)
 
         if add_to_menu:
-            self.iface.addPluginToMenu(
-                self.menu,
-                action)
-
+            if hasattr(self.iface, 'addPluginToWebMenu'):
+                self.iface.addPluginToWebMenu('', action)
+            # We'll also keep it in the Plugin menu for the time being...
+            # else:
+            #     self.iface.addPluginToMenu(self.menuName, action)
+            self.iface.addPluginToMenu(self.menuName, action)
         self.actions.append(action)
-
         return action
 
     def initGui(self):
@@ -168,17 +169,21 @@ class Plugin:
             text=self.tr(u'Resource Sharing'),
             callback=self.run,
             parent=self.iface.mainWindow(),
-            add_to_toolbar=False)
+            add_to_toolbar=True)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginMenu(
-                self.tr(u'&Resource Sharing'),
-                action)
+            if hasattr(self.iface, 'removePluginWebMenu'):
+                self.iface.removePluginWebMenu('', action)
+            # We'll also keep it in the Plugin menu for the time being...
+            # else:
+            #    self.iface.removePluginMenu(self.menuName, action)
+            self.iface.removePluginMenu(self.menuName, action)
+
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
-        del self.toolbar
+        self.toolbar.parentWidget().removeToolBar(self.toolbar)
 
     def run(self):
         """Run method that performs all the real work"""

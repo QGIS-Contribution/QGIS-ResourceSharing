@@ -95,7 +95,7 @@ if __name__ == "__main__":
     if not options.username:
         # interactive mode
         username = getpass.getuser()
-        print "Please enter user name [%s] :" % username,
+        print "Please enter osgeo id / user name [%s] :" % username,
         res = raw_input()
         if res != "":
             options.username = res

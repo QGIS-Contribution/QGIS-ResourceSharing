@@ -1,6 +1,8 @@
 # coding=utf-8
 import hashlib
 import os
+# Use pathlib instead of os.path?
+# from pathlib import Path
 import shutil
 import logging
 import traceback
@@ -18,7 +20,7 @@ from resource_sharing.utilities import (
 from resource_sharing.repository_handler import BaseRepositoryHandler
 from resource_sharing.resource_handler import BaseResourceHandler
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class CollectionInstaller(QObject):
@@ -110,7 +112,7 @@ class CollectionManager(object):
         :rtype: dict
         """
         installed_collections = {}
-        for id, collection in config.COLLECTIONS.iteritems():
+        for id, collection in config.COLLECTIONS.items():
             if collection['status'] != COLLECTION_INSTALLED_STATUS:
                 continue
 
@@ -158,15 +160,24 @@ class CollectionManager(object):
         :param collection_id: The id of the collection about to be uninstalled.
         :type collection_id: str
         """
-        # Remove the collection directory
-        collection_dir = local_collection_path(collection_id)
-        if os.path.exists(collection_dir):
-            shutil.rmtree(collection_dir)
-
         # Uninstall all type of resources from QGIS
         for resource_handler in BaseResourceHandler.registry.values():
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.uninstall()
 
+        # Remove the collection directory
+        collection_dir = local_collection_path(collection_id)
+        # if collection_dir.exists():
+        if os.path.exists(collection_dir):
+            shutil.rmtree(collection_dir)
+
         config.COLLECTIONS[collection_id]['status'] = \
             COLLECTION_NOT_INSTALLED_STATUS
+
+        # Should items from other installed collections be reinstalled
+        # "automatically"?
+        # Relevant if an item in another installed collection has the same
+        # file name as one of the files that have been removed (and is
+        # installed in the same directory).
+        # for coll_id in config.COLLECTIONS:
+        #     install(self, coll_id)

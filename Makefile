@@ -15,12 +15,18 @@ zip:
 	@echo $(VERSION)
 	@git archive `git branch | grep '\*'| sed 's/^\* //g'` | tar -x -C ${WORK_DIR}/${PLUGIN}
 	@rm -rf ${WORK_DIR}/${PLUGIN}/.git*
-	@rm -rf ${WORK_DIR}/${PLUGIN}/test
 	@rm -rf ${WORK_DIR}/${PLUGIN}/scripts
-	@rm -rf ${WORK_DIR}/${PLUGIN}/.travis.yml
-	@rm -rf ${WORK_DIR}/${PLUGIN}/.coverage
+	@rm -rf ${WORK_DIR}/${PLUGIN}/test
 	@rm -rf ${WORK_DIR}/${PLUGIN}/.coveragerc
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.coverage
+	@rm -rf ${WORK_DIR}/${PLUGIN}/.travis.yml
+	@rm -rf ${WORK_DIR}/${PLUGIN}/Makefile
+	@rm -rf ${WORK_DIR}/${PLUGIN}/NOTES.rst
+	@rm -rf ${WORK_DIR}/${PLUGIN}/README.md
+	@rm -rf ${WORK_DIR}/${PLUGIN}/plugin_upload.py
 	@rm -rf ${WORK_DIR}/${PLUGIN}/pylintrc
+	@rm -rf ${WORK_DIR}/${PLUGIN}/test_suite.py
+
 	@cd ${WORK_DIR} && zip -r ${OUTPUT} * --exclude \*.pyc
 	@echo "Your plugin archive has been generated:"
 	@ls -lah ${OUTPUT}

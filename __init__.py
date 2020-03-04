@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- QgsSymbologySharing
-                                 A QGIS plugin
- Download colllections shared by other users
-                             -------------------
-        begin                : 2016-05-29
-        copyright            : (C) 2016 by Akbar Gumbira
-        email                : akbargumbira@gmail.com
-        git sha              : $Format:%H$
+ QGIS Resource Sharing - A QGIS plugin
+ Download collections shared by other users
+                           -------------------
+        begin              : 2016-05-29
+        copyright          : (C) 2016 by Akbar Gumbira, 2020 by Håvard Tveite
+        email              : havard.tveite@nmbu.no
+        git sha            : $Format:%H$
  ***************************************************************************/
 
 /***************************************************************************
@@ -25,7 +24,7 @@
 import sys
 import os
 
-# Dulwich tries to call sys.argv while in QGIS, argv module is missing
+# Dulwich tries to call sys.argv, but the argv module is missing in QGIS
 if not hasattr(sys, 'argv'):
     sys.argv = []
 
@@ -43,12 +42,13 @@ if EXT_LIBS_DIR not in sys.path:
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
-    """Load QgsSymbologySharing class from file QgsSymbologySharing.
+    """Load the Plugin class from the plugin.py file.
+       And set up the logger
 
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
-    #
+
     from resource_sharing.custom_logging import setup_logger
     setup_logger()
 

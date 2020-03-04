@@ -15,7 +15,7 @@ from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
 
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class FileSystemHandler(BaseRepositoryHandler):

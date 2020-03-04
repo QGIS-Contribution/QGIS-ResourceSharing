@@ -1,22 +1,37 @@
 [general]
 name=QGIS Resource Sharing
-email=akbargumbira@gmail.com
-author=Akbar Gumbira
+
+email=havard.tveite@nmbu.no
+author=Akbar Gumbira, Håvard Tveite
 qgisMinimumVersion=3.0
-description=Download collections shared by other users
-about=Developed as GSoC 2016 project, this plugin allows users to search for available collections and install them. Users can also create repositories to put the collections there. There are some options where to put the repository: Github, Bitbucket, local file system, or with https(s). Please read the documentation for more information.
-version=0.6.0
+description=Download shared collections
+about=Search for published collections and install them for use with QGIS. Symbology (SVG, images, styles), Processing scripts, Processing models and R scripts are supported. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S).
+version=0.11.1
 tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing.git
 
 qgisMaximumVersion=3.99
-tags=symbol,style,svg,processing,script,R,collections,maps,design,repository
-homepage=http://www.akbargumbira.com/qgis_resources_sharing/
-experimental=True
+tags=collections,processing,algorithms,Python,R,model,script,style,svg,symbol,sharing,repository,design,maps
+homepage=http://qgis-contribution.github.io/QGIS-ResourceSharing/
+experimental=False
 deprecated=False
 icon=resources/icon.png
 changelog=
-    0.6.0 - Experimental version for QGIS 3
+        0.11.1 - Reduce log level to avoid exception on missing name or URL in directory (#64)
+        0.11.0 - Check for missing repository name and URL in directory (#64)
+	       - Correct link to documentation
+        0.10.0 - Added support for Processing models (#42)
+	       - Make the plugin available from the web menu (#68)
+	       - Allow specification of the file system location of the local collections folder (#51)
+	       - Fixing log message levels (#71)
+	       - Add the action to the toolbar (#70)
+	       - Avoid breaking when collections with incompatible QGIS versions are encountered (#60)
+	       - Avoid [WinErr 32] (#80)
+        0.9.0 - Added support for R scripts (#57)
+        0.8.0 - Fix issue #59 (deleting repositories does not work)
+        0.7.0 - Flip experimental flag
+              - Merge PR from havatv (issue #60 - avoid breaking on incompatible versions)
+        0.6.0 - Experimental version for QGIS 3
 	0.5.2 - Add support for gitlab and gogs repositories (PR by Salvatore Larosa - gh username: slarosa)
 	0.5.1 - Allow authors to add license details in the collection
 	0.5.1 - Fixed problem in QGIS < 2.12 as a result of using the new QgsAuthManager

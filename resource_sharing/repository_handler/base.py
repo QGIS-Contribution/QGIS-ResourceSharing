@@ -2,7 +2,7 @@
 """This module contains the base class of repository handler."""
 try:
     from io import StringIO
-except:
+except ImportError as error:
     from StringIO import StringIO
 
 import logging
@@ -20,7 +20,7 @@ from resource_sharing.version_compare import isCompatible
 from resource_sharing.network_manager import NetworkManager
 
 
-LOGGER = logging.getLogger('QGIS Resources Sharing')
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class RepositoryHandlerMeta(type):
@@ -132,7 +132,6 @@ class BaseRepositoryHandler(object):
             self.metadata = bytes(network_manager.content).decode('utf8')
         return status, description
 
-
     def parse_metadata(self):
         """Parse str metadata to collection dict."""
         if not self.metadata:
@@ -174,7 +173,7 @@ class BaseRepositoryHandler(object):
                     '%s' % (
                         collection, Qgis.QGIS_VERSION, qgis_min_version,
                         qgis_max_version))
-                break
+                continue
 
             # Collection is compatible, continue parsing
             try:

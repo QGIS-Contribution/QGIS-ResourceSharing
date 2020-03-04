@@ -7,7 +7,8 @@
         begin                : 2016-05-29
         git sha              : $Format:%H$
         copyright            : (C) 2016 by Akbar Gumbira
-        email                : akbargumbira@gmail.com
+        copyright            : (C) 2020 by Håvard Tveite
+        email                : havard.tveite@nmbu.no
  ***************************************************************************/
 
 /***************************************************************************
@@ -51,6 +52,7 @@ except ImportError:
 
 from qgis.gui import QgsMessageBar
 from qgis.core import Qgis
+from qgis.core import QgsSettings
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 from resource_sharing.repository_manager import RepositoryManager
@@ -285,7 +287,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             return
 
         # Check if it's the approved online dir repository
-        settings = QSettings()
+        # settings = QSettings()
+        settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
         if settings.value(repo_name + '/url') in \
                 self.repository_manager._online_directories.values():
@@ -589,7 +592,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
     def open_help(self):
         """Open help."""
-        doc_url = QUrl('http://www.akbargumbira.com/qgis_resources_sharing')
+        doc_url = QUrl('http://qgis-contribution.github.io/QGIS-ResourceSharing/')
         QDesktopServices.openUrl(doc_url)
 
     def show_progress_dialog(self, text):

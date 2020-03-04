@@ -79,15 +79,15 @@ def classifyCharacter(c):
 # ------------------------------------------------------------------------ #
 def chopString(s):
     """ convert string to list of numbers and words """
-    l = [s[0]]
+    list_n_w = [s[0]]
     for i in range(1, len(s)):
         if classifyCharacter(s[i]) == 0:
             pass
         elif classifyCharacter(s[i]) == classifyCharacter(s[i - 1]):
-            l[len(l) - 1] += s[i]
+            list_n_w[len(list_n_w) - 1] += s[i]
         else:
-            l += [s[i]]
-    return l
+            list_n_w += [s[i]]
+    return list_n_w
 
 
 # ------------------------------------------------------------------------ #

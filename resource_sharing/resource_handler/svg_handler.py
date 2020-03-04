@@ -2,6 +2,7 @@
 import os
 
 from qgis.PyQt.QtCore import QSettings
+from qgis.core import QgsSettings
 try:
     from qgis.core import Qgis
 except ImportError:
@@ -22,9 +23,9 @@ class SVGResourceHandler(BaseResourceHandler):
     @classmethod
     def svg_search_paths(cls):
         """Return a list of SVG paths read from settings"""
-        settings = QSettings()
+        # settings = QSettings()
+        settings = QgsSettings()
         search_paths_str = settings.value('svg/searchPathsForSVG')
-
         # QGIS 3: it's already a list!
         is_list = False
         if not search_paths_str:
@@ -39,8 +40,8 @@ class SVGResourceHandler(BaseResourceHandler):
     @classmethod
     def set_svg_search_paths(cls, paths):
         """Set a list of SVG paths read from settings"""
-        settings = QSettings()
-
+        # settings = QSettings()
+        settings = QgsSettings()
         if Qgis.QGIS_VERSION_INT < 29900:
             settings.setValue('svg/searchPathsForSVG', '|'.join(paths))
         else:

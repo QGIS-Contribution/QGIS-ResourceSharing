@@ -12,28 +12,28 @@ upload.
 
 Follow these steps to release the plugin:
 
-1. Update ```metadata.txt```:
-   * change the ``version``.
-     Example: ``version=0.11.1`` (for point release 11.1 of version 0)
-   * update the ``changelog`` (add information about the changes in the new
+1. Update `metadata.txt`:
+   * change the `version`.
+     Example: ```version=0.11.1``` (for point release 11.1 of version 0)
+   * update the `changelog` (add information about the changes in the new
      version).
      Example:
-```
-changelog=
-    0.11.0 - Check for missing repository name and URL in directory (#64)
-           - Correct link to documentation
-```
+     ```
+     changelog=
+         0.11.0 - Check for missing repository name and URL in directory (#64)
+                - Correct link to documentation
+     ```
      to mention two changes, and refer issue (or PR) #64.
 2. Make sure that the log level (set in *resource_sharing/custom_logging.py*)
    is appropriate for deployment:
 
-   ``logger.setLevel(logging.INFO)``
+   ```logger.setLevel(logging.INFO)```
 
-3. The branch to release should be ```master```, so make sure you are on the
+3. The branch to release should be `master`, so make sure you are on the
    master branch before proceeding to the next step.
    
-   If you want to release from the ```develop``` branch, please make a PR
-   to the ```master``` branch first.
+   If you want to release from the `develop` branch, please make a PR
+   to the `master` branch first.
 4. Run ```make release```.
 
    This will create a package from the current branch,

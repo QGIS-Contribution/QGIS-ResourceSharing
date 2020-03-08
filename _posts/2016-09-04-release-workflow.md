@@ -19,9 +19,11 @@ Follow these steps to release the plugin:
      version).
      Example:
      
-   ``changelog=
-          0.11.0 - Check for missing repository name and URL in directory (#64)
- 	               - Correct link to documentation``
+     > changelog=
+
+     >      0.11.0 - Check for missing repository name and URL in directory (#64)
+     
+ 	   >             - Correct link to documentation
 
      to mention two changes, and refer issue (or PR) #64.
 2. Make sure that the log level (set in *resource_sharing/custom_logging.py*)

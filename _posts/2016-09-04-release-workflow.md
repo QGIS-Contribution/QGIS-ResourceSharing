@@ -45,6 +45,6 @@ Follow these steps to release the plugin:
    You will be asked for your ``plugins.qgis.org`` id and password.   
 5. Voila, the new version of the plugin should be published!
 
-   Please check if you can upgrade the plugin in QGIS without problems.
+   ***Check if you can upgrade the plugin in QGIS without problems***.
 6. Make a release on Github and highlight all the new features and fixes of
    the new version.

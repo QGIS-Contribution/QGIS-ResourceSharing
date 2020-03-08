@@ -13,10 +13,12 @@ upload.
 Follow these steps to release the plugin:
 
 1. Update `metadata.txt`:
-   * change the `version`.
-     Example: ```version=0.11.1``` (for point release 11.1 of version 0)
-   * update the `changelog` (add information about the changes in the new
+   * Change the `version`.
+
+     Example: ```version=0.11.1``` (for point release 11.1 of version 0).
+   * Update the `changelog` (add information about the changes in the new
      version).
+
      Example:
      ```
      changelog=
@@ -39,8 +41,10 @@ Follow these steps to release the plugin:
    This will create a package from the current branch,
    add a GitHub version release tag, and publish the plugin to
    ``plugin.qgis.org``.
+
    You will be asked for your ``plugins.qgis.org`` id and password.   
 5. Voila, the new version of the plugin should be published!
+
    Please check if you can upgrade the plugin in QGIS without problems.
 6. Make a release on Github and highlight all the new features and fixes of
    the new version.

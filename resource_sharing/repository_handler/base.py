@@ -127,15 +127,16 @@ class BaseRepositoryHandler(object):
         """Fetch metadata file from the url."""
         # Download the metadata
         network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
-        status, error = network_manager.fetch()
+        status, fetcherror = network_manager.fetch()
         if status:
             self.metadata = bytes(network_manager.content).decode('utf8')
-        return status, error
+        return status, fetcherror
 
     def parse_metadata(self):
         """Parse str metadata to collection dict.
 
-        :return:
+        :return: collections
+        :rtype: (dict)
         """
         if not self.metadata:
             msg = 'The metadata content is None'

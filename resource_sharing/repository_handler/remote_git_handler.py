@@ -84,12 +84,11 @@ class RemoteGitHandler(BaseRepositoryHandler):
 
         :param id: The ID of the collection.
         :type id: str
-        :return: (success (True or False), error message (None if success))
-        :rtype: (boolean, string)
-
         :param register_name: The register name of the collection (the
             section name of the collection)
         :type register_name: unicode
+        :return: (success (True or False), error message (None if success))
+        :rtype: (boolean, string)
         """
         # Clone or pull the repositories first
         local_repo_dir = os.path.join(

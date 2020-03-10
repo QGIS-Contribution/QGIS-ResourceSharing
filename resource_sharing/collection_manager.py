@@ -129,13 +129,13 @@ class CollectionManager(object):
 
         :param collection_id: The id of the collection about to be downloaded.
         :type collection_id: str
-        :return status (True or False), information from the repo handler
-
+        :return: status (True or False), information from the repo handler
+        :rtype: (boolean, string)
         """
         repo_url = config.COLLECTIONS[collection_id]['repository_url']
         repo_handler = BaseRepositoryHandler.get_handler(repo_url)
         if repo_handler is None:
-            message = 'There is no handler available for the URL!'
+            message = 'There is no handler available for ' + str(repo_url)
             LOGGER.error(message)
             return False, message
         register_name = config.COLLECTIONS[collection_id]['register_name']

@@ -31,10 +31,9 @@ class ModelHandler(BaseResourceHandler):
     def install(self):
         """Install the models from the collection.
 
-        Copy the models (*.model3) that exist in the models
-        directory of the Resource Sharing collection's to the
-        user's processing model directory and refresh the
-        provider.
+        Copy the models (*.model3) in the models directory of the
+        Resource Sharing collection to the user's processing
+        model directory and refresh the provider.
         """
         # Check if the dir exists, return silently if it doesn't
         # if Path(self.resource_dir).exists():

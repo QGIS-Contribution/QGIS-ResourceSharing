@@ -180,7 +180,6 @@ class RepositoryManager(QObject):
             try:
                 collections = repo_handler.parse_metadata()
             except MetadataError as me:
-                # raise
                 LOGGER.warning("Error parsing metadata for " +
                                str(repo_name) + ":\n" + str(me))
             # Add the repo and the collections

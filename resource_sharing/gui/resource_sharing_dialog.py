@@ -547,7 +547,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.collections_model.sort(0, Qt.AscendingOrder)
 
     def on_tree_repositories_itemSelectionChanged(self):
-        """Slot for the itemSelectionChanged signal."""
+        """Slot for the itemSelectionChanged signal of tree_repositories."""
         selected_item = self.tree_repositories.currentItem()
         if selected_item:
             repo_name = selected_item.text(0)

@@ -45,9 +45,6 @@ except ImportError:
     BaseHTTPServer = http.server
     SimpleHTTPServer = http.server
 
-if sys.platform == 'win32':
-    import ctypes
-
 from dulwich import (
     client,
     errors,
@@ -71,11 +68,16 @@ from dulwich.tests.compat.utils import (
     )
 
 
+if sys.platform == 'win32':
+    import ctypes
+
+
 class DulwichClientTestBase(object):
     """Tests for client/server compatibility."""
 
     def setUp(self):
-        self.gitroot = os.path.dirname(import_repo_to_dir('server_new.export').rstrip(os.sep))
+        self.gitroot = os.path.dirname(
+                import_repo_to_dir('server_new.export').rstrip(os.sep))
         self.dest = os.path.join(self.gitroot, 'dest')
         file.ensure_dir_exists(self.dest)
         run_git_or_fail(['init', '--quiet', '--bare'], cwd=self.dest)
@@ -102,8 +104,8 @@ class DulwichClientTestBase(object):
         with repo.Repo(srcpath) as src:
             sendrefs = dict(src.get_refs())
             del sendrefs[b'HEAD']
-            c.send_pack(self._build_path(b'/dest'), lambda _: sendrefs,
-                        src.object_store.generate_pack_contents)
+            c.send_pack(self._build_path('/dest'), lambda _: sendrefs,
+                        src.object_store.generate_pack_data)
 
     def test_send_pack(self):
         self._do_send_pack()
@@ -122,8 +124,8 @@ class DulwichClientTestBase(object):
         with repo.Repo(srcpath) as src:
             sendrefs = dict(src.get_refs())
             del sendrefs[b'HEAD']
-            c.send_pack(self._build_path(b'/dest'), lambda _: sendrefs,
-                        src.object_store.generate_pack_contents)
+            c.send_pack(self._build_path('/dest'), lambda _: sendrefs,
+                        src.object_store.generate_pack_data)
             self.assertDestEqualsSrc()
 
     def make_dummy_commit(self, dest):
@@ -150,7 +152,7 @@ class DulwichClientTestBase(object):
     def compute_send(self, src):
         sendrefs = dict(src.get_refs())
         del sendrefs[b'HEAD']
-        return sendrefs, src.object_store.generate_pack_contents
+        return sendrefs, src.object_store.generate_pack_data
 
     def test_send_pack_one_error(self):
         dest, dummy_commit = self.disable_ff_and_make_dummy_commit()
@@ -160,7 +162,8 @@ class DulwichClientTestBase(object):
             sendrefs, gen_pack = self.compute_send(src)
             c = self._client()
             try:
-                c.send_pack(self._build_path(b'/dest'), lambda _: sendrefs, gen_pack)
+                c.send_pack(self._build_path('/dest'),
+                            lambda _: sendrefs, gen_pack)
             except errors.UpdateRefsError as e:
                 self.assertEqual('refs/heads/master failed to update',
                                  e.args[0])
@@ -178,13 +181,15 @@ class DulwichClientTestBase(object):
             sendrefs, gen_pack = self.compute_send(src)
             c = self._client()
             try:
-                c.send_pack(self._build_path(b'/dest'), lambda _: sendrefs, gen_pack)
+                c.send_pack(self._build_path('/dest'), lambda _: sendrefs,
+                            gen_pack)
             except errors.UpdateRefsError as e:
-                self.assertIn(str(e),
-                              ['{0}, {1} failed to update'.format(
-                                  branch.decode('ascii'), master.decode('ascii')),
-                               '{1}, {0} failed to update'.format(
-                                   branch.decode('ascii'), master.decode('ascii'))])
+                self.assertIn(
+                        str(e),
+                        ['{0}, {1} failed to update'.format(
+                            branch.decode('ascii'), master.decode('ascii')),
+                         '{1}, {0} failed to update'.format(
+                             branch.decode('ascii'), master.decode('ascii'))])
                 self.assertEqual({branch: b'non-fast-forward',
                                   master: b'non-fast-forward'},
                                  e.ref_status)
@@ -192,7 +197,7 @@ class DulwichClientTestBase(object):
     def test_archive(self):
         c = self._client()
         f = BytesIO()
-        c.archive(self._build_path(b'/server_new.export'), b'HEAD', f.write)
+        c.archive(self._build_path('/server_new.export'), b'HEAD', f.write)
         f.seek(0)
         tf = tarfile.open(fileobj=f)
         self.assertEqual(['baz', 'foo'], tf.getnames())
@@ -200,8 +205,32 @@ class DulwichClientTestBase(object):
     def test_fetch_pack(self):
         c = self._client()
         with repo.Repo(os.path.join(self.gitroot, 'dest')) as dest:
-            refs = c.fetch(self._build_path(b'/server_new.export'), dest)
-            for r in refs.items():
+            result = c.fetch(self._build_path('/server_new.export'), dest)
+            for r in result.refs.items():
+                dest.refs.set_if_equals(r[0], None, r[1])
+            self.assertDestEqualsSrc()
+
+    def test_fetch_pack_depth(self):
+        c = self._client()
+        with repo.Repo(os.path.join(self.gitroot, 'dest')) as dest:
+            result = c.fetch(self._build_path('/server_new.export'), dest,
+                             depth=1)
+            for r in result.refs.items():
+                dest.refs.set_if_equals(r[0], None, r[1])
+            self.assertEqual(
+                    dest.get_shallow(),
+                    set([b'35e0b59e187dd72a0af294aedffc213eaa4d03ff',
+                         b'514dc6d3fbfe77361bcaef320c4d21b72bc10be9']))
+
+    def test_repeat(self):
+        c = self._client()
+        with repo.Repo(os.path.join(self.gitroot, 'dest')) as dest:
+            result = c.fetch(self._build_path('/server_new.export'), dest)
+            for r in result.refs.items():
+                dest.refs.set_if_equals(r[0], None, r[1])
+            self.assertDestEqualsSrc()
+            result = c.fetch(self._build_path('/server_new.export'), dest)
+            for r in result.refs.items():
                 dest.refs.set_if_equals(r[0], None, r[1])
             self.assertDestEqualsSrc()
 
@@ -212,8 +241,8 @@ class DulwichClientTestBase(object):
         c = self._client()
         repo_dir = os.path.join(self.gitroot, 'server_new.export')
         with repo.Repo(repo_dir) as dest:
-            refs = c.fetch(self._build_path(b'/dest'), dest)
-            for r in refs.items():
+            result = c.fetch(self._build_path('/dest'), dest)
+            for r in result.refs.items():
                 dest.refs.set_if_equals(r[0], None, r[1])
             self.assertDestEqualsSrc()
 
@@ -221,8 +250,8 @@ class DulwichClientTestBase(object):
         c = self._client()
         c._fetch_capabilities.remove(b'side-band-64k')
         with repo.Repo(os.path.join(self.gitroot, 'dest')) as dest:
-            refs = c.fetch(self._build_path(b'/server_new.export'), dest)
-            for r in refs.items():
+            result = c.fetch(self._build_path('/server_new.export'), dest)
+            for r in result.refs.items():
                 dest.refs.set_if_equals(r[0], None, r[1])
             self.assertDestEqualsSrc()
 
@@ -231,9 +260,10 @@ class DulwichClientTestBase(object):
         # be ignored
         c = self._client()
         with repo.Repo(os.path.join(self.gitroot, 'dest')) as dest:
-            refs = c.fetch(self._build_path(b'/server_new.export'), dest,
+            result = c.fetch(
+                self._build_path('/server_new.export'), dest,
                 lambda refs: [protocol.ZERO_SHA])
-            for r in refs.items():
+            for r in result.refs.items():
                 dest.refs.set_if_equals(r[0], None, r[1])
 
     def test_send_remove_branch(self):
@@ -244,15 +274,18 @@ class DulwichClientTestBase(object):
             sendrefs = dict(dest.refs)
             sendrefs[b'refs/heads/abranch'] = b"00" * 20
             del sendrefs[b'HEAD']
-            gen_pack = lambda have, want: []
+
+            def gen_pack(have, want, ofs_delta=False):
+                return 0, []
             c = self._client()
             self.assertEqual(dest.refs[b"refs/heads/abranch"], dummy_commit)
-            c.send_pack(self._build_path(b'/dest'), lambda _: sendrefs, gen_pack)
+            c.send_pack(
+                self._build_path('/dest'), lambda _: sendrefs, gen_pack)
             self.assertFalse(b"refs/heads/abranch" in dest.refs)
 
     def test_get_refs(self):
         c = self._client()
-        refs = c.get_refs(self._build_path(b'/server_new.export'))
+        refs = c.get_refs(self._build_path('/server_new.export'))
 
         repo_dir = os.path.join(self.gitroot, 'server_new.export')
         with repo.Repo(repo_dir) as dest:
@@ -266,7 +299,7 @@ class DulwichTCPClientTest(CompatTestCase, DulwichClientTestBase):
         DulwichClientTestBase.setUp(self)
         if check_for_daemon(limit=1):
             raise SkipTest('git-daemon was already running on port %s' %
-                              protocol.TCP_GIT_PORT)
+                           protocol.TCP_GIT_PORT)
         fd, self.pidfile = tempfile.mkstemp(prefix='dulwich-test-git-client',
                                             suffix=".pid")
         os.fdopen(fd).close()
@@ -318,10 +351,11 @@ class DulwichTCPClientTest(CompatTestCase, DulwichClientTestBase):
 class TestSSHVendor(object):
 
     @staticmethod
-    def run_command(host, command, username=None, port=None):
-        cmd, path = command.split(b' ')
-        cmd = cmd.split(b'-', 1)
-        path = path.replace(b"'", b"")
+    def run_command(host, command, username=None, port=None,
+                    password=None, key_filename=None):
+        cmd, path = command.split(' ')
+        cmd = cmd.split('-', 1)
+        path = path.replace("'", "")
         p = subprocess.Popen(cmd + [path], bufsize=0, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return client.SubprocessWrapper(p)
@@ -344,7 +378,7 @@ class DulwichMockSSHClientTest(CompatTestCase, DulwichClientTestBase):
         return client.SSHGitClient('localhost')
 
     def _build_path(self, path):
-        return self.gitroot.encode(sys.getfilesystemencoding()) + path
+        return self.gitroot + path
 
 
 class DulwichSubprocessClientTest(CompatTestCase, DulwichClientTestBase):
@@ -358,10 +392,10 @@ class DulwichSubprocessClientTest(CompatTestCase, DulwichClientTestBase):
         CompatTestCase.tearDown(self)
 
     def _client(self):
-        return client.SubprocessGitClient(stderr=subprocess.PIPE)
+        return client.SubprocessGitClient()
 
     def _build_path(self, path):
-        return self.gitroot.encode(sys.getfilesystemencoding()) + path
+        return self.gitroot + path
 
 
 class GitHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -387,7 +421,8 @@ class GitHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def run_backend(self):
         """Call out to git http-backend."""
         # Based on CGIHTTPServer.CGIHTTPRequestHandler.run_cgi:
-        # Copyright (c) 2001-2010 Python Software Foundation; All Rights Reserved
+        # Copyright (c) 2001-2010 Python Software Foundation;
+        # All Rights Reserved
         # Licensed under the Python Software Foundation License.
         rest = self.path
         # find an explicit query string, if present.
@@ -419,7 +454,8 @@ class GitHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if authorization:
             authorization = authorization.split()
             if len(authorization) == 2:
-                import base64, binascii
+                import base64
+                import binascii
                 env['AUTH_TYPE'] = authorization[0]
                 if authorization[0].lower() == "basic":
                     try:
@@ -431,7 +467,9 @@ class GitHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                         if len(authorization) == 2:
                             env['REMOTE_USER'] = authorization[0]
         # XXX REMOTE_IDENT
-        env['CONTENT_TYPE'] = self.headers.get('content-type')
+        content_type = self.headers.get('content-type')
+        if content_type:
+            env['CONTENT_TYPE'] = content_type
         length = self.headers.get('content-length')
         if length:
             env['CONTENT_LENGTH'] = length
@@ -474,6 +512,7 @@ class GitHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             data = self.rfile.read(nbytes)
         else:
             data = None
+            env['CONTENT_LENGTH'] = '0'
         # throw away additional data [see bug #427345]
         while select.select([self.rfile._sock], [], [], 0)[0]:
             if not self.rfile._sock.recv(1):
@@ -481,7 +520,8 @@ class GitHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         args = ['http-backend']
         if '=' not in decoded_query:
             args.append(decoded_query)
-        stdout = run_git_or_fail(args, input=data, env=env, stderr=subprocess.PIPE)
+        stdout = run_git_or_fail(
+            args, input=data, env=env, stderr=subprocess.PIPE)
         self.wfile.write(stdout)
 
 
@@ -490,7 +530,8 @@ class HTTPGitServer(BaseHTTPServer.HTTPServer):
     allow_reuse_address = True
 
     def __init__(self, server_address, root_path):
-        BaseHTTPServer.HTTPServer.__init__(self, server_address, GitHTTPRequestHandler)
+        BaseHTTPServer.HTTPServer.__init__(
+            self, server_address, GitHTTPRequestHandler)
         self.root_path = root_path
         self.server_name = "localhost"
 
@@ -523,10 +564,7 @@ class DulwichHttpClientTest(CompatTestCase, DulwichClientTestBase):
         return client.HttpGitClient(self._httpd.get_url())
 
     def _build_path(self, path):
-        if sys.version_info[0] == 3:
-            return path.decode('ascii')
-        else:
-            return path
+        return path
 
     def test_archive(self):
         raise SkipTest("exporting archives not supported over http")

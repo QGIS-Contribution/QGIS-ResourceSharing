@@ -167,12 +167,17 @@ class PackInfoMissingObjectFinder(GreenThreadsMissingObjectFinder):
 def load_conf(path=None, file=None):
     """Load configuration in global var CONF
 
-    :param path: The path to the configuration file
-    :param file: If provided read instead the file like object
+    Args:
+      path: The path to the configuration file
+      file: If provided read instead the file like object
     """
     conf = ConfigParser()
     if file:
-        conf.readfp(file)
+        try:
+            conf.read_file(file, path)
+        except AttributeError:
+            # read_file only exists in Python3
+            conf.readfp(file)
         return conf
     confpath = None
     if not path:
@@ -191,15 +196,13 @@ def load_conf(path=None, file=None):
 def swift_load_pack_index(scon, filename):
     """Read a pack index file from Swift
 
-    :param scon: a `SwiftConnector` instance
-    :param filename: Path to the index file objectise
-    :return: a `PackIndexer` instance
+    Args:
+      scon: a `SwiftConnector` instance
+      filename: Path to the index file objectise
+    Returns: a `PackIndexer` instance
     """
-    f = scon.get_object(filename)
-    try:
+    with scon.get_object(filename) as f:
         return load_pack_index_file(filename, f)
-    finally:
-        f.close()
 
 
 def pack_info_create(pack_data, pack_index):
@@ -247,8 +250,9 @@ class SwiftConnector(object):
     def __init__(self, root, conf):
         """ Initialize a SwiftConnector
 
-        :param root: The swift container that will act as Git bare repository
-        :param conf: A ConfigParser Object
+        Args:
+          root: The swift container that will act as Git bare repository
+          conf: A ConfigParser Object
         """
         self.conf = conf
         self.auth_ver = self.conf.get("swift", "auth_ver")
@@ -282,8 +286,8 @@ class SwiftConnector(object):
                                 connection_timeout=self.http_timeout,
                                 network_timeout=self.http_timeout,
                                 headers=token_header)
-        self.base_path = str(
-            posixpath.join(urlparse.urlparse(self.storage_url).path, self.root))
+        self.base_path = str(posixpath.join(
+                urlparse.urlparse(self.storage_url).path, self.root))
 
     def swift_auth_v1(self):
         self.user = self.user.replace(";", ":")
@@ -352,7 +356,7 @@ class SwiftConnector(object):
     def test_root_exists(self):
         """Check that Swift container exist
 
-        :return: True if exist or None it not
+        Returns: True if exist or None it not
         """
         ret = self.httpclient.request('HEAD', self.base_path)
         if ret.status_code == 404:
@@ -365,7 +369,8 @@ class SwiftConnector(object):
     def create_root(self):
         """Create the Swift container
 
-        :raise: `SwiftException` if unable to create
+        Raises:
+          SwiftException: if unable to create
         """
         if not self.test_root_exists():
             ret = self.httpclient.request('PUT', self.base_path)
@@ -376,7 +381,7 @@ class SwiftConnector(object):
     def get_container_objects(self):
         """Retrieve objects list in a container
 
-        :return: A list of dict that describe objects
+        Returns: A list of dict that describe objects
                  or None if container does not exist
         """
         qs = '?format=json'
@@ -393,9 +398,10 @@ class SwiftConnector(object):
     def get_object_stat(self, name):
         """Retrieve object stat
 
-        :param name: The object name
-        :return: A dict that describe the object
-                 or None if object does not exist
+        Args:
+          name: The object name
+        Returns:
+          A dict that describe the object or None if object does not exist
         """
         path = self.base_path + '/' + name
         ret = self.httpclient.request('HEAD', path)
@@ -412,9 +418,11 @@ class SwiftConnector(object):
     def put_object(self, name, content):
         """Put an object
 
-        :param name: The object name
-        :param content: A file object
-        :raise: `SwiftException` if unable to create
+        Args:
+          name: The object name
+          content: A file object
+        Raises:
+          SwiftException: if unable to create
         """
         content.seek(0)
         data = content.read()
@@ -441,11 +449,12 @@ class SwiftConnector(object):
     def get_object(self, name, range=None):
         """Retrieve an object
 
-        :param name: The object name
-        :param range: A string range like "0-10" to
-                      retrieve specified bytes in object content
-        :return: A file like instance
-                 or bytestring if range is specified
+        Args:
+          name: The object name
+          range: A string range like "0-10" to
+                 retrieve specified bytes in object content
+        Returns:
+          A file like instance or bytestring if range is specified
         """
         headers = {}
         if range:
@@ -466,8 +475,10 @@ class SwiftConnector(object):
     def del_object(self, name):
         """Delete an object
 
-        :param name: The object name
-        :raise: `SwiftException` if unable to delete
+        Args:
+          name: The object name
+        Raises:
+          SwiftException: if unable to delete
         """
         path = self.base_path + '/' + name
         ret = self.httpclient.request('DELETE', path)
@@ -478,7 +489,8 @@ class SwiftConnector(object):
     def del_root(self):
         """Delete the root container by removing container content
 
-        :raise: `SwiftException` if unable to delete
+        Raises:
+          SwiftException: if unable to delete
         """
         for obj in self.get_container_objects():
             self.del_object(obj['name'])
@@ -501,9 +513,10 @@ class SwiftPackReader(object):
     def __init__(self, scon, filename, pack_length):
         """Initialize a SwiftPackReader
 
-        :param scon: a `SwiftConnector` instance
-        :param filename: the pack filename
-        :param pack_length: The size of the pack object
+        Args:
+          scon: a `SwiftConnector` instance
+          filename: the pack filename
+          pack_length: The size of the pack object
         """
         self.scon = scon
         self.filename = filename
@@ -516,16 +529,18 @@ class SwiftPackReader(object):
     def _read(self, more=False):
         if more:
             self.buff_length = self.buff_length * 2
-        l = self.base_offset
+        offset = self.base_offset
         r = min(self.base_offset + self.buff_length, self.pack_length)
-        ret = self.scon.get_object(self.filename, range="%s-%s" % (l, r))
+        ret = self.scon.get_object(self.filename, range="%s-%s" % (offset, r))
         self.buff = ret
 
     def read(self, length):
         """Read a specified amount of Bytes form the pack object
 
-        :param length: amount of bytes to read
-        :return: bytestring
+        Args:
+          length: amount of bytes to read
+        Returns:
+          a bytestring
         """
         end = self.offset+length
         if self.base_offset + end > self.pack_length:
@@ -543,7 +558,8 @@ class SwiftPackReader(object):
     def seek(self, offset):
         """Seek to a specified offset
 
-        :param offset: the offset to seek to
+        Args:
+          offset: the offset to seek to
         """
         self.base_offset = offset
         self._read()
@@ -552,7 +568,7 @@ class SwiftPackReader(object):
     def read_checksum(self):
         """Read the checksum from the pack
 
-        :return: the checksum bytestring
+        Returns: the checksum bytestring
         """
         return self.scon.get_object(self.filename, range="-20")
 
@@ -567,8 +583,9 @@ class SwiftPackData(PackData):
     def __init__(self, scon, filename):
         """ Initialize a SwiftPackReader
 
-        :param scon: a `SwiftConnector` instance
-        :param filename: the pack filename
+        Args:
+          scon: a `SwiftConnector` instance
+          filename: the pack filename
         """
         self.scon = scon
         self._filename = filename
@@ -638,7 +655,8 @@ class SwiftObjectStore(PackBasedObjectStore):
     def __init__(self, scon):
         """Open a Swift object store.
 
-        :param scon: A `SwiftConnector` instance
+        Args:
+          scon: A `SwiftConnector` instance
         """
         super(SwiftObjectStore, self).__init__()
         self.scon = scon
@@ -646,16 +664,16 @@ class SwiftObjectStore(PackBasedObjectStore):
         self.pack_dir = posixpath.join(OBJECTDIR, PACKDIR)
         self._alternates = None
 
-    @property
-    def packs(self):
-        """List with pack objects."""
-        if not self._pack_cache:
-            self._update_pack_cache()
-        return self._pack_cache.values()
-
     def _update_pack_cache(self):
-        for pack in self._load_packs():
-            self._pack_cache[pack._basename] = pack
+        objects = self.scon.get_container_objects()
+        pack_files = [o['name'].replace(".pack", "")
+                      for o in objects if o['name'].endswith(".pack")]
+        ret = []
+        for basename in pack_files:
+            pack = SwiftPack(basename, scon=self.scon)
+            self._pack_cache[basename] = pack
+            ret.append(pack)
+        return ret
 
     def _iter_loose_objects(self):
         """Loose objects are not supported by this repository
@@ -665,7 +683,7 @@ class SwiftObjectStore(PackBasedObjectStore):
     def iter_shas(self, finder):
         """An iterator over pack's ObjectStore.
 
-        :return: a `ObjectStoreIterator` or `GreenThreadsObjectStoreIterator`
+        Returns: a `ObjectStoreIterator` or `GreenThreadsObjectStoreIterator`
                  instance if gevent is enabled
         """
         shas = iter(finder.next, None)
@@ -675,16 +693,6 @@ class SwiftObjectStore(PackBasedObjectStore):
     def find_missing_objects(self, *args, **kwargs):
         kwargs['concurrency'] = self.scon.concurrency
         return PackInfoMissingObjectFinder(self, *args, **kwargs)
-
-    def _load_packs(self):
-        """Load all packs from Swift
-
-        :return: a list of `SwiftPack` instances
-        """
-        objects = self.scon.get_container_objects()
-        pack_files = [o['name'].replace(".pack", "")
-                      for o in objects if o['name'].endswith(".pack")]
-        return [SwiftPack(pack, scon=self.scon) for pack in pack_files]
 
     def pack_info_get(self, sha):
         for pack in self.packs:
@@ -719,7 +727,7 @@ class SwiftObjectStore(PackBasedObjectStore):
     def add_pack(self):
         """Add a new pack to this object store.
 
-        :return: Fileobject to write to and a commit function to
+        Returns: Fileobject to write to and a commit function to
             call when the pack is finished.
         """
         f = BytesIO()
@@ -741,7 +749,7 @@ class SwiftObjectStore(PackBasedObjectStore):
                 index.close()
                 final_pack = SwiftPack(basename, scon=self.scon)
                 final_pack.check_length_and_checksum()
-                self._add_known_pack(basename, final_pack)
+                self._add_cached_pack(basename, final_pack)
                 return final_pack
             else:
                 return None
@@ -808,7 +816,8 @@ class SwiftObjectStore(PackBasedObjectStore):
         entries.sort()
         pack_base_name = posixpath.join(
             self.pack_dir,
-            'pack-' + iter_sha1(e[0] for e in entries).decode(sys.getfilesystemencoding()))
+            'pack-' + iter_sha1(e[0] for e in entries).decode(
+                sys.getfilesystemencoding()))
         self.scon.put_object(pack_base_name + '.pack', f)
 
         # Write the index.
@@ -833,7 +842,7 @@ class SwiftObjectStore(PackBasedObjectStore):
         # Add the pack to the store and return it.
         final_pack = SwiftPack(pack_base_name, scon=self.scon)
         final_pack.check_length_and_checksum()
-        self._add_known_pack(pack_base_name, final_pack)
+        self._add_cached_pack(pack_base_name, final_pack)
         return final_pack
 
 
@@ -909,8 +918,9 @@ class SwiftRepo(BaseRepo):
         `SwiftInfoRefsContainer`. The root attribute is the Swift
         container that contain the Git bare repository.
 
-        :param root: The container which contains the bare repo
-        :param conf: A ConfigParser object
+        Args:
+          root: The container which contains the bare repo
+          conf: A ConfigParser object
         """
         self.root = root.lstrip('/')
         self.conf = conf
@@ -930,28 +940,30 @@ class SwiftRepo(BaseRepo):
     def _determine_file_mode(self):
         """Probe the file-system to determine whether permissions can be trusted.
 
-        :return: True if permissions can be trusted, False otherwise.
+        Returns: True if permissions can be trusted, False otherwise.
         """
         return False
 
     def _put_named_file(self, filename, contents):
         """Put an object in a Swift container
 
-        :param filename: the path to the object to put on Swift
-        :param contents: the content as bytestring
+        Args:
+          filename: the path to the object to put on Swift
+          contents: the content as bytestring
         """
-        f = BytesIO()
-        f.write(contents)
-        self.scon.put_object(filename, f)
-        f.close()
+        with BytesIO() as f:
+            f.write(contents)
+            self.scon.put_object(filename, f)
 
     @classmethod
     def init_bare(cls, scon, conf):
         """Create a new bare repository.
 
-        :param scon: a `SwiftConnector` instance
-        :param conf: a ConfigParser object
-        :return: a `SwiftRepo` instance
+        Args:
+          scon: a `SwiftConnector` instance
+          conf: a ConfigParser object
+        Returns:
+          a `SwiftRepo` instance
         """
         scon.create_root()
         for obj in [posixpath.join(OBJECTDIR, PACKDIR),
@@ -990,14 +1002,13 @@ def cmd_daemon(args):
 
     try:
         import gevent
-        import geventhttpclient
+        import geventhttpclient  # noqa: F401
     except ImportError:
         print("gevent and geventhttpclient libraries are mandatory "
               " for use the Swift backend.")
         sys.exit(1)
     import gevent.monkey
     gevent.monkey.patch_socket()
-    from dulwich.contrib.swift import load_conf
     from dulwich import log_utils
     logger = log_utils.getLogger(__name__)
     conf = load_conf(options.swift_config)
@@ -1032,14 +1043,16 @@ def main(argv=sys.argv):
     }
 
     if len(sys.argv) < 2:
-        print("Usage: %s <%s> [OPTIONS...]" % (sys.argv[0], "|".join(commands.keys())))
+        print("Usage: %s <%s> [OPTIONS...]" % (
+                sys.argv[0], "|".join(commands.keys())))
         sys.exit(1)
 
     cmd = sys.argv[1]
-    if not cmd in commands:
+    if cmd not in commands:
         print("No such subcommand: %s" % cmd)
         sys.exit(1)
     commands[cmd](sys.argv[2:])
+
 
 if __name__ == '__main__':
     main()

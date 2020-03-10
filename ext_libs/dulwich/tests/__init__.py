@@ -30,7 +30,12 @@ import tempfile
 
 # If Python itself provides an exception, use that
 import unittest
-from unittest import SkipTest, TestCase as _TestCase, skipIf, expectedFailure
+from unittest import (  # noqa: F401
+    SkipTest,
+    TestCase as _TestCase,
+    skipIf,
+    expectedFailure,
+    )
 
 
 class TestCase(_TestCase):
@@ -52,14 +57,16 @@ class BlackboxTestCase(TestCase):
     """Blackbox testing."""
 
     # TODO(jelmer): Include more possible binary paths.
-    bin_directories = [os.path.abspath(os.path.join(os.path.dirname(__file__),
-        "..", "..", "bin")), '/usr/bin', '/usr/local/bin']
+    bin_directories = [os.path.abspath(os.path.join(
+            os.path.dirname(__file__), "..", "..", "bin")), '/usr/bin',
+            '/usr/local/bin']
 
     def bin_path(self, name):
         """Determine the full path of a binary.
 
-        :param name: Name of the script
-        :return: Full path
+        Args:
+          name: Name of the script
+        Returns: Full path
         """
         for d in self.bin_directories:
             p = os.path.join(d, name)
@@ -71,8 +78,9 @@ class BlackboxTestCase(TestCase):
     def run_command(self, name, args):
         """Run a Dulwich command.
 
-        :param name: Name of the command, as it exists in bin/
-        :param args: Arguments to the command
+        Args:
+          name: Name of the command, as it exists in bin/
+          args: Arguments to the command
         """
         env = dict(os.environ)
         env["PYTHONPATH"] = os.pathsep.join(sys.path)
@@ -83,10 +91,11 @@ class BlackboxTestCase(TestCase):
         #
         # Save us from all that headache and call python with the bin script.
         argv = [sys.executable, self.bin_path(name)] + args
-        return subprocess.Popen(argv,
-            stdout=subprocess.PIPE,
-            stdin=subprocess.PIPE, stderr=subprocess.PIPE,
-            env=env)
+        return subprocess.Popen(
+                argv,
+                stdout=subprocess.PIPE,
+                stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+                env=env)
 
 
 def self_test_suite():
@@ -101,8 +110,11 @@ def self_test_suite():
         'grafts',
         'greenthreads',
         'hooks',
+        'ignore',
         'index',
+        'line_ending',
         'lru_cache',
+        'mailmap',
         'objects',
         'objectspec',
         'object_store',
@@ -115,6 +127,8 @@ def self_test_suite():
         'refs',
         'repository',
         'server',
+        'stash',
+        'utils',
         'walk',
         'web',
         ]
@@ -124,6 +138,13 @@ def self_test_suite():
 
 
 def tutorial_test_suite():
+    import dulwich.client  # noqa: F401
+    import dulwich.config  # noqa: F401
+    import dulwich.index  # noqa: F401
+    import dulwich.reflog  # noqa: F401
+    import dulwich.repo  # noqa: F401
+    import dulwich.server  # noqa: F401
+    import dulwich.patch  # noqa: F401
     tutorial = [
         'introduction',
         'file-format',
@@ -133,23 +154,26 @@ def tutorial_test_suite():
         'conclusion',
         ]
     tutorial_files = ["../../docs/tutorial/%s.txt" % name for name in tutorial]
+
     def setup(test):
         test.__old_cwd = os.getcwd()
-        test.__dulwich_tempdir = tempfile.mkdtemp()
-        os.chdir(test.__dulwich_tempdir)
+        test.tempdir = tempfile.mkdtemp()
+        test.globs.update({'tempdir': test.tempdir})
+        os.chdir(test.tempdir)
+
     def teardown(test):
         os.chdir(test.__old_cwd)
-        shutil.rmtree(test.__dulwich_tempdir)
-    return doctest.DocFileSuite(setUp=setup, tearDown=teardown,
-        *tutorial_files)
+        shutil.rmtree(test.tempdir)
+    return doctest.DocFileSuite(
+            module_relative=True, package='dulwich.tests',
+            setUp=setup, tearDown=teardown, *tutorial_files)
 
 
 def nocompat_test_suite():
     result = unittest.TestSuite()
     result.addTests(self_test_suite())
+    result.addTests(tutorial_test_suite())
     from dulwich.contrib import test_suite as contrib_test_suite
-    if sys.version_info[0] == 2:
-        result.addTests(tutorial_test_suite())
     result.addTests(contrib_test_suite())
     return result
 
@@ -164,7 +188,7 @@ def compat_test_suite():
 def test_suite():
     result = unittest.TestSuite()
     result.addTests(self_test_suite())
-    if sys.version_info[0] == 2 and sys.platform != 'win32':
+    if sys.platform != 'win32':
         result.addTests(tutorial_test_suite())
     from dulwich.tests.compat import test_suite as compat_test_suite
     result.addTests(compat_test_suite())

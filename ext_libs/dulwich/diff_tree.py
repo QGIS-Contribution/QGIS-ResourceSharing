@@ -77,10 +77,12 @@ def _tree_entries(path, tree):
 def _merge_entries(path, tree1, tree2):
     """Merge the entries of two trees.
 
-    :param path: A path to prepend to all tree entry names.
-    :param tree1: The first Tree object to iterate, or None.
-    :param tree2: The second Tree object to iterate, or None.
-    :return: A list of pairs of TreeEntry objects for each pair of entries in
+    Args:
+      path: A path to prepend to all tree entry names.
+      tree1: The first Tree object to iterate, or None.
+      tree2: The second Tree object to iterate, or None.
+    Returns:
+      A list of pairs of TreeEntry objects for each pair of entries in
         the trees. If an entry exists in one tree but not the other, the other
         entry will have all attributes set to None. If neither entry's path is
         None, they are guaranteed to match.
@@ -124,11 +126,13 @@ def walk_trees(store, tree1_id, tree2_id, prune_identical=False):
 
     Iteration is depth-first pre-order, as in e.g. os.walk.
 
-    :param store: An ObjectStore for looking up objects.
-    :param tree1_id: The SHA of the first Tree object to iterate, or None.
-    :param tree2_id: The SHA of the second Tree object to iterate, or None.
-    :param prune_identical: If True, identical subtrees will not be walked.
-    :return: Iterator over Pairs of TreeEntry objects for each pair of entries
+    Args:
+      store: An ObjectStore for looking up objects.
+      tree1_id: The SHA of the first Tree object to iterate, or None.
+      tree2_id: The SHA of the second Tree object to iterate, or None.
+      param prune_identical: If True, identical subtrees will not be walked.
+    Returns:
+      Iterator over Pairs of TreeEntry objects for each pair of entries
         in the trees and their subtrees recursively. If an entry exists in one
         tree but not the other, the other entry will have all attributes set
         to None. If neither entry's path is None, they are guaranteed to
@@ -153,30 +157,37 @@ def walk_trees(store, tree1_id, tree2_id, prune_identical=False):
         yield entry1, entry2
 
 
-def _skip_tree(entry):
-    if entry.mode is None or stat.S_ISDIR(entry.mode):
+def _skip_tree(entry, include_trees):
+    if entry.mode is None or (not include_trees and stat.S_ISDIR(entry.mode)):
         return _NULL_ENTRY
     return entry
 
 
 def tree_changes(store, tree1_id, tree2_id, want_unchanged=False,
-                 rename_detector=None):
+                 rename_detector=None, include_trees=False,
+                 change_type_same=False):
     """Find the differences between the contents of two trees.
 
-    :param store: An ObjectStore for looking up objects.
-    :param tree1_id: The SHA of the source tree.
-    :param tree2_id: The SHA of the target tree.
-    :param want_unchanged: If True, include TreeChanges for unmodified entries
+    Args:
+      store: An ObjectStore for looking up objects.
+      tree1_id: The SHA of the source tree.
+      tree2_id: The SHA of the target tree.
+      want_unchanged: If True, include TreeChanges for unmodified entries
         as well.
-    :param rename_detector: RenameDetector object for detecting renames.
-    :return: Iterator over TreeChange instances for each change between the
+      include_trees: Whether to include trees
+      rename_detector: RenameDetector object for detecting renames.
+      change_type_same: Whether to report change types in the same
+        entry or as delete+add.
+    Returns:
+      Iterator over TreeChange instances for each change between the
         source and target tree.
     """
     if (rename_detector is not None and tree1_id is not None and
-        tree2_id is not None):
+            tree2_id is not None):
         for change in rename_detector.changes_with_renames(
-            tree1_id, tree2_id, want_unchanged=want_unchanged):
-                yield change
+                tree1_id, tree2_id, want_unchanged=want_unchanged,
+                include_trees=include_trees):
+            yield change
         return
 
     entries = walk_trees(store, tree1_id, tree2_id,
@@ -186,11 +197,12 @@ def tree_changes(store, tree1_id, tree2_id, want_unchanged=False,
             continue
 
         # Treat entries for trees as missing.
-        entry1 = _skip_tree(entry1)
-        entry2 = _skip_tree(entry2)
+        entry1 = _skip_tree(entry1, include_trees)
+        entry2 = _skip_tree(entry2, include_trees)
 
         if entry1 != _NULL_ENTRY and entry2 != _NULL_ENTRY:
-            if stat.S_IFMT(entry1.mode) != stat.S_IFMT(entry2.mode):
+            if (stat.S_IFMT(entry1.mode) != stat.S_IFMT(entry2.mode)
+                    and not change_type_same):
                 # File type changed: report as delete/add.
                 yield TreeChange.delete(entry1)
                 entry1 = _NULL_ENTRY
@@ -224,21 +236,23 @@ def tree_changes_for_merge(store, parent_tree_ids, tree_id,
                            rename_detector=None):
     """Get the tree changes for a merge tree relative to all its parents.
 
-    :param store: An ObjectStore for looking up objects.
-    :param parent_tree_ids: An iterable of the SHAs of the parent trees.
-    :param tree_id: The SHA of the merge tree.
-    :param rename_detector: RenameDetector object for detecting renames.
+    Args:
+      store: An ObjectStore for looking up objects.
+      parent_tree_ids: An iterable of the SHAs of the parent trees.
+      tree_id: The SHA of the merge tree.
+      rename_detector: RenameDetector object for detecting renames.
 
-    :return: Iterator over lists of TreeChange objects, one per conflicted path
-        in the merge.
+    Returns:
+      Iterator over lists of TreeChange objects, one per conflicted path
+      in the merge.
 
-        Each list contains one element per parent, with the TreeChange for that
-        path relative to that parent. An element may be None if it never
-        existed in one parent and was deleted in two others.
+      Each list contains one element per parent, with the TreeChange for that
+      path relative to that parent. An element may be None if it never
+      existed in one parent and was deleted in two others.
 
-        A path is only included in the output if it is a conflict, i.e. its SHA
-        in the merge tree is not found in any of the parents, or in the case of
-        deletes, if not all of the old SHAs match.
+      A path is only included in the output if it is a conflict, i.e. its SHA
+      in the merge tree is not found in any of the parents, or in the case of
+      deletes, if not all of the old SHAs match.
     """
     all_parent_changes = [tree_changes(store, t, tree_id,
                                        rename_detector=rename_detector)
@@ -255,8 +269,11 @@ def tree_changes_for_merge(store, parent_tree_ids, tree_id,
                 path = change.new.path
             changes_by_path[path][i] = change
 
-    old_sha = lambda c: c.old.sha
-    change_type = lambda c: c.type
+    def old_sha(c):
+        return c.old.sha
+
+    def change_type(c):
+        return c.type
 
     # Yield only conflicting changes.
     for _, changes in sorted(changes_by_path.items()):
@@ -282,8 +299,10 @@ def _count_blocks(obj):
 
     Splits the data into blocks either on lines or <=64-byte chunks of lines.
 
-    :param obj: The object to count blocks for.
-    :return: A dict of block hashcode -> total bytes occurring.
+    Args:
+      obj: The object to count blocks for.
+    Returns:
+      A dict of block hashcode -> total bytes occurring.
     """
     block_counts = defaultdict(int)
     block = BytesIO()
@@ -315,10 +334,12 @@ def _count_blocks(obj):
 def _common_bytes(blocks1, blocks2):
     """Count the number of common bytes in two block count dicts.
 
-    :param block1: The first dict of block hashcode -> total bytes.
-    :param block2: The second dict of block hashcode -> total bytes.
-    :return: The number of bytes in common between blocks1 and blocks2. This is
-        only approximate due to possible hash collisions.
+    Args:
+      block1: The first dict of block hashcode -> total bytes.
+      block2: The second dict of block hashcode -> total bytes.
+    Returns:
+      The number of bytes in common between blocks1 and blocks2. This is
+      only approximate due to possible hash collisions.
     """
     # Iterate over the smaller of the two dicts, since this is symmetrical.
     if len(blocks1) > len(blocks2):
@@ -334,11 +355,13 @@ def _common_bytes(blocks1, blocks2):
 def _similarity_score(obj1, obj2, block_cache=None):
     """Compute a similarity score for two objects.
 
-    :param obj1: The first object to score.
-    :param obj2: The second object to score.
-    :param block_cache: An optional dict of SHA to block counts to cache
+    Args:
+      obj1: The first object to score.
+      obj2: The second object to score.
+      block_cache: An optional dict of SHA to block counts to cache
         results between calls.
-    :return: The similarity score between the two objects, defined as the
+    Returns:
+      The similarity score between the two objects, defined as the
         number of bytes in common between the two objects divided by the
         maximum size, scaled to the range 0-100.
     """
@@ -376,18 +399,19 @@ class RenameDetector(object):
                  find_copies_harder=False):
         """Initialize the rename detector.
 
-        :param store: An ObjectStore for looking up objects.
-        :param rename_threshold: The threshold similarity score for considering
+        Args:
+          store: An ObjectStore for looking up objects.
+          rename_threshold: The threshold similarity score for considering
             an add/delete pair to be a rename/copy; see _similarity_score.
-        :param max_files: The maximum number of adds and deletes to consider,
+          max_files: The maximum number of adds and deletes to consider,
             or None for no limit. The detector is guaranteed to compare no more
-            than max_files ** 2 add/delete pairs. This limit is provided because
-            rename detection can be quadratic in the project size. If the limit
-            is exceeded, no content rename detection is attempted.
-        :param rewrite_threshold: The threshold similarity score below which a
+            than max_files ** 2 add/delete pairs. This limit is provided
+            because rename detection can be quadratic in the project size. If
+            the limit is exceeded, no content rename detection is attempted.
+          rewrite_threshold: The threshold similarity score below which a
             modify should be considered a delete/add, or None to not break
             modifies; see _similarity_score.
-        :param find_copies_harder: If True, consider unmodified files when
+          find_copies_harder: If True, consider unmodified files when
             detecting copies.
         """
         self._store = store
@@ -404,7 +428,7 @@ class RenameDetector(object):
 
     def _should_split(self, change):
         if (self._rewrite_threshold is None or change.type != CHANGE_MODIFY or
-            change.old.sha == change.new.sha):
+                change.old.sha == change.new.sha):
             return False
         old_obj = self._store[change.old.sha]
         new_obj = self._store[change.new.sha]
@@ -431,7 +455,8 @@ class RenameDetector(object):
     def _collect_changes(self, tree1_id, tree2_id):
         want_unchanged = self._find_copies_harder or self._want_unchanged
         for change in tree_changes(self._store, tree1_id, tree2_id,
-                                   want_unchanged=want_unchanged):
+                                   want_unchanged=want_unchanged,
+                                   include_trees=self._include_trees):
             self._add_change(change)
 
     def _prune(self, add_paths, delete_paths):
@@ -551,7 +576,7 @@ class RenameDetector(object):
             path = add.new.path
             delete = delete_map.get(path)
             if (delete is not None and
-                stat.S_IFMT(delete.old.mode) == stat.S_IFMT(add.new.mode)):
+                    stat.S_IFMT(delete.old.mode) == stat.S_IFMT(add.new.mode)):
                 modifies[path] = TreeChange(CHANGE_MODIFY, delete.old, add.new)
 
         self._adds = [a for a in self._adds if a.new.path not in modifies]
@@ -570,12 +595,15 @@ class RenameDetector(object):
     def _prune_unchanged(self):
         if self._want_unchanged:
             return
-        self._deletes = [d for d in self._deletes if d.type != CHANGE_UNCHANGED]
+        self._deletes = [
+            d for d in self._deletes if d.type != CHANGE_UNCHANGED]
 
-    def changes_with_renames(self, tree1_id, tree2_id, want_unchanged=False):
+    def changes_with_renames(self, tree1_id, tree2_id, want_unchanged=False,
+                             include_trees=False):
         """Iterate TreeChanges between two tree SHAs, with rename detection."""
         self._reset()
         self._want_unchanged = want_unchanged
+        self._include_trees = include_trees
         self._collect_changes(tree1_id, tree2_id)
         self._find_exact_renames()
         self._find_content_rename_candidates()

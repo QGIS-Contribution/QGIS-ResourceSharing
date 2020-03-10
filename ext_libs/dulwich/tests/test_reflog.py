@@ -1,6 +1,6 @@
 # test_reflog.py -- tests for reflog.py
 # encoding: utf-8
-# Copyright (C) 2015 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2015 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -58,13 +58,15 @@ class ReflogLineTests(TestCase):
                 1446552482, 0, b'clone: from git://jelmer.uk/samba'))
 
     def test_parse(self):
+        reflog_line = (
+                 b'0000000000000000000000000000000000000000 '
+                 b'49030649db3dfec5a9bc03e5dde4255a14499f16 Jelmer Vernooij '
+                 b'<jelmer@jelmer.uk> 1446552482 +0000	'
+                 b'clone: from git://jelmer.uk/samba'
+                 )
         self.assertEqual(
                 (b'0000000000000000000000000000000000000000',
                  b'49030649db3dfec5a9bc03e5dde4255a14499f16',
                  b'Jelmer Vernooij <jelmer@jelmer.uk>',
                  1446552482, 0, b'clone: from git://jelmer.uk/samba'),
-                 parse_reflog_line(
-                     b'0000000000000000000000000000000000000000 '
-                     b'49030649db3dfec5a9bc03e5dde4255a14499f16 Jelmer Vernooij '
-                     b'<jelmer@jelmer.uk> 1446552482 +0000	'
-                     b'clone: from git://jelmer.uk/samba'))
+                parse_reflog_line(reflog_line))

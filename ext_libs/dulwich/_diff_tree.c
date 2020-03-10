@@ -18,6 +18,7 @@
  * License, Version 2.0.
  */
 
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <sys/stat.h>
 
@@ -25,12 +26,8 @@
 typedef unsigned short mode_t;
 #endif
 
-#if (PY_VERSION_HEX < 0x02050000)
-typedef int Py_ssize_t;
-#endif
-
-#if (PY_VERSION_HEX < 0x02060000)
-#define Py_SIZE(ob)             (((PyVarObject*)(ob))->ob_size)
+#if PY_MAJOR_VERSION < 3
+typedef long Py_hash_t;
 #endif
 
 #if PY_MAJOR_VERSION >= 3
@@ -38,7 +35,6 @@ typedef int Py_ssize_t;
 #define PyInt_AsLong PyLong_AsLong
 #define PyInt_AS_LONG PyLong_AS_LONG
 #define PyString_AS_STRING PyBytes_AS_STRING
-#define PyString_AsString PyBytes_AsString
 #define PyString_AsStringAndSize PyBytes_AsStringAndSize
 #define PyString_Check PyBytes_Check
 #define PyString_CheckExact PyBytes_CheckExact
@@ -67,11 +63,12 @@ static void free_objects(PyObject **objs, Py_ssize_t n)
 /**
  * Get the entries of a tree, prepending the given path.
  *
- * :param path: The path to prepend, without trailing slashes.
- * :param path_len: The length of path.
- * :param tree: The Tree object to iterate.
- * :param n: Set to the length of result.
- * :return: A (C) array of PyObject pointers to TreeEntry objects for each path
+ * Args:
+ *   path: The path to prepend, without trailing slashes.
+ *   path_len: The length of path.
+ *   tree: The Tree object to iterate.
+ *   n: Set to the length of result.
+ * Returns: A (C) array of PyObject pointers to TreeEntry objects for each path
  *     in tree.
  */
 static PyObject **tree_entries(char *path, Py_ssize_t path_len, PyObject *tree,
@@ -201,8 +198,7 @@ static PyObject *py_merge_entries(PyObject *self, PyObject *args)
 {
 	PyObject *tree1, *tree2, **entries1 = NULL, **entries2 = NULL;
 	PyObject *e1, *e2, *pair, *result = NULL;
-	Py_ssize_t n1 = 0, n2 = 0, i1 = 0, i2 = 0;
-	int path_len;
+	Py_ssize_t n1 = 0, n2 = 0, i1 = 0, i2 = 0, path_len;
 	char *path_str;
 	int cmp;
 
@@ -301,11 +297,11 @@ static PyObject *py_is_tree(PyObject *self, PyObject *args)
 	return result;
 }
 
-static int add_hash(PyObject *get, PyObject *set, char *str, int n)
+static Py_hash_t add_hash(PyObject *get, PyObject *set, char *str, int n)
 {
 	PyObject *str_obj = NULL, *hash_obj = NULL, *value = NULL,
 		*set_value = NULL;
-	long hash;
+	Py_hash_t hash;
 
 	/* It would be nice to hash without copying str into a PyString, but that
 	 * isn't exposed by the API. */

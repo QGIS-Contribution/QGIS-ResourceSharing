@@ -28,6 +28,9 @@ import tempfile
 
 from dulwich.repo import Repo
 from dulwich.objects import hex_to_sha
+from dulwich.protocol import (
+    CAPABILITY_SIDE_BAND_64K,
+    )
 from dulwich.server import (
     ReceivePackHandler,
     )
@@ -169,8 +172,9 @@ class ServerTests(object):
         port = self._start_server(self._source_repo)
 
         # Fetch at depth 1
-        run_git_or_fail(['clone', '--mirror', '--depth=1', '--no-single-branch',
-                        self.url(port), self._stub_repo.path])
+        run_git_or_fail(
+            ['clone', '--mirror', '--depth=1', '--no-single-branch',
+             self.url(port), self._stub_repo.path])
         clone = self._stub_repo = Repo(self._stub_repo.path)
         expected_shallow = [b'35e0b59e187dd72a0af294aedffc213eaa4d03ff',
                             b'514dc6d3fbfe77361bcaef320c4d21b72bc10be9']
@@ -186,13 +190,14 @@ class ServerTests(object):
         self.addCleanup(tear_down_repo, self._stub_repo_dw)
 
         # shallow clone using stock git, then using dulwich
-        run_git_or_fail(['clone', '--mirror', '--depth=1', '--no-single-branch',
-                         'file://' + self._source_repo.path,
-                         self._stub_repo_git.path])
+        run_git_or_fail(
+            ['clone', '--mirror', '--depth=1', '--no-single-branch',
+             'file://' + self._source_repo.path, self._stub_repo_git.path])
 
         port = self._start_server(self._source_repo)
-        run_git_or_fail(['clone', '--mirror', '--depth=1', '--no-single-branch',
-                        self.url(port), self._stub_repo_dw.path])
+        run_git_or_fail(
+            ['clone', '--mirror', '--depth=1', '--no-single-branch',
+             self.url(port), self._stub_repo_dw.path])
 
         # compare the two clones; they should be equal
         self.assertReposEqual(Repo(self._stub_repo_git.path),
@@ -206,8 +211,9 @@ class ServerTests(object):
         port = self._start_server(self._source_repo)
 
         # Fetch at depth 2
-        run_git_or_fail(['clone', '--mirror', '--depth=2', '--no-single-branch',
-                        self.url(port), self._stub_repo.path])
+        run_git_or_fail(
+            ['clone', '--mirror', '--depth=2', '--no-single-branch',
+             self.url(port), self._stub_repo.path])
         clone = self._stub_repo = Repo(self._stub_repo.path)
 
         # Fetching at the same depth is a no-op.
@@ -227,8 +233,9 @@ class ServerTests(object):
         port = self._start_server(self._source_repo)
 
         # Fetch at depth 2
-        run_git_or_fail(['clone', '--mirror', '--depth=2', '--no-single-branch',
-                        self.url(port), self._stub_repo.path])
+        run_git_or_fail(
+            ['clone', '--mirror', '--depth=2', '--no-single-branch',
+             self.url(port), self._stub_repo.path])
         clone = self._stub_repo = Repo(self._stub_repo.path)
 
         # Fetching at the same depth is a no-op.
@@ -246,11 +253,13 @@ class ServerTests(object):
     def test_fetch_from_dulwich_issue_88_standard(self):
         # Basically an integration test to see that the ACK/NAK
         # generation works on repos with common head.
-        self._source_repo = self.import_repo('issue88_expect_ack_nak_server.export')
-        self._client_repo = self.import_repo('issue88_expect_ack_nak_client.export')
+        self._source_repo = self.import_repo(
+            'issue88_expect_ack_nak_server.export')
+        self._client_repo = self.import_repo(
+            'issue88_expect_ack_nak_client.export')
         port = self._start_server(self._source_repo)
 
-        run_git_or_fail(['fetch', self.url(port), 'master',],
+        run_git_or_fail(['fetch', self.url(port), 'master'],
                         cwd=self._client_repo.path)
         self.assertObjectStoreEqual(
             self._source_repo.object_store,
@@ -258,13 +267,16 @@ class ServerTests(object):
 
     def test_fetch_from_dulwich_issue_88_alternative(self):
         # likewise, but the case where the two repos have no common parent
-        self._source_repo = self.import_repo('issue88_expect_ack_nak_other.export')
-        self._client_repo = self.import_repo('issue88_expect_ack_nak_client.export')
+        self._source_repo = self.import_repo(
+            'issue88_expect_ack_nak_other.export')
+        self._client_repo = self.import_repo(
+            'issue88_expect_ack_nak_client.export')
         port = self._start_server(self._source_repo)
 
-        self.assertRaises(KeyError, self._client_repo.get_object,
+        self.assertRaises(
+            KeyError, self._client_repo.get_object,
             b'02a14da1fc1fc13389bbf32f0af7d8899f2b2323')
-        run_git_or_fail(['fetch', self.url(port), 'master',],
+        run_git_or_fail(['fetch', self.url(port), 'master'],
                         cwd=self._client_repo.path)
         self.assertEqual(b'commit', self._client_repo.get_object(
             b'02a14da1fc1fc13389bbf32f0af7d8899f2b2323').type_name)
@@ -272,11 +284,13 @@ class ServerTests(object):
     def test_push_to_dulwich_issue_88_standard(self):
         # Same thing, but we reverse the role of the server/client
         # and do a push instead.
-        self._source_repo = self.import_repo('issue88_expect_ack_nak_client.export')
-        self._client_repo = self.import_repo('issue88_expect_ack_nak_server.export')
+        self._source_repo = self.import_repo(
+            'issue88_expect_ack_nak_client.export')
+        self._client_repo = self.import_repo(
+            'issue88_expect_ack_nak_server.export')
         port = self._start_server(self._source_repo)
 
-        run_git_or_fail(['push', self.url(port), 'master',],
+        run_git_or_fail(['push', self.url(port), 'master'],
                         cwd=self._client_repo.path)
         self.assertReposEqual(self._source_repo, self._client_repo)
 
@@ -289,8 +303,8 @@ class NoSideBand64kReceivePackHandler(ReceivePackHandler):
 
     @classmethod
     def capabilities(cls):
-        return tuple(c for c in ReceivePackHandler.capabilities()
-                     if c != b'side-band-64k')
+        return [c for c in ReceivePackHandler.capabilities()
+                if c != CAPABILITY_SIDE_BAND_64K]
 
 
 def ignore_error(error):
@@ -298,4 +312,3 @@ def ignore_error(error):
     (e_type, e_value, e_tb) = error
     return (issubclass(e_type, socket.error) and
             e_value[0] in (errno.ECONNRESET, errno.EPIPE))
-

@@ -1,5 +1,5 @@
 # config.py - Reading and writing Git config files
-# Copyright (C) 2011-2013 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2011-2013 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -28,14 +28,89 @@ TODO:
 
 import errno
 import os
+import sys
 
 from collections import (
     OrderedDict,
-    MutableMapping,
     )
-
+try:
+    from collections.abc import (
+        Iterable,
+        MutableMapping,
+        )
+except ImportError:  # python < 3.7
+    from collections import (
+        Iterable,
+        MutableMapping,
+        )
 
 from dulwich.file import GitFile
+
+
+SENTINAL = object()
+
+
+def lower_key(key):
+    if isinstance(key, (bytes, str)):
+        return key.lower()
+
+    if isinstance(key, Iterable):
+        return type(key)(
+            map(lower_key, key)
+        )
+
+    return key
+
+
+class CaseInsensitiveDict(OrderedDict):
+
+    @classmethod
+    def make(cls, dict_in=None):
+
+        if isinstance(dict_in, cls):
+            return dict_in
+
+        out = cls()
+
+        if dict_in is None:
+            return out
+
+        if not isinstance(dict_in, MutableMapping):
+            raise TypeError
+
+        for key, value in dict_in.items():
+            out[key] = value
+
+        return out
+
+    def __setitem__(self, key, value, **kwargs):
+        key = lower_key(key)
+
+        super(CaseInsensitiveDict, self).__setitem__(key, value,  **kwargs)
+
+    def __getitem__(self, item):
+        key = lower_key(item)
+
+        return super(CaseInsensitiveDict, self).__getitem__(key)
+
+    def get(self, key, default=SENTINAL):
+        try:
+            return self[key]
+        except KeyError:
+            pass
+
+        if default is SENTINAL:
+            return type(self)()
+
+        return default
+
+    def setdefault(self, key, default=SENTINAL):
+        try:
+            return self[key]
+        except KeyError:
+            self[key] = self.get(key, default)
+
+        return self[key]
 
 
 class Config(object):
@@ -44,21 +119,27 @@ class Config(object):
     def get(self, section, name):
         """Retrieve the contents of a configuration setting.
 
-        :param section: Tuple with section name and optional subsection namee
-        :param subsection: Subsection name
-        :return: Contents of the setting
-        :raise KeyError: if the value is not set
+        Args:
+          section: Tuple with section name and optional subsection namee
+          subsection: Subsection name
+        Returns:
+          Contents of the setting
+        Raises:
+          KeyError: if the value is not set
         """
         raise NotImplementedError(self.get)
 
     def get_boolean(self, section, name, default=None):
         """Retrieve a configuration setting as boolean.
 
-        :param section: Tuple with section name and optional subsection namee
-        :param name: Name of the setting, including section and possible
+        Args:
+          section: Tuple with section name and optional subsection name
+          name: Name of the setting, including section and possible
             subsection.
-        :return: Contents of the setting
-        :raise KeyError: if the value is not set
+        Returns:
+          Contents of the setting
+        Raises:
+          KeyError: if the value is not set
         """
         try:
             value = self.get(section, name)
@@ -73,37 +154,51 @@ class Config(object):
     def set(self, section, name, value):
         """Set a configuration value.
 
-        :param section: Tuple with section name and optional subsection namee
-        :param name: Name of the configuration value, including section
+        Args:
+          section: Tuple with section name and optional subsection namee
+          name: Name of the configuration value, including section
             and optional subsection
-        :param: Value of the setting
+           value: value of the setting
         """
         raise NotImplementedError(self.set)
 
     def iteritems(self, section):
         """Iterate over the configuration pairs for a specific section.
 
-        :param section: Tuple with section name and optional subsection namee
-        :return: Iterator over (name, value) pairs
+        Args:
+          section: Tuple with section name and optional subsection namee
+        Returns:
+          Iterator over (name, value) pairs
         """
         raise NotImplementedError(self.iteritems)
 
     def itersections(self):
         """Iterate over the sections.
 
-        :return: Iterator over section tuples
+        Returns: Iterator over section tuples
         """
         raise NotImplementedError(self.itersections)
+
+    def has_section(self, name):
+        """Check if a specified section exists.
+
+        Args:
+          name: Name of section to check for
+        Returns:
+          boolean indicating whether the section exists
+        """
+        return (name in self.itersections())
 
 
 class ConfigDict(Config, MutableMapping):
     """Git configuration stored in a dictionary."""
 
-    def __init__(self, values=None):
+    def __init__(self, values=None, encoding=None):
         """Create a new ConfigDict."""
-        if values is None:
-            values = OrderedDict()
-        self._values = values
+        if encoding is None:
+            encoding = sys.getdefaultencoding()
+        self.encoding = encoding
+        self._values = CaseInsensitiveDict.make(values)
 
     def __repr__(self):
         return "%s(%r)" % (self.__class__.__name__, self._values)
@@ -136,27 +231,42 @@ class ConfigDict(Config, MutableMapping):
         else:
             return (parts[0], None, parts[1])
 
-    def get(self, section, name):
+    def _check_section_and_name(self, section, name):
         if not isinstance(section, tuple):
             section = (section, )
+
+        section = tuple([
+            subsection.encode(self.encoding)
+            if not isinstance(subsection, bytes) else subsection
+            for subsection in section
+            ])
+
+        if not isinstance(name, bytes):
+            name = name.encode(self.encoding)
+
+        return section, name
+
+    def get(self, section, name):
+        section, name = self._check_section_and_name(section, name)
+
         if len(section) > 1:
             try:
                 return self._values[section][name]
             except KeyError:
                 pass
+
         return self._values[(section[0],)][name]
 
     def set(self, section, name, value):
-        if not isinstance(section, tuple):
-            section = (section, )
-        if not isinstance(name, bytes):
-            raise TypeError(name)
+        section, name = self._check_section_and_name(section, name)
+
         if type(value) not in (bool, bytes):
-            raise TypeError(value)
-        self._values.setdefault(section, OrderedDict())[name] = value
+            value = value.encode(self.encoding)
+
+        self._values.setdefault(section)[name] = value
 
     def iteritems(self, section):
-        return self._values.get(section, OrderedDict()).items()
+        return self._values.get(section).items()
 
     def itersections(self):
         return self._values.keys()
@@ -164,11 +274,13 @@ class ConfigDict(Config, MutableMapping):
 
 def _format_string(value):
     if (value.startswith(b" ") or
-        value.startswith(b"\t") or
-        value.endswith(b" ") or
-        value.endswith(b"\t")):
+            value.startswith(b"\t") or
+            value.endswith(b" ") or
+            b'#' in value or
+            value.endswith(b"\t")):
         return b'"' + _escape_value(value) + b'"'
-    return _escape_value(value)
+    else:
+        return _escape_value(value)
 
 
 _ESCAPE_TABLE = {
@@ -180,6 +292,7 @@ _ESCAPE_TABLE = {
     }
 _COMMENT_CHARS = [ord(b"#"), ord(b";")]
 _WHITESPACE_CHARS = [ord(b"\t"), ord(b" ")]
+
 
 def _parse_string(value):
     value = bytearray(value.strip())
@@ -199,8 +312,8 @@ def _parse_string(value):
                     (value, i))
             except KeyError:
                 raise ValueError(
-                    "escape character followed by unknown character %s at %d in %r" %
-                    (value[i], i, value))
+                    "escape character followed by unknown character "
+                    "%s at %d in %r" % (value[i], i, value))
             if whitespace:
                 ret.extend(whitespace)
                 whitespace = bytearray()
@@ -227,7 +340,11 @@ def _parse_string(value):
 
 def _escape_value(value):
     """Escape a value."""
-    return value.replace(b"\\", b"\\\\").replace(b"\n", b"\\n").replace(b"\t", b"\\t").replace(b"\"", b"\\\"")
+    value = value.replace(b"\\", b"\\\\")
+    value = value.replace(b"\n", b"\\n")
+    value = value.replace(b"\t", b"\\t")
+    value = value.replace(b"\"", b"\\\"")
+    return value
 
 
 def _check_variable_name(name):
@@ -247,8 +364,16 @@ def _check_section_name(name):
 
 
 def _strip_comments(line):
-    line = line.split(b"#")[0]
-    line = line.split(b";")[0]
+    comment_bytes = {ord(b"#"), ord(b";")}
+    quote = ord(b'"')
+    string_open = False
+    # Normalize line to bytearray for simple 2/3 compatibility
+    for i, character in enumerate(bytearray(line)):
+        # Comment characters outside balanced quotes denote comment start
+        if character == quote:
+            string_open = not string_open
+        elif not string_open and character in comment_bytes:
+            return line[:i]
     return line
 
 
@@ -268,12 +393,12 @@ class ConfigFile(ConfigDict):
                 # Parse section header ("[bla]")
                 if len(line) > 0 and line[:1] == b"[":
                     line = _strip_comments(line).rstrip()
-                    last = line.index(b"]")
-                    if last == -1:
+                    try:
+                        last = line.index(b"]")
+                    except ValueError:
                         raise ValueError("expected trailing ]")
                     pts = line[1:last].split(b" ", 1)
                     line = line[last+1:]
-                    pts[0] = pts[0].lower()
                     if len(pts) == 2:
                         if pts[1][:1] != b"\"" or pts[1][-1:] != b"\"":
                             raise ValueError(
@@ -286,14 +411,14 @@ class ConfigFile(ConfigDict):
                         section = (pts[0], pts[1])
                     else:
                         if not _check_section_name(pts[0]):
-                            raise ValueError("invalid section name %r" %
-                                    pts[0])
+                            raise ValueError(
+                                "invalid section name %r" % pts[0])
                         pts = pts[0].split(b".", 1)
                         if len(pts) == 2:
                             section = (pts[0], pts[1])
                         else:
                             section = (pts[0], )
-                    ret._values[section] = OrderedDict()
+                    ret._values.setdefault(section)
                 if _strip_comments(line).strip() == b"":
                     continue
                 if section is None:
@@ -303,27 +428,24 @@ class ConfigFile(ConfigDict):
                 except ValueError:
                     setting = line
                     value = b"true"
-                setting = setting.strip().lower()
+                setting = setting.strip()
                 if not _check_variable_name(setting):
                     raise ValueError("invalid variable name %s" % setting)
                 if value.endswith(b"\\\n"):
-                    value = value[:-2]
-                    continuation = True
+                    continuation = value[:-2]
                 else:
-                    continuation = False
-                value = _parse_string(value)
-                ret._values[section][setting] = value
-                if not continuation:
+                    continuation = None
+                    value = _parse_string(value)
+                    ret._values[section][setting] = value
                     setting = None
             else:  # continuation line
                 if line.endswith(b"\\\n"):
-                    line = line[:-2]
-                    continuation = True
+                    continuation += line[:-2]
                 else:
-                    continuation = False
-                value = _parse_string(line)
-                ret._values[section][setting] += value
-                if not continuation:
+                    continuation += line
+                    value = _parse_string(continuation)
+                    ret._values[section][setting] = value
+                    continuation = None
                     setting = None
         return ret
 
@@ -353,14 +475,15 @@ class ConfigFile(ConfigDict):
             if subsection_name is None:
                 f.write(b"[" + section_name + b"]\n")
             else:
-                f.write(b"[" + section_name + b" \"" + subsection_name + b"\"]\n")
+                f.write(b"[" + section_name +
+                        b" \"" + subsection_name + b"\"]\n")
             for key, value in values.items():
                 if value is True:
                     value = b"true"
                 elif value is False:
                     value = b"false"
                 else:
-                    value = _escape_value(value)
+                    value = _format_string(value)
                 f.write(b"\t" + key + b" = " + value + b"\n")
 
 
@@ -373,6 +496,10 @@ class StackedConfig(Config):
 
     def __repr__(self):
         return "<%s for %r>" % (self.__class__.__name__, self.backends)
+
+    @classmethod
+    def default(cls):
+        return cls(cls.default_backends())
 
     @classmethod
     def default_backends(cls):
@@ -404,6 +531,8 @@ class StackedConfig(Config):
         return backends
 
     def get(self, section, name):
+        if not isinstance(section, tuple):
+            section = (section, )
         for backend in self.backends:
             try:
                 return backend.get(section, name)
@@ -420,8 +549,10 @@ class StackedConfig(Config):
 def parse_submodules(config):
     """Parse a gitmodules GitConfig file, returning submodules.
 
-   :param config: A `ConfigFile`
-   :return: list of tuples (submodule path, url, name),
+   Args:
+     config: A `ConfigFile`
+   Returns:
+     list of tuples (submodule path, url, name),
        where name is quoted part of the section's name.
     """
     for section in config.keys():

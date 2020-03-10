@@ -26,6 +26,7 @@ import os
 import sys
 import tempfile
 
+
 def ensure_dir_exists(dirname):
     """Ensure a directory exists, creating if necessary."""
     try:
@@ -46,7 +47,7 @@ def _fancy_rename(oldname, newname):
 
     # destination file exists
     try:
-        (fd, tmpfile) = tempfile.mkstemp(".tmp", prefix=oldname+".", dir=".")
+        (fd, tmpfile) = tempfile.mkstemp(".tmp", prefix=oldname, dir=".")
         os.close(fd)
         os.remove(tmpfile)
     except OSError:
@@ -68,9 +69,9 @@ def _fancy_rename(oldname, newname):
 def GitFile(filename, mode='rb', bufsize=-1):
     """Create a file object that obeys the git file locking protocol.
 
-    :return: a builtin file object or a _GitFile object
+    Returns: a builtin file object or a _GitFile object
 
-    :note: See _GitFile for a description of the file locking protocol.
+    Note: See _GitFile for a description of the file locking protocol.
 
     Only read-only and write-only (binary) modes are supported; r+, w+, and a
     are not.  To read and write from the same file, you can take advantage of
@@ -89,6 +90,15 @@ def GitFile(filename, mode='rb', bufsize=-1):
         return io.open(filename, mode, bufsize)
 
 
+class FileLocked(Exception):
+    """File is already locked."""
+
+    def __init__(self, filename, lockfilename):
+        self.filename = filename
+        self.lockfilename = lockfilename
+        super(FileLocked, self).__init__(filename, lockfilename)
+
+
 class _GitFile(object):
     """File that follows the git locking protocol for writes.
 
@@ -96,7 +106,7 @@ class _GitFile(object):
     directory, and the lockfile will be renamed to overwrite the original file
     on close.
 
-    :note: You *must* call close() or abort() on a _GitFile for the lock to be
+    Note: You *must* call close() or abort() on a _GitFile for the lock to be
         released. Typically this will happen in a finally block.
     """
 
@@ -105,11 +115,22 @@ class _GitFile(object):
     PROXY_METHODS = ('__iter__', 'flush', 'fileno', 'isatty', 'read',
                      'readline', 'readlines', 'seek', 'tell',
                      'truncate', 'write', 'writelines')
+
     def __init__(self, filename, mode, bufsize):
         self._filename = filename
-        self._lockfilename = '%s.lock' % self._filename
-        fd = os.open(self._lockfilename,
-            os.O_RDWR | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0))
+        if isinstance(self._filename, bytes):
+            self._lockfilename = self._filename + b'.lock'
+        else:
+            self._lockfilename = self._filename + '.lock'
+        try:
+            fd = os.open(
+                self._lockfilename,
+                os.O_RDWR | os.O_CREAT | os.O_EXCL |
+                getattr(os, "O_BINARY", 0))
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                raise FileLocked(filename, self._lockfilename)
+            raise
         self._file = os.fdopen(fd, mode, bufsize)
         self._closed = False
 
@@ -136,26 +157,29 @@ class _GitFile(object):
     def close(self):
         """Close this file, saving the lockfile over the original.
 
-        :note: If this method fails, it will attempt to delete the lockfile.
-            However, it is not guaranteed to do so (e.g. if a filesystem becomes
-            suddenly read-only), which will prevent future writes to this file
-            until the lockfile is removed manually.
-        :raises OSError: if the original file could not be overwritten. The lock
-            file is still closed, so further attempts to write to the same file
-            object will raise ValueError.
+        Note: If this method fails, it will attempt to delete the lockfile.
+            However, it is not guaranteed to do so (e.g. if a filesystem
+            becomes suddenly read-only), which will prevent future writes to
+            this file until the lockfile is removed manually.
+        Raises:
+          OSError: if the original file could not be overwritten. The
+            lock file is still closed, so further attempts to write to the same
+            file object will raise ValueError.
         """
         if self._closed:
             return
+        os.fsync(self._file.fileno())
         self._file.close()
         try:
-            try:
-                os.rename(self._lockfilename, self._filename)
-            except OSError as e:
-                if sys.platform == 'win32' and e.errno == errno.EEXIST:
-                    # Windows versions prior to Vista don't support atomic renames
-                    _fancy_rename(self._lockfilename, self._filename)
+            if getattr(os, 'replace', None) is not None:
+                os.replace(self._lockfilename, self._filename)
+            else:
+                if sys.platform != 'win32':
+                    os.rename(self._lockfilename, self._filename)
                 else:
-                    raise
+                    # Windows versions prior to Vista don't support atomic
+                    # renames
+                    _fancy_rename(self._lockfilename, self._filename)
         finally:
             self.abort()
 

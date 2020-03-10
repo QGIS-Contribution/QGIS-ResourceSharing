@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # test_index.py -- Tests for the git index
 # encoding: utf-8
-# Copyright (C) 2008-2009 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2008-2009 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -30,6 +30,7 @@ import stat
 import struct
 import sys
 import tempfile
+import warnings
 
 from dulwich.index import (
     Index,
@@ -62,6 +63,29 @@ from dulwich.tests import (
     TestCase,
     skipIf,
     )
+from dulwich.tests.utils import (
+    setup_warning_catcher,
+    )
+
+
+def can_symlink():
+    """Return whether running process can create symlinks."""
+    if sys.platform != 'win32':
+        # Platforms other than Windows should allow symlinks without issues.
+        return True
+
+    if not hasattr(os, 'symlink'):
+        # Older Python versions do not have `os.symlink` on Windows.
+        return False
+
+    test_source = tempfile.mkdtemp()
+    test_target = test_source + 'can_symlink'
+    try:
+        os.symlink(test_source, test_target)
+    except OSError:
+        return False
+    return True
+
 
 class IndexTestCase(TestCase):
 
@@ -79,11 +103,38 @@ class SimpleIndexTestCase(IndexTestCase):
     def test_iter(self):
         self.assertEqual([b'bla'], list(self.get_simple_index("index")))
 
+    def test_iterobjects(self):
+        self.assertEqual(
+                [(b'bla', b'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391', 33188)],
+                list(self.get_simple_index("index").iterobjects()))
+
+    def test_iterblobs(self):
+        warnings.simplefilter("always", UserWarning)
+        self.addCleanup(warnings.resetwarnings)
+        warnings_list, restore_warnings = setup_warning_catcher()
+        self.addCleanup(restore_warnings)
+
+        self.assertEqual(
+                [(b'bla', b'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391', 33188)],
+                list(self.get_simple_index("index").iterblobs()))
+
+        expected_warning = PendingDeprecationWarning(
+            'Use iterobjects() instead.')
+        for w in warnings_list:
+            if (type(w) == type(expected_warning) and
+                    w.args == expected_warning.args):
+                break
+        else:
+            raise AssertionError(
+                'Expected warning %r not in %r' %
+                (expected_warning, warnings_list))
+
     def test_getitem(self):
-        self.assertEqual(((1230680220, 0), (1230680220, 0), 2050, 3761020,
-                           33188, 1000, 1000, 0,
-                           b'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391', 0),
-                          self.get_simple_index("index")[b"bla"])
+        self.assertEqual(
+                ((1230680220, 0), (1230680220, 0), 2050, 3761020,
+                 33188, 1000, 1000, 0,
+                 b'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391', 0),
+                self.get_simple_index("index")[b"bla"])
 
     def test_empty(self):
         i = self.get_simple_index("notanindex")
@@ -97,6 +148,7 @@ class SimpleIndexTestCase(IndexTestCase):
         (oldname, newname), (oldmode, newmode), (oldsha, newsha) = changes[0]
         self.assertEqual(b'bla', newname)
         self.assertEqual(b'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391', newsha)
+
 
 class SimpleIndexWriterTestCase(IndexTestCase):
 
@@ -131,9 +183,11 @@ class ReadIndexDictTests(IndexTestCase):
         shutil.rmtree(self.tempdir)
 
     def test_simple_write(self):
-        entries = {b'barbla': ((1230680220, 0), (1230680220, 0), 2050, 3761020,
-                    33188, 1000, 1000, 0,
-                    b'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391', 0)}
+        entries = {
+                b'barbla':
+                ((1230680220, 0), (1230680220, 0), 2050, 3761020, 33188,
+                 1000, 1000, 0,
+                 b'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391', 0)}
         filename = os.path.join(self.tempdir, 'test-simple-write-index')
         with open(filename, 'wb+') as x:
             write_index_dict(x, entries)
@@ -170,25 +224,29 @@ class CommitTreeTests(TestCase):
         self.assertEqual((stat.S_IFDIR, dirid), self.store[rootid][b"bla"])
         self.assertEqual((stat.S_IFREG, blob.id), self.store[dirid][b"bar"])
         self.assertEqual(set([rootid, dirid, blob.id]),
-                          set(self.store._data.keys()))
+                         set(self.store._data.keys()))
 
 
 class CleanupModeTests(TestCase):
 
+    def assertModeEqual(self, expected, got):
+        self.assertEqual(expected, got, '%o != %o' % (expected, got))
+
     def test_file(self):
-        self.assertEqual(0o100644, cleanup_mode(0o100000))
+        self.assertModeEqual(0o100644, cleanup_mode(0o100000))
 
     def test_executable(self):
-        self.assertEqual(0o100755, cleanup_mode(0o100711))
+        self.assertModeEqual(0o100755, cleanup_mode(0o100711))
+        self.assertModeEqual(0o100755, cleanup_mode(0o100700))
 
     def test_symlink(self):
-        self.assertEqual(0o120000, cleanup_mode(0o120711))
+        self.assertModeEqual(0o120000, cleanup_mode(0o120711))
 
     def test_dir(self):
-        self.assertEqual(0o040000, cleanup_mode(0o40531))
+        self.assertModeEqual(0o040000, cleanup_mode(0o40531))
 
     def test_submodule(self):
-        self.assertEqual(0o160000, cleanup_mode(0o160744))
+        self.assertModeEqual(0o160000, cleanup_mode(0o160744))
 
 
 class WriteCacheTimeTests(TestCase):
@@ -216,9 +274,9 @@ class WriteCacheTimeTests(TestCase):
 class IndexEntryFromStatTests(TestCase):
 
     def test_simple(self):
-        st = os.stat_result((16877, 131078, 64769,
-                154, 1000, 1000, 12288,
-                1323629595, 1324180496, 1324180496))
+        st = os.stat_result(
+                (16877, 131078, 64769, 154, 1000, 1000, 12288,
+                 1323629595, 1324180496, 1324180496))
         entry = index_entry_from_stat(st, "22" * 20, 0)
         self.assertEqual(entry, (
             1324180496,
@@ -233,11 +291,12 @@ class IndexEntryFromStatTests(TestCase):
             0))
 
     def test_override_mode(self):
-        st = os.stat_result((stat.S_IFREG + 0o644, 131078, 64769,
-                154, 1000, 1000, 12288,
-                1323629595, 1324180496, 1324180496))
-        entry = index_entry_from_stat(st, "22" * 20, 0,
-                mode=stat.S_IFREG + 0o755)
+        st = os.stat_result(
+                (stat.S_IFREG + 0o644, 131078, 64769,
+                 154, 1000, 1000, 12288,
+                 1323629595, 1324180496, 1324180496))
+        entry = index_entry_from_stat(
+            st, "22" * 20, 0, mode=stat.S_IFREG + 0o755)
         self.assertEqual(entry, (
             1324180496,
             1324180496,
@@ -272,7 +331,8 @@ class BuildIndexTests(TestCase):
             tree = Tree()
             repo.object_store.add_object(tree)
 
-            build_index_from_tree(repo.path, repo.index_path(),
+            build_index_from_tree(
+                    repo.path, repo.index_path(),
                     repo.object_store, tree.id)
 
             # Verify index entries
@@ -295,11 +355,11 @@ class BuildIndexTests(TestCase):
             tree[b'.git/a'] = (stat.S_IFREG | 0o644, filea.id)
             tree[b'c/e'] = (stat.S_IFREG | 0o644, filee.id)
 
-            repo.object_store.add_objects([(o, None)
-                for o in [filea, filee, tree]])
+            repo.object_store.add_objects(
+                    [(o, None) for o in [filea, filee, tree]])
 
-            build_index_from_tree(repo.path, repo.index_path(),
-                    repo.object_store, tree.id)
+            build_index_from_tree(
+                repo.path, repo.index_path(), repo.object_store, tree.id)
 
             # Verify index entries
             index = repo.open_index()
@@ -312,8 +372,8 @@ class BuildIndexTests(TestCase):
             # filee
             epath = os.path.join(repo.path, 'c', 'e')
             self.assertTrue(os.path.exists(epath))
-            self.assertReasonableIndexEntry(index[b'c/e'],
-                stat.S_IFREG | 0o644, 1, filee.id)
+            self.assertReasonableIndexEntry(
+                index[b'c/e'], stat.S_IFREG | 0o644, 1, filee.id)
             self.assertFileContents(epath, b'd')
 
     def test_nonempty(self):
@@ -331,11 +391,11 @@ class BuildIndexTests(TestCase):
             tree[b'b'] = (stat.S_IFREG | 0o644, fileb.id)
             tree[b'c/d'] = (stat.S_IFREG | 0o644, filed.id)
 
-            repo.object_store.add_objects([(o, None)
-                for o in [filea, fileb, filed, tree]])
+            repo.object_store.add_objects(
+                [(o, None) for o in [filea, fileb, filed, tree]])
 
-            build_index_from_tree(repo.path, repo.index_path(),
-                    repo.object_store, tree.id)
+            build_index_from_tree(
+                repo.path, repo.index_path(), repo.object_store, tree.id)
 
             # Verify index entries
             index = repo.open_index()
@@ -344,32 +404,32 @@ class BuildIndexTests(TestCase):
             # filea
             apath = os.path.join(repo.path, 'a')
             self.assertTrue(os.path.exists(apath))
-            self.assertReasonableIndexEntry(index[b'a'],
-                stat.S_IFREG | 0o644, 6, filea.id)
+            self.assertReasonableIndexEntry(
+                    index[b'a'], stat.S_IFREG | 0o644, 6, filea.id)
             self.assertFileContents(apath, b'file a')
 
             # fileb
             bpath = os.path.join(repo.path, 'b')
             self.assertTrue(os.path.exists(bpath))
-            self.assertReasonableIndexEntry(index[b'b'],
-                stat.S_IFREG | 0o644, 6, fileb.id)
+            self.assertReasonableIndexEntry(
+                    index[b'b'], stat.S_IFREG | 0o644, 6, fileb.id)
             self.assertFileContents(bpath, b'file b')
 
             # filed
             dpath = os.path.join(repo.path, 'c', 'd')
             self.assertTrue(os.path.exists(dpath))
-            self.assertReasonableIndexEntry(index[b'c/d'],
-                stat.S_IFREG | 0o644, 6, filed.id)
+            self.assertReasonableIndexEntry(
+                    index[b'c/d'], stat.S_IFREG | 0o644, 6, filed.id)
             self.assertFileContents(dpath, b'file d')
 
             # Verify no extra files
-            self.assertEqual(['.git', 'a', 'b', 'c'],
-                sorted(os.listdir(repo.path)))
-            self.assertEqual(['d'],
-                sorted(os.listdir(os.path.join(repo.path, 'c'))))
+            self.assertEqual(
+                    ['.git', 'a', 'b', 'c'], sorted(os.listdir(repo.path)))
+            self.assertEqual(
+                    ['d'], sorted(os.listdir(os.path.join(repo.path, 'c'))))
 
+    @skipIf(not getattr(os, 'sync', None), 'Requires sync support')
     def test_norewrite(self):
-        sync = getattr(os, 'sync', lambda: os.system('sync'))
         repo_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, repo_dir)
         with Repo.init(repo_dir) as repo:
@@ -379,37 +439,35 @@ class BuildIndexTests(TestCase):
             tree = Tree()
             tree[b'a'] = (stat.S_IFREG | 0o644, filea.id)
 
-            repo.object_store.add_objects([(o, None)
-                for o in [filea, tree]])
+            repo.object_store.add_objects([(o, None) for o in [filea, tree]])
 
             # First Write
             build_index_from_tree(repo.path, repo.index_path(),
                                   repo.object_store, tree.id)
             # Use sync as metadata can be cached on some FS
-            sync()
+            os.sync()
             mtime = os.stat(filea_path).st_mtime
 
             # Test Rewrite
             build_index_from_tree(repo.path, repo.index_path(),
                                   repo.object_store, tree.id)
-            sync()
+            os.sync()
             self.assertEqual(mtime, os.stat(filea_path).st_mtime)
 
             # Modify content
             with open(filea_path, 'wb') as fh:
                 fh.write(b'test a')
-            sync()
+            os.sync()
             mtime = os.stat(filea_path).st_mtime
 
             # Test rewrite
             build_index_from_tree(repo.path, repo.index_path(),
                                   repo.object_store, tree.id)
-            sync()
+            os.sync()
             with open(filea_path, 'rb') as fh:
                 self.assertEqual(b'file a', fh.read())
 
-
-    @skipIf(not getattr(os, 'symlink', None), 'Requires symlink support')
+    @skipIf(not can_symlink(), 'Requires symlink support')
     def test_symlink(self):
         repo_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, repo_dir)
@@ -423,11 +481,11 @@ class BuildIndexTests(TestCase):
             tree[b'c/d'] = (stat.S_IFREG | 0o644, filed.id)
             tree[b'c/e'] = (stat.S_IFLNK, filee.id)  # symlink
 
-            repo.object_store.add_objects([(o, None)
-                for o in [filed, filee, tree]])
+            repo.object_store.add_objects(
+                    [(o, None) for o in [filed, filee, tree]])
 
-            build_index_from_tree(repo.path, repo.index_path(),
-                    repo.object_store, tree.id)
+            build_index_from_tree(
+                    repo.path, repo.index_path(), repo.object_store, tree.id)
 
             # Verify index entries
             index = repo.open_index()
@@ -452,12 +510,21 @@ class BuildIndexTests(TestCase):
 
             tree = Tree()
             latin1_name = u'À'.encode('latin1')
+            latin1_path = os.path.join(repo_dir_bytes, latin1_name)
             utf8_name = u'À'.encode('utf8')
+            utf8_path = os.path.join(repo_dir_bytes, utf8_name)
             tree[latin1_name] = (stat.S_IFREG | 0o644, file.id)
             tree[utf8_name] = (stat.S_IFREG | 0o644, file.id)
 
             repo.object_store.add_objects(
                 [(o, None) for o in [file, tree]])
+
+            try:
+                os.path.exists(latin1_path)
+            except UnicodeDecodeError:
+                # This happens e.g. with python3.6 on Windows.
+                # It implicitly decodes using utf8, which doesn't work.
+                self.skipTest('can not implicitly convert as utf8')
 
             build_index_from_tree(
                 repo.path, repo.index_path(),
@@ -465,11 +532,11 @@ class BuildIndexTests(TestCase):
 
             # Verify index entries
             index = repo.open_index()
+            self.assertIn(latin1_name, index)
+            self.assertIn(utf8_name, index)
 
-            latin1_path = os.path.join(repo_dir_bytes, latin1_name)
             self.assertTrue(os.path.exists(latin1_path))
 
-            utf8_path = os.path.join(repo_dir_bytes, utf8_name)
             self.assertTrue(os.path.exists(utf8_path))
 
     def test_git_submodule(self):
@@ -495,8 +562,49 @@ class BuildIndexTests(TestCase):
             repo.object_store.add_objects(
                 [(o, None) for o in [tree]])
 
-            build_index_from_tree(repo.path, repo.index_path(),
-                    repo.object_store, tree.id)
+            build_index_from_tree(
+                    repo.path, repo.index_path(), repo.object_store, tree.id)
+
+            # Verify index entries
+            index = repo.open_index()
+            self.assertEqual(len(index), 1)
+
+            # filea
+            apath = os.path.join(repo.path, 'c/a')
+            self.assertFalse(os.path.exists(apath))
+
+            # dir c
+            cpath = os.path.join(repo.path, 'c')
+            self.assertTrue(os.path.isdir(cpath))
+            self.assertEqual(index[b'c'][4], S_IFGITLINK)  # mode
+            self.assertEqual(index[b'c'][8], c.id)  # sha
+
+    def test_git_submodule_exists(self):
+        repo_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, repo_dir)
+        with Repo.init(repo_dir) as repo:
+            filea = Blob.from_string(b'file alalala')
+
+            subtree = Tree()
+            subtree[b'a'] = (stat.S_IFREG | 0o644, filea.id)
+
+            c = Commit()
+            c.tree = subtree.id
+            c.committer = c.author = b'Somebody <somebody@example.com>'
+            c.commit_time = c.author_time = 42342
+            c.commit_timezone = c.author_timezone = 0
+            c.parents = []
+            c.message = b'Subcommit'
+
+            tree = Tree()
+            tree[b'c'] = (S_IFGITLINK, c.id)
+
+            os.mkdir(os.path.join(repo_dir, 'c'))
+            repo.object_store.add_objects(
+                [(o, None) for o in [tree]])
+
+            build_index_from_tree(
+                    repo.path, repo.index_path(), repo.object_store, tree.id)
 
             # Verify index entries
             index = repo.open_index()
@@ -532,7 +640,8 @@ class GetUnstagedChangesTests(TestCase):
                 f.write(b'origstuff')
 
             repo.stage(['foo1', 'foo2'])
-            repo.do_commit(b'test status', author=b'', committer=b'')
+            repo.do_commit(b'test status', author=b'author <email>',
+                           committer=b'committer <email>')
 
             with open(foo1_fullpath, 'wb') as f:
                 f.write(b'newstuff')
@@ -557,9 +666,57 @@ class GetUnstagedChangesTests(TestCase):
                 f.write(b'origstuff')
 
             repo.stage(['foo1'])
-            repo.do_commit(b'test status', author=b'', committer=b'')
+            repo.do_commit(b'test status', author=b'author <email>',
+                           committer=b'committer <email>')
 
             os.unlink(foo1_fullpath)
+
+            changes = get_unstaged_changes(repo.open_index(), repo_dir)
+
+            self.assertEqual(list(changes), [b'foo1'])
+
+    def test_get_unstaged_changes_removed_replaced_by_directory(self):
+        """Unit test for get_unstaged_changes."""
+
+        repo_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, repo_dir)
+        with Repo.init(repo_dir) as repo:
+
+            # Commit a dummy file then modify it
+            foo1_fullpath = os.path.join(repo_dir, 'foo1')
+            with open(foo1_fullpath, 'wb') as f:
+                f.write(b'origstuff')
+
+            repo.stage(['foo1'])
+            repo.do_commit(b'test status', author=b'author <email>',
+                           committer=b'committer <email>')
+
+            os.remove(foo1_fullpath)
+            os.mkdir(foo1_fullpath)
+
+            changes = get_unstaged_changes(repo.open_index(), repo_dir)
+
+            self.assertEqual(list(changes), [b'foo1'])
+
+    @skipIf(not can_symlink(), 'Requires symlink support')
+    def test_get_unstaged_changes_removed_replaced_by_link(self):
+        """Unit test for get_unstaged_changes."""
+
+        repo_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, repo_dir)
+        with Repo.init(repo_dir) as repo:
+
+            # Commit a dummy file then modify it
+            foo1_fullpath = os.path.join(repo_dir, 'foo1')
+            with open(foo1_fullpath, 'wb') as f:
+                f.write(b'origstuff')
+
+            repo.stage(['foo1'])
+            repo.do_commit(b'test status', author=b'author <email>',
+                           committer=b'committer <email>')
+
+            os.remove(foo1_fullpath)
+            os.symlink(os.path.dirname(foo1_fullpath), foo1_fullpath)
 
             changes = get_unstaged_changes(repo.open_index(), repo_dir)
 

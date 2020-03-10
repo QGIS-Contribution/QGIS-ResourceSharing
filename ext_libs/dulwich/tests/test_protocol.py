@@ -1,5 +1,5 @@
 # test_protocol.py -- Tests for the git protocol
-# Copyright (C) 2009 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2009 Jelmer Vernooij <jelmer@jelmer.uk>
 #
 # Dulwich is dual-licensed under the Apache License, Version 2.0 and the GNU
 # General Public License as public by the Free Software Foundation; version 2.0
@@ -128,7 +128,8 @@ class ReceivableBytesIO(BytesIO):
     def recv(self, size):
         # fail fast if no bytes are available; in a real socket, this would
         # block forever
-        if self.tell() == len(self.getvalue()) and not self.allow_read_past_eof:
+        if (self.tell() == len(self.getvalue())
+                and not self.allow_read_past_eof):
             raise GitProtocolError('Blocking read past end of socket')
         if size == 1:
             return self.read(1)
@@ -215,28 +216,30 @@ class CapabilitiesTestCase(TestCase):
     def test_caps(self):
         self.assertEqual((b'bla', [b'la']), extract_capabilities(b'bla\0la'))
         self.assertEqual((b'bla', [b'la']), extract_capabilities(b'bla\0la\n'))
-        self.assertEqual((b'bla', [b'la', b'la']), extract_capabilities(b'bla\0la la'))
+        self.assertEqual((b'bla', [b'la', b'la']),
+                         extract_capabilities(b'bla\0la la'))
 
     def test_plain_want_line(self):
-        self.assertEqual((b'want bla', []), extract_want_line_capabilities(b'want bla'))
+        self.assertEqual((b'want bla', []),
+                         extract_want_line_capabilities(b'want bla'))
 
     def test_caps_want_line(self):
         self.assertEqual((b'want bla', [b'la']),
-                extract_want_line_capabilities(b'want bla la'))
+                         extract_want_line_capabilities(b'want bla la'))
         self.assertEqual((b'want bla', [b'la']),
-                extract_want_line_capabilities(b'want bla la\n'))
+                         extract_want_line_capabilities(b'want bla la\n'))
         self.assertEqual((b'want bla', [b'la', b'la']),
-                extract_want_line_capabilities(b'want bla la la'))
+                         extract_want_line_capabilities(b'want bla la la'))
 
     def test_ack_type(self):
         self.assertEqual(SINGLE_ACK, ack_type([b'foo', b'bar']))
         self.assertEqual(MULTI_ACK, ack_type([b'foo', b'bar', b'multi_ack']))
         self.assertEqual(MULTI_ACK_DETAILED,
-                          ack_type([b'foo', b'bar', b'multi_ack_detailed']))
+                         ack_type([b'foo', b'bar', b'multi_ack_detailed']))
         # choose detailed when both present
         self.assertEqual(MULTI_ACK_DETAILED,
-                          ack_type([b'foo', b'bar', b'multi_ack',
-                                    b'multi_ack_detailed']))
+                         ack_type([b'foo', b'bar', b'multi_ack',
+                                   b'multi_ack_detailed']))
 
 
 class BufferedPktLineWriterTests(TestCase):

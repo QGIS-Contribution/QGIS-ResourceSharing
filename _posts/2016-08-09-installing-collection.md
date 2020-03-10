@@ -13,8 +13,8 @@ local machine.
 The first time you use the plugin, there will not be any
 collections to be found in the ``All`` tab.
 But once you have loaded the available repositories, the
-collections will be there.
-Loadin the repositories is done by pushing the
+officially approved collections should be there.
+Loading the repositories is done by pushing the
 ``Reload Repositories`` button in the ``Settings`` tab.
 
 It is a good idea to ***reload*** the repositories now and then,
@@ -25,6 +25,11 @@ and click the ```Install``` button (below the collection
 description).
 The resources in the collection will be installed (the location
 in the file system depends on their type).
+
+.. note:: When you have installed a collection from a repository, the
+   complete repository will be duplicated on your local file
+   system (under ``resource_sharing/repositories`` in the QGIS
+   user directory).
 
 #### SVG
 If the collection contains SVGs, they will be copied to your file

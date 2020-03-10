@@ -3,6 +3,7 @@ import os
 import shutil
 import logging
 import traceback
+import warnings
 
 from qgis.core import QgsApplication
 
@@ -90,7 +91,9 @@ class RemoteGitHandler(BaseRepositoryHandler):
         :return: (success (True or False), error message (None if success))
         :rtype: (boolean, string)
         """
-        # Clone or pull the repositories first
+        # Hack to avoid irritating Dulwich / Porcelain ResourceWarning
+        warnings.filterwarnings("ignore", category=ResourceWarning)
+         # Clone or pull the repositories first
         local_repo_dir = os.path.join(
             QgsApplication.qgisSettingsDirPath(),
             'resource_sharing',

@@ -27,6 +27,6 @@ Bitbucket |  https://bitbucket.org/gisuser/qgis-style-repo-useful.git | Works on
 File system | file:///home/gisuser/dev/repositories/qgis_resources | Pointing to the repository root in your local file system 
 HTTP(s) with zip collections | https://github.com/qgis/QGIS-Resources | Pointing to the base URL of the repository. Metadata must be available, with this URL: http(s)://[base_url]/metadata.ini. The collections should be in http(s)://[base_url]/collections/[collection_name].zip
 
-Adding a repository (and loading it) means that a copy of the repository will
-be placed in the local file system (under ``resource_sharing/repositories`` in
-the QGIS user directory).
+Adding a repository (and loading one or more of its collections) means that
+a copy of the repository will be placed in the local file system
+(under ``resource_sharing/repositories`` in the QGIS user directory).

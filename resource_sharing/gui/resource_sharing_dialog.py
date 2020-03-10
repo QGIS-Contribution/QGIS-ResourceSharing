@@ -547,10 +547,21 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.collections_model.sort(0, Qt.AscendingOrder)
 
     def on_tree_repositories_itemSelectionChanged(self):
-        """Slot for when the itemSelectionChanged signal emitted."""
-        # Activate edit and delete button
-        self.button_edit.setEnabled(True)
-        self.button_delete.setEnabled(True)
+        """Slot for the itemSelectionChanged signal of tree_repositories."""
+        selected_item = self.tree_repositories.currentItem()
+        if selected_item:
+            repo_name = selected_item.text(0)
+        if not repo_name:
+            return
+        repo_url = self.repository_manager.directories[repo_name]['url']
+        # Disable the edit and delete buttons for "official" repositories
+        if repo_url in self.repository_manager._online_directories.values():
+            self.button_edit.setEnabled(False)
+            self.button_delete.setEnabled(False)
+        else:
+            # Activate the edit and delete buttons
+            self.button_edit.setEnabled(True)
+            self.button_delete.setEnabled(True)
 
     def on_list_view_collections_clicked(self, index):
         """Slot for when the list_view_collections is clicked."""

@@ -2,11 +2,13 @@
 import os
 import fnmatch
 import shutil
+import logging
 
 from processing.script import ScriptUtils
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
-from qgis.core import QgsApplication, QgsMessageLog, Qgis
+from qgis.core import QgsApplication
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class ProcessingScriptHandler(BaseResourceHandler):
@@ -45,10 +47,8 @@ class ProcessingScriptHandler(BaseResourceHandler):
                     shutil.copy(processing_file, self.scripts_folder())
                     valid += 1
                 except OSError as e:
-                    QgsMessageLog.logMessage("Could not copy script '" +
-                                             str(processing_file) + "'\n" +
-                                             str(e), "QGIS Resource Sharing",
-                                             Qgis.Warning)
+                    LOGGER.error("Could not copy script '" +
+                                 str(processing_file) + "'\n" + str(e))
         if valid > 0:
             self.refresh_script_provider()
 

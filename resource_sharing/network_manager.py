@@ -37,7 +37,10 @@ class NetworkManager(object):
         return self._network_timeout
 
     def fetch(self):
-        """Fetch the content."""
+        """Fetch the content (in the background).
+        :return: (status, error message)
+        :rtype: (boolean, string)
+        """
         # Initialize some properties again
         self._content = None
         self._network_finished = False
@@ -76,9 +79,9 @@ class NetworkManager(object):
         return status, description
 
     def fetch_finished(self):
-        """Slot for when fetching metadata finished."""
+        """Called when fetching metadata has finished."""
         self._network_finished = True
 
     def request_timeout(self):
-        """Slot for when request timeout signal is emitted."""
+        """Called when a request timeout signal is emitted."""
         self._network_timeout = True

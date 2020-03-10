@@ -127,13 +127,17 @@ class BaseRepositoryHandler(object):
         """Fetch metadata file from the url."""
         # Download the metadata
         network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
-        status, description = network_manager.fetch()
+        status, fetcherror = network_manager.fetch()
         if status:
             self.metadata = bytes(network_manager.content).decode('utf8')
-        return status, description
+        return status, fetcherror
 
     def parse_metadata(self):
-        """Parse str metadata to collection dict."""
+        """Parse str metadata to collection dict.
+
+        :return: collections
+        :rtype: (dict)
+        """
         if not self.metadata:
             msg = 'The metadata content is None'
             LOGGER.error(msg)
@@ -167,7 +171,7 @@ class BaseRepositoryHandler(object):
                 qgis_max_version = '3.99'
             if not isCompatible(
                     Qgis.QGIS_VERSION, qgis_min_version, qgis_max_version):
-                LOGGER.info(
+                LOGGER.warning(
                     'Collection %s is not compatible with current QGIS '
                     'version. QGIS ver:%s, QGIS min ver:%s, QGIS max ver: '
                     '%s' % (

@@ -91,7 +91,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
         :return: (success (True or False), error message (None if success))
         :rtype: (boolean, string)
         """
-        # Hack to avoid irritating dulwich / porcelain ResourceWarning
+        # Hack to avoid irritating Dulwich / Porcelain ResourceWarning
         warnings.filterwarnings("ignore", category=ResourceWarning)
          # Clone or pull the repositories first
         local_repo_dir = os.path.join(

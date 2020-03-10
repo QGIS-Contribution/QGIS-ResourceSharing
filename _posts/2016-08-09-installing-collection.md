@@ -26,10 +26,10 @@ description).
 The resources in the collection will be installed (the location
 in the file system depends on their type).
 
-**Note**: When you have installed a collection from a repository, the
-          complete repository will be duplicated on your local file
-          system (under ``resource_sharing/repositories`` in the QGIS
-          user directory).
+**Note**: When you have installed a collection from a repository,
+the complete repository will be duplicated on your local file
+system (under ``resource_sharing/repositories`` in the QGIS
+user directory).
 
 
 #### SVG

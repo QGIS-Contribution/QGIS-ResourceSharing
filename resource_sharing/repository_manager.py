@@ -169,8 +169,9 @@ class RepositoryManager(QObject):
         """
         repo_handler = BaseRepositoryHandler.get_handler(url)
         if repo_handler is None:
-            raise Exception('There is no handler available for the given URL!')
-
+            # raise Exception('There is no handler available for the given URL!')
+            LOGGER.warning("There is no handler available for URL '" +
+                           str(url) + "'!")
         if auth_cfg:
             repo_handler.auth_cfg = auth_cfg
 
@@ -180,8 +181,9 @@ class RepositoryManager(QObject):
             # Parse metadata
             try:
                 collections = repo_handler.parse_metadata()
-            except MetadataError:
-                raise
+            except MetadataError as me:
+                # raise
+                LOGGER.warning("Error parsing metadata for " + str(repo_name) + ":\n" + str(me))
             # Add the repo and the collections
             self._repositories[repo_name] = collections
             self.rebuild_collections()
@@ -225,7 +227,9 @@ class RepositoryManager(QObject):
         # Fetch the metadata from the new url
         repo_handler = BaseRepositoryHandler.get_handler(new_url)
         if repo_handler is None:
-            raise Exception('There is no handler available for the given URL!')
+            # raise Exception('There is no handler available for the given URL!')
+            LOGGER.warning("No handler available for URL '" +
+                           str(new_url) + "'!")
 
         if new_auth_cfg:
             repo_handler.auth_cfg = new_auth_cfg
@@ -237,8 +241,9 @@ class RepositoryManager(QObject):
             try:
                 new_collections = repo_handler.parse_metadata()
             except MetadataError:
-                raise
-
+                # raise
+                LOGGER.warning("Error parsing metadata for " +
+                               str(new_repo_name) + ":\n" + str(me))
             old_collections = self._repositories.get(old_repo_name, [])
             # Get all the installed collections from the old repository
             installed_old_collections = []

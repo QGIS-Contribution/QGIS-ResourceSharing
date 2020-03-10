@@ -20,6 +20,8 @@
  *                                                                         *
  ***************************************************************************/
 """
+import logging
+
 from qgis.PyQt import uic
 from qgis.PyQt.Qt import QSize
 from qgis.PyQt.QtCore import (
@@ -79,6 +81,7 @@ from resource_sharing.config import (
 from resource_sharing import config
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('resource_sharing_dialog_base.ui'))
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class ResourceSharingDialog(QDialog, FORM_CLASS):
@@ -237,7 +240,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add another repository with the same URL!'),
-                    Qgis.Critical, 5)
+                    Qgis.Warning, 5)
                 return
 
         repo_name = dlg.line_edit_name.text()
@@ -262,11 +265,11 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add repository: %s') % description,
-                    Qgis.Critical, 5)
+                    Qgis.Warning, 5)
         except Exception as e:
             self.message_bar.pushMessage(
                 self.tr('%s') % e,
-                Qgis.Critical, 5)
+                Qgis.Warning, 5)
         finally:
             self.progress_dialog.hide()
 
@@ -316,7 +319,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr('Unable to add another repository with the same '
                             'URL!'),
-                    Qgis.Critical, 5)
+                    Qgis.Warning, 5)
                 return
 
         new_name = dlg.line_edit_name.text()
@@ -345,10 +348,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             else:
                 self.message_bar.pushMessage(
                     self.tr('Unable to add repository: %s') % description,
-                    Qgis.Critical, 5)
+                    Qgis.Warning, 5)
         except Exception as e:
             self.message_bar.pushMessage(
-                self.tr('%s') % e, Qgis.Critical, 5)
+                self.tr('%s') % e, Qgis.Warning, 5)
         finally:
             self.progress_dialog.hide()
 
@@ -423,11 +426,11 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                         self.tr(
                             'Unable to reload %s: %s') % (
                             repo_name, description),
-                        Qgis.Critical, 5)
+                        Qgis.Warning, 5)
             except Exception as e:
                 self.message_bar.pushMessage(
                     self.tr('%s') % e,
-                    Qgis.Critical, 5)
+                    Qgis.Warning, 5)
 
         self.progress_dialog.hide()
         # Reload data and widget
@@ -482,12 +485,15 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         try:
             self.collection_manager.uninstall(self._selected_collection_id)
         except Exception as e:
-            raise
-        self.reload_collections_model()
-        QMessageBox.information(
-            self,
-            'Resource Sharing',
-            'The collection is uninstalled succesfully!')
+            LOGGER.error('Could not uninstall collection ' +
+                           config.COLLECTIONS[self._selected_collection_id]['name'])
+            # raise
+        else:
+            self.reload_collections_model()
+            QMessageBox.information(
+                self,
+                'Resource Sharing',
+                'The collection was successfully uninstalled!')
 
     def open_collection(self):
         """Slot for when user clicks 'Open' button."""

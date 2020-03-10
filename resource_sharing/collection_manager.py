@@ -134,8 +134,9 @@ class CollectionManager(object):
         repo_handler = BaseRepositoryHandler.get_handler(repo_url)
         if repo_handler is None:
             message = 'There is no handler available for the given URL!'
-            LOGGER.exception(message)
-            raise Exception(message)
+            LOGGER.error(message)
+            # raise Exception(message)
+            return False, None
         register_name = config.COLLECTIONS[collection_id]['register_name']
         status, information = repo_handler.download_collection(
             collection_id, register_name)

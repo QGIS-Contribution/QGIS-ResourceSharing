@@ -10,7 +10,7 @@ from giturlparse import parse, validate
 from dulwich import porcelain
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
-from qgis.core import QgsMessageLog
+# from qgis.core import QgsMessageLog
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
@@ -20,7 +20,8 @@ class writeOut():
 
     @classmethod
     def write(cls, m):
-        QgsMessageLog.logMessage(m.decode('utf8'), 'QGIS Resource Sharing')
+        LOGGER.info(m.decode('utf8'))
+        # QgsMessageLog.logMessage(m.decode('utf8'), 'QGIS Resource Sharing')
 
     @classmethod
     def flush(cls):

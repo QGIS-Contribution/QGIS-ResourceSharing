@@ -4,14 +4,17 @@ import os
 # from pathlib import Path
 import fnmatch
 import shutil
+import logging
 from processing.tools.system import userFolder, mkdir
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
-from qgis.core import QgsApplication, QgsMessageLog, Qgis
+from qgis.core import QgsApplication
+# from qgis.core import QgsMessageLog, Qgis
 
 MODELS_FOLDER = 'models'
 MODELS = 'models'  # Directory name
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class ModelHandler(BaseResourceHandler):
@@ -55,9 +58,11 @@ class ModelHandler(BaseResourceHandler):
                 shutil.copy(model_file, self.Models_folder())
                 valid += 1
             except OSError as e:
-                QgsMessageLog.logMessage("Could not copy model '" +
-                                         str(model_file) + "':\n" + str(e),
-                                         "QGIS Resource Sharing", Qgis.Warning)
+                LOGGER.error("Could not copy model '" +
+                             str(model_file) + "':\n" + str(e))
+                # QgsMessageLog.logMessage("Could not copy model '" +
+                #                          str(model_file) + "':\n" + str(e),
+                #                          "QGIS Resource Sharing", Qgis.Warning)
 
         if valid > 0:
             self.refresh_Model_provider()

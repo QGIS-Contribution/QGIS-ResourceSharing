@@ -5,6 +5,7 @@ import os
 import fnmatch
 import shutil
 from processing.tools.system import userFolder, mkdir
+import logging
 
 # Worth a try? Should probably be present if the Processing R
 # Provider plugin is installed.
@@ -12,11 +13,12 @@ from processing.tools.system import userFolder, mkdir
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
-from qgis.core import QgsApplication, QgsMessageLog, Qgis
+from qgis.core import QgsApplication, Qgis
+# from qgis.core import QgsMessageLog
 
 R_SCRIPTS_FOLDER = 'R_SCRIPTS_FOLDER'
 RSCRIPTS = 'rscripts'
-
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 class RScriptHandler(BaseResourceHandler):
     """Handler for R script resources."""
@@ -59,9 +61,11 @@ class RScriptHandler(BaseResourceHandler):
                 shutil.copy(R_file, self.RScripts_folder())
                 valid += 1
             except OSError as e:
-                QgsMessageLog.logMessage("Could not copy script '" +
-                                         str(R_file) + "'\n" + str(e),
-                                         "QGIS Resource Sharing",
+                LOGGER.error("Could not copy script '" + str(R_file) +
+                             "'\n" + str(e))
+                # QgsMessageLog.logMessage("Could not copy script '" +
+                #                          str(R_file) + "'\n" + str(e),
+                #                          "QGIS Resource Sharing",
                                          Qgis.Warning)
         if valid > 0:
             self.refresh_Rscript_provider()

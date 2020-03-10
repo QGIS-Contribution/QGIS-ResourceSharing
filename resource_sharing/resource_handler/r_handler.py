@@ -4,21 +4,19 @@ import os
 # from pathlib import Path
 import fnmatch
 import shutil
-from processing.tools.system import userFolder, mkdir
 import logging
 
+from qgis.core import QgsApplication, Qgis
 # Worth a try? Should probably be present if the Processing R
 # Provider plugin is installed.
 # from processing_r.processing.utils import RUtils
-
+from processing.tools.system import userFolder, mkdir
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
-from qgis.core import QgsApplication, Qgis
-# from qgis.core import QgsMessageLog
-
-R_SCRIPTS_FOLDER = 'R_SCRIPTS_FOLDER'
-RSCRIPTS = 'rscripts'
+RSCRIPTS_PROCESSING_FOLDER = 'rscripts'  # Processing folder for R scripts
+RSCRIPTS_FOLDER = 'rscripts'  # Collection subfolder name
 LOGGER = logging.getLogger('QGIS Resource Sharing')
+
 
 class RScriptHandler(BaseResourceHandler):
     """Handler for R script resources."""
@@ -30,7 +28,7 @@ class RScriptHandler(BaseResourceHandler):
 
     @classmethod
     def dir_name(cls):
-        return 'rscripts'
+        return RSCRIPTS_FOLDER
 
     def install(self):
         """Install the R scripts of the collection.
@@ -63,10 +61,6 @@ class RScriptHandler(BaseResourceHandler):
             except OSError as e:
                 LOGGER.error("Could not copy script '" + str(R_file) +
                              "'\n" + str(e))
-                # QgsMessageLog.logMessage("Could not copy script '" +
-                #                          str(R_file) + "'\n" + str(e),
-                #                          "QGIS Resource Sharing",
-                                         Qgis.Warning)
         if valid > 0:
             self.refresh_Rscript_provider()
 
@@ -94,15 +88,14 @@ class RScriptHandler(BaseResourceHandler):
 
     def default_rscripts_folder(self):
         """Return the default R scripts folder."""
-        # folder = userFolder() / RSCRIPTS
-        folder = str(os.path.join(userFolder(), RSCRIPTS))
+        # Perphaps better to use RUtils.default_scripts_folder()?
+        # return RUtils.default_scripts_folder()
+        # folder = userFolder() / RSCRIPTS_PROCESSING_FOLDER
+        folder = str(os.path.join(userFolder(), RSCRIPTS_PROCESSING_FOLDER))
         mkdir(folder)
         # return folder.absolute()
         return os.path.abspath(folder)
 
     def RScripts_folder(self):
         """Return the default R scripts folder."""
-        # Perphaps better to use RUtils.default_scripts_folder()?
-        # return RUtils.default_scripts_folder()
-        # Local:
         return self.default_rscripts_folder()

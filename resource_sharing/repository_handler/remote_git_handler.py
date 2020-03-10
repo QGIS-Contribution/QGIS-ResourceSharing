@@ -10,7 +10,6 @@ from giturlparse import parse, validate
 from dulwich import porcelain
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
-# from qgis.core import QgsMessageLog
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
@@ -21,7 +20,6 @@ class writeOut():
     @classmethod
     def write(cls, m):
         LOGGER.info(m.decode('utf8'))
-        # QgsMessageLog.logMessage(m.decode('utf8'), 'QGIS Resource Sharing')
 
     @classmethod
     def flush(cls):
@@ -86,6 +84,8 @@ class RemoteGitHandler(BaseRepositoryHandler):
 
         :param id: The ID of the collection.
         :type id: str
+        :return: (success (True or False), error message (None if success))
+        :rtype: (boolean, string)
 
         :param register_name: The register name of the collection (the
             section name of the collection)
@@ -107,7 +107,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 )
                 repo.close()  # To avoid WinErr 32
             except Exception as e:
-                # Try to clone with https if it's ssh url
+                # Try to clone with https if it is a ssh url
                 git_parsed = parse(self.url)
                 if self.url == git_parsed.url2ssh:
                     try:
@@ -156,7 +156,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                     LOGGER.exception(traceback.format_exc())
                     return False, error_message
 
-        # Copy the specific downloaded collection to collections dir
+        # Copy the specific downloaded collection to the collections dir
         src_dir = os.path.join(local_repo_dir, 'collections', register_name)
         if not os.path.exists(src_dir):
             error_message = ('Error: The collection does not exist in the '

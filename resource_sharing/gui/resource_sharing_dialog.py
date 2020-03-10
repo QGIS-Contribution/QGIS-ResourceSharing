@@ -485,9 +485,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         try:
             self.collection_manager.uninstall(self._selected_collection_id)
         except Exception as e:
+            coll_id = self._selected_collection_id
             LOGGER.error('Could not uninstall collection ' +
-                           config.COLLECTIONS[self._selected_collection_id]['name'])
-            # raise
+                         config.COLLECTIONS[coll_id]['name'])
         else:
             self.reload_collections_model()
             QMessageBox.information(
@@ -598,7 +598,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
     def open_help(self):
         """Open help."""
-        doc_url = QUrl('http://qgis-contribution.github.io/QGIS-ResourceSharing/')
+        doc_url = QUrl('http://qgis-contribution.github.io/' +
+                       'QGIS-ResourceSharing/')
         QDesktopServices.openUrl(doc_url)
 
     def show_progress_dialog(self, text):

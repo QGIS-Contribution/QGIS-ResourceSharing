@@ -8,7 +8,6 @@ from processing.script import ScriptUtils
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
 from qgis.core import QgsApplication
-# from qgis.core import QgsMessageLog, Qgis
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
@@ -50,10 +49,6 @@ class ProcessingScriptHandler(BaseResourceHandler):
                 except OSError as e:
                     LOGGER.error("Could not copy script '" +
                                  str(processing_file) + "'\n" + str(e))
-                    # QgsMessageLog.logMessage("Could not copy script '" +
-                    #                          str(processing_file) + "'\n" +
-                    #                          str(e), "QGIS Resource Sharing",
-                    #                          Qgis.Warning)
         if valid > 0:
             self.refresh_script_provider()
 

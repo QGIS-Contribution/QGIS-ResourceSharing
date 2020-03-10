@@ -10,10 +10,9 @@ from processing.tools.system import userFolder, mkdir
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
 from qgis.core import QgsApplication
-# from qgis.core import QgsMessageLog, Qgis
 
-MODELS_FOLDER = 'models'
-MODELS = 'models'  # Directory name
+MODELS_PROCESSING_FOLDER = 'models'
+MODELS = 'models'  # Resource Sharing collection subdirectory name
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
@@ -30,11 +29,12 @@ class ModelHandler(BaseResourceHandler):
         return MODELS
 
     def install(self):
-        """Install the models of the collection.
+        """Install the models from the collection.
 
-        We copy the models (*.model) that exist in
-        the models dir to the user's model directory and refresh
-        the provider.
+        Copy the models (*.model3) that exist in the models
+        directory of the Resource Sharing collection's to the
+        user's processing model directory and refresh the
+        provider.
         """
         # Check if the dir exists, return silently if it doesn't
         # if Path(self.resource_dir).exists():
@@ -48,9 +48,6 @@ class ModelHandler(BaseResourceHandler):
             file_path = os.path.join(self.resource_dir, item)
             if fnmatch.fnmatch(file_path, '*.model3'):
                 model_files.append(file_path)
-            # if fnmatch.fnmatch(file_path, '*.rsx.help'):
-            #     model_files.append(file_path)
-
         valid = 0
         for model_file in model_files:
             # Install the model file silently
@@ -60,10 +57,6 @@ class ModelHandler(BaseResourceHandler):
             except OSError as e:
                 LOGGER.error("Could not copy model '" +
                              str(model_file) + "':\n" + str(e))
-                # QgsMessageLog.logMessage("Could not copy model '" +
-                #                          str(model_file) + "':\n" + str(e),
-                #                          "QGIS Resource Sharing", Qgis.Warning)
-
         if valid > 0:
             self.refresh_Model_provider()
 
@@ -90,14 +83,14 @@ class ModelHandler(BaseResourceHandler):
             mod_prov.refreshAlgorithms()
 
     def default_models_folder(self):
-        """Return the default models folder."""
-        # folder = userFolder() / MODELS
-        folder = str(os.path.join(userFolder(), MODELS_FOLDER))
+        """Return the default location of the processing models folder."""
+        # folder = userFolder() / MODELS_PROCESSING_FOLDER
+        folder = str(os.path.join(userFolder(), MODELS_PROCESSING_FOLDER))
         mkdir(folder)
         # return folder.absolute()
         return os.path.abspath(folder)
 
     def Models_folder(self):
-        """Return the default models folder."""
-        # Local:
+        """Return the folder where processing expects to find models."""
+        # Use the default location
         return self.default_models_folder()

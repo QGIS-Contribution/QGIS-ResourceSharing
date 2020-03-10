@@ -136,20 +136,20 @@ def compareVersions(a, b):
     v1 = chopString(a)
     v2 = chopString(b)
     # set the shorter string as a base
-    l = len(v1)
-    if l > len(v2):
-        l = len(v2)
+    shorter = len(v1)
+    if shorter > len(v2):
+        shorter = len(v2)
     # try to determine within the common length
-    for i in range(l):
+    for i in range(shorter):
         if compareElements(v1[i], v2[i]):
             return compareElements(v1[i], v2[i])
     # if the lists are identical till the end of the shorther string, try to
     # compare the odd tail with the simple space (because the 'alpha',
     # 'beta', 'preview' and 'rc' are LESS then nothing)
-    if len(v1) > l:
-        return compareElements(v1[l], u' ')
-    if len(v2) > l:
-        return compareElements(u' ', v2[l])
+    if len(v1) > shorter:
+        return compareElements(v1[shorter], u' ')
+    if len(v2) > shorter:
+        return compareElements(u' ', v2[shorter])
     # if everything else fails...
     if a > b:
         return 1
@@ -168,15 +168,15 @@ def splitVersion(s):
     """ split string into 2 or 3 numerical segments """
     if not s or type(s) != str:
         return None
-    l = s.split('.')
-    for c in l:
+    versionlist = s.split('.')
+    for c in versionlist:
         if not c.isnumeric():
             return None
         if int(c) > 99:
             return None
-    if len(l) not in [2, 3]:
+    if len(versionlist) not in [2, 3]:
         return None
-    return l
+    return versionlist
 
 
 def isCompatible(curVer, minVer, maxVer):

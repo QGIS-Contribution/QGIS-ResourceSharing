@@ -254,17 +254,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
         # Add repository
         try:
-            status, description = self.repository_manager.add_directory(
+            status, adderror = self.repository_manager.add_directory(
                 repo_name, repo_url, repo_auth_cfg)
             if status:
                 self.message_bar.pushMessage(
                     self.tr(
-                        'Repository is successfully added'),
+                        'Repository was successfully added'),
                     Qgis.Success, 5)
             else:
                 self.message_bar.pushMessage(
                     self.tr(
-                        'Unable to add repository: %s') % description,
+                        'Unable to add repository: %s') % adderror,
                     Qgis.Warning, 5)
         except Exception as e:
             self.message_bar.pushMessage(
@@ -334,7 +334,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
         # Edit repository
         try:
-            status, description = self.repository_manager.edit_directory(
+            status, editerror = self.repository_manager.edit_directory(
                 repo_name,
                 new_name,
                 old_url,
@@ -347,7 +347,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     Qgis.Success, 5)
             else:
                 self.message_bar.pushMessage(
-                    self.tr('Unable to add repository: %s') % description,
+                    self.tr('Unable to edit repository: %s') % editerror,
                     Qgis.Warning, 5)
         except Exception as e:
             self.message_bar.pushMessage(
@@ -414,7 +414,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             url = directory['url']
             auth_cfg = directory['auth_cfg']
             try:
-                status, description = self.repository_manager.reload_directory(
+                status, reloaderror = self.repository_manager.reload_directory(
                     repo_name, url, auth_cfg)
                 if status:
                     self.message_bar.pushMessage(
@@ -425,7 +425,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     self.message_bar.pushMessage(
                         self.tr(
                             'Unable to reload %s: %s') % (
-                            repo_name, description),
+                            repo_name, reloaderror),
                         Qgis.Warning, 5)
             except Exception as e:
                 self.message_bar.pushMessage(

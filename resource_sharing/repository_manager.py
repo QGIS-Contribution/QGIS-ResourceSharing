@@ -174,7 +174,7 @@ class RepositoryManager(QObject):
             repo_handler.auth_cfg = auth_cfg
 
         # Fetch metadata
-        status, description = repo_handler.fetch_metadata()
+        status, fetcherror = repo_handler.fetch_metadata()
         if status:
             # Parse metadata
             try:
@@ -197,7 +197,7 @@ class RepositoryManager(QObject):
             # Serialize repositories every time we successfully added a repo
             self.serialize_repositories()
 
-        return status, description
+        return status, fetcherror
 
     def edit_directory(
             self,
@@ -210,18 +210,16 @@ class RepositoryManager(QObject):
 
         :param old_repo_name: The old name of the repository
         :type old_repo_name: str
-
         :param new_repo_name: The new name of the repository
         :type new_repo_name: str
-
         :param old_url: The old URL of the repository
         :type old_url: str
-
         :param new_url: The new URL of the repository
         :type new_url: str
-
         :param new_auth_cfg: The auth config id.
         :type new_auth_cfg: str
+        :return: (status, error)
+        :rtype: (boolean, string)
         """
         # Fetch the metadata from the new url
         repo_handler = BaseRepositoryHandler.get_handler(new_url)
@@ -232,7 +230,7 @@ class RepositoryManager(QObject):
         if new_auth_cfg:
             repo_handler.auth_cfg = new_auth_cfg
 
-        status, description = repo_handler.fetch_metadata()
+        status, fetcherror = repo_handler.fetch_metadata()
 
         if status:
             # Parse metadata
@@ -294,7 +292,7 @@ class RepositoryManager(QObject):
             settings.endGroup()
             # Serialize repositories every time we successfully edited repo
             self.serialize_repositories()
-        return status, description
+        return status, fetcherror
 
     def remove_directory(self, repo_name):
         """Remove a directory and all the collections of that repository.
@@ -323,14 +321,14 @@ class RepositoryManager(QObject):
         :type url: str
         """
         # We're basically editing a directory with the same repo name and url
-        status, description = self.edit_directory(
+        status, editerror = self.edit_directory(
             repo_name,
             repo_name,
             url,
             url,
             auth_cfg
         )
-        return status, description
+        return status, editerror
 
     def rebuild_collections(self):
         """Rebuild collections from repositories."""

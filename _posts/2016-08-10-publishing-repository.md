@@ -14,5 +14,11 @@ Well, yes, you can do that.
  
 To offer your repository as a default repository, fork the
 [QGIS official resource repository](https://github.com/qgis/QGIS-Resources),
-update the ```directory.csv``` file and make a pull request to the
-upstream project.
+update the
+[```directory.csv```](https://github.com/qgis/QGIS-Resources/blob/master/directory.csv)
+file and make a pull request to the upstream project.
+
+If your offer is accepted, and the pull request merged, your repository
+will be listed among the "approved" repositories and its collections will
+be available to everyone through the *Resource Sharing* plugin the next
+time they start QGIS.

@@ -553,6 +553,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             repo_name = selected_item.text(0)
         if not repo_name:
             return
+        if not repo_name in self.repository_manager.directories.keys():
+            return
         repo_url = self.repository_manager.directories[repo_name]['url']
         # Disable the edit and delete buttons for "official" repositories
         if repo_url in self.repository_manager._online_directories.values():

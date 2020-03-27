@@ -59,6 +59,11 @@ class RemoteGitHandler(BaseRepositoryHandler):
             self._git_host = git_parse.host
             self._git_owner = git_parse.owner
             self._git_repository = git_parse.repo
+            LOGGER.debug('git parse URL: ' + str(url))
+            LOGGER.debug(' platform: ' + str(git_parse.platform))
+            LOGGER.debug(' host: ' + str(git_parse.host))
+            LOGGER.debug(' owner: ' + str(git_parse.owner))
+            LOGGER.debug(' repository: ' + str(git_parse.repo))
 
     @property
     def git_platform(self):

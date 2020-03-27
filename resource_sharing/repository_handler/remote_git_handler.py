@@ -20,7 +20,7 @@ class writeOut():
 
     @classmethod
     def write(cls, m):
-        LOGGER.info(m.decode('utf8'))
+        LOGGER.info('Dulwich/Porcelain (github): ' + m.decode('utf8'))
 
     @classmethod
     def flush(cls):

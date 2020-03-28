@@ -52,7 +52,7 @@ class NetworkManager(object):
             QNetworkRequest.AlwaysNetwork)
 
         if self._auth_cfg and qgis_version() >= 21200:
-            LOGGER.info('Update request with auth_cfg %s' % self._auth_cfg)
+            LOGGER.debug('Update request with auth_cfg %s' % self._auth_cfg)
             QgsAuthManager.instance().updateNetworkRequest(
                 request, self._auth_cfg
             )

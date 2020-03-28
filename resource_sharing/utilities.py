@@ -126,7 +126,8 @@ def local_collection_path(id=None):
     #     'Resource Sharing')
     if id:
         collection_name = config.COLLECTIONS[id]['name']
-        dir_name = '%s (%s)' % (collection_name, id)
+        # dir_name = '%s (%s)' % (collection_name, id)
+        dir_name = '%s' % (id)
         # path = path / dir_name
         path = os.path.join(path, dir_name)
     return path

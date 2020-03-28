@@ -37,7 +37,8 @@ unintelligible name (the *QGIS R script collection* from the
 ``resource_sharing/collections/8bc41c8c4fe90615b47eef7c81199fa6d7148fb3``
 directory).
 The collection folder will have sub-folders - the collections
-branch in the [repository structure](2016-07-22-repository-structure.md).
+branch in the
+<a href="QGIS-ResourceSharing/author/repository-structure.html">repository structure</a>.
 
 #### SVG
 If the collection contains SVGs, they will be copied to your file

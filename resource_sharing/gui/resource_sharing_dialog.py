@@ -209,8 +209,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 # Set the web view
                 title = self.tr('Installed Collections')
                 description = self.tr(
-                    'On the left you see the list of all collections '
-                    'installed on your QGIS')
+                    'On the left you see the list of all the installed collections.')
             else:
                 # All
                 self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
@@ -219,7 +218,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 description = self.tr(
                     'On the left you see the list of all collections '
                     'available from the repositories registered in the '
-                    'settings.')
+                    'settings.\nAlready installed collections are '
+                    'emphasized (in bold).')
 
             context = {
                 'resources_path': resources_path(),

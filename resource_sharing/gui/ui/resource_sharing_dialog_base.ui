@@ -468,7 +468,7 @@
                   <item>
                    <widget class="QGroupBox" name="groupBox">
                     <property name="title">
-                     <string>Collection Repositories</string>
+                     <string>Repositories (and their collections)</string>
                     </property>
                     <property name="flat">
                      <bool>true</bool>
@@ -486,7 +486,7 @@
                        </column>
                        <column>
                         <property name="text">
-                         <string>URL</string>
+                         <string>Repository URL / Collection tags</string>
                         </property>
                        </column>
                       </widget>
@@ -522,14 +522,14 @@
                           <string>Add a new collection repository</string>
                          </property>
                          <property name="text">
-                          <string>Add...</string>
+                          <string>Add repository...</string>
                          </property>
                         </widget>
                        </item>
                        <item>
                         <widget class="QPushButton" name="button_edit">
                          <property name="text">
-                          <string>Edit...</string>
+                          <string>Edit repository...</string>
                          </property>
                         </widget>
                        </item>
@@ -539,7 +539,7 @@
                           <string>Remove the selected repository</string>
                          </property>
                          <property name="text">
-                          <string>Delete</string>
+                          <string>Delete repository</string>
                          </property>
                         </widget>
                        </item>

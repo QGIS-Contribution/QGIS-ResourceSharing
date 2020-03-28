@@ -27,15 +27,17 @@ The resources in the collection will be installed (the location
 in the file system depends on their type).
 
 **Note**: When you have installed a collection from a repository,
-the complete repository will be duplicated in your local file
+the complete *repository* will be duplicated in your local file
 system (under ``resource_sharing/repositories`` in the QGIS
-user directory). The collection will also be added under the
-*collections* directory (for instance,
+user directory). In addition, the *collection* will be added under
+the *collections* directory (for instance,
 ``resource_sharing/collections``), with a, for most people,
 unintelligible name (the *QGIS R script collection* from the
 *QGIS Official Repository* is located in the
 ``resource_sharing/collections/8bc41c8c4fe90615b47eef7c81199fa6d7148fb3``
 directory).
+The collection folder will have sub-folders - the collections
+branch in the [repository structure](2016-07-22-repository-structure.md).
 
 #### SVG
 If the collection contains SVGs, they will be copied to your file

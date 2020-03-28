@@ -535,7 +535,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             collection_tags = config.COLLECTIONS[id]['tags']
             collection_description = config.COLLECTIONS[id]['description']
             collection_status = config.COLLECTIONS[id]['status']
-            item = QStandardItem(collection_name)
+            repository_name = ''
+            if 'repository_name' in config.COLLECTIONS[id].keys():
+              repository_name = config.COLLECTIONS[id]['repository_name']
+            item = QStandardItem(collection_name + ' (' + repository_name + ')')
             item.setEditable(False)
             item.setData(id, COLLECTION_ID_ROLE)
             item.setData(collection_name, COLLECTION_NAME_ROLE)

@@ -222,6 +222,7 @@ class BaseRepositoryHandler(object):
                 'author': author,
                 'author_email': email,
                 'repository_url': self.url,
+                'repository_name': '',
                 'status': COLLECTION_NOT_INSTALLED_STATUS,
                 'name': name,
                 'tags': tags,

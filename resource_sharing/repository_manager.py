@@ -339,6 +339,7 @@ class RepositoryManager(QObject):
                     collection['register_name'],
                     collection['repository_url']
                 )
+                collection['repository_name'] = repo
                 config.COLLECTIONS[collection_id] = collection
 
                 # Check in the file system if the collection exists for all

@@ -14,6 +14,7 @@ config.COLLECTIONS is a dict of collection with this structure:
             'author': author,
             'author_email': email,
             'repository_url': self.url,
+            'repository_name': <the name of the repository>,
             'status': COLLECTION_NOT_INSTALLED_STATUS,
             'name': parser.get(collection, 'name'),
             'tags': parser.get(collection, 'tags'),

@@ -9,7 +9,7 @@ order: 3
 To add a repository and get access to the collections available in it,
 go to the ```Settings``` tab, click ```Add```, and specify a name
 for the repository (you are free to call it whatever you like) and its
-URL.
+URL (remember to use https for github and similar repositories).
 If authentication is needed to access the repository, add the
 configuration.
 

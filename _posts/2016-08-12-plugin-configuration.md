@@ -8,10 +8,13 @@ order: 4
 
 ***Local collections directory***
 
-The (local) file system directory that contains the installed collections
-is controlled in settings: ``localCollectionDir`` under ``ResourceSharing``.
-After you have promised to be careful, you can change this in *Advanced*
+The location (in the local file system) of the directory that
+contains the installed collections is configurable in settings:
+``localCollectionDir`` under ``[ResourceSharing]``.
+You can change this in the GUI by going to the *Advanced*
 tab of the *Options* dialog (*Settings-> Options...*).
+After you have promised to be careful, you can make your
+changes.
 You can also change it by editing the QGIS3.ini file that is located
 under QGIS in the user QGIS folder
 (``/.local/share/QGIS/QGIS3/profiles/default/QGIS`` on Ubuntu,
@@ -27,4 +30,6 @@ but the user can specify an alternative location using the
 ``localCollectionDir`` setting as explained above.
 If the specified alternative location does not exist in the file system,
 the plugin will try to create it.
-Changing the location in settings will not move the collections.
+Changing the location in settings will not move the already installed
+collections, so if they are not moved (manually) to the new location,
+they will have to be installed again.

@@ -9,14 +9,14 @@ order: 3
 To add a repository and get access to the collections available in it,
 go to the ```Settings``` tab, click ```Add```, and specify a name
 for the repository (you are free to call it whatever you like) and its
-URL (remember to use https for github and similar repositories).
+URL (remember to use ``https`` for github and similar repositories).
 If authentication is needed to access the repository, add the
 configuration.
 
 ![Add repository]({{ site.baseurl }}/assets/settings.png)
 
 If the repository is successfully added, you can now also see its
-collections in the ```All``` tab and install them from there.
+collections in the ``All`` tab and install them from there.
 
 There are four kinds of repositories that you can add (see table below).
 

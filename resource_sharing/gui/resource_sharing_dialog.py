@@ -217,10 +217,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 # Set the web view
                 title = self.tr('All Collections')
                 description = self.tr(
-                    'On the left you see the list of all collections '
-                    'available from the repositories registered in the '
-                    'settings.\nAlready installed collections are '
-                    'emphasized (in bold).')
+                    'On the left you see a list of all the collections '
+                    'that are available from the registered repositories.<br> '
+                    'Already installed collections are emphasized (in <b>bold</b>).')
 
             context = {
                 'resources_path': resources_path(),

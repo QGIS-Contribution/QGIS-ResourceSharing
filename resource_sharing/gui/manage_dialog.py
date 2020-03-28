@@ -38,7 +38,7 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
         """Create the dialog and configure the UI."""
         super(ManageRepositoryDialog, self).__init__(parent)
         self.setupUi(self)
-        self.line_edit_url.setText('http://')
+        self.line_edit_url.setText('https://')
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.line_edit_name.textChanged.connect(self.form_changed)
         self.line_edit_url.textChanged.connect(self.form_changed)

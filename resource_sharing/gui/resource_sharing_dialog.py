@@ -218,7 +218,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 title = self.tr('All Collections')
                 description = self.tr(
                     'To the left you see the list of available '
-                    'collections')
+                    'collections.\nAlready installed collections are '
+                    'emphasized (in bold).')
 
             context = {
                 'resources_path': resources_path(),

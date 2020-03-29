@@ -129,6 +129,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         group_or_tag_id = self._get_parent_group_or_tag()
 
+        # QGIS version 2 symbol file (<qgis_style version="1">)
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             # FIXME: no groups in QGIS3!!!
@@ -150,6 +151,9 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                         colorramp_name, colorramp['colorramp'], True):
                     self._group_or_tag(
                         QgsStyle.ColorrampEntity, colorramp_name, child_id)
+            LOGGER.info('XML file: ' + file_name + ' Symbols: ' + str(len(symbol_xml_extractor.symbols)) + ' ColorRamps: ' + str(len(symbol_xml_extractor.colorramps)))
+        # QGIS version 3 symbol file (<qgis_style version="2">)
+
         if valid >= 0:
             self.collection[SYMBOL] = valid
 

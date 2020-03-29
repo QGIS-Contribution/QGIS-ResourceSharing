@@ -456,7 +456,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.progress_dialog.hide()
         if self.installer_worker.install_status:
             self.reload_collections_model()
-            // Report what has been installed
+            # Report what has been installed
             message = '<b>%s</b> was successfully installed, containing:\n<ul>' % (
                 config.COLLECTIONS[self._selected_collection_id]['name'])
             number = 0

@@ -120,10 +120,12 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         LOGGER.info("Installing symbol 3")
         # Get all the symbol xml files under resource dirs
         symbol_files = []
+        valid = 0
         for item in os.listdir(self.resource_dir):
             file_path = os.path.join(self.resource_dir, item)
-            if fnmatch.fnmatch(file_path, '*.xml'):
+            if fnmatch.fnmatch(file_path, '*.qml') or fnmatch.fnmatch(file_path, '*.xml'):
                 symbol_files.append(file_path)
+            valid += 1
 
         LOGGER.info("Installing symbol 4")
         # If there's no symbol files don't do anything
@@ -132,7 +134,6 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         group_or_tag_id = self._get_parent_group_or_tag()
 
-        valid = 0
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             # FIXME: no groups in QGIS3!!!
@@ -149,7 +150,6 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
                     self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
                                        child_id)
-                valid += 1
 
             for colorramp in symbol_xml_extractor.colorramps:
                 colorramp_name = '%s (%s)' % (

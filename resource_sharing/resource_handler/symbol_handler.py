@@ -28,7 +28,6 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
     @classmethod
     def dir_name(self):
-        LOGGER.info("dir_name 'symbol'")
         return SYMBOL
 
     def _get_parent_group_or_tag(self):
@@ -108,16 +107,13 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         each xml file and save all the symbols and colorramp defined that xml
         file into that child group.
         """
-        LOGGER.info("Installing symbol 1")
         # Check if the dir exists, pass installing silently if it doesn't exist
         if not os.path.exists(self.resource_dir):
             return
 
-        LOGGER.info("Installing symbol 2")
         # Uninstall first in case of reinstalling
         self.uninstall()
 
-        LOGGER.info("Installing symbol 3")
         # Get all the symbol xml files under resource dirs
         symbol_files = []
         valid = 0
@@ -127,40 +123,35 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 symbol_files.append(file_path)
             valid += 1
 
-        LOGGER.info("Installing symbol 4")
         # If there's no symbol files don't do anything
         if len(symbol_files) == 0:
             return
 
         group_or_tag_id = self._get_parent_group_or_tag()
 
-        for symbol_file in symbol_files:
-            file_name = os.path.splitext(os.path.basename(symbol_file))[0]
-            # FIXME: no groups in QGIS3!!!
-
-            child_id = self._get_child_group_tag(group_or_tag_id, file_name)
-            # Modify the symbol file first
-            self.resolve_dependency(symbol_file)
-            # Add all symbols and colorramps and group it
-            symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
-
-            for symbol in symbol_xml_extractor.symbols:
-                symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
-                # self.resolve_dependency(symbol[SYMBOL])
-                if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
-                    self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
-                                       child_id)
-
-            for colorramp in symbol_xml_extractor.colorramps:
-                colorramp_name = '%s (%s)' % (
-                    colorramp['name'], self.collection_id)
-                if self.style.addColorRamp(
-                        colorramp_name, colorramp['colorramp'], True):
-                    self._group_or_tag(
-                        QgsStyle.ColorrampEntity, colorramp_name, child_id)
+        # for symbol_file in symbol_files:
+        #     file_name = os.path.splitext(os.path.basename(symbol_file))[0]
+        #     # FIXME: no groups in QGIS3!!!
+        #     child_id = self._get_child_group_tag(group_or_tag_id, file_name)
+        #     # Modify the symbol file first
+        #     self.resolve_dependency(symbol_file)
+        #     # Add all symbols and colorramps and group it
+        #     symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
+        #     for symbol in symbol_xml_extractor.symbols:
+        #         symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
+        #         # self.resolve_dependency(symbol[SYMBOL])
+        #         if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
+        #             self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
+        #                                child_id)
+        #     for colorramp in symbol_xml_extractor.colorramps:
+        #         colorramp_name = '%s (%s)' % (
+        #             colorramp['name'], self.collection_id)
+        #         if self.style.addColorRamp(
+        #                 colorramp_name, colorramp['colorramp'], True):
+        #             self._group_or_tag(
+        #                 QgsStyle.ColorrampEntity, colorramp_name, child_id)
         if valid >= 0:
             self.collection[SYMBOL] = valid
-        LOGGER.info("Installing symbol, valid: " + str(valid))
 
     def uninstall(self):
         """Uninstall the symbols from QGIS."""

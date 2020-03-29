@@ -1,11 +1,13 @@
 # coding=utf-8
 import os
 import fnmatch
+import logging
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.resource_handler.symbol_resolver_mixin import \
     SymbolResolverMixin
 
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 STYLE = 'style'
 
 class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
@@ -25,10 +27,12 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         We just resolve the symbol svg/image path in the qml file
         """
+        LOGGER.info("Installing style 1")
         # Check if the dir exists, pass installing silently if it doesn't exist
         if not os.path.exists(self.resource_dir):
             return
 
+        LOGGER.info("Installing style 2")
         # Get all the style xml files under resource dirs
         style_files = []
         for item in os.listdir(self.resource_dir):
@@ -36,6 +40,7 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             if fnmatch.fnmatch(file_path, '*.qml'):
                 style_files.append(file_path)
 
+        LOGGER.info("Installing style 3")
         # If there's no symbol files don't do anything
         if len(style_files) == 0:
             return
@@ -45,8 +50,9 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             # Modify the style
             self.resolve_dependency(style_file)
             valid += 1
-        if valid > 0:
+        if valid >= 0:
             self.collection[STYLE] = valid
+        LOGGER.info("Installing style, installed: " + str(valid))
 
     def uninstall(self):
         """Uninstall the style from QGIS."""

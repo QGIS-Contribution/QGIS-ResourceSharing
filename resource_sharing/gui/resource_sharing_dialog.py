@@ -462,17 +462,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             number = 0
             if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['style']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' style'
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' XML style file'
                 if number > 1:
                     message = message + 's'
             if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['symbol']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' symbol'
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' symbol (QML) files'
                 if number > 1:
                     message = message + 's'
             if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['svg']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['svg']) + ' SVG'
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['svg']) + ' SVG file'
                 if number > 1:
                     message = message + 's'
             if 'models' in config.COLLECTIONS[self._selected_collection_id].keys():

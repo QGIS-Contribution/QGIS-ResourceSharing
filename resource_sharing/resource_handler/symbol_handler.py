@@ -119,7 +119,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         valid = 0
         for item in os.listdir(self.resource_dir):
             file_path = os.path.join(self.resource_dir, item)
-            if fnmatch.fnmatch(file_path, '*.qml') or fnmatch.fnmatch(file_path, '*.xml'):
+            if fnmatch.fnmatch(file_path, '*.xml'):
                 symbol_files.append(file_path)
             valid += 1
 
@@ -129,27 +129,27 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         group_or_tag_id = self._get_parent_group_or_tag()
 
-        # for symbol_file in symbol_files:
-        #     file_name = os.path.splitext(os.path.basename(symbol_file))[0]
-        #     # FIXME: no groups in QGIS3!!!
-        #     child_id = self._get_child_group_tag(group_or_tag_id, file_name)
-        #     # Modify the symbol file first
-        #     self.resolve_dependency(symbol_file)
-        #     # Add all symbols and colorramps and group it
-        #     symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
-        #     for symbol in symbol_xml_extractor.symbols:
-        #         symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
-        #         # self.resolve_dependency(symbol[SYMBOL])
-        #         if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
-        #             self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
-        #                                child_id)
-        #     for colorramp in symbol_xml_extractor.colorramps:
-        #         colorramp_name = '%s (%s)' % (
-        #             colorramp['name'], self.collection_id)
-        #         if self.style.addColorRamp(
-        #                 colorramp_name, colorramp['colorramp'], True):
-        #             self._group_or_tag(
-        #                 QgsStyle.ColorrampEntity, colorramp_name, child_id)
+        for symbol_file in symbol_files:
+            file_name = os.path.splitext(os.path.basename(symbol_file))[0]
+            # FIXME: no groups in QGIS3!!!
+            child_id = self._get_child_group_tag(group_or_tag_id, file_name)
+            # Modify the symbol file first
+            self.resolve_dependency(symbol_file)
+            # Add all symbols and colorramps and group it
+            symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
+            for symbol in symbol_xml_extractor.symbols:
+                symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
+                # self.resolve_dependency(symbol[SYMBOL])
+                if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
+                    self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
+                                       child_id)
+            for colorramp in symbol_xml_extractor.colorramps:
+                colorramp_name = '%s (%s)' % (
+                    colorramp['name'], self.collection_id)
+                if self.style.addColorRamp(
+                        colorramp_name, colorramp['colorramp'], True):
+                    self._group_or_tag(
+                        QgsStyle.ColorrampEntity, colorramp_name, child_id)
         if valid >= 0:
             self.collection[SYMBOL] = valid
 

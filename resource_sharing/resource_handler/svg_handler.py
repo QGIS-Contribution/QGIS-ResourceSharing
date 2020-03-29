@@ -61,11 +61,9 @@ class SVGResourceHandler(BaseResourceHandler):
         We simply just add the path to the collection root directory to search
         path in QGIS.
         """
-        LOGGER.info("Installing SVG 1")
         # Check if the dir exists, pass installing silently if it doesn't exist
         if not os.path.exists(self.resource_dir):
             return
-        LOGGER.info("Installing SVG 2")
         # Add to the search paths for SVG
         search_paths = self.svg_search_paths()
 
@@ -82,7 +80,6 @@ class SVGResourceHandler(BaseResourceHandler):
                 valid += 1
         if valid >= 0:
             self.collection[SVG] = valid
-        LOGGER.info("Installing SVG, installed: " + str(valid))
 
     def uninstall(self):
         """Uninstall the SVGs from QGIS."""

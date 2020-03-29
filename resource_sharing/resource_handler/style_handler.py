@@ -16,10 +16,12 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
     def __init__(self, collection_id):
         """Constructor of the base class."""
+        LOGGER.info("init 'style'")
         BaseResourceHandler.__init__(self, collection_id)
 
     @classmethod
     def dir_name(cls):
+        LOGGER.info("dir_name 'style'")
         return STYLE
 
     def install(self):

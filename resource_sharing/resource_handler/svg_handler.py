@@ -76,7 +76,7 @@ class SVGResourceHandler(BaseResourceHandler):
             file_path = os.path.join(self.resource_dir, item)
             if fnmatch.fnmatch(file_path, '*.svg'):
                 valid += 1
-        if valid > 0:
+        if valid >= 0:
             self.collection[SVG] = valid
 
     def uninstall(self):

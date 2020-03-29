@@ -151,7 +151,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                         colorramp_name, colorramp['colorramp'], True):
                     self._group_or_tag(
                         QgsStyle.ColorrampEntity, colorramp_name, child_id)
-        if valid > 0:
+        if valid >= 0:
             self.collection[SYMBOL] = valid
 
     def uninstall(self):

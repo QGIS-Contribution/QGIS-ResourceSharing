@@ -46,7 +46,6 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             self.resolve_dependency(style_file)
             valid += 1
         if valid > 0:
-            self.refresh_script_provider()
             self.collection[STYLE] = valid
 
     def uninstall(self):

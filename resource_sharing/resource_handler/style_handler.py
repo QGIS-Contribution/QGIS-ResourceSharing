@@ -6,6 +6,7 @@ from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.resource_handler.symbol_resolver_mixin import \
     SymbolResolverMixin
 
+STYLE = 'style'
 
 class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     """Concrete class of the style handler."""
@@ -17,7 +18,7 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
     @classmethod
     def dir_name(cls):
-        return 'style'
+        return STYLE
 
     def install(self):
         """Install the style.
@@ -39,9 +40,14 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         if len(style_files) == 0:
             return
 
+        valid = 0
         for style_file in style_files:
             # Modify the style
             self.resolve_dependency(style_file)
+            valid += 1
+        if valid > 0:
+            self.refresh_script_provider()
+            self.collection[STYLE] = valid
 
     def uninstall(self):
         """Uninstall the style from QGIS."""

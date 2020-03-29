@@ -9,6 +9,7 @@ from resource_sharing.resource_handler.base import BaseResourceHandler
 
 from qgis.core import QgsApplication
 LOGGER = logging.getLogger('QGIS Resource Sharing')
+PROCESSING = 'processing'
 
 
 class ProcessingScriptHandler(BaseResourceHandler):
@@ -21,7 +22,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
     @classmethod
     def dir_name(cls):
-        return 'processing'
+        return PROCESSING
 
     def install(self):
         """Install the processing scripts in the collection.
@@ -51,6 +52,8 @@ class ProcessingScriptHandler(BaseResourceHandler):
                                  str(processing_file) + "'\n" + str(e))
         if valid > 0:
             self.refresh_script_provider()
+            self.collection[PROCESSING] = valid
+
 
     def uninstall(self):
         """Uninstall the processing scripts from processing toolbox."""

@@ -11,6 +11,7 @@ except ImportError:
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.utilities import local_collection_path
 
+SVG = 'svg'
 
 class SVGResourceHandler(BaseResourceHandler):
     """Concrete class of the SVG resource handler."""
@@ -49,7 +50,7 @@ class SVGResourceHandler(BaseResourceHandler):
 
     @classmethod
     def dir_name(cls):
-        return 'svg'
+        return SVG
 
     def install(self):
         """Install the SVGs from this collection in to QGIS.
@@ -68,6 +69,15 @@ class SVGResourceHandler(BaseResourceHandler):
             search_paths.append(local_collection_path())
 
         self.set_svg_search_paths(search_paths)
+
+        valid = 0
+        for item in os.listdir(self.resource_dir):
+            # file_path = self.resource_dir / item)
+            file_path = os.path.join(self.resource_dir, item)
+            if fnmatch.fnmatch(file_path, '*.svg'):
+                valid += 1
+        if valid > 0:
+            self.collection[SVG] = valid
 
     def uninstall(self):
         """Uninstall the SVGs from QGIS."""

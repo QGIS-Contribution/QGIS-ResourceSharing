@@ -456,8 +456,23 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.progress_dialog.hide()
         if self.installer_worker.install_status:
             self.reload_collections_model()
-            message = '%s is installed successfully' % (
+            message = '<b>%s</b> was successfully installed, containing:\n<ul>' % (
                 config.COLLECTIONS[self._selected_collection_id]['name'])
+            if 'rscripts' in config.COLLECTIONS[self._selected_collection_id].keys():
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['rscripts']) + ' R scripts'
+            if 'models' in config.COLLECTIONS[self._selected_collection_id].keys():
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['models']) + ' Models'
+            if 'processing' in config.COLLECTIONS[self._selected_collection_id].keys():
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['processing']) + ' Processing scripts'
+            if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['svg']) + ' SVGs'
+            if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' Symbols'
+            if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' Styles'
+            #if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
+            #    message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['rscripts']) + ' R scripts'
+            message = message + '\n</ul>'
         else:
             message = self.installer_worker.error_message
         QMessageBox.information(self, 'Resource Sharing', message)

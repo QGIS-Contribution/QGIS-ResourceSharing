@@ -58,6 +58,7 @@ class ModelHandler(BaseResourceHandler):
                              str(model_file) + "':\n" + str(e))
         if valid > 0:
             self.refresh_Model_provider()
+            self.collection[MODELS] = valid
 
     def uninstall(self):
         """Uninstall the models from processing toolbox."""

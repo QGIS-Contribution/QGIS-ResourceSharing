@@ -12,6 +12,7 @@ from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 from resource_sharing.resource_handler.symbol_resolver_mixin import \
     SymbolResolverMixin
 
+SYMBOL = 'symbol'
 
 class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     """Concrete class of the Symbol handler."""
@@ -25,7 +26,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
     @classmethod
     def dir_name(self):
-        return 'symbol'
+        return SYMBOL
 
     def _get_parent_group_or_tag(self):
         """Retrieve or create the parent group (QGIS2) or tag (QGIS3) for
@@ -124,6 +125,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         group_or_tag_id = self._get_parent_group_or_tag()
 
+        valid = 0
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             # FIXME: no groups in QGIS3!!!
@@ -136,10 +138,11 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
             for symbol in symbol_xml_extractor.symbols:
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
-                # self.resolve_dependency(symbol['symbol'])
-                if self.style.addSymbol(symbol_name, symbol['symbol'], True):
+                # self.resolve_dependency(symbol[SYMBOL])
+                if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
                     self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
                                        child_id)
+                valid += 1
 
             for colorramp in symbol_xml_extractor.colorramps:
                 colorramp_name = '%s (%s)' % (
@@ -148,6 +151,8 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                         colorramp_name, colorramp['colorramp'], True):
                     self._group_or_tag(
                         QgsStyle.ColorrampEntity, colorramp_name, child_id)
+        if valid > 0:
+            self.collection[SYMBOL] = valid
 
     def uninstall(self):
         """Uninstall the symbols from QGIS."""

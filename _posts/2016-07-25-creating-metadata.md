@@ -44,7 +44,7 @@ author=Anita Graser
 email=anitagraser@gmx.at
 tags=osm,spatialite,google maps,roads
 description=The collection contains a complete resources to create a coherent map that looks similar to the old Google Maps style from OSM data in a SpatiaLite database
-preview=image/osm_spatialite_googlemaps.png, image/osm_spatialite_googlemaps_lines.png
+preview=preview/osm_spatialite_googlemaps.png, preview/osm_spatialite_googlemaps_lines.png
 qgis_minimum_version=2.0
 qgis_maximum_version=3.99
 

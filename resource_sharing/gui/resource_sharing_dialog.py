@@ -460,9 +460,19 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             message = '<b>%s</b> was successfully installed, containing:\n<ul>' % (
                 config.COLLECTIONS[self._selected_collection_id]['name'])
             number = 0
-            if 'rscripts' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['rscripts']
-                message = message + '\n<li> ' + str(number) + ' R script'
+            if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['style']
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' style'
+                if number > 1:
+                    message = message + 's'
+            if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['symbol']
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' symbol'
+                if number > 1:
+                    message = message + 's'
+            if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['svg']
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['svg']) + ' SVG'
                 if number > 1:
                     message = message + 's'
             if 'models' in config.COLLECTIONS[self._selected_collection_id].keys():
@@ -475,19 +485,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['processing']) + ' processing script'
                 if number > 1:
                     message = message + 's'
-            if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['svg']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['svg']) + ' SVG'
-                if number > 1:
-                    message = message + 's'
-            if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['symbol']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' symbol'
-                if number > 1:
-                    message = message + 's'
-            if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['style']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' style'
+            if 'rscripts' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['rscripts']
+                message = message + '\n<li> ' + str(number) + ' R script'
                 if number > 1:
                     message = message + 's'
             message = message + '\n</ul>'

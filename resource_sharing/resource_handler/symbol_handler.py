@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import fnmatch
+import logging
 
 try:
     from qgis.core import QgsStyleV2 as QgsStyle
@@ -12,6 +13,7 @@ from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 from resource_sharing.resource_handler.symbol_resolver_mixin import \
     SymbolResolverMixin
 
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 SYMBOL = 'symbol'
 
 class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
@@ -26,6 +28,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
     @classmethod
     def dir_name(self):
+        LOGGER.info("dir_name 'symbol'")
         return SYMBOL
 
     def _get_parent_group_or_tag(self):
@@ -105,13 +108,16 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         each xml file and save all the symbols and colorramp defined that xml
         file into that child group.
         """
+        LOGGER.info("Installing symbol 1")
         # Check if the dir exists, pass installing silently if it doesn't exist
         if not os.path.exists(self.resource_dir):
             return
 
+        LOGGER.info("Installing symbol 2")
         # Uninstall first in case of reinstalling
         self.uninstall()
 
+        LOGGER.info("Installing symbol 3")
         # Get all the symbol xml files under resource dirs
         symbol_files = []
         for item in os.listdir(self.resource_dir):
@@ -119,6 +125,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             if fnmatch.fnmatch(file_path, '*.xml'):
                 symbol_files.append(file_path)
 
+        LOGGER.info("Installing symbol 4")
         # If there's no symbol files don't do anything
         if len(symbol_files) == 0:
             return
@@ -153,6 +160,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                         QgsStyle.ColorrampEntity, colorramp_name, child_id)
         if valid >= 0:
             self.collection[SYMBOL] = valid
+        LOGGER.info("Installing symbol, valid: " + str(valid))
 
     def uninstall(self):
         """Uninstall the symbols from QGIS."""

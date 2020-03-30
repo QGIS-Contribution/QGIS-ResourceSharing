@@ -1,5 +1,7 @@
 # coding=utf-8
 import os
+import fnmatch
+import logging
 
 from qgis.PyQt.QtCore import QSettings
 from qgis.core import QgsSettings
@@ -11,18 +13,20 @@ except ImportError:
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.utilities import local_collection_path
 
+SVG = 'svg'
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 class SVGResourceHandler(BaseResourceHandler):
-    """Concrete class of the SVG resource handler."""
+    """The SVG resource handler class."""
     IS_DISABLED = False
 
     def __init__(self, collection_id):
-        """Constructor of the base class."""
+        """Base class constructor."""
         BaseResourceHandler.__init__(self, collection_id)
 
     @classmethod
     def svg_search_paths(cls):
-        """Return a list of SVG paths read from settings"""
+        """Read the SVG paths from settings"""
         # settings = QSettings()
         settings = QgsSettings()
         search_paths_str = settings.value('svg/searchPathsForSVG')
@@ -39,7 +43,7 @@ class SVGResourceHandler(BaseResourceHandler):
 
     @classmethod
     def set_svg_search_paths(cls, paths):
-        """Set a list of SVG paths read from settings"""
+        """Write the list of SVG paths to settings"""
         # settings = QSettings()
         settings = QgsSettings()
         if Qgis.QGIS_VERSION_INT < 29900:
@@ -49,18 +53,17 @@ class SVGResourceHandler(BaseResourceHandler):
 
     @classmethod
     def dir_name(cls):
-        return 'svg'
+        return SVG
 
     def install(self):
-        """Install the SVGs from this collection in to QGIS.
+        """Install the SVGs from this collection.
 
-        We simply just add the path to the collection root directory to search
-        path in QGIS.
+        We just add the collection root directory path to the
+        SVG search path.
         """
         # Check if the dir exists, pass installing silently if it doesn't exist
         if not os.path.exists(self.resource_dir):
             return
-
         # Add to the search paths for SVG
         search_paths = self.svg_search_paths()
 
@@ -69,9 +72,19 @@ class SVGResourceHandler(BaseResourceHandler):
 
         self.set_svg_search_paths(search_paths)
 
+        # Count the SVGs
+        valid = 0
+        for item in os.listdir(self.resource_dir):
+            # file_path = self.resource_dir / item)
+            file_path = os.path.join(self.resource_dir, item)
+            if fnmatch.fnmatch(file_path, '*.svg'):
+                valid += 1
+        if valid >= 0:
+            self.collection[SVG] = valid
+
     def uninstall(self):
         """Uninstall the SVGs from QGIS."""
-        # Remove from the searchPaths if the dir empty of collection
+        # Remove from the SVG search paths if the directory is empty
         search_paths = self.svg_search_paths()
         collection_directories = os.listdir(local_collection_path())
 

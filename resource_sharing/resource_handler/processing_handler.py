@@ -9,6 +9,7 @@ from resource_sharing.resource_handler.base import BaseResourceHandler
 
 from qgis.core import QgsApplication
 LOGGER = logging.getLogger('QGIS Resource Sharing')
+PROCESSING = 'processing'
 
 
 class ProcessingScriptHandler(BaseResourceHandler):
@@ -21,15 +22,15 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
     @classmethod
     def dir_name(cls):
-        return 'processing'
+        return PROCESSING
 
     def install(self):
-        """Install the processing scripts in the collection.
+        """Install the processing scripts of the collection.
 
-        We copy the processing scripts exist in the processing dir to the
-        user's processing scripts directory and refresh the provider.
+        We copy the processing scripts to the user's processing
+        scripts directory, and refresh the provider.
         """
-        # Check if the dir exists, pass installing silently if it doesn't exist
+        # Pass silently if the directory does not exist
         if not os.path.exists(self.resource_dir):
             return
 
@@ -42,24 +43,37 @@ class ProcessingScriptHandler(BaseResourceHandler):
 
         valid = 0
         for processing_file in processing_files:
-            # Install silently the processing file
-                try:
-                    shutil.copy(processing_file, self.scripts_folder())
-                    valid += 1
-                except OSError as e:
-                    LOGGER.error("Could not copy script '" +
+            # Install the processing file silently
+            try:
+                shutil.copy(processing_file, self.scripts_folder())
+                valid += 1
+            except OSError as e:
+                LOGGER.error("Could not copy script '" +
                                  str(processing_file) + "'\n" + str(e))
         if valid > 0:
             self.refresh_script_provider()
+            self.collection[PROCESSING] = valid
 
     def uninstall(self):
         """Uninstall the processing scripts from processing toolbox."""
-        # Remove the script files containing substring collection_id
-        for item in os.listdir(self.scripts_folder()):
-            if fnmatch.fnmatch(item, '*%s*' % self.collection_id):
+        # if not Path(self.resource_dir).exists():
+        if not os.path.exists(self.resource_dir):
+            return
+        # Remove the processing script files that are present in this
+        # collection
+        for item in os.listdir(self.resource_dir):
+            # file_path = self.resource_dir / item)
+            file_path = os.path.join(self.resource_dir, item)
+            if fnmatch.fnmatch(file_path, '*%s*' % self.collection_id):
                 script_path = os.path.join(self.scripts_folder(), item)
                 if os.path.exists(script_path):
                     os.remove(script_path)
+
+        #for item in os.listdir(self.scripts_folder()):
+        #    if fnmatch.fnmatch(item, '*%s*' % self.collection_id):
+        #        script_path = os.path.join(self.scripts_folder(), item)
+        #        if os.path.exists(script_path):
+        #            os.remove(script_path)
 
         self.refresh_script_provider()
 

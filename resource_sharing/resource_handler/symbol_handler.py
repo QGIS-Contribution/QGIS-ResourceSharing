@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import fnmatch
+import logging
 
 try:
     from qgis.core import QgsStyleV2 as QgsStyle
@@ -12,6 +13,8 @@ from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 from resource_sharing.resource_handler.symbol_resolver_mixin import \
     SymbolResolverMixin
 
+LOGGER = logging.getLogger('QGIS Resource Sharing')
+SYMBOL = 'symbol'
 
 class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     """Concrete class of the Symbol handler."""
@@ -20,154 +23,187 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     def __init__(self, collection_id):
         """Constructor of the base class."""
         BaseResourceHandler.__init__(self, collection_id)
-        # Init the default style
+        # Initialize with the default style
         self.style = QgsStyle.defaultStyle()
 
     @classmethod
     def dir_name(self):
-        return 'symbol'
+        return SYMBOL
 
     def _get_parent_group_or_tag(self):
-        """Retrieve or create the parent group (QGIS2) or tag (QGIS3) for
-        the styles returns the group or tag id."""
+        """Retrieve or create the parent group (for QGIS2)
+        or parent tag (for QGIS3) for the styles.
+        Returns the id of the (existing or new) group or tag."""
         parent_group_name = '%s (%s)' % (
             self.collection['name'], self.collection_id)
         try:
+            # QGIS 2
             group = self.style.groupId(parent_group_name)
             if group != 0:
                 return group
             return self.style.addGroup(parent_group_name)
         except AttributeError:
-            tag = self.style.tagId(parent_group_name)
-            if tag != 0:
-                return tag
-            return self.style.addTag(parent_group_name)
+            # not QGIS 2, so hopefully QGIS 3
+            #tag = self.style.tagId(parent_group_name)
+            #if tag != 0:
+            #    return tag
+            #return self.style.addTag(parent_group_name)
+            # We don't want to create an empty "parent" tag
+            return None
 
     def _get_child_group_tag(self, group_or_tag_id, file_name):
-        """Retrieve or create the child group (QGIS2) or the parent tag for
-        (QGIS3, no hierarchy) for the styles, returns the group or parent tag
-        id with a slash and the file_name as a way to fake a tree within QGIS3.
+        """Retrieve or create the child group (for QGIS2) or the tag
+        (QGIS3, no hierarchy) for the styles.
+        Returns the id of the group or tag id.
+        Use a slash and the file_name as a way of simulating a tree
+        in QGIS3.
         """
         try:
+            # QGIS 2
             group = self.style.groupId(file_name)
             if group != 0:
                 return group
             return self.style.addGroup(file_name, group_or_tag_id)
         except AttributeError:
-            tag_name = self.style.tag(group_or_tag_id) + '/' + file_name
+            # not QGIS 2, so hopefully QGIS 3
+            #tag_name = self.style.tag(group_or_tag_id) + '/' + file_name
+            tag_name = ('%s (%s)/') % (self.collection['name'], self.collection_id) + file_name
             tag = self.style.tagId(tag_name)
             if tag != 0:
                 return tag
             return self.style.addTag(tag_name)
 
     def _get_child_groups_tags_ids(self):
-        """Retrieve child groups (QGIS2) or tags (QGIS3) ids."""
+        """Retrieve ids for the child groups (for QGIS2) or tags (for QGIS3)."""
         parent_group_name = '%s (%s)' % (
             self.collection['name'], self.collection_id)
         try:
+            # QGIS 2
             return [self.style.groupId(n) for n in
                     self.style.childGroupNames(parent_group_name)]
         except AttributeError:
+            # not QGIS 2, so hopefully QGIS 3
             return [self.style.tagId(tag) for tag in self.style.tags()
                     if tag.find(parent_group_name) == 0]
 
     def _get_symbols_for_group_or_tag(self, symbol_type,
                                       child_group_or_tag_id):
-        """Return all symbols names in the group id (QGIS2) or tag id
-        (QGIS3)."""
+        """Return all the symbols for the given group (QGIS2) or tag
+        (QGIS3) id."""
         try:
+            # QGIS 2
             return self.style.symbolsOfGroup(
                 QgsStyle.SymbolEntity, child_group_or_tag_id)
         except AttributeError:
+            # not QGIS 2, so hopefully QGIS 3
             return self.style.symbolsWithTag(
                 QgsStyle.SymbolEntity, child_group_or_tag_id)
 
     def _group_or_tag(self, symbol_type, symbol_name, tag_or_group):
-        """Add to group (QGIS2) or tag (QGIS3)."""
+        """Add the symbol to a group (QGIS2) or tag the symbol (QGIS3)."""
         try:
+            # QGIS 2
             self.style.group(QgsStyle.SymbolEntity, symbol_name, tag_or_group)
         except AttributeError:
+            # not QGIS 2, so hopefully QGIS 3
             self.style.tagSymbol(QgsStyle.SymbolEntity, symbol_name,
                                  [self.style.tag(tag_or_group)])
 
     def _group_or_tag_remove(self, group_or_tag_id):
-        """Remove a group or tag."""
+        """Remove a group (QGIS 2) or tag (QGIS 3)."""
         try:
+            # QGIS 2
             self.style.remove(QgsStyle.GroupEntity, group_or_tag_id)
         except AttributeError:
-            self.style.remove(QgsStyle.TagEntity, group_or_tag_id)
+            # not QGIS 2, so hopefully QGIS 3
+            if group_or_tag_id is not None:
+                self.style.remove(QgsStyle.TagEntity, group_or_tag_id)
 
     def install(self):
-        """Install the symbol and collection from this collection into QGIS.
+        """Install the symbols from this collection in the QGIS default style.
 
-        We create a group with the name of the collection, a child group for
-        each xml file and save all the symbols and colorramp defined that xml
-        file into that child group.
+        For QGIS 2, a group with the name of the collection is created,
+        and for each of the XML files in the collection, a child group
+        is created, where the symbols and colorramps defined in the XML
+        file are stored.
+        For QGIS 3, for each of the XML files in the collection, a tag
+        is created, and the tag is used for the symbols and colorramps
+        defined in that XML file.
         """
-        # Check if the dir exists, pass installing silently if it doesn't exist
+        # Skip installation if the directory does not exist
         if not os.path.exists(self.resource_dir):
             return
 
-        # Uninstall first in case of reinstalling
+        # Uninstall first (in case it is a reinstall)
         self.uninstall()
 
-        # Get all the symbol xml files under resource dirs
+        # Get all the symbol XML files in the collection
         symbol_files = []
+        valid = 0
         for item in os.listdir(self.resource_dir):
             file_path = os.path.join(self.resource_dir, item)
             if fnmatch.fnmatch(file_path, '*.xml'):
                 symbol_files.append(file_path)
+            valid += 1
+            #LOGGER.info('Symbol file: ' + file_path)
 
-        # If there's no symbol files don't do anything
+        # If there are no symbol files, there is nothing to do
         if len(symbol_files) == 0:
             return
 
+        # Only relevant for QGIS 2!
         group_or_tag_id = self._get_parent_group_or_tag()
+        #LOGGER.info('ID: ' + str(group_or_tag_id))
 
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
-            # FIXME: no groups in QGIS3!!!
-
-            child_id = self._get_child_group_tag(group_or_tag_id, file_name)
-            # Modify the symbol file first
+            # Groups in QGIS2, tags in QGIS3...
+            groupOrTag_id = self._get_child_group_tag(group_or_tag_id, file_name)
+            #LOGGER.info('groupOrTag_id: ' + str(groupOrTag_id))
+            # Modify the symbol file to fix image and SVG paths
             self.resolve_dependency(symbol_file)
-            # Add all symbols and colorramps and group it
+            # Add all symbols and colorramps and group / tag them
             symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
-
             for symbol in symbol_xml_extractor.symbols:
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
-                # self.resolve_dependency(symbol['symbol'])
-                if self.style.addSymbol(symbol_name, symbol['symbol'], True):
+                #LOGGER.info('symbol_name: ' + symbol_name)
+                # self.resolve_dependency(symbol[SYMBOL])
+                if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
                     self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
-                                       child_id)
-
+                                       groupOrTag_id)
             for colorramp in symbol_xml_extractor.colorramps:
                 colorramp_name = '%s (%s)' % (
                     colorramp['name'], self.collection_id)
+                #LOGGER.info('colorramp_name: ' + colorramp_name)
                 if self.style.addColorRamp(
                         colorramp_name, colorramp['colorramp'], True):
                     self._group_or_tag(
-                        QgsStyle.ColorrampEntity, colorramp_name, child_id)
+                        QgsStyle.ColorrampEntity, colorramp_name, groupOrTag_id)
+            #LOGGER.info('XML file: ' + file_name + ' Symbols: ' + str(len(symbol_xml_extractor.symbols)) + ' ColorRamps: ' + str(len(symbol_xml_extractor.colorramps)))
+
+        if valid >= 0:
+            self.collection[SYMBOL] = valid
 
     def uninstall(self):
         """Uninstall the symbols from QGIS."""
-        # Get the parent group id
+        # Get the parent group id (not relevant for QGIS 3)
         group_or_tag_id = self._get_parent_group_or_tag()
+        # Get the ids of the groups / tags that contain symbols
         child_groups_or_tags_ids = self._get_child_groups_tags_ids()
         for child_group_id in child_groups_or_tags_ids:
-            # Get all the symbol from this child group and remove them
+            # Get all the symbol from this tag / child group and remove them
             symbols = self._get_symbols_for_group_or_tag(
                 QgsStyle.SymbolEntity, child_group_id)
             for symbol in symbols:
                 self.style.removeSymbol(symbol)
-            # Get all the colorramps and remove them
+            # Get all the colorramps for this tag / child group and remove them
             colorramps = self._get_symbols_for_group_or_tag(
                 QgsStyle.ColorrampEntity, child_group_id)
             for colorramp in colorramps:
                 self.style.removeColorRamp(colorramp)
 
-            # Remove this child group
+            # Remove this tag / child group
             self._group_or_tag_remove(child_group_id)
 
-        # Remove parent group:
+        # Remove parent group (only relevant for QGIS 3):
         self._group_or_tag_remove(group_or_tag_id)

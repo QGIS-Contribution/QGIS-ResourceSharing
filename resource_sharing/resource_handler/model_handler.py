@@ -35,7 +35,7 @@ class ModelHandler(BaseResourceHandler):
         Resource Sharing collection to the user's processing
         model directory and refresh the provider.
         """
-        # Check if the dir exists, return silently if it doesn't
+        # Return silently if the directory does not exist
         # if Path(self.resource_dir).exists():
         if not os.path.exists(self.resource_dir):
             return
@@ -58,6 +58,7 @@ class ModelHandler(BaseResourceHandler):
                              str(model_file) + "':\n" + str(e))
         if valid > 0:
             self.refresh_Model_provider()
+            self.collection[MODELS] = valid
 
     def uninstall(self):
         """Uninstall the models from processing toolbox."""

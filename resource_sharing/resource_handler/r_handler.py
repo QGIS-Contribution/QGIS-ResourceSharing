@@ -63,9 +63,10 @@ class RScriptHandler(BaseResourceHandler):
                              "'\n" + str(e))
         if valid > 0:
             self.refresh_Rscript_provider()
+            self.collection[RSCRIPTS_FOLDER] = valid
 
     def uninstall(self):
-        """Uninstall the r scripts from processing toolbox."""
+        """Uninstall the R scripts from processing toolbox."""
         # if not Path(self.resource_dir).exists():
         if not os.path.exists(self.resource_dir):
             return
@@ -77,7 +78,6 @@ class RScriptHandler(BaseResourceHandler):
                 script_path = os.path.join(self.RScripts_folder(), item)
                 if os.path.exists(script_path):
                     os.remove(script_path)
-
         self.refresh_Rscript_provider()
 
     def refresh_Rscript_provider(self):

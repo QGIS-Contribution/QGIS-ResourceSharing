@@ -456,8 +456,41 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.progress_dialog.hide()
         if self.installer_worker.install_status:
             self.reload_collections_model()
-            message = '%s is installed successfully' % (
+            # Report what has been installed
+            message = '<b>%s</b> was successfully installed, containing:\n<ul>' % (
                 config.COLLECTIONS[self._selected_collection_id]['name'])
+            number = 0
+            if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['style']
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' Layer style (QML) file'
+                if number > 1:
+                    message = message + 's'
+            if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['symbol']
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' XML symbol file'
+                if number > 1:
+                    message = message + 's'
+            if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['svg']
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['svg']) + ' SVG file'
+                if number > 1:
+                    message = message + 's'
+            if 'models' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['models']
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['models']) + ' model'
+                if number > 1:
+                    message = message + 's'
+            if 'processing' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['processing']
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['processing']) + ' processing script'
+                if number > 1:
+                    message = message + 's'
+            if 'rscripts' in config.COLLECTIONS[self._selected_collection_id].keys():
+                number = config.COLLECTIONS[self._selected_collection_id]['rscripts']
+                message = message + '\n<li> ' + str(number) + ' R script'
+                if number > 1:
+                    message = message + 's'
+            message = message + '\n</ul>'
         else:
             message = self.installer_worker.error_message
         QMessageBox.information(self, 'Resource Sharing', message)

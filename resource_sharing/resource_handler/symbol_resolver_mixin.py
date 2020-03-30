@@ -9,18 +9,20 @@ from resource_sharing.utilities import path_leaf
 
 
 class SymbolResolverMixin(object):
-    """Mixin for Resources Handler that need to resolve image symbol path."""
+    """Mixin for Resources Handler that need to resolve SVG
+    and image symbol paths."""
 
     def resolve_dependency(self, xml_path):
-        """Modify the xml and resolve the resources dependency.
+        """Modify the XML and resolve dependencies.
 
-        We need to update any path dependency of downloaded symbol so that
-        the path points to the right path after it's installed.
+        Update paths to downloaded symbol so that the paths
+        point to the right location.
 
-        For now, we only update the svg/image path to the svg/ directory of
-        the collection if the svg exists.
+        For now, we only update the svg/image paths to the
+        svg directory of the collection if the SVG file exists
+        there.
 
-        :param xml_path: The path to the style xml file.
+        :param xml_path: The path to the XML style file.
         :type xml_path: str
         """
         with open(xml_path, 'rb') as xml_file:
@@ -36,14 +38,15 @@ class SymbolResolverMixin(object):
 def fix_xml_node(xml, collection_path, search_paths):
     """Loop through the XML nodes to resolve the SVG and image paths.
 
-    :param xml: The xml string of the symbol (or full xml symbols definition)
+    :param xml: The XML string of the symbol (or full XML symbol definition)
     :type xml: str
 
-    :param collection_path: The downloaded collection path in local so we
-        know where to lookup the image/svg inside the collection.
+    :param collection_path: The downloaded collection local file
+        system path, where can lookup the images/SVGs of the
+        collection.
     :type collection_path: str
 
-    :param search_paths: List of paths to search the image/svg path.
+    :param search_paths: List of paths to search for images/SVGs.
     :type search_paths: str
     """
     root = ET.fromstring(xml)
@@ -61,27 +64,27 @@ def fix_xml_node(xml, collection_path, search_paths):
 def resolve_path(path, collection_path, search_paths):
     """Try to resolve the SVG and image path.
 
-    This is the procedure to check it by order:
-        * It might be a full local path, check if it exists
-        * It might be a url (either local file system or http(s))
-        * Check in the 'svg' collection path
-        * Check in the 'image' collection path
+    This is the procedure to check it:
+        * It might be a complete local file system path, check if it exists
+        * It might be a URL (either local file system or http(s))
+        * Check in the 'svg' directory of the collection
+        * Check in the 'image' directory of the collection
         * Check in the search_paths
 
     :param path: The original path.
     :type path: str
 
-    :param collection_path: The downloaded collection path in local.
+    :param collection_path: The local file system path for the collection.
     :type collection_path: str
 
-    :param search_paths: List of paths to search the image/svg path
+    :param search_paths: List of paths to search for images/SVGs.
     :type search_paths: str
     """
-    # It might be a full path
+    # It might be a complete local file system path
     if QFile(path).exists():
         return QFileInfo(path).canonicalFilePath()
 
-    # It might be a url
+    # It might be a URL
     if '://' in path:
         url = QUrl(path)
         if url.isValid() and url.scheme() != '':
@@ -91,21 +94,21 @@ def resolve_path(path, collection_path, search_paths):
                 if QFile(path).exists():
                     return QFileInfo(path).canonicalFilePath()
             else:
-                # URL to pointing to online resource
+                # URL pointing to online resource
                 return path
 
-    # Check in the svg collection path
+    # Check in the 'svg' directory of the collection
     file_name = path_leaf(path)
     svg_collection_path = os.path.join(collection_path, 'svg', file_name)
     if QFile(svg_collection_path).exists():
         return QFileInfo(svg_collection_path).canonicalFilePath()
 
-    # Check in the image collection path
+    # Check in the 'image' directory of the collection
     image_collection_path = os.path.join(collection_path, 'image', file_name)
     if QFile(image_collection_path).exists():
         return QFileInfo(image_collection_path).canonicalFilePath()
 
-    # Still not found, check in the search_paths
+    # Still not found, check the search_paths
     for search_path in search_paths:
         local_path = os.path.join(search_path, path)
         if QFile(local_path).exists():

@@ -6,17 +6,19 @@ author=Akbar Gumbira, Håvard Tveite
 qgisMinimumVersion=3.0
 description=Download shared collections
 about=Search for published collections and install them for use with QGIS. Symbology (SVG, images, styles), Processing scripts, Processing models and R scripts are supported. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S).
-version=0.12.0
+version=0.13.0
 tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing.git
 
 qgisMaximumVersion=3.99
-tags=collections,processing,algorithms,Python,R,model,script,style,svg,symbol,sharing,repository,design,maps
+tags=collections,sharing,processing,algorithms,Python,R,model,script,style,svg,symbol,repository,design,maps
 homepage=http://qgis-contribution.github.io/QGIS-ResourceSharing/
 experimental=False
 deprecated=False
 icon=resources/icon.png
 changelog=
+        0.13.0 - Provide installation summary (#6)
+               - Avoid (parent) tag with no members in QGIS 3 style documents (#101)
         0.12.0 - Make font sizes OK on HiDPI systems (#3)
                - Disable editing and removal of "official" repositories in Settings (#93)
                - Avoid ResourceWarning when installing a collection (#95)

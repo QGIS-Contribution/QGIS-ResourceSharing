@@ -41,10 +41,11 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 return group
             return self.style.addGroup(parent_group_name)
         except AttributeError:
-            tag = self.style.tagId(parent_group_name)
-            if tag != 0:
-                return tag
-            return self.style.addTag(parent_group_name)
+            #tag = self.style.tagId(parent_group_name)
+            #if tag != 0:
+            #    return tag
+            #return self.style.addTag(parent_group_name)
+            return None
 
     def _get_child_group_tag(self, group_or_tag_id, file_name):
         """Retrieve or create the child group (QGIS2) or the parent tag for
@@ -57,7 +58,8 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 return group
             return self.style.addGroup(file_name, group_or_tag_id)
         except AttributeError:
-            tag_name = self.style.tag(group_or_tag_id) + '/' + file_name
+            #tag_name = self.style.tag(group_or_tag_id) + '/' + file_name
+            tag_name = ('%s (%s)/') % (self.collection['name'], self.collection_id) + file_name
             tag = self.style.tagId(tag_name)
             if tag != 0:
                 return tag

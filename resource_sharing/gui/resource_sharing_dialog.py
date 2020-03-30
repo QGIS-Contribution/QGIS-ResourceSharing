@@ -462,12 +462,12 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             number = 0
             if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['style']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' XML style file'
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' Layer style (QML) file'
                 if number > 1:
                     message = message + 's'
             if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['symbol']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' symbol (QML) file'
+                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' XML symbol file'
                 if number > 1:
                     message = message + 's'
             if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():

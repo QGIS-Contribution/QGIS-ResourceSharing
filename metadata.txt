@@ -21,6 +21,7 @@ changelog=
                - Disable editing and removal of "official" repositories in Settings (#93)
                - Avoid ResourceWarning when installing a collection (#95)
                - Stop using the collection name for naming directories (#99)
+               - Fixed parsing metadata issue - byte decoding (#41)
                - Update dulwich to v0.19.15
                - Update of bootstrap to v4.4.1
                - Update jquery to v3.4.1

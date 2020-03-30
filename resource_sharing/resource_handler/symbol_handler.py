@@ -114,9 +114,6 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         # Uninstall first in case of reinstalling
         self.uninstall()
 
-        LOGGER.info('Symbol - exiting...')
-        return
-
         # Get all the symbol xml files under resource dirs
         symbol_files = []
         valid = 0
@@ -125,12 +122,17 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             if fnmatch.fnmatch(file_path, '*.xml'):
                 symbol_files.append(file_path)
             valid += 1
+            LOGGER.info('Symbol file: ' + file_path)
 
         # If there's no symbol files don't do anything
         if len(symbol_files) == 0:
             return
 
         group_or_tag_id = self._get_parent_group_or_tag()
+
+        LOGGER.info('ID: ' + group_or_tag_id)
+        return
+
 
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]

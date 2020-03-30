@@ -100,7 +100,8 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         try:
             self.style.remove(QgsStyle.GroupEntity, group_or_tag_id)
         except AttributeError:
-            self.style.remove(QgsStyle.TagEntity, group_or_tag_id)
+            if group_or_tag_id is not None:
+                self.style.remove(QgsStyle.TagEntity, group_or_tag_id)
 
     def install(self):
         """Install the symbol and collection from this collection into QGIS.

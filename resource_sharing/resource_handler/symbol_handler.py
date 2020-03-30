@@ -111,6 +111,9 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         if not os.path.exists(self.resource_dir):
             return
 
+        LOGGING.info('Symbol - exiting...')
+        return
+
         # Uninstall first in case of reinstalling
         self.uninstall()
 
@@ -129,10 +132,10 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         group_or_tag_id = self._get_parent_group_or_tag()
 
-        # QGIS version 2 symbol file (<qgis_style version="1">)
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             # FIXME: no groups in QGIS3!!!
+            # QGIS version 2 symbol file (<qgis_style version="1">)
             child_id = self._get_child_group_tag(group_or_tag_id, file_name)
             # Modify the symbol file first
             self.resolve_dependency(symbol_file)

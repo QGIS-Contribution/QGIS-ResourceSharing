@@ -130,7 +130,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         group_or_tag_id = self._get_parent_group_or_tag()
 
-        LOGGER.info('ID: ' + group_or_tag_id)
+        LOGGER.info('ID: ' + str(group_or_tag_id))
         return
 
 

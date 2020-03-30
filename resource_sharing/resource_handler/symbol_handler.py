@@ -111,11 +111,11 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         if not os.path.exists(self.resource_dir):
             return
 
-        LOGGING.info('Symbol - exiting...')
-        return
-
         # Uninstall first in case of reinstalling
         self.uninstall()
+
+        LOGGER.info('Symbol - exiting...')
+        return
 
         # Get all the symbol xml files under resource dirs
         symbol_files = []

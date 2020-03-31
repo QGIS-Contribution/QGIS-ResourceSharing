@@ -341,7 +341,6 @@
                   <property name="margin">
                    <number>0</number>
                   </property>
-                  <item>
                    <widget class="QWebView" name="web_view_details" native="true">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -553,19 +552,6 @@
                      </item>
                     </layout>
                    </widget>
-                  </item>
-                  <item>
-                   <spacer name="verticalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                  </layout>
                 </widget>

@@ -342,7 +342,7 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QWebView" name="web_view_details">
+                   <widget class="QWebView" name="web_view_details" native="true">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -355,7 +355,7 @@
                       <height>0</height>
                      </size>
                     </property>
-                    <property name="url">
+                    <property name="url" stdset="0">
                      <url>
                       <string>about:blank</string>
                      </url>

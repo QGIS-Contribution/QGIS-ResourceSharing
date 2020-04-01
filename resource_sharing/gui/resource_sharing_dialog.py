@@ -522,14 +522,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                          config.COLLECTIONS[coll_id]['name'])
         else:
             self.reload_collections_model()
-<<<<<<< HEAD
             currentRow = self.menu_list_widget.currentRow()
             self.set_current_tab(currentRow)
             self.set_current_tab(0)
-=======
-            currentPage = self.stacked_menu_widget.getCurrentIndex(1)
-            self.set_current_tab(currentPage)
->>>>>>> testing
             QMessageBox.information(
                 self,
                 'Resource Sharing',

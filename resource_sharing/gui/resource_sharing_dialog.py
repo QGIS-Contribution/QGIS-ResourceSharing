@@ -209,8 +209,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 # Set the web view
                 title = self.tr('Installed Collections')
                 description = self.tr(
-                    'To the left you see the list of installed '
-                    'collections')
+                    'On the left you see the list of all the '
+                    'installed collections.')
             else:
                 # All collections (0)
                 self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS

@@ -524,7 +524,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.reload_collections_model()
             currentRow = self.menu_list_widget.currentRow()
             self.set_current_tab(currentRow)
-            self.set_current_tab(0)
+            #self.set_current_tab(0)
             QMessageBox.information(
                 self,
                 'Resource Sharing',

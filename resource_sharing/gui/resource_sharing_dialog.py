@@ -197,10 +197,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # Clear message bar first
         self.message_bar.clearWidgets()
         if index == (self.menu_list_widget.count() - 1):
-            # Switch to settings tab
+            # Switch to the settings page
             self.stacked_menu_widget.setCurrentIndex(1)
         else:
-            # Switch to plugins tab
+            # Switch to the collections page
             if index == 1:
                 # Installed
                 self.collection_proxy.accepted_status = \
@@ -522,7 +522,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             LOGGER.error('Could not uninstall collection ' +
                          config.COLLECTIONS[coll_id]['name'])
         else:
+            self._selected_collection_id = None
             self.reload_collections_model()
+            self.set_current_tab(0)
             QMessageBox.information(
                 self,
                 'Resource Sharing',

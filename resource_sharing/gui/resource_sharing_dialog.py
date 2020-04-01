@@ -197,12 +197,12 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # Clear message bar first
         self.message_bar.clearWidgets()
         if index == (self.menu_list_widget.count() - 1):
-            # Switch to the settings page
+            # Last entry in the menu list - switch to settings
             self.stacked_menu_widget.setCurrentIndex(1)
         else:
-            # Switch to the collections page
+            # Switch to collections
             if index == 1:
-                # Installed
+                # Installed collections
                 self.collection_proxy.accepted_status = \
                     COLLECTION_INSTALLED_STATUS
                 # Set the web view
@@ -211,7 +211,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     'On the left you see the list of all collections '
                     'installed on your QGIS')
             else:
-                # All
+                # All collections
                 self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
                 # Set the web view
                 title = self.tr('All Collections')
@@ -523,7 +523,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                          config.COLLECTIONS[coll_id]['name'])
         else:
             self.reload_collections_model()
-            currentPage = self.stacked_menu_widget.currentIndex()
+            currentPage = self.menu_list_widget.currentRow()
             self.set_current_tab(currentPage)
             QMessageBox.information(
                 self,

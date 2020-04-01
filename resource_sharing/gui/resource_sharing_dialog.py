@@ -197,17 +197,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # Clear message bar first
         self.message_bar.clearWidgets()
         if index == (self.menu_list_widget.count() - 1):
-<<<<<<< HEAD
             # Last menu entry - Settings
             self.stacked_menu_widget.setCurrentIndex(1)
         else:
             # Not settings, must be Collections
-=======
-            # Last entry in the menu list - switch to settings
-            self.stacked_menu_widget.setCurrentIndex(1)
-        else:
-            # Switch to collections
->>>>>>> testing
             if index == 1:
                 # Installed collections
                 self.collection_proxy.accepted_status = \

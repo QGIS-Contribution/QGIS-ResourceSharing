@@ -93,3 +93,13 @@ class SVGResourceHandler(BaseResourceHandler):
                 search_paths.remove(local_collection_path())
 
         self.set_svg_search_paths(search_paths)
+
+        if not os.path.exists(self.resource_dir):
+            return
+        # Remove the SVGs from the collection
+        for item in os.listdir(self.resource_dir):
+            # file_path = self.resource_dir / item)
+            file_path = os.path.join(self.resource_dir, item)
+            if fnmatch.fnmatch(file_path, '*.svg'):
+                os.remove(file_path)
+

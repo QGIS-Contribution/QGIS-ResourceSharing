@@ -110,7 +110,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_open.setEnabled(False)
         self.button_uninstall.setEnabled(False)
 
-        # Set QListWidgetItem
+        # Set QListWidgetItem - "main menu"
         # All
         icon_all = QIcon()
         icon_all.addFile(
@@ -120,7 +120,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             QIcon.Off)
         item_all = QListWidgetItem()
         item_all.setIcon(icon_all)
-        item_all.setText(self.tr('All'))
+        item_all.setText(self.tr('All collections'))
         # Installed
         icon_installed = QIcon()
         icon_installed.addFile(
@@ -130,7 +130,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             QIcon.Off)
         item_installed = QListWidgetItem()
         item_installed.setIcon(icon_installed)
-        item_installed.setText(self.tr('Installed'))
+        item_installed.setText(self.tr('Installed collections'))
         item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         # Settings
         icon_settings = QIcon()
@@ -197,28 +197,27 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # Clear message bar first
         self.message_bar.clearWidgets()
         if index == (self.menu_list_widget.count() - 1):
-            # Switch to settings tab
+            # Last menu entry - Settings
             self.stacked_menu_widget.setCurrentIndex(1)
         else:
-            # Switch to plugins tab
+            # Not settings, must be Collections
             if index == 1:
-                # Installed
+                # Installed collections
                 self.collection_proxy.accepted_status = \
                     COLLECTION_INSTALLED_STATUS
                 # Set the web view
                 title = self.tr('Installed Collections')
                 description = self.tr(
-                    'On the left you see the list of all collections '
-                    'installed on your QGIS')
+                    'To the left you see the list of installed '
+                    'collections')
             else:
-                # All
+                # All collections (0)
                 self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
                 # Set the web view
                 title = self.tr('All Collections')
                 description = self.tr(
-                    'On the left you see the list of all collections '
-                    'available from the repositories registered in the '
-                    'settings.')
+                    'To the left you see the list of available '
+                    'collections')
 
             context = {
                 'resources_path': resources_path(),
@@ -523,6 +522,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                          config.COLLECTIONS[coll_id]['name'])
         else:
             self.reload_collections_model()
+            currentRow = self.menu_list_widget.currentRow()
+            self.set_current_tab(currentRow)
             QMessageBox.information(
                 self,
                 'Resource Sharing',

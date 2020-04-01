@@ -523,7 +523,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                          config.COLLECTIONS[coll_id]['name'])
         else:
             self.reload_collections_model()
-            currentPage = self.stacked_menu_widget.currentIndex(1)
+            currentPage = self.stacked_menu_widget.currentIndex()
             self.set_current_tab(currentPage)
             QMessageBox.information(
                 self,

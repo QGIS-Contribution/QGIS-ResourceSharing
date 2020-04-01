@@ -522,7 +522,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             LOGGER.error('Could not uninstall collection ' +
                          config.COLLECTIONS[coll_id]['name'])
         else:
-            self._selected_collection_id = None
             self.reload_collections_model()
             QMessageBox.information(
                 self,

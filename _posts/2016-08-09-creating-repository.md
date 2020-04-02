@@ -71,71 +71,72 @@ choose this option:
   * Each collection must be zipped.  The zip file of a collection
     must be named <name of collection>.zip, and the zip shall combine
     the subdirectories of the collection (one or more of `image`,
-    `models`, `processing`, `rscripts`, `svg` and `symbol`).
+    `models`, `processing`, `rscripts`, `svg` and `symbol`), in
+    addition to a `preview` subdirectory for preview images.
 
     For example, if you have a collection named ```test_collection```,
-    the collection must exist in:
+    the collection must be present as:
     ```http://www.mydomain.com/qgisrepository/collections/test_collection.zip```,
-    and the structure of the zip file must be (only include directories
-    that resources you want to share):
+    and the structure of this zip file must be (only include directories
+    that contain resources you would like to share):
 
             test_collection.zip
             ├── image
             ├── models
+            ├── preview
             ├── processing
             ├── rscripts
             ├── svg
             ├── symbol
     
   
-  * The location of the preview images are relative to the collection
-    base URL. As an example, if you define preview images in
-    metadata (```preview=preview/prev1.png```), you have to place the
-    previews for collection ```test_collection``` in this URL:
-    ```http://www.mydomain.com/qgisrepository/collections/test_collection/preview/prev1.png```
+  * Preview images that illustrates the collection should be included.
+    If you define preview images for collection ```test_collection```
+    in metadata (```preview=preview/prev1.png,prev2.png```), you have
+    to place the these previews in the zip-file in a separate directory
+    - `preview` is the recommended name for that directory.
     
     An example server directory setup for the repository
     `myfirstrepository` with one collection (`test_collection`)
-    that contains resources to share in all resource categories:
+    that contains resources to share in a lot of resource categories:
 
-        myfirstrepository
+        qgisrepository
         ├── metadata.ini
         └── collections
-            ├── test_collection.zip
-            │   ├── image
-            |   |   ├── image1.png
-            |   |   ├── ...
-            |   |   └── lastimage.png
-            │   ├── models
-            |   |   ├── firstmodel.model3
-            |   |   ├── ...
-            |   |   └── testmodel.model3
-            │   ├── processing
-            |   |   ├── firstscript.py
-            |   |   ├── ...
-            |   |   └── testscript.py
-            │   ├── rscripts
-            |   |   ├── firstRscript.rsx
-            |   |   ├── ...
-            |   |   ├── testRscript.rsx
-            |   |   ├── firstRscript.rsx.help
-            |   |   ├── ...
-            |   |   └── testRscript.rsx.help
-            │   ├── style
-            |   |   ├── firstlayerstyle.qml
-            |   |   ├── ...
-            |   |   └── testlayerstyle.qml
-            │   ├── svg
-            |   |   ├── firstmodel.model3
-            |   |   ├── ...
-            |   |   └── testmodel.model3
-            │   └── symbol
-            |   |   ├── firststyle.xml
-            |   |   ├── ...
-            |   |   └── teststyle.xml
-            └── test_collection
-                └── preview
-                    └── prev1.png
+            └── test_collection.zip
+                ├── image
+                |   ├── image1.png
+                |   ├── ...
+                |   └── lastimage.png
+                ├── models
+                |   ├── firstmodel.model3
+                |   ├── ...
+                |   └── testmodel.model3
+                ├── preview
+                |   └── prev1.png
+                ├── processing
+                |   ├── firstscript.py
+                |   ├── ...
+                |   └── testscript.py
+                ├── rscripts
+                |   ├── firstRscript.rsx
+                |   ├── ...
+                |   ├── testRscript.rsx
+                |   ├── firstRscript.rsx.help
+                |   ├── ...
+                |   └── testRscript.rsx.help
+                ├── style
+                |   ├── firstlayerstyle.qml
+                |   ├── ...
+                |   └── testlayerstyle.qml
+                ├── svg
+                |   ├── firstmodel.model3
+                |   ├── ...
+                |   └── testmodel.model3
+                └── symbol
+                    ├── firststyle.xml
+                    ├── ...
+                    └── teststyle.xml
 
     The repository URL to be used when adding the repository (in the
     *QGIS Resource Sharing* plugin):

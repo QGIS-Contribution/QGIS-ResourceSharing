@@ -49,11 +49,12 @@ for your repository.
 **Local File System**
 
 This is even simpler. After preparing the repository, you can use 
-it right away. In the ```Settings``` tab, try to add a repository with URL 
-pointing to the repository root in your local machine.
+it right away. In the ```Settings``` tab, you add a repository with URL 
+pointing to the repository root in your local machine (absolute path,
+example: `file:/home/user/QGIS-collections/mycollection`).
 It's as simple as that.
 If there is a problem with metadata or other issues when adding the 
-repository, the tools will tell you.
+repository, you will be told.
 
 
 **Your Own Server**

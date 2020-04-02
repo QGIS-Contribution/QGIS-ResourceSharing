@@ -64,21 +64,84 @@ collections available for your customers.
 There are some additional requirements that you need to be aware of if you
 choose this option:
 
-  * The URL structure of the repository. If your base repository URL 
-    is ```http://www.akbargumbira.com/repository```, you must make the 
+  * The URL structure of the repository. If your repository URL 
+    is ```http://www.mydomain.com/qgisrepository/```, you must make the 
     metadata available on:
-    ```http://www.akbargumbira.com/repository/metadata.ini```
-  * The collections must be in zip format. For example, if you have a 
-    collection named ```test_collection```, the collection must exist in: 
-    ```http://www.akbargumbira.com/repository/collections/test_collection.zip```
-  * The preview images are relative to the collection base URL. As an example,
-   if you define the preview images in the metadata
-   (```preview=preview/prev1.png, preview/prev2.png```), you have to make the
-   previews available for collection ```test_collection``` in this URL:
-   ```http://www.akbargumbira.com/repository/collections/test_collection/preview/prev1.png```
-   and
-   ```http://www.akbargumbira.com/repository/collections/test_collection/preview/prev2.png```
+    ```http://www.mydomain.com/qgisrepository/metadata.ini```
+  * Each collection must be zipped.  The zip file of a collection
+    must be named <name of collection>.zip, and the zip shall combine
+    the subdirectories of the collection (one or more of `image`,
+    `models`, `processing`, `rscripts`, `svg` and `symbol`).
+
+    For example, if you have a collection named ```test_collection```,
+    the collection must exist in:
+    ```http://www.mydomain.com/qgisrepository/collections/test_collection.zip```,
+    and the structure of the zip file must be (only include directories
+    that resources you want to share):
+
+            test_collection.zip
+            ├── image
+            ├── models
+            ├── processing
+            ├── rscripts
+            ├── svg
+            ├── symbol
+    
+  
+  * The location of the preview images are relative to the collection
+    base URL. As an example, if you define preview images in
+    metadata (```preview=preview/prev1.png```), you have to place the
+    previews for collection ```test_collection``` in this URL:
+    ```http://www.mydomain.com/qgisrepository/collections/test_collection/preview/prev1.png```
+    
+    An example server directory setup for the repository
+    `myfirstrepository` with one collection (`test_collection`)
+    that contains resources to share in all resource categories:
+
+        myfirstrepository
+        ├── metadata.ini
+        └── collections
+            ├── test_collection.zip
+            │   ├── image
+            |   |   ├── image1.png
+            |   |   ├── ...
+            |   |   └── lastimage.png
+            │   ├── models
+            |   |   ├── firstmodel.model3
+            |   |   ├── ...
+            |   |   └── testmodel.model3
+            │   ├── processing
+            |   |   ├── firstscript.py
+            |   |   ├── ...
+            |   |   └── testscript.py
+            │   ├── rscripts
+            |   |   ├── firstRscript.rsx
+            |   |   ├── ...
+            |   |   ├── testRscript.rsx
+            |   |   ├── firstRscript.rsx.help
+            |   |   ├── ...
+            |   |   └── testRscript.rsx.help
+            │   ├── style
+            |   |   ├── firstlayerstyle.qml
+            |   |   ├── ...
+            |   |   └── testlayerstyle.qml
+            │   ├── svg
+            |   |   ├── firstmodel.model3
+            |   |   ├── ...
+            |   |   └── testmodel.model3
+            │   └── symbol
+            |   |   ├── firststyle.xml
+            |   |   ├── ...
+            |   |   └── teststyle.xml
+            └── test_collection
+                └── preview
+                    └── prev1.png
+
+    The repository URL to be used when adding the repository (in the
+    *QGIS Resource Sharing* plugin):
+    
+        http://www.mydomain.com/qgisrepository/
 
 You can also use authentication for this repository.
-In the  plugin, users can configure authentication details so that they will
-be able to fetch the repository and the collections inside.
+Users can configure authentication details in the plugin, so that they
+will be able to fetch the repository and the collections inside.

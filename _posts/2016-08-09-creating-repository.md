@@ -93,7 +93,7 @@ choose this option:
   * Preview images that illustrates the collection should be included.
     If you define preview images for collection ```test_collection```
     in metadata (```preview=preview/prev1.png,prev2.png```), you have
-    to place the these previews in the zip-file in a separate directory
+    to place these preview images in the zip-file in a separate directory
     - `preview` is the recommended name for that directory.
     
     An example server directory setup for the repository
@@ -113,7 +113,8 @@ choose this option:
                 |   ├── ...
                 |   └── testmodel.model3
                 ├── preview
-                |   └── prev1.png
+                |   ├── prev1.png
+                |   └── prev2.png
                 ├── processing
                 |   ├── firstscript.py
                 |   ├── ...

@@ -180,8 +180,11 @@ class RepositoryManager(QObject):
             try:
                 collections = repo_handler.parse_metadata()
             except MetadataError as me:
-                LOGGER.warning("Error parsing metadata for " +
-                               str(repo_name) + ":\n" + str(me))
+                metadata_warning = "Error parsing metadata for " \
+                               str(new_repo_name) + ":\n" + str(me)
+                LOGGER.warning(metadata_warning)
+                return False, metadata_warning
+
             # Add the repo and the collections
             self._repositories[repo_name] = collections
             self.rebuild_collections()
@@ -236,7 +239,7 @@ class RepositoryManager(QObject):
             try:
                 new_collections = repo_handler.parse_metadata()
             except MetadataError as me:
-                metadata_warning = "Error parsing metadata for " \ 
+                metadata_warning = "Error parsing metadata for " \
                                str(new_repo_name) + ":\n" + str(me)
                 LOGGER.warning(metadata_warning)
                 return(False, metadata_warning)

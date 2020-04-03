@@ -23,7 +23,7 @@
 import logging
 
 from qgis.PyQt import uic
-from qgis.PyQt.Qt import QSize
+from qgis.PyQt.Qt import QSize, QFont
 from qgis.PyQt.QtCore import (
     Qt, QSettings, pyqtSlot, QRegExp, QUrl, QThread)
 
@@ -82,7 +82,8 @@ from resource_sharing import config
 
 FORM_CLASS, _ = uic.loadUiType(ui_path('resource_sharing_dialog_base.ui'))
 LOGGER = logging.getLogger('QGIS Resource Sharing')
-
+REPOSITORY_ITEM = 1000
+COLLECTION_ITEM = 2000
 
 class ResourceSharingDialog(QDialog, FORM_CLASS):
     TAB_ALL = 0
@@ -208,16 +209,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 # Set the web view
                 title = self.tr('Installed Collections')
                 description = self.tr(
-                    'To the left you see the list of installed '
-                    'collections')
+                    'On the left you see the list of all the '
+                    'installed collections.')
             else:
                 # All collections (0)
                 self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
                 # Set the web view
                 title = self.tr('All Collections')
                 description = self.tr(
-                    'To the left you see the list of available '
-                    'collections')
+                    'On the left you see a list of all the collections '
+                    'that are available from the registered repositories.<br> '
+                    'Installed collections are emphasized (in <b>bold</b>).')
 
             context = {
                 'resources_path': resources_path(),
@@ -498,6 +500,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.installer_thread.quit()
         self.installer_thread.wait()
         self.installer_thread.deleteLater()
+        self.populate_repositories_widget()
 
     def install_canceled(self):
         self.progress_dialog.hide()
@@ -528,6 +531,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self,
                 'Resource Sharing',
                 'The collection was successfully uninstalled!')
+            self.populate_repositories_widget()
 
     def open_collection(self):
         """Slot for when user clicks 'Open' button."""
@@ -549,13 +553,28 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         """Populate the current dictionary repositories to the tree widget."""
         # Clear the current tree widget
         self.tree_repositories.clear()
-
+        installed_collections = \
+            self.collection_manager.get_installed_collections()
         # Export the updated ones from the repository manager
         for repo_name in self.repository_manager.directories:
             url = self.repository_manager.directories[repo_name]['url']
-            item = QTreeWidgetItem(self.tree_repositories)
+            item = QTreeWidgetItem(self.tree_repositories, REPOSITORY_ITEM)
             item.setText(0, repo_name)
             item.setText(1, url)
+            for coll_id in config.COLLECTIONS:
+                if ('repository_name' in config.COLLECTIONS[coll_id].keys() and
+                    config.COLLECTIONS[coll_id]['repository_name'] == repo_name):
+                    coll_name = config.COLLECTIONS[coll_id]['name']
+                    coll_tags = config.COLLECTIONS[coll_id]['tags']
+                    collectionItem = QTreeWidgetItem(item, COLLECTION_ITEM)
+                    collitemtext = coll_name
+                    if installed_collections and coll_id in installed_collections.keys():
+                       collitemtext = coll_name + ' (installed)'
+                       collectionFont = QFont()
+                       collectionFont.setWeight(60)
+                       collectionItem.setFont(0, collectionFont)
+                    collectionItem.setText(0, collitemtext)
+                    collectionItem.setText(1, coll_tags)
         self.tree_repositories.resizeColumnToContents(0)
         self.tree_repositories.resizeColumnToContents(1)
         self.tree_repositories.sortItems(1, Qt.AscendingOrder)
@@ -563,6 +582,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
     def reload_collections_model(self):
         """Reload the collections model with the current collections."""
         self.collections_model.clear()
+        installed_collections = \
+            self.collection_manager.get_installed_collections()
         for id in config.COLLECTIONS:
             collection_name = config.COLLECTIONS[id]['name']
             collection_author = config.COLLECTIONS[id]['author']
@@ -580,27 +601,38 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             item.setData(collection_author, COLLECTION_AUTHOR_ROLE)
             item.setData(collection_tags, COLLECTION_TAGS_ROLE)
             item.setData(collection_status, COLLECTION_STATUS_ROLE)
+            if installed_collections and id in installed_collections.keys():
+                collectionFont = QFont()
+                collectionFont.setWeight(60)
+                item.setFont(collectionFont)
             self.collections_model.appendRow(item)
         self.collections_model.sort(0, Qt.AscendingOrder)
 
     def on_tree_repositories_itemSelectionChanged(self):
         """Slot for the itemSelectionChanged signal of tree_repositories."""
         selected_item = self.tree_repositories.currentItem()
-        if selected_item:
-            repo_name = selected_item.text(0)
-        if not repo_name:
-            return
-        if not repo_name in self.repository_manager.directories.keys():
-            return
-        repo_url = self.repository_manager.directories[repo_name]['url']
-        # Disable the edit and delete buttons for "official" repositories
-        if repo_url in self.repository_manager._online_directories.values():
+        if selected_item and selected_item.type() == REPOSITORY_ITEM:
+            if selected_item:
+                repo_name = selected_item.text(0)
+            if not repo_name:
+                return
+            if not repo_name in self.repository_manager.directories.keys():
+                return
+            repo_url = self.repository_manager.directories[repo_name]['url']
+            # Disable the edit and delete buttons for "official" repositories
+            if repo_url in self.repository_manager._online_directories.values():
+                self.button_edit.setEnabled(False)
+                self.button_delete.setEnabled(False)
+            else:
+                # Activate the edit and delete buttons
+                self.button_edit.setEnabled(True)
+                self.button_delete.setEnabled(True)
+        elif selected_item and selected_item.type() == COLLECTION_ITEM:
             self.button_edit.setEnabled(False)
             self.button_delete.setEnabled(False)
         else:
-            # Activate the edit and delete buttons
-            self.button_edit.setEnabled(True)
-            self.button_delete.setEnabled(True)
+            self.button_edit.setEnabled(False)
+            self.button_delete.setEnabled(False)
 
     def on_list_view_collections_clicked(self, index):
         """Slot for when the list_view_collections is clicked."""

@@ -39,7 +39,7 @@ class CollectionInstaller(QObject):
     def run(self):
         self.progress.emit('Downloading the collection...')
 
-        # We can't really kill the process here, so let's finish it even when
+        # We can't kill the process here, so let's finish it even when
         # user cancels the download process
         download_status, error_message = self._collection_manager.download(
             self._collection_id)
@@ -100,12 +100,12 @@ class CollectionManager(object):
         return render_template('collection_details.html', context)
 
     def get_installed_collections(self, repo_url=None):
-        """Get all installed collections of a given repository url.
+        """Get all installed collections for a given repository URL.
 
-        If repository url is not specified, it will return all the installed
+        If a URL is not specified, it will return all the installed
         collections.
 
-        :param repo_url: The repository url.
+        :param repo_url: The repository URL.
         :type repo_url: str
 
         :return: Subset of config.COLLECTIONS that meet the requirement
@@ -157,12 +157,12 @@ class CollectionManager(object):
             COLLECTION_INSTALLED_STATUS
 
     def uninstall(self, collection_id):
-        """Uninstall the collection from QGIS.
+        """Uninstall the collection.
 
         :param collection_id: The id of the collection about to be uninstalled.
         :type collection_id: str
         """
-        # Uninstall all type of resources from QGIS
+        # Uninstall all types of resources
         for resource_handler in BaseResourceHandler.registry.values():
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.uninstall()

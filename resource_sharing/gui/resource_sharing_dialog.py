@@ -438,8 +438,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.reload_data_and_widget()
 
     def install_collection(self):
-        """Slot for when user clicks download button."""
-        self.show_progress_dialog('Starting installation process...')
+        """Slot for when the user clicks the install/reinstall button."""
+        self.show_progress_dialog('Starting installation...')
         self.progress_dialog.canceled.connect(self.install_canceled)
 
         self.installer_thread = QThread()
@@ -516,11 +516,11 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.progress_dialog.setLabelText(text)
 
     def uninstall_collection(self):
-        """Slot called when user clicks uninstall button."""
+        """Slot called when user clicks the uninstall button."""
+        coll_id = self._selected_collection_id
         try:
-            self.collection_manager.uninstall(self._selected_collection_id)
+            self.collection_manager.uninstall(coll_id)
         except Exception as e:
-            coll_id = self._selected_collection_id
             LOGGER.error('Could not uninstall collection ' +
                          config.COLLECTIONS[coll_id]['name'])
         else:

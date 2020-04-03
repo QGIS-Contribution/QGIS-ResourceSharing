@@ -172,6 +172,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
 
         dest_dir = local_collection_path(id)
         if os.path.exists(dest_dir):
+            # Remove the existing collection directory
             shutil.rmtree(dest_dir)
         shutil.copytree(src_dir, dest_dir)
 

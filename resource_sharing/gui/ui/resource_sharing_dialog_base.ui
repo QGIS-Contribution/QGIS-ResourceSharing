@@ -158,12 +158,12 @@
           <number>0</number>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="page_collections">
           <layout class="QVBoxLayout" name="verticalLayout_13">
            <property name="leftMargin">
-            <number>2</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
             <number>0</number>
@@ -414,7 +414,13 @@
          </widget>
          <widget class="QWidget" name="page_settings">
           <layout class="QGridLayout" name="gridLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
            <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item row="0" column="0">
@@ -465,17 +471,20 @@
                   <property name="topMargin">
                    <number>0</number>
                   </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QGroupBox" name="groupBox">
                     <property name="title">
-                     <string>Collection Repositories</string>
+                     <string>Repositories (and their collections)</string>
                     </property>
                     <property name="flat">
                      <bool>true</bool>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_5">
                      <property name="leftMargin">
-                      <number>6</number>
+                      <number>0</number>
                      </property>
                      <item>
                       <widget class="QTreeWidget" name="tree_repositories">
@@ -486,7 +495,7 @@
                        </column>
                        <column>
                         <property name="text">
-                         <string>URL</string>
+                         <string>Repository URL / Collection tags</string>
                         </property>
                        </column>
                       </widget>
@@ -522,14 +531,14 @@
                           <string>Add a new collection repository</string>
                          </property>
                          <property name="text">
-                          <string>Add...</string>
+                          <string>Add repository...</string>
                          </property>
                         </widget>
                        </item>
                        <item>
                         <widget class="QPushButton" name="button_edit">
                          <property name="text">
-                          <string>Edit...</string>
+                          <string>Edit repository...</string>
                          </property>
                         </widget>
                        </item>
@@ -539,7 +548,7 @@
                           <string>Remove the selected repository</string>
                          </property>
                          <property name="text">
-                          <string>Delete</string>
+                          <string>Delete repository</string>
                          </property>
                         </widget>
                        </item>
@@ -547,19 +556,6 @@
                      </item>
                     </layout>
                    </widget>
-                  </item>
-                  <item>
-                   <spacer name="verticalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                  </layout>
                 </widget>

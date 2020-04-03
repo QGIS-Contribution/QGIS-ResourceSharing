@@ -223,9 +223,9 @@ class RepositoryManager(QObject):
         # Fetch the metadata from the new url
         repo_handler = BaseRepositoryHandler.get_handler(new_url)
         if repo_handler is None:
-            LOGGER.warning("No handler available for URL '" +
-                           str(new_url) + "'!")
-
+            repo_warning = "No handler for URL '" + str(new_url) + "'!"
+            LOGGER.warning(repo_warning)
+            return(False, repo_warning)
         if new_auth_cfg:
             repo_handler.auth_cfg = new_auth_cfg
 
@@ -235,10 +235,12 @@ class RepositoryManager(QObject):
             # Parse metadata
             try:
                 new_collections = repo_handler.parse_metadata()
-            except MetadataError:
-                # raise
-                LOGGER.warning("Error parsing metadata for " +
-                               str(new_repo_name) + ":\n" + str(me))
+            except MetadataError as me:
+                metadata_warning = "Error parsing metadata for " \ 
+                               str(new_repo_name) + ":\n" + str(me)
+                LOGGER.warning(metadata_warning)
+                return(False, metadata_warning)
+                # raise MetadataError(metadata_warning)
             old_collections = self._repositories.get(old_repo_name, [])
             # Get all the installed collections from the old repository
             installed_old_collections = []
@@ -246,33 +248,35 @@ class RepositoryManager(QObject):
                 if old_collection['status'] == COLLECTION_INSTALLED_STATUS:
                     installed_old_collections.append(old_collection)
 
-            # Beware of the installed collections
-            # Old collection exists in the new URL are identified by its
-            # register name. Cases for installed collections:
+            # Handling installed collections
+            # An old collection that is present in the new URL are
+            # identified by its register name.
+            # Cases for installed collections:
             # 1. Old collection exists in the new URL, same URL: use the new
-            # one, update the status to INSTALLED
+            # one, else: update the status to INSTALLED
             # 2. Old collection exists in the new URL, different URL: keep them
             # both (add the old one). Because they should be treated as
             # different collection
             # 3. Old collection doesn't exist in the new URL, same URL: keep
             # the old collection
             # 4. Old collection doesn't exist in the new URL, different URL:
-            # same with 3
+            # same as 3
             for installed_collection in installed_old_collections:
                 reg_name = installed_collection['register_name']
                 is_present = False
 
                 for collection in new_collections:
+                    # Look for collections that are already present
                     if collection['register_name'] == reg_name:
+                        # Already present
                         is_present = True
                         if old_url == new_url:
+                            # Set the status to installed
                             collection['status'] = COLLECTION_INSTALLED_STATUS
                         else:
+                            # Different repository URLs, so append
                             new_collections.append(installed_collection)
                         break
-
-                # Get to this point could be because it's present or the old
-                # installed collection doesn't exist in the new URL
                 if not is_present:
                     new_collections.append(installed_collection)
 

@@ -102,4 +102,4 @@ class SVGResourceHandler(BaseResourceHandler):
             file_path = os.path.join(self.resource_dir, item)
             if fnmatch.fnmatch(file_path, '*.svg'):
                 os.remove(file_path)
-
+        os.rmdir(self.resource_dir)

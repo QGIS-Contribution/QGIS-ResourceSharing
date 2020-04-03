@@ -64,4 +64,5 @@ class RemoteZipHandler(BaseRepositoryHandler):
         return True, None
 
     def file_url(self, relative_path):
+        LOGGER.info('file_url: ' + urljoin(self.url, relative_path))
         return urljoin(self.url, relative_path)

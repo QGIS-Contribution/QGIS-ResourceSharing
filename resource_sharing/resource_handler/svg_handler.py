@@ -74,11 +74,16 @@ class SVGResourceHandler(BaseResourceHandler):
 
         # Count the SVGs
         valid = 0
-        for item in os.listdir(self.resource_dir):
-            # file_path = self.resource_dir / item)
-            file_path = os.path.join(self.resource_dir, item)
-            if fnmatch.fnmatch(file_path, '*.svg'):
+
+        for dirpath, dirnames, filenames in os.walk(self.resource_dir):
+            for filename in [f for f in filenames if f.lower().endswith(".svg")]:
                 valid += 1
+
+        #for item in os.listdir(self.resource_dir):
+        #    # file_path = self.resource_dir / item)
+        #    file_path = os.path.join(self.resource_dir, item)
+        #    if fnmatch.fnmatch(file_path, '*.svg'):
+        #        valid += 1
         if valid >= 0:
             self.collection[SVG] = valid
 

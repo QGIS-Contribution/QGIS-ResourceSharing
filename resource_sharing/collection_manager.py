@@ -93,6 +93,54 @@ class CollectionManager(object):
         :param collection_id: The id of the collection
         :type collection_id: str
         """
+        html = ''
+        resource_types = 0
+        if 'svg' in config.COLLECTIONS[collection_id].keys():
+           html = html + str(config.COLLECTIONS[collection_id]['svg']) + ' SVG'
+           if config.COLLECTIONS[collection_id]['svg'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'style' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['style']) + ' Layer style'
+           if config.COLLECTIONS[collection_id]['style'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'symbol' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol'
+           if config.COLLECTIONS[collection_id]['symbol'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'models' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['models']) + ' Processing model'
+           if config.COLLECTIONS[collection_id]['models'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'processing' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['processing']) + ' Processing script'
+           if config.COLLECTIONS[collection_id]['processing'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'rscripts' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['rscripts']) + ' R script'
+           if config.COLLECTIONS[collection_id]['rscripts'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if resource_types == 0:
+           html = 'No resources available'
+        if config.COLLECTIONS[collection_id]['status'] != COLLECTION_INSTALLED_STATUS:
+           html = 'Unknown before installation'
+
+        config.COLLECTIONS[collection_id]['resources_html'] = html
         context = {
             'resources_path': resources_path(),
             'collection': config.COLLECTIONS[collection_id]

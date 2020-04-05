@@ -522,7 +522,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.collection_manager.uninstall(coll_id)
         except Exception as e:
             LOGGER.error('Could not uninstall collection ' +
-                         config.COLLECTIONS[coll_id]['name'] + str(e))
+                         config.COLLECTIONS[coll_id]['name'] + ':\n' + str(e))
         else:
             self.reload_collections_model()
             currentRow = self.menu_list_widget.currentRow()

@@ -82,13 +82,13 @@ class SVGResourceHandler(BaseResourceHandler):
             self.collection[SVG] = valid
 
     def uninstall(self):
-        """Uninstall the SVGs from QGIS."""
+        """Uninstall the SVGs."""
         if not os.path.exists(self.resource_dir):
             return
         # Remove from the SVG search paths if there are no SVGs left
         # in any collection
         # Remove now, to enable SVG search path update
-        shutil.rmtree(collection_dir)
+        shutil.rmtree(local_collection_path())
         svgCount = 0
         for dirpath, dirnames, filenames in os.walk(local_collection_path()):
             for filename in [f for f in filenames if f.lower().endswith(".svg")]:

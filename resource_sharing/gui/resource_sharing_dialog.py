@@ -503,7 +503,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.populate_repositories_widget()
 
         # Update the GUI
-        on_list_view_collections_clicked(self._selected_collection_id)
+        self.on_list_view_collections_clicked(self._selected_collection_id)
         #currentRow = self.menu_list_widget.currentRow()
         #self.set_current_tab(currentRow)
         #self.populate_repositories_widget()

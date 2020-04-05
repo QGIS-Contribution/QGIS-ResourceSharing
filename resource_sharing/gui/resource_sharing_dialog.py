@@ -502,6 +502,11 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.installer_thread.deleteLater()
         self.populate_repositories_widget()
 
+        # Update the UI
+        currentRow = self.menu_list_widget.currentRow()
+        self.set_current_tab(currentRow)
+        self.populate_repositories_widget()
+
     def install_canceled(self):
         self.progress_dialog.hide()
         self.show_progress_dialog('Cancelling installation...')

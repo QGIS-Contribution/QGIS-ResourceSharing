@@ -502,6 +502,12 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.installer_thread.deleteLater()
         self.populate_repositories_widget()
 
+        # Update the buttons
+        self.button_install.setEnabled(True)
+        self.button_install.setText('Reinstall')
+        self.button_open.setEnabled(True)
+        self.button_uninstall.setEnabled(True)
+
         # Update the GUI
         self.show_collection_metadata(self._selected_collection_id)
 
@@ -540,6 +546,20 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 'Resource Sharing',
                 'The collection was successfully uninstalled!')
             self.populate_repositories_widget()
+
+            status = config.COLLECTIONS[self._selected_collection_id]['status']
+            is_installed = status == COLLECTION_INSTALLED_STATUS
+            if is_installed:
+                self.button_install.setEnabled(True)
+                self.button_install.setText('Reinstall')
+                self.button_open.setEnabled(True)
+                self.button_uninstall.setEnabled(True)
+            else:
+                self.button_install.setEnabled(True)
+                self.button_install.setText('Install')
+                self.button_open.setEnabled(False)
+                self.button_uninstall.setEnabled(False)
+
 
     def open_collection(self):
         """Slot for when user clicks 'Open' button."""

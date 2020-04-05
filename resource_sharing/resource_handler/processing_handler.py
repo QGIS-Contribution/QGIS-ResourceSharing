@@ -68,13 +68,6 @@ class ProcessingScriptHandler(BaseResourceHandler):
                 script_path = os.path.join(self.scripts_folder(), item)
                 if os.path.exists(script_path):
                     os.remove(script_path)
-
-        #for item in os.listdir(self.scripts_folder()):
-        #    if fnmatch.fnmatch(item, '*%s*' % self.collection_id):
-        #        script_path = os.path.join(self.scripts_folder(), item)
-        #        if os.path.exists(script_path):
-        #            os.remove(script_path)
-
         self.refresh_script_provider()
 
     def refresh_script_provider(self):

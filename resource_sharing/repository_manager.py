@@ -239,8 +239,8 @@ class RepositoryManager(QObject):
             try:
                 new_collections = repo_handler.parse_metadata()
             except MetadataError as me:
-                metadata_warning = "Error parsing metadata for " \
-                               str(new_repo_name) + ":\n" + str(me)
+                metadata_warning = ("Error parsing metadata for " +
+                                    str(new_repo_name) + ":\n" + str(me))
                 LOGGER.warning(metadata_warning)
                 return(False, metadata_warning)
                 # raise MetadataError(metadata_warning)

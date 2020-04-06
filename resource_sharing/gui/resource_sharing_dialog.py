@@ -439,6 +439,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
     def install_collection(self):
         """Slot for when the user clicks the install/reinstall button."""
+        # Save the current index to enable selection after installation
+        self.current_index = self.list_view_collections.currentIndex()
         self.show_progress_dialog('Starting installation...')
         self.progress_dialog.canceled.connect(self.install_canceled)
 
@@ -502,6 +504,11 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.installer_thread.deleteLater()
         self.populate_repositories_widget()
 
+        # Set the selection
+        oldRow = self.current_index.row()
+        newIndex = self.collections_model.createIndex(oldRow, 0)
+        self.list_view_collections.selectionModel().select(newIndex, self.list_view_collections.selectionModel().ClearAndSelect)
+
         # Update the buttons
         self.button_install.setEnabled(True)
         self.button_install.setText('Reinstall')
@@ -531,6 +538,11 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
     def uninstall_collection(self):
         """Slot called when user clicks the uninstall button."""
+        # Get the index of the selected item (=current item)
+        current_index = self.list_view_collections.currentIndex()
+        #LOGGER.info('current_index, row: ' + str(current_index.row()))
+        #selected_item = self.list_view_collections.selectedIndexes()[0]
+        #selected_row = selected_item.row()
         coll_id = self._selected_collection_id
         try:
             self.collection_manager.uninstall(coll_id)
@@ -547,6 +559,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 'The collection was successfully uninstalled!')
             self.populate_repositories_widget()
 
+            # Set the selection
+            newRow = current_index.row()
+            #newRow = selected_row
+            if newRow == self.collections_model.rowCount() - 1:
+               newRow = newRow - 1
+            newIndex = self.collections_model.createIndex(newRow, 0)
+            self.list_view_collections.selectionModel().select(newIndex, self.list_view_collections.selectionModel().ClearAndSelect)
+            # Not entirely correct...
+            self.show_collection_metadata(self._selected_collection_id)
+
+            # Update buttons
             status = config.COLLECTIONS[self._selected_collection_id]['status']
             is_installed = status == COLLECTION_INSTALLED_STATUS
             if is_installed:
@@ -559,7 +582,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.button_install.setText('Install')
                 self.button_open.setEnabled(False)
                 self.button_uninstall.setEnabled(False)
-
 
     def open_collection(self):
         """Slot for when user clicks 'Open' button."""

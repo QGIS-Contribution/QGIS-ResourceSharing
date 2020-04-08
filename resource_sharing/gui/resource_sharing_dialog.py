@@ -562,32 +562,39 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 'The collection was successfully uninstalled!')
             self.populate_repositories_widget()
 
-            # Set the current (and selected) row in the listview
-            newRow = uninstall_index.row()
-            # Check if the last element was uninstalled
             rowCount = self.collection_proxy.rowCount()
-            if newRow == rowCount:
-               newRow = newRow - 1
-            # Select the new current element
-            newIndex = self.collections_model.createIndex(newRow, 0)
-            selection_model = self.list_view_collections.selectionModel()
-            selection_model.setCurrentIndex(newIndex, selection_model.ClearAndSelect)
-            # Get the id of the current collection
-            proxyModel = self.list_view_collections.model()
-            proxyIndex = proxyModel.index(newRow,0)
-            current_coll_id = proxyIndex.data(COLLECTION_ID_ROLE)
-            # Update the web_view_details frame
-            self.show_collection_metadata(current_coll_id)
-            # Update buttons
-            status = config.COLLECTIONS[self._selected_collection_id]['status']
-            is_installed = status == COLLECTION_INSTALLED_STATUS
-            if is_installed:
-                self.button_install.setEnabled(True)
-                self.button_install.setText('Reinstall')
-                self.button_open.setEnabled(True)
-                self.button_uninstall.setEnabled(True)
+            if rowCount > 0:
+                # Set the current (and selected) row in the listview
+                newRow = uninstall_index.row()
+                # Check if the last element was uninstalled
+                rowCount = self.collection_proxy.rowCount()
+                if newRow == rowCount:
+                   newRow = newRow - 1
+                # Select the new current element
+                newIndex = self.collections_model.createIndex(newRow, 0)
+                selection_model = self.list_view_collections.selectionModel()
+                selection_model.setCurrentIndex(newIndex, selection_model.ClearAndSelect)
+                # Get the id of the current collection
+                proxyModel = self.list_view_collections.model()
+                proxyIndex = proxyModel.index(newRow,0)
+                current_coll_id = proxyIndex.data(COLLECTION_ID_ROLE)
+                # Update the web_view_details frame
+                self.show_collection_metadata(current_coll_id)
+                # Update buttons
+                status = config.COLLECTIONS[self._selected_collection_id]['status']
+                is_installed = status == COLLECTION_INSTALLED_STATUS
+                if is_installed:
+                    self.button_install.setEnabled(True)
+                    self.button_install.setText('Reinstall')
+                    self.button_open.setEnabled(True)
+                    self.button_uninstall.setEnabled(True)
+                else:
+                    self.button_install.setEnabled(True)
+                    self.button_install.setText('Install')
+                    self.button_open.setEnabled(False)
+                    self.button_uninstall.setEnabled(False)
             else:
-                self.button_install.setEnabled(True)
+                self.button_install.setEnabled(False)
                 self.button_install.setText('Install')
                 self.button_open.setEnabled(False)
                 self.button_uninstall.setEnabled(False)

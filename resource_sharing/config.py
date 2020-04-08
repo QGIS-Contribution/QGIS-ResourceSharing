@@ -21,6 +21,13 @@ config.COLLECTIONS is a dict of collection with this structure:
             'description': parser.get(collection, 'description'),
             'qgis_min_version': parser.get(collection, 'qgis_minimum_version'),
             'qgis_max_version': parser.get(collection, 'qgis_maximum_version')
+            # Additional entries (for resource statistics):
+            'models': count of models in the collection,
+            'processing': count of processing scripts in the collection,
+            'rscripts': count of R scripts in the collection,
+            'style': count of layer styles (QML) in the collection,
+            'svg': count of SVGs in the collection,
+            'symbol': count of symbol files (XML) in the collection,
         },
         ....
     }

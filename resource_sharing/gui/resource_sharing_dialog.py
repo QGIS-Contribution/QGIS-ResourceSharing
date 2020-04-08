@@ -190,7 +190,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.reload_collections_model()
 
     def set_current_tab(self, index):
-        """Set stacked widget based on active tab.
+        """Set stacked widget based on the active tab.
 
         :param index: The index of the active list widget item.
         :type index: int
@@ -201,7 +201,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             # Last menu entry - Settings
             self.stacked_menu_widget.setCurrentIndex(1)
         else:
-            # Not settings, must be Collections
+            # Not settings, must be Collections (all or installed)
             if index == 1:
                 # Installed collections
                 self.collection_proxy.accepted_status = \
@@ -507,7 +507,12 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # Set the selection
         oldRow = self.current_index.row()
         newIndex = self.collections_model.createIndex(oldRow, 0)
-        self.list_view_collections.selectionModel().select(newIndex, self.list_view_collections.selectionModel().ClearAndSelect)
+        selection_model = self.list_view_collections.selectionModel()
+        selection_model.setCurrentIndex(newIndex, selection_model.ClearAndSelect)
+        selection_model.select(newIndex, selection_model.ClearAndSelect)
+
+        #self.list_view_collections.setCurrentItem()
+        #self.list_view_collections.setCurrentRow(oldRow)
 
         # Update the buttons
         self.button_install.setEnabled(True)
@@ -515,8 +520,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_open.setEnabled(True)
         self.button_uninstall.setEnabled(True)
 
-        # Update the GUI
-        self.show_collection_metadata(self._selected_collection_id)
+        # Update the GUI (done with setCurrentIndex)
+        #self.show_collection_metadata(self._selected_collection_id)
 
         #self.on_list_view_collections_clicked(self._selected_collection_id)
         #currentRow = self.menu_list_widget.currentRow()
@@ -651,6 +656,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             item.setData(collection_author, COLLECTION_AUTHOR_ROLE)
             item.setData(collection_tags, COLLECTION_TAGS_ROLE)
             item.setData(collection_status, COLLECTION_STATUS_ROLE)
+            # Make installed collections stand out
             if installed_collections and id in installed_collections.keys():
                 collectionFont = QFont()
                 collectionFont.setWeight(60)

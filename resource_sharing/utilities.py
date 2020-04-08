@@ -159,7 +159,7 @@ def path_leaf(path):
 def qgis_version():
     """Get the version of QGIS.
 
-    :returns: QGIS Version where 30400 represents QGIS 3.04 etc.
+    :returns: QGIS Version where 30400 represents QGIS 3.4 etc.
     :rtype: int
     """
     version = unicode(Qgis.QGIS_VERSION_INT)

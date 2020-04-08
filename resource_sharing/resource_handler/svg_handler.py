@@ -87,8 +87,8 @@ class SVGResourceHandler(BaseResourceHandler):
             return
         # Remove from the SVG search paths if there are no SVGs left
         # in any collection
-        # Remove now, to enable SVG search path update
-        shutil.rmtree(local_collection_path())
+        # Have to remove now, to be able to update the SVG search path
+        shutil.rmtree(self.resource_dir)
         svgCount = 0
         for dirpath, dirnames, filenames in os.walk(local_collection_path()):
             for filename in [f for f in filenames if f.lower().endswith(".svg")]:

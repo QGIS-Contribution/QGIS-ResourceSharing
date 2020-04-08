@@ -514,6 +514,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_open.setEnabled(True)
         self.button_uninstall.setEnabled(True)
 
+        self.show_collection_metadata(self._selected_collection_id)
+
     def install_canceled(self):
         self.progress_dialog.hide()
         self.show_progress_dialog('Cancelling installation...')

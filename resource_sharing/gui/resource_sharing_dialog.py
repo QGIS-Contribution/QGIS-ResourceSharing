@@ -578,13 +578,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 proxyModel = self.list_view_collections.model()
                 proxyIndex = proxyModel.index(newRow,0)
                 current_coll_id = proxyIndex.data(COLLECTION_ID_ROLE)
-                # Update the web_view_details frame
-                self.show_collection_metadata(current_coll_id)
                 # Update buttons
                 status = config.COLLECTIONS[current_coll_id]['status']
-                # status = config.COLLECTIONS[self._selected_collection_id]['status']
-                is_installed = status == COLLECTION_INSTALLED_STATUS
-                if is_installed:
+                if status == COLLECTION_INSTALLED_STATUS:
                     self.button_install.setEnabled(True)
                     self.button_install.setText('Reinstall')
                     self.button_open.setEnabled(True)
@@ -594,6 +590,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     self.button_install.setText('Install')
                     self.button_open.setEnabled(False)
                     self.button_uninstall.setEnabled(False)
+                # Update the web_view_details frame
+                self.show_collection_metadata(current_coll_id)
             else:
                 self.button_install.setEnabled(False)
                 self.button_install.setText('Install')

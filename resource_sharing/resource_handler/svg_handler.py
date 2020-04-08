@@ -94,8 +94,8 @@ class SVGResourceHandler(BaseResourceHandler):
             for filename in [f for f in filenames if f.lower().endswith(".svg")]:
                 svgCount += 1
                 break
+        search_paths = self.svg_search_paths()
         if svgCount == 0:
-            search_paths = self.svg_search_paths()
             if local_collection_path() in search_paths:
                 search_paths.remove(local_collection_path())
         self.set_svg_search_paths(search_paths)

@@ -17,7 +17,8 @@ experimental=False
 deprecated=False
 icon=resources/icon.png
 changelog=
-        0.13.0 - Provide installation summary (#6)
+        0.13.0 - GUI updates (#100)
+               - Provide installation summary (#6)
                - Avoid (parent) tag with no members in QGIS 3 style documents (#101)
                - Fix reloading problems ([WinError 5]) with Microsoft Windows (#103)
                - Other minor issues (#104)

@@ -24,9 +24,9 @@ import os.path
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 try:
-    from qgis.PyQt.QtGui import QAction
+    from qgis.PyQt.QtGui import QAction    # QT 4 - could be removed
 except ImportError:
-    from qgis.PyQt.QtWidgets import QAction
+    from qgis.PyQt.QtWidgets import QAction    # QT 5
 
 from .gui.resource_sharing_dialog import ResourceSharingDialog
 from .utilities import resources_path
@@ -38,16 +38,16 @@ class Plugin:
     def __init__(self, iface):
         """Constructor.
 
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
+        :param iface: An interface instance that will be passed to
+            this class, providing the hook to manipulate the QGIS
             application at run time.
         :type iface: QgsInterface
         """
-        # Save reference to the QGIS interface
+        # Save the reference to the QGIS interface
         self.iface = iface
-        # initialize plugin directory
+        # initialize the plugin directory
         self.plugin_dir = os.path.dirname(__file__)
-        # initialize locale
+        # initialize the locale
         locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
             self.plugin_dir,
@@ -67,13 +67,14 @@ class Plugin:
         # Declare instance attributes
         self.actions = []
         self.menuName = self.tr(u'&Resource Sharing')
-        # TODO: We are going to let the user set this up in a future iteration
+        # TODO: We may let the user set this up
         self.toolbar = self.iface.addToolBar(self.menuName)
         self.toolbar.setObjectName(u'Resource Sharing')
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
-        """Get the translation for a string using Qt translation API.
+        """Get the translation for a string using the Qt translation
+        API.
 
         We implement this ourselves since we do not inherit QObject.
 
@@ -186,7 +187,7 @@ class Plugin:
         self.toolbar.parentWidget().removeToolBar(self.toolbar)
 
     def run(self):
-        """Run method that performs all the real work"""
+        """Performs all the real work"""
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop

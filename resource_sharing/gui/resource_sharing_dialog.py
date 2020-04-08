@@ -111,8 +111,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_open.setEnabled(False)
         self.button_uninstall.setEnabled(False)
 
-        # Set QListWidgetItem - "main menu"
-        # All
+        # Set up the "main menu" - QListWidgetItem
+        # All collections
         icon_all = QIcon()
         icon_all.addFile(
             resources_path('img', 'plugin.svg'),
@@ -122,7 +122,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         item_all = QListWidgetItem()
         item_all.setIcon(icon_all)
         item_all.setText(self.tr('All collections'))
-        # Installed
+        # Installed collections
         icon_installed = QIcon()
         icon_installed.addFile(
             resources_path('img', 'plugin-installed.svg'),
@@ -133,7 +133,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         item_installed.setIcon(icon_installed)
         item_installed.setText(self.tr('Installed collections'))
         item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-        # Settings
+        # Settings / repositories
         icon_settings = QIcon()
         icon_settings.addFile(
             resources_path('img', 'settings.svg'),
@@ -145,7 +145,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         item_settings.setText(self.tr('Settings'))
         item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-        # Add the list widget item to the widget
+        # Add the items to the list widget
         self.menu_list_widget.addItem(item_all)
         self.menu_list_widget.addItem(item_installed)
         self.menu_list_widget.addItem(item_settings)
@@ -155,10 +155,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.message_bar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.vlayoutRightColumn.insertWidget(0, self.message_bar)
 
-        # Progress dialog for any long running process
+        # Progress dialog for long running processes
         self.progress_dialog = None
 
-        # Init repository manager
+        # Init the repository manager dialog
         self.repository_manager = RepositoryManager()
         self.collection_manager = CollectionManager()
         # Collections list view
@@ -185,17 +185,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_box.button(QDialogButtonBox.Help).clicked.connect(
             self.open_help)
 
-        # Populate repositories widget and collections list view
+        # Populate the repositories widget and collections list view
         self.populate_repositories_widget()
         self.reload_collections_model()
 
     def set_current_tab(self, index):
         """Set stacked widget based on the active tab.
 
-        :param index: The index of the active list widget item.
+        :param index: The index of the active widget (in the list widget).
         :type index: int
         """
-        # Clear message bar first
+        # Clear message bar
         self.message_bar.clearWidgets()
         if index == (self.menu_list_widget.count() - 1):
             # Last menu entry - Settings
@@ -290,8 +290,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         if not repo_name:
             return
 
-        # Check if it's the approved online dir repository
-        # settings = QSettings()
+        # Check if it is among the officially approved QGIS repositories
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
         if settings.value(repo_name + '/url') in \
@@ -312,7 +311,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         if not dlg.exec_():
             return
 
-        # Check if the changed URL is already there in the repo
+        # Check if the changed URL is already present
         new_url = dlg.line_edit_url.text().strip()
         old_url = self.repository_manager.directories[repo_name]['url']
         for repo in self.repository_manager.directories.values():
@@ -359,7 +358,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # Reload data and widget
         self.reload_data_and_widget()
 
-        # Deactivate edit and delete button
+        # Deactivate the edit and delete buttons
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
 
@@ -371,12 +370,12 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
         if not repo_name:
             return
-        # Check if it's the approved online dir repository
+        # Check if it is among the offical repositories
         repo_url = self.repository_manager.directories[repo_name]['url']
         if repo_url in self.repository_manager._online_directories.values():
             self.message_bar.pushMessage(
                 self.tr(
-                    'You can not remove the official repositories!'),
+                    'You can not remove official repositories!'),
                 Qgis.Warning, 5)
             return
 
@@ -394,14 +393,14 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         installed_collections = \
             self.collection_manager.get_installed_collections(repo_url)
         if installed_collections:
-            message = ('You have some installed collections from this '
+            message = ('You have installed collections from this '
                        'repository. Please uninstall them first!')
             self.message_bar.pushMessage(message, Qgis.Warning, 5)
         else:
             self.repository_manager.remove_directory(repo_name)
             # Reload data and widget
             self.reload_data_and_widget()
-            # Deactivate edit and delete button
+            # Deactivate the edit and delete buttons
             self.button_edit.setEnabled(False)
             self.button_delete.setEnabled(False)
 
@@ -553,7 +552,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             if rowCount > 0:
                 # Set the current (and selected) row in the listview
                 newRow = uninstall_index.row()
-                # Check if the last element was uninstalled
+                # Check if this was the last element
                 rowCount = self.collection_proxy.rowCount()
                 if newRow == rowCount:
                    newRow = newRow - 1
@@ -696,7 +695,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             collection_id = collection_item.data(COLLECTION_ID_ROLE)
             self._selected_collection_id = collection_id
 
-            # Enable/disable button
+            # Enable / disable buttons
             status = config.COLLECTIONS[self._selected_collection_id]['status']
             is_installed = status == COLLECTION_INSTALLED_STATUS
             if is_installed:
@@ -722,7 +721,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.collection_proxy.setFilterRegExp(search)
 
     def show_collection_metadata(self, id):
-        """Show the collection metadata given the id."""
+        """Show the collection metadata given the ID."""
         html = self.collection_manager.get_html(id)
         self.web_view_details.setHtml(html)
 
@@ -750,7 +749,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.progress_dialog.setAutoClose(False)
             title = self.tr('Resource Sharing')
             self.progress_dialog.setWindowTitle(title)
-            # Just use infinite progress bar here
+            # Just use an infinite progress bar here
             self.progress_dialog.setMaximum(0)
             self.progress_dialog.setMinimum(0)
             self.progress_dialog.setValue(0)

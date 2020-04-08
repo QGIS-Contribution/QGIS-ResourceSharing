@@ -84,9 +84,9 @@ class RemoteGitHandler(BaseRepositoryHandler):
     def download_collection(self, id, register_name):
         """Download a collection given its ID.
 
-        For remote git repositories, we will clone the repository first (or
-        pull if the repo is already cloned before) and copy the collection to
-        collections dir.
+        For remote git repositories, we will clone the repository (or
+        pull if the repo is already cloned), and copy the collection to
+        the collections directory.
 
         :param id: The ID of the collection.
         :type id: str

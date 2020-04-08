@@ -13,7 +13,7 @@ PROCESSING = 'processing'
 
 
 class ProcessingScriptHandler(BaseResourceHandler):
-    """Concrete class handler for processing script resource."""
+    """Handler for processing scripts."""
     IS_DISABLED = False
 
     def __init__(self, collection_id):

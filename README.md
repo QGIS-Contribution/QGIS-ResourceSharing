@@ -1,8 +1,8 @@
 QGIS Resource Sharing Plugin
 ============================
 QGIS Resource Sharing allows sharing of resources (currently SVGs, symbols,
-styles, color ramps, processing scripts and R scripts), and this plugin
-gives you access to shared collections.
+styles, color ramps, processing scripts, processing models and R scripts),
+and this plugin gives you access to shared collections.
 
 The [documentation](http://qgis-contribution.github.io/QGIS-ResourceSharing/)
 explains how to use the plugin and how to share resources.
@@ -18,6 +18,6 @@ We have some branches that we use for our workflow:
 
 * **master**: The latest stable version.
 
-* **gh-pages**: This is the branch for the documentation hosted in github 
-pages (http://qgis-contribution.github.io/QGIS-ResourceSharing/). It's in markdown.
-Make a PR to this branch if you want to change or add something to the documentation.
+* **gh-pages**: This is the branch for the documentation (github pages -
+  http://qgis-contribution.github.io/QGIS-ResourceSharing/). It is in markdown.
+  Make a PR to this branch if you want to update the documentation.

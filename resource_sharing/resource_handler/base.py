@@ -43,7 +43,7 @@ class BaseResourceHandler(object):
 
     @property
     def collection(self):
-        """Return the dictionary of the collection."""
+        """Return the collection dictionary."""
         return self._collection
 
     @property
@@ -53,12 +53,12 @@ class BaseResourceHandler(object):
 
     @classmethod
     def dir_name(cls):
-        """The root directory name for this type of the resource."""
+        """The root directory name for this resource type."""
         raise NotImplementedError
 
     @property
     def resource_dir(self):
-        """The root of the resource dir from this type of the resource."""
+        """The root of the resource dir from this resource type."""
         # resource_dir = (local_collection_path(self.collection_id) /
         #                 self.dir_name()
         resource_dir = os.path.join(
@@ -66,9 +66,11 @@ class BaseResourceHandler(object):
         return resource_dir
 
     def install(self):
-        """Install all the resources of this type in the collection."""
+        """Install all the resources in the collection that are
+        of this type."""
         raise NotImplementedError
 
     def uninstall(self):
-        """Uninstall all the resources of this type in the collection."""
+        """Uninstall all the resources of this type from the
+        collection."""
         raise NotImplementedError

@@ -28,11 +28,8 @@ class SVGResourceHandler(BaseResourceHandler):
     @classmethod
     def svg_search_paths(cls):
         """Read the SVG paths from settings"""
-        # settings = QSettings()
         settings = QgsSettings()
         search_paths_str = settings.value('svg/searchPathsForSVG')
-        # QGIS 3: it's already a list!
-        is_list = False
         if not search_paths_str:
             search_paths = []
         else:
@@ -59,13 +56,12 @@ class SVGResourceHandler(BaseResourceHandler):
     def install(self):
         """Install the SVGs from this collection.
 
-        We just add the collection root directory path to the
-        SVG search path.
+        Add the collection root directory path to the SVG search path.
         """
-        # Check if the dir exists, pass installing silently if it doesn't exist
+        # Check if the dir exists, pass silently if it doesn't
         if not os.path.exists(self.resource_dir):
             return
-        # Add to the search paths for SVG
+        # Add to the SVG search paths
         search_paths = self.svg_search_paths()
 
         if local_collection_path() not in search_paths:

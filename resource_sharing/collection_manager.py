@@ -39,12 +39,12 @@ class CollectionInstaller(QObject):
     def run(self):
         self.progress.emit('Downloading the collection...')
 
-        # We can't kill the process here, so let's finish it even when
-        # user cancels the download process
+        # We can't kill the process here, so let us finish it even if
+        # the user cancels the download process
         download_status, error_message = self._collection_manager.download(
             self._collection_id)
 
-        # If at this point it's killed, let's abort and tell the main thread
+        # If at this point it is killed, so abort and tell the main thread
         if self.killed:
             self.aborted.emit()
             return
@@ -56,7 +56,7 @@ class CollectionInstaller(QObject):
             self.finished.emit()
             return
 
-        # Downloading is fine, It's not killed, let's install it
+        # Downloading is fine, It is not killed, let us install it
         if not self.killed:
             self.progress.emit('Installing the collection...')
             try:
@@ -82,13 +82,13 @@ class CollectionManager(object):
         """"Utilities class related to collection."""
 
     def get_collection_id(self, register_name, repo_url):
-        """Generate id of a collection."""
+        """Generate the collection ID."""
         hash_object = hashlib.sha1((register_name + repo_url).encode('utf-8'))
         hex_dig = hash_object.hexdigest()
         return hex_dig
 
     def get_html(self, collection_id):
-        """Return the detail of a collection in HTML form given the id.
+        """Return the details of a collection as HTML, given its id.
 
         :param collection_id: The id of the collection
         :type collection_id: str
@@ -150,8 +150,8 @@ class CollectionManager(object):
     def get_installed_collections(self, repo_url=None):
         """Get all installed collections for a given repository URL.
 
-        If a URL is not specified, it will return all the installed
-        collections.
+        If a URL is not specified, all the installed collections
+        will be returned.
 
         :param repo_url: The repository URL.
         :type repo_url: str
@@ -173,9 +173,9 @@ class CollectionManager(object):
         return installed_collections
 
     def download(self, collection_id):
-        """Download a collection given the id.
+        """Download a collection given its ID.
 
-        :param collection_id: The id of the collection about to be downloaded.
+        :param collection_id: The ID of the collection to be downloaded.
         :type collection_id: str
         :return: status (True or False), information from the repo handler
         :rtype: (boolean, string)
@@ -192,7 +192,7 @@ class CollectionManager(object):
         return status, information
 
     def install(self, collection_id):
-        """Install a collection into QGIS.
+        """Install the collection.
 
         :param collection_id: The id of the collection about to be installed.
         :type collection_id: str

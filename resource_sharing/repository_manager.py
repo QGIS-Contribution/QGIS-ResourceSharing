@@ -30,8 +30,8 @@ class RepositoryManager(QObject):
         """Constructor.
 
         ..note:
-        - Directories is a list of repository that are registered in user's
-        QGIS. Data structure of directories:
+        - Directories is a list of repositories. It is stored in the
+        settings. The data structure of directories:
         self._directories = {
             'QGIS Official Repository': {
                 'url': 'git@github.com:anitagraser/QGIS-style-repo-dummy.git',
@@ -39,8 +39,8 @@ class RepositoryManager(QObject):
              }
         }
 
-        - Repositories is a dictionary of repository with all the collections
-        contained in that repository. Data structure of repositories:
+        - Repositories is a dictionary of repositories with all their
+        collections. The data structure of repositories:
         self._repositories = {
             repo_name: [{
                 'register_name': collection,
@@ -115,14 +115,12 @@ class RepositoryManager(QObject):
                                            str(row['name']) +
                                            " - not added")
             # Save it to cache
-            # settings = QSettings()
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             settings.setValue('online_directories', self._online_directories)
             settings.endGroup()
         else:
             # Just use cache from previous use
-            # settings = QSettings()
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             self._online_directories = settings.value('online_directories', {})
@@ -131,11 +129,10 @@ class RepositoryManager(QObject):
     def load_directories(self):
         """Load directories of repository registered in settings."""
         self._directories = {}
-        # settings = QSettings()
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
 
-        # Write online directory first to QSettings if needed
+        # Write the online directory to QgsSettings first, if needed
         for online_dir_name in self._online_directories:
             repo_present = False
             for repo_name in settings.childGroups():
@@ -185,11 +182,10 @@ class RepositoryManager(QObject):
                 LOGGER.warning(metadata_warning)
                 return False, metadata_warning
 
-            # Add the repo and the collections
+            # Add the repository and its collections
             self._repositories[repo_name] = collections
             self.rebuild_collections()
-            # Add to QSettings
-            # settings = QSettings()
+            # Add to QgsSettings
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             settings.setValue(repo_name + '/url', url)
@@ -208,7 +204,8 @@ class RepositoryManager(QObject):
             old_url,
             new_url,
             new_auth_cfg):
-        """Edit a directory and update the collections.
+        """Edit the directory of repositories and update the
+        collections.
 
         :param old_repo_name: The old name of the repository
         :type old_repo_name: str
@@ -252,17 +249,17 @@ class RepositoryManager(QObject):
                     installed_old_collections.append(old_collection)
 
             # Handling installed collections
-            # An old collection that is present in the new URL are
+            # An old collection that is present in the new URL is
             # identified by its register name.
             # Cases for installed collections:
-            # 1. Old collection exists in the new URL, same URL: use the new
+            # 1. Old collection exists in the new, same URL: use the new
             # one, else: update the status to INSTALLED
-            # 2. Old collection exists in the new URL, different URL: keep them
+            # 2. Old collection exists in the new, different URL: keep them
             # both (add the old one). Because they should be treated as
-            # different collection
-            # 3. Old collection doesn't exist in the new URL, same URL: keep
+            # different collections
+            # 3. Old collection doesn't exist in the new, same URL: keep
             # the old collection
-            # 4. Old collection doesn't exist in the new URL, different URL:
+            # 4. Old collection doesn't exist in the new, different URL:
             # same as 3
             for installed_collection in installed_old_collections:
                 reg_name = installed_collection['register_name']
@@ -283,13 +280,12 @@ class RepositoryManager(QObject):
                 if not is_present:
                     new_collections.append(installed_collection)
 
-            # Remove old repository and add new one
+            # Remove the old repository and add the new one
             self._repositories.pop(old_repo_name, None)
             self._repositories[new_repo_name] = new_collections
             self.rebuild_collections()
 
-            # Update QSettings
-            # settings = QSettings()
+            # Update QgsSettings
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             settings.remove(old_repo_name)
@@ -301,20 +297,19 @@ class RepositoryManager(QObject):
         return status, fetcherror
 
     def remove_directory(self, repo_name):
-        """Remove a directory and all the collections of that repository.
+        """Remove a directory and all its collections.
 
         :param repo_name: The old name of the repository
         :type repo_name: str
         """
         self._repositories.pop(repo_name, None)
         self.rebuild_collections()
-        # Remove repo from QSettings
-        # settings = QSettings()
+        # Remove repository from QgsSettings
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
         settings.remove(repo_name)
         settings.endGroup()
-        # Serialize repositories every time successfully removed a repo
+        # Serialize repositories
         self.serialize_repositories()
 
     def reload_directory(self, repo_name, url, auth_cfg):
@@ -326,7 +321,7 @@ class RepositoryManager(QObject):
         :param url: The URL of the repository
         :type url: str
         """
-        # We're basically editing a directory with the same repo name and url
+        # We are basically editing a directory (same repo name and url)
         status, editerror = self.edit_directory(
             repo_name,
             repo_name,
@@ -337,7 +332,7 @@ class RepositoryManager(QObject):
         return status, editerror
 
     def rebuild_collections(self):
-        """Rebuild collections from repositories."""
+        """Rebuild the collections for all the repositories."""
         config.COLLECTIONS = {}
         for repo in self._repositories.keys():
             repo_collections = self._repositories[repo]
@@ -349,8 +344,8 @@ class RepositoryManager(QObject):
                 collection['repository_name'] = repo
                 config.COLLECTIONS[collection_id] = collection
 
-                # Check in the file system if the collection exists for all
-                # installed collections. If not, also uninstall resources
+                # Check the file system to see if the collection exists.
+                # If not, also uninstall its resources
                 current_status = config.COLLECTIONS[collection_id]['status']
                 if current_status == COLLECTION_INSTALLED_STATUS:
                     collection_path = local_collection_path(collection_id)

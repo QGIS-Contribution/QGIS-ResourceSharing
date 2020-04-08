@@ -110,7 +110,7 @@ class CollectionManager(object):
         if 'symbol' in config.COLLECTIONS[collection_id].keys():
            if resource_types > 0:
                html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol'
+           html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol file'
            if config.COLLECTIONS[collection_id]['symbol'] > 1:
                html = html + 's'
            resource_types = resource_types + 1

@@ -539,14 +539,14 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             LOGGER.error('Could not uninstall collection ' +
                          config.COLLECTIONS[coll_id]['name'] + ':\n' + str(e))
         else:
-            self.reload_collections_model()
-            # Fix the GUI
-            currentMenuRow = self.menu_list_widget.currentRow()
-            self.set_current_tab(currentMenuRow)
             QMessageBox.information(
                 self,
                 'Resource Sharing',
                 'The collection was successfully uninstalled!')
+            self.reload_collections_model()
+            # Fix the GUI
+            currentMenuRow = self.menu_list_widget.currentRow()
+            self.set_current_tab(currentMenuRow)
             self.populate_repositories_widget()
 
             rowCount = self.collection_proxy.rowCount()

@@ -19,7 +19,8 @@ icon=resources/icon.png
 changelog=
         0.13.0 - Provide installation summary (#6)
                - Avoid (parent) tag with no members in QGIS 3 style documents (#101)
-               - Fix some minor issues (#104, )
+               - Fix reloading problems ([WinError 5]) with Microsoft Windows (#103)
+               - Other minor issues (#104)
         0.12.0 - Make font sizes OK on HiDPI systems (#3)
                - Disable editing and removal of "official" repositories in Settings (#93)
                - Avoid ResourceWarning when installing a collection (#95)

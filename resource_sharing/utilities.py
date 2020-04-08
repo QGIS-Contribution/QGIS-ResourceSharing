@@ -168,9 +168,8 @@ def qgis_version():
 
 
 def render_template(filename, context):
-    """Render a template with the specified filename under the
-    template directory.
-    :param filename: The filename (must be under the template directory)
+    """Render a template with the specified filename.
+    :param filename: The filename (must be in the template directory)
     :type filename: str
 
     :param context: The context passed for the template

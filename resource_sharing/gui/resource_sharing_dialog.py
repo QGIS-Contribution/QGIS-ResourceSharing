@@ -503,30 +503,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.installer_thread.wait()
         self.installer_thread.deleteLater()
         self.populate_repositories_widget()
-
         # Set the selection
         oldRow = self.current_index.row()
         newIndex = self.collections_model.createIndex(oldRow, 0)
         selection_model = self.list_view_collections.selectionModel()
         selection_model.setCurrentIndex(newIndex, selection_model.ClearAndSelect)
         selection_model.select(newIndex, selection_model.ClearAndSelect)
-
-        #self.list_view_collections.setCurrentItem()
-        #self.list_view_collections.setCurrentRow(oldRow)
-
         # Update the buttons
         self.button_install.setEnabled(True)
         self.button_install.setText('Reinstall')
         self.button_open.setEnabled(True)
         self.button_uninstall.setEnabled(True)
-
-        # Update the GUI (done with setCurrentIndex)
-        #self.show_collection_metadata(self._selected_collection_id)
-
-        #self.on_list_view_collections_clicked(self._selected_collection_id)
-        #currentRow = self.menu_list_widget.currentRow()
-        #self.set_current_tab(currentRow)
-        #self.populate_repositories_widget()
 
     def install_canceled(self):
         self.progress_dialog.hide()

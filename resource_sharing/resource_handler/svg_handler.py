@@ -99,4 +99,3 @@ class SVGResourceHandler(BaseResourceHandler):
             if local_collection_path() in search_paths:
                 search_paths.remove(local_collection_path())
         self.set_svg_search_paths(search_paths)
-

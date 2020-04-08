@@ -543,11 +543,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
     def uninstall_collection(self):
         """Slot called when user clicks the uninstall button."""
-        # Get the index of the selected item (=current item)
-        current_index = self.list_view_collections.currentIndex()
-        #LOGGER.info('current_index, row: ' + str(current_index.row()))
-        #selected_item = self.list_view_collections.selectedIndexes()[0]
-        #selected_row = selected_item.row()
+        # get the QModelIndex for the item to be uninstalled
+        uninstall_index = self.list_view_collections.currentIndex()
         coll_id = self._selected_collection_id
         try:
             self.collection_manager.uninstall(coll_id)
@@ -556,24 +553,31 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                          config.COLLECTIONS[coll_id]['name'] + ':\n' + str(e))
         else:
             self.reload_collections_model()
-            currentRow = self.menu_list_widget.currentRow()
-            self.set_current_tab(currentRow)
+            # Fix the GUI
+            currentMenuRow = self.menu_list_widget.currentRow()
+            self.set_current_tab(currentMenuRow)
             QMessageBox.information(
                 self,
                 'Resource Sharing',
                 'The collection was successfully uninstalled!')
             self.populate_repositories_widget()
 
-            # Set the selection
-            newRow = current_index.row()
-            #newRow = selected_row
-            if newRow == self.collections_model.rowCount() - 1:
+            # Set the current (and selected) row in the listview
+            newRow = uninstall_index.row()
+            # Check if the last element was uninstalled
+            rowCount = self.collection_proxy.rowCount()
+            if newRow == rowCount:
                newRow = newRow - 1
+            # Select the new current element
             newIndex = self.collections_model.createIndex(newRow, 0)
-            self.list_view_collections.selectionModel().select(newIndex, self.list_view_collections.selectionModel().ClearAndSelect)
-            # Not entirely correct...
-            self.show_collection_metadata(self._selected_collection_id)
-
+            selection_model = self.list_view_collections.selectionModel()
+            selection_model.setCurrentIndex(newIndex, selection_model.ClearAndSelect)
+            # Get the id of the current collection
+            proxyModel = self.list_view_collections.model()
+            proxyIndex = proxyModel.index(newRow,0)
+            current_coll_id = proxyIndex.data(COLLECTION_ID_ROLE)
+            # Update the web_view_details frame
+            self.show_collection_metadata(current_coll_id)
             # Update buttons
             status = config.COLLECTIONS[self._selected_collection_id]['status']
             is_installed = status == COLLECTION_INSTALLED_STATUS

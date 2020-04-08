@@ -578,6 +578,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 proxyModel = self.list_view_collections.model()
                 proxyIndex = proxyModel.index(newRow,0)
                 current_coll_id = proxyIndex.data(COLLECTION_ID_ROLE)
+                self._selected_collection_id = current_coll_id
                 # Update buttons
                 status = config.COLLECTIONS[current_coll_id]['status']
                 if status == COLLECTION_INSTALLED_STATUS:

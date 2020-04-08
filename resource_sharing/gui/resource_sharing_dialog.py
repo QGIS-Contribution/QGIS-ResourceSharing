@@ -581,7 +581,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 # Update the web_view_details frame
                 self.show_collection_metadata(current_coll_id)
                 # Update buttons
-                status = config.COLLECTIONS[self._selected_collection_id]['status']
+                status = config.COLLECTIONS[current_coll_id]['status']
+                # status = config.COLLECTIONS[self._selected_collection_id]['status']
                 is_installed = status == COLLECTION_INSTALLED_STATUS
                 if is_installed:
                     self.button_install.setEnabled(True)

@@ -273,6 +273,11 @@ class RepositoryManager(QObject):
                         if old_url == new_url:
                             # Set the status to installed
                             collection['status'] = COLLECTION_INSTALLED_STATUS
+                            # Keep the collection statistics
+                            for key in installed_collection.keys():
+                                if key in ['models', 'processing', 'rscripts', 'style', 'svg', 'symbol']:
+                                    collection[key] = installed_collection[key]
+
                         else:
                             # Different repository URLs, so append
                             new_collections.append(installed_collection)

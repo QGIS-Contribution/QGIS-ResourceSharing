@@ -15,7 +15,7 @@ LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class NetworkManager(object):
-    """Class to get the content of the file in the URL given."""
+    """Class to get the content of a file with a given URL."""
     def __init__(self, url, auth_cfg=None):
         self._network_manager = QgsNetworkAccessManager.instance()
         self._network_finished = False

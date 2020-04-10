@@ -17,7 +17,7 @@ LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class ModelHandler(BaseResourceHandler):
-    """Handler for model resources."""
+    """Handler for processing models."""
     IS_DISABLED = False
 
     def __init__(self, collection_id):

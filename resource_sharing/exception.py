@@ -3,5 +3,5 @@
 
 
 class MetadataError(Exception):
-    """Raise when the repository metadata is wrong."""
+    """Raise when there is something wrong with the repository metadata."""
     pass

@@ -84,9 +84,9 @@ class RemoteGitHandler(BaseRepositoryHandler):
     def download_collection(self, id, register_name):
         """Download a collection given its ID.
 
-        For remote git repositories, we will clone the repository first (or
-        pull if the repo is already cloned before) and copy the collection to
-        collections dir.
+        For remote git repositories, we will clone the repository (or
+        pull if the repo is already cloned), and copy the collection to
+        the collections directory.
 
         :param id: The ID of the collection.
         :type id: str
@@ -172,6 +172,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
 
         dest_dir = local_collection_path(id)
         if os.path.exists(dest_dir):
+            # Remove the existing collection directory
             shutil.rmtree(dest_dir)
         shutil.copytree(src_dir, dest_dir)
 

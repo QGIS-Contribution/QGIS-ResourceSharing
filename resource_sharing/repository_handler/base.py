@@ -1,5 +1,5 @@
 # coding=utf-8
-"""This module contains the base class of repository handler."""
+"""This module contains the base class for the repository handlers."""
 try:
     from io import StringIO
 except ImportError as error:
@@ -19,19 +19,18 @@ from resource_sharing.exception import MetadataError
 from resource_sharing.version_compare import isCompatible
 from resource_sharing.network_manager import NetworkManager
 
-
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class RepositoryHandlerMeta(type):
-    """Handler meta class definition."""
+    """Resource handler meta class."""
     def __init__(cls, name, bases, dct):
         if not hasattr(cls, 'registry'):
             # This is the base class.  Create an empty registry
             cls.registry = {}
         else:
             # This is a derived class.
-            # Add the class if it's not disabled
+            # Add the class if it is not disabled
             if not cls.IS_DISABLED:
                 interface_id = name.lower()
                 cls.registry[interface_id] = cls
@@ -47,7 +46,7 @@ class BaseRepositoryHandler(object):
     IS_DISABLED = False
 
     def __init__(self, url):
-        """Constructor of the base class."""
+        """Constructor for the base class."""
         self._url = None
         self._auth_cfg = None
         self._metadata = None
@@ -57,12 +56,12 @@ class BaseRepositoryHandler(object):
         self.url = url
 
     def can_handle(self):
-        """Checking if handler can handle this URL."""
+        """Checking if the handler can handle this URL."""
         raise NotImplementedError
 
     @classmethod
     def get_handler(cls, url):
-        """Get the right repository handler instance for given URL.
+        """Get the right repository handler for the given URL.
 
         :param url: The url of the repository
         :type url: str
@@ -80,11 +79,11 @@ class BaseRepositoryHandler(object):
 
     @property
     def url(self):
-        """The URL to the repository.
+        """The repository URL.
 
         Example:
         - https://github.com/anitagraser/QGIS-style-repo-dummy.git
-        - file://home/akbar/dev/qgis-style-repo-dummy
+        - file://home/qgisuser/qgisrepos/qgis-style-repo-dummy
         """
         return self._url
 
@@ -172,7 +171,7 @@ class BaseRepositoryHandler(object):
             if not isCompatible(
                     Qgis.QGIS_VERSION, qgis_min_version, qgis_max_version):
                 LOGGER.warning(
-                    'Collection %s is not compatible with current QGIS '
+                    'Collection %s is not compatible with this QGIS '
                     'version. QGIS ver:%s, QGIS min ver:%s, QGIS max ver: '
                     '%s' % (
                         collection, Qgis.QGIS_VERSION, qgis_min_version,
@@ -250,9 +249,9 @@ class BaseRepositoryHandler(object):
         raise NotImplementedError
 
     def file_url(self, relative_path):
-        """Return the URL to a path given the relative path to repository root.
+        """Return the URL, given the relative path to the repository root.
 
-        This depends on the repository type so it's implemented in each
+        This depends on the repository type so it is implemented in each
         of the concrete repository handler classes.
 
         :param relative_path: The relative path to the root of the repository.
@@ -264,9 +263,10 @@ class BaseRepositoryHandler(object):
         raise NotImplementedError
 
     def collection_file_url(self, collection_name, file_path):
-        """Return the URL of a file relative the collection root
+        """Return the URL of a file that is specified relative the
+        collection root
 
-        ..e.g If it's file repository, calling
+        ..e.g. If it is a file repository, calling
             self.collection_file_url('test_collection', 'preview/prev1.png')
             will return file:///<the_repository_path>/collections
             /test_collection/preview/prev1.png

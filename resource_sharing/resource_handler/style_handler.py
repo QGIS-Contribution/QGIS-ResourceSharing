@@ -25,13 +25,13 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     def install(self):
         """Install the style.
 
-        We just resolve the symbol SVG/image path in the QML file
+        Resolve the symbol SVG/image paths in the QML file
         """
-        # Check if the dir exists, pass installing silently if it doesn't exist
+        # Check if the dir exists, pass silently if it doesn't
         if not os.path.exists(self.resource_dir):
             return
 
-        # Get all the style xml files under resource dirs
+        # Get all the style XML files under resource dirs
         style_files = []
         for item in os.listdir(self.resource_dir):
             file_path = os.path.join(self.resource_dir, item)
@@ -44,7 +44,7 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         valid = 0
         for style_file in style_files:
-            # Try to fix image and PNG paths in the QML file
+            # Try to fix image and SVG paths in the QML file
             self.resolve_dependency(style_file)
             valid += 1
         if valid >= 0:
@@ -52,5 +52,5 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
     def uninstall(self):
         """Uninstall the style."""
-        # The style is not installed, so do nothing.
+        # Styles are not installed, so do nothing.
         pass

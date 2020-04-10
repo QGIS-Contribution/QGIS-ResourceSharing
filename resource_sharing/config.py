@@ -1,13 +1,14 @@
 # coding=utf-8
 """
-# Put the collections object in module namespace
-# http://effbot.org/pyfaq/how-do-i-share-global-variables-across-modules.htm
+# Put the COLLECTIONS object (dict) in the module namespace
+# (http://effbot.org/pyfaq/how-do-i-share-global-variables-across-modules.htm)
 
-Always call this variable as attribute from config module e.g:
+Call this variable as an attribute from the config module e.g:
     from resource_sharing import config
     print config.COLLECTIONS
 
-config.COLLECTIONS is a dict of collection with this structure:
+config.COLLECTIONS is a dict that contains metadata for the
+collections. It has this structure:
     config.COLLECTIONS = {
         collection_id(computed): {
             'register_name': collection,
@@ -21,6 +22,14 @@ config.COLLECTIONS is a dict of collection with this structure:
             'description': parser.get(collection, 'description'),
             'qgis_min_version': parser.get(collection, 'qgis_minimum_version'),
             'qgis_max_version': parser.get(collection, 'qgis_maximum_version')
+            'preview': ['preview/image1.png', 'preview/image2.png']
+            # Additional entries (for resource statistics):
+            'models': count of models in the collection,
+            'processing': count of processing scripts in the collection,
+            'rscripts': count of R scripts in the collection,
+            'style': count of layer styles (QML) in the collection,
+            'svg': count of SVGs in the collection,
+            'symbol': count of symbol files (XML) in the collection,
         },
         ....
     }

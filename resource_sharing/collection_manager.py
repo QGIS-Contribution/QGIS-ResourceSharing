@@ -39,12 +39,12 @@ class CollectionInstaller(QObject):
     def run(self):
         self.progress.emit('Downloading the collection...')
 
-        # We can't really kill the process here, so let's finish it even when
-        # user cancels the download process
+        # We can't kill the process here, so let us finish it even if
+        # the user cancels the download process
         download_status, error_message = self._collection_manager.download(
             self._collection_id)
 
-        # If at this point it's killed, let's abort and tell the main thread
+        # If at this point it is killed, so abort and tell the main thread
         if self.killed:
             self.aborted.emit()
             return
@@ -56,7 +56,7 @@ class CollectionInstaller(QObject):
             self.finished.emit()
             return
 
-        # Downloading is fine, It's not killed, let's install it
+        # Downloading is fine, It is not killed, let us install it
         if not self.killed:
             self.progress.emit('Installing the collection...')
             try:
@@ -82,17 +82,66 @@ class CollectionManager(object):
         """"Utilities class related to collection."""
 
     def get_collection_id(self, register_name, repo_url):
-        """Generate id of a collection."""
+        """Generate the collection ID."""
         hash_object = hashlib.sha1((register_name + repo_url).encode('utf-8'))
         hex_dig = hash_object.hexdigest()
         return hex_dig
 
     def get_html(self, collection_id):
-        """Return the detail of a collection in HTML form given the id.
+        """Return the details of a collection as HTML, given its id.
 
         :param collection_id: The id of the collection
         :type collection_id: str
         """
+        html = ''
+        resource_types = 0
+        if 'svg' in config.COLLECTIONS[collection_id].keys():
+           html = html + str(config.COLLECTIONS[collection_id]['svg']) + ' SVG'
+           if config.COLLECTIONS[collection_id]['svg'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'style' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['style']) + ' Layer style'
+           if config.COLLECTIONS[collection_id]['style'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'symbol' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol file'
+           if config.COLLECTIONS[collection_id]['symbol'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'models' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['models']) + ' Processing model'
+           if config.COLLECTIONS[collection_id]['models'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'processing' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['processing']) + ' Processing script'
+           if config.COLLECTIONS[collection_id]['processing'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        if 'rscripts' in config.COLLECTIONS[collection_id].keys():
+           if resource_types > 0:
+               html = html + ', '
+           html = html + str(config.COLLECTIONS[collection_id]['rscripts']) + ' R script'
+           if config.COLLECTIONS[collection_id]['rscripts'] > 1:
+               html = html + 's'
+           resource_types = resource_types + 1
+        html = html + ' (<i>Reinstall</i> to update)'
+        if resource_types == 0:
+           html = 'Reinstall the collection to get statistics'
+        if config.COLLECTIONS[collection_id]['status'] != COLLECTION_INSTALLED_STATUS:
+           html = 'Unknown before installation'
+
+        config.COLLECTIONS[collection_id]['resources_html'] = html
         context = {
             'resources_path': resources_path(),
             'collection': config.COLLECTIONS[collection_id]
@@ -100,12 +149,12 @@ class CollectionManager(object):
         return render_template('collection_details.html', context)
 
     def get_installed_collections(self, repo_url=None):
-        """Get all installed collections of a given repository url.
+        """Get all installed collections for a given repository URL.
 
-        If repository url is not specified, it will return all the installed
-        collections.
+        If a URL is not specified, all the installed collections
+        will be returned.
 
-        :param repo_url: The repository url.
+        :param repo_url: The repository URL.
         :type repo_url: str
 
         :return: Subset of config.COLLECTIONS that meet the requirement
@@ -125,9 +174,9 @@ class CollectionManager(object):
         return installed_collections
 
     def download(self, collection_id):
-        """Download a collection given the id.
+        """Download a collection given its ID.
 
-        :param collection_id: The id of the collection about to be downloaded.
+        :param collection_id: The ID of the collection to be downloaded.
         :type collection_id: str
         :return: status (True or False), information from the repo handler
         :rtype: (boolean, string)
@@ -144,7 +193,7 @@ class CollectionManager(object):
         return status, information
 
     def install(self, collection_id):
-        """Install a collection into QGIS.
+        """Install the collection.
 
         :param collection_id: The id of the collection about to be installed.
         :type collection_id: str
@@ -157,12 +206,12 @@ class CollectionManager(object):
             COLLECTION_INSTALLED_STATUS
 
     def uninstall(self, collection_id):
-        """Uninstall the collection from QGIS.
+        """Uninstall the collection.
 
         :param collection_id: The id of the collection about to be uninstalled.
         :type collection_id: str
         """
-        # Uninstall all type of resources from QGIS
+        # Uninstall all types of resources
         for resource_handler in BaseResourceHandler.registry.values():
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.uninstall()

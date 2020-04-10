@@ -145,7 +145,6 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             if fnmatch.fnmatch(file_path, '*.xml'):
                 symbol_files.append(file_path)
             valid += 1
-            #LOGGER.info('Symbol file: ' + file_path)
 
         # If there are no symbol files, there is nothing to do
         if len(symbol_files) == 0:
@@ -153,20 +152,17 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         # Only relevant for QGIS 2!
         group_or_tag_id = self._get_parent_group_or_tag()
-        #LOGGER.info('ID: ' + str(group_or_tag_id))
 
         for symbol_file in symbol_files:
             file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             # Groups in QGIS2, tags in QGIS3...
             groupOrTag_id = self._get_child_group_tag(group_or_tag_id, file_name)
-            #LOGGER.info('groupOrTag_id: ' + str(groupOrTag_id))
             # Modify the symbol file to fix image and SVG paths
             self.resolve_dependency(symbol_file)
             # Add all symbols and colorramps and group / tag them
             symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
             for symbol in symbol_xml_extractor.symbols:
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
-                #LOGGER.info('symbol_name: ' + symbol_name)
                 # self.resolve_dependency(symbol[SYMBOL])
                 if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
                     self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
@@ -174,12 +170,10 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             for colorramp in symbol_xml_extractor.colorramps:
                 colorramp_name = '%s (%s)' % (
                     colorramp['name'], self.collection_id)
-                #LOGGER.info('colorramp_name: ' + colorramp_name)
                 if self.style.addColorRamp(
                         colorramp_name, colorramp['colorramp'], True):
                     self._group_or_tag(
                         QgsStyle.ColorrampEntity, colorramp_name, groupOrTag_id)
-            #LOGGER.info('XML file: ' + file_name + ' Symbols: ' + str(len(symbol_xml_extractor.symbols)) + ' ColorRamps: ' + str(len(symbol_xml_extractor.colorramps)))
 
         if valid >= 0:
             self.collection[SYMBOL] = valid
@@ -191,7 +185,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         # Get the ids of the groups / tags that contain symbols
         child_groups_or_tags_ids = self._get_child_groups_tags_ids()
         for child_group_id in child_groups_or_tags_ids:
-            # Get all the symbol from this tag / child group and remove them
+            # Get all the symbols from this tag / child group and remove them
             symbols = self._get_symbols_for_group_or_tag(
                 QgsStyle.SymbolEntity, child_group_id)
             for symbol in symbols:
@@ -205,5 +199,5 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             # Remove this tag / child group
             self._group_or_tag_remove(child_group_id)
 
-        # Remove parent group (only relevant for QGIS 3):
+        # Remove the group / tag:
         self._group_or_tag_remove(group_or_tag_id)

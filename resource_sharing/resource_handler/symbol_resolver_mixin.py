@@ -9,7 +9,7 @@ from resource_sharing.utilities import path_leaf
 
 
 class SymbolResolverMixin(object):
-    """Mixin for Resources Handler that need to resolve SVG
+    """Mixin for Resources Handlers that need to resolve SVG
     and image symbol paths."""
 
     def resolve_dependency(self, xml_path):
@@ -41,9 +41,8 @@ def fix_xml_node(xml, collection_path, search_paths):
     :param xml: The XML string of the symbol (or full XML symbol definition)
     :type xml: str
 
-    :param collection_path: The downloaded collection local file
-        system path, where can lookup the images/SVGs of the
-        collection.
+    :param collection_path: The downloaded collection's local file
+        system path, where we can look for images/SVGs.
     :type collection_path: str
 
     :param search_paths: List of paths to search for images/SVGs.
@@ -62,9 +61,9 @@ def fix_xml_node(xml, collection_path, search_paths):
 
 
 def resolve_path(path, collection_path, search_paths):
-    """Try to resolve the SVG and image path.
+    """Try to resolve the SVG and image paths.
 
-    This is the procedure to check it:
+    This is the procedure:
         * It might be a complete local file system path, check if it exists
         * It might be a URL (either local file system or http(s))
         * Check in the 'svg' directory of the collection

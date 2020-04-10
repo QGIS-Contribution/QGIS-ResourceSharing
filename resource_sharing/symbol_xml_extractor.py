@@ -72,7 +72,7 @@ class SymbolXMLExtractor(object):
 
     @property
     def symbols(self):
-        """Return list of symbols in the xml.
+        """Return a list of the symbols in the XML file.
 
         The structure of the property:
         symbols = [
@@ -86,7 +86,7 @@ class SymbolXMLExtractor(object):
 
     @property
     def colorramps(self):
-        """Return list of colorramps in the xml.
+        """Return a list of the colorramps in the XML file.
 
         The structure of the property:
         colorramps = [

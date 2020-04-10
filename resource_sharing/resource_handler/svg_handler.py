@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import fnmatch
+import shutil
 import logging
 
 from qgis.PyQt.QtCore import QSettings
@@ -27,11 +28,8 @@ class SVGResourceHandler(BaseResourceHandler):
     @classmethod
     def svg_search_paths(cls):
         """Read the SVG paths from settings"""
-        # settings = QSettings()
         settings = QgsSettings()
         search_paths_str = settings.value('svg/searchPathsForSVG')
-        # QGIS 3: it's already a list!
-        is_list = False
         if not search_paths_str:
             search_paths = []
         else:
@@ -58,13 +56,12 @@ class SVGResourceHandler(BaseResourceHandler):
     def install(self):
         """Install the SVGs from this collection.
 
-        We just add the collection root directory path to the
-        SVG search path.
+        Add the collection root directory path to the SVG search path.
         """
-        # Check if the dir exists, pass installing silently if it doesn't exist
+        # Check if the dir exists, pass silently if it doesn't
         if not os.path.exists(self.resource_dir):
             return
-        # Add to the search paths for SVG
+        # Add to the SVG search paths
         search_paths = self.svg_search_paths()
 
         if local_collection_path() not in search_paths:
@@ -74,22 +71,27 @@ class SVGResourceHandler(BaseResourceHandler):
 
         # Count the SVGs
         valid = 0
-        for item in os.listdir(self.resource_dir):
-            # file_path = self.resource_dir / item)
-            file_path = os.path.join(self.resource_dir, item)
-            if fnmatch.fnmatch(file_path, '*.svg'):
+        for dirpath, dirnames, filenames in os.walk(self.resource_dir):
+            for filename in [f for f in filenames if f.lower().endswith(".svg")]:
                 valid += 1
         if valid >= 0:
             self.collection[SVG] = valid
 
     def uninstall(self):
-        """Uninstall the SVGs from QGIS."""
-        # Remove from the SVG search paths if the directory is empty
+        """Uninstall the SVGs."""
+        if not os.path.exists(self.resource_dir):
+            return
+        # Remove from the SVG search paths if there are no SVGs left
+        # in any collection
+        # Have to remove now, to be able to update the SVG search path
+        shutil.rmtree(self.resource_dir)
+        svgCount = 0
+        for dirpath, dirnames, filenames in os.walk(local_collection_path()):
+            for filename in [f for f in filenames if f.lower().endswith(".svg")]:
+                svgCount += 1
+                break
         search_paths = self.svg_search_paths()
-        collection_directories = os.listdir(local_collection_path())
-
-        if len(collection_directories) == 0:
+        if svgCount == 0:
             if local_collection_path() in search_paths:
                 search_paths.remove(local_collection_path())
-
         self.set_svg_search_paths(search_paths)

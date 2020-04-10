@@ -93,9 +93,9 @@ def default_local_collection_root_dir():
 def local_collection_path(id=None):
     """Get the path to the local collection dir.
 
-    If id is not passed, it will just return the root dir of the collections.
+    If id is not passed, it will just return the root dir of the
+    collections.
     """
-    # settings = QSettings()
     settings = QgsSettings()
     settings.beginGroup(resource_sharing_group())
     if settings.contains(local_collection_root_dir_key()):
@@ -115,9 +115,9 @@ def local_collection_path(id=None):
     settings.endGroup()
     # If the directory does not exist, create it!
     if not os.path.exists(path):
-            LOGGER.debug('coll_mgr - creating local collection dir: ' +
-                         str(path))
-            os.makedirs(path)
+        LOGGER.debug('coll_mgr - creating local collection dir: ' +
+                     str(path))
+        os.makedirs(path)
 
     # # path = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
     # path = os.path.join(
@@ -136,7 +136,8 @@ def local_collection_path(id=None):
 def old_local_collection_path(id=None):
     """Get the path to the old local collection dir.
     (in case we would like to help the users migrate)
-    If id is not passed, it will just return the root dir of the collections.
+    If id is not passed, it will just return the root dir of the
+    collections.
     """
     path = os.path.join(
         QDir.homePath(),
@@ -157,7 +158,7 @@ def path_leaf(path):
 def qgis_version():
     """Get the version of QGIS.
 
-    :returns: QGIS Version where 10700 represents QGIS 1.7 etc.
+    :returns: QGIS Version where 30400 represents QGIS 3.4 etc.
     :rtype: int
     """
     version = unicode(Qgis.QGIS_VERSION_INT)
@@ -166,8 +167,8 @@ def qgis_version():
 
 
 def render_template(filename, context):
-    """Render template with specific filename under template directory.
-    :param filename: The filename (must be under template directory)
+    """Render a template with the specified filename.
+    :param filename: The filename (must be in the template directory)
     :type filename: str
 
     :param context: The context passed for the template

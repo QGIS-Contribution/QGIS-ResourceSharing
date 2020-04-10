@@ -10,16 +10,14 @@ except ImportError:
     from urllib.parse import urljoin
     from urllib.request import pathname2url
 
-
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
-
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 
 class FileSystemHandler(BaseRepositoryHandler):
-    """Class to handle file system repository."""
+    """Handler for file system repositories."""
     IS_DISABLED = False
 
     def __init__(self, url):
@@ -34,27 +32,23 @@ class FileSystemHandler(BaseRepositoryHandler):
                 return True
 
     def fetch_metadata(self):
-        """Fetch metadata file from the repository."""
+        """Fetch the metadata file from the repository."""
         # Check if the metadata exists
         metadata_path = os.path.join(self._path, self.METADATA_FILE)
         if not os.path.exists(metadata_path):
-            message = 'Metadata file does not exist in the repository'
+            message = 'The metadata file could not be found in the repository'
             return False, message
 
         # Read the metadata file:
         with open(metadata_path, 'r') as metadata_file:
             metadata_content = metadata_file.read()
         self.metadata = metadata_content
-        message = 'Fetching metadata is successful'
+        message = 'Metadata successfully fetched'
 
         return True, message
 
     def download_collection(self, id, register_name):
         """Download a collection given its ID.
-
-        For remote git repositories, we will clone the repository first (or
-        pull if the repo is already cloned before) and copy the collection to
-        collections dir.
 
         :param id: The ID of the collection.
         :type id: str

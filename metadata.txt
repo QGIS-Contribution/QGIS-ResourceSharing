@@ -17,8 +17,8 @@ experimental=False
 deprecated=False
 icon=resources/icon.png
 changelog=
+        0.13.1 - Files removed from repository are still being installed from cache (#44)
         0.13.0 - GUI updates (#100)
-               - Files removed from repository are still being installed from cache (#44)
                - Provide installation summary (#6)
                - Avoid (parent) tag with no members in QGIS 3 style documents (#101)
                - Fix reloading problems ([WinError 5]) with Microsoft Windows (#103)

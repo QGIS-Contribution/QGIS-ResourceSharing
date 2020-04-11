@@ -6,7 +6,7 @@ author=Akbar Gumbira, Håvard Tveite
 qgisMinimumVersion=3.0
 description=Download shared collections
 about=Search for published collections and install them for use with QGIS. Symbology (SVG, images, styles), Processing scripts, Processing models and R scripts are supported. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S).
-version=0.13.0
+version=0.13.1
 tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing.git
 

@@ -112,7 +112,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                     self.url, local_repo_dir,
                     errstream=writeOut
                 )
-                repo.close()  # To avoid WinErr 32
+                repo.close()  # Try to avoid WinErr 32
             except Exception as e:
                 # Try to clone with https if it is a ssh url
                 git_parsed = parse(self.url)
@@ -121,7 +121,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                         repo = porcelain.clone(
                             git_parsed.url2https, local_repo_dir,
                             errstream=writeOut)
-                        repo.close()  # To avoid WinErr 32
+                        repo.close()  # Try to avoid WinErr 32
                     except Exception as e:
                         error_message = 'Error: %s' % str(e)
                         LOGGER.exception(traceback.format_exc())
@@ -136,6 +136,9 @@ class RemoteGitHandler(BaseRepositoryHandler):
                                  'collection failed.')
                 return False, error_message
         else:
+            # Hack until dulwich/porcelain handles file removal
+            collDir = os.path.join(local_repo_dir, 'collections')
+            shutil.rmtree(collDir)
             try:
                 porcelain.pull(
                     local_repo_dir,

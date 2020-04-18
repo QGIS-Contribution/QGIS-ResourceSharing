@@ -13,17 +13,17 @@ in the screenshot below.
 
 ![Repositories]({{ site.baseurl }}/assets/repositories.png)
 
-You can add other repositories by clicking the ```Add``` button
-and specify a name for the repository (you are free to call it whatever
-you like) and its URL (remember to use ``https`` for github and similar
-repositories).
-If authentication is needed to access the repository, add the
+You can add other repositories by clicking the ```Add repository...```
+button and specify a *Name* for the repository (you are free to call
+it whatever you like) and its *URL* (remember to use ``https`` for
+github and similar repositories).
+If authentication is needed to access the repository, *Add* the
 configuration.
 
 ![Add repository]({{ site.baseurl }}/assets/settings.png)
 
 If the repository is successfully added, you can now also see its
-collections in the ``All`` tab and install them from there.
+collections in the ``All collections`` tab and install them from there.
 
 The table below lists the types of repositories that can be added.
 

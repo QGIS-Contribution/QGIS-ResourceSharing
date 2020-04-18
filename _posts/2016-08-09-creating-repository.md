@@ -22,12 +22,12 @@ must have a certain structure. This is what you need to do:
     ```file://C:/home/pointing/to/repository_root``` on Windows.
 
 #### Where can you  share it?
-These are the options for sharing: on Github, Bitbucket (they need to be
-public repositories), local file system (if you want to share the
+These are the options for sharing: on Github, GitLab, Bitbucket (they need to be
+public repositories), Gogs (*Go Git Service*), local file system (if you want to share the
 collections with your colleagues on the network), or in your own server
 with the HTTP(S) protocol.
 
-**Github and Bitbucket**
+**Github, GitLab and Bitbucket**
 
 There is nothing complicated here if you are already familiar with git.
 After preparing the repository on your local machine, you can make it

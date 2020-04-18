@@ -6,10 +6,17 @@ date: 2016-08-11 23:11:10
 order: 3
 ---
 
-To add a repository and get access to the collections available in it,
-go to the ```Settings``` tab, click ```Add```, and specify a name
-for the repository (you are free to call it whatever you like) and its
-URL (remember to use ``https`` for github and similar repositories).
+The officially approved *QGIS Resource Sharing* repositories and
+their collections should be listed in the *Settings* tab when you
+have clicked the ***Reload Repositories*** button, as illustrated
+in the screenshot below.
+
+![Repositories]({{ site.baseurl }}/assets/repositories.png)
+
+You can add other repositories by clicking the ```Add``` button
+and specify a name for the repository (you are free to call it whatever
+you like) and its URL (remember to use ``https`` for github and similar
+repositories).
 If authentication is needed to access the repository, add the
 configuration.
 

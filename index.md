@@ -16,6 +16,8 @@ collection, or a zipped collection on the Web - HTTP(S).
 
 ![the plugin]({{ site.baseurl }}/assets/app.png)
 
+![settings-repositories]({{ site.baseurl }}/assets/repositories.png)
+
 The plugin was initially implemented as a Google Summer of Code project
 in 2016 for QGIS under the OSGeo organization by Akbar Gumbira (student),
 Alessandro Pasotti (mentor), Anita Graser (mentor), and with the help of

@@ -33,3 +33,9 @@ the plugin will try to create it.
 Changing the location in settings will not move the already installed
 collections, so if they are not moved (manually) to the new location,
 they will have to be installed again.
+
+If you upgrade from a pre-0.10.0 version of the plugin, and the
+``~/QGIS/Resource Sharing`` directory exists in your file system,
+that directory will be used (and recorded in your QGIS
+``localCollectionDir`` settings) until the location is changed by
+modifying the ``localCollectionDir`` settings.

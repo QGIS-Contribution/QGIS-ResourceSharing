@@ -11,7 +11,7 @@ registered in the ```Settings``` tab) and install them in your
 file system, making them available to QGIS.
 
 The first time you use the plugin, there will be no collections
-in the ``All`` tab.
+in the ``All collections`` tab.
 But once you have loaded the available repositories, the
 officially approved collections should be there.
 Loading the repositories is done by pushing the
@@ -20,8 +20,8 @@ Loading the repositories is done by pushing the
 It is a good idea to ***reload*** the repositories now and then,
 so that your local copies are kept up-to-date.
 
-To install a collection, you go to the ``All`` tab, select it
-and click the ```Install``` button (below the collection
+To install a collection, you go to the ``All collections`` tab,
+select it and click the ```Install``` button (below the collection
 description).
 The resources in the collection will be installed (the location
 in the file system depends on their type).
@@ -36,13 +36,13 @@ unintelligible name (the *QGIS R script collection* from the
 *QGIS Official Repository* is located in the
 ``resource_sharing/collections/8bc41c8c4fe90615b47eef7c81199fa6d7148fb3``
 directory).
-The collection folder will have sub-folders - the collections
-branch in the
+The collection folder will have sub-folders for the resources -
+branches in the
 <a href="../author/repository-structure.html">repository structure</a>.
 
 #### SVG
-If the collection contains SVGs, they will be copied to your file
-system, and the path will be included in your QGIS SVG search path.
+If the collection contains SVGs, the path to the collections
+folder will be included in your QGIS SVG search path.
 The SVGs will be available when editing symbols (under the
 ``User Symbols`` section in **SVG Groups**).
 
@@ -61,23 +61,26 @@ to see the items installed from the collection.
  
 #### Style
 For QML styles, the plugin will resolve the image or SVG paths for you.
-You can click on the ```Open folder``` button to see where the QML style
-is, for later use.
+You can click on the ```Open folder``` button to see where in the file
+system the QML style file is located, for later use.
 
 #### Processing Script
-After the installation, the processing scripts in the collection will be 
-available for use in the Processing Toolbox under the ```Scripts``` menu.
+The Python scripts will be copied to the processing scripts folder and
+thereby become available for use in the Processing Toolbox under the
+```Scripts``` menu.
 
 ![Processing Toolbox Scripts]({{ site.baseurl }}/assets/processing_toolbox_scipts.png)
 
 #### Processing Model
-After the installation, the processing models in the collection will be 
-available for use in the Processing Toolbox under the ```Models``` menu.
+The model fioles will be copied to the processing models folder and
+become available for use in the Processing Toolbox under the
+```Models``` menu.
 
 ![Processing Toolbox Models]({{ site.baseurl }}/assets/processing_toolbox_models.png)
 
 #### R Script
-After the installation, the R scripts in the collection will be available for use
-in the Processing Toolbox under the ```R``` menu.
+The R scripts in the collection will be copied to the R scripts folder
+and become available for use in the Processing Toolbox under the
+```R``` menu.
 
 ![Processing Toolbox R]({{ site.baseurl }}/assets/processing_toolbox_r.png)

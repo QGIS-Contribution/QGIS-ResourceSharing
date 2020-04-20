@@ -129,10 +129,14 @@ def local_collection_path(id=None):
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         sane_name = sanitize_filename(collection_name)
+        repository_name = config.COLLECTIONS[id]['repository_name']
+        sane_repo_name = sanitize_filename(repository_name)
 
-        dir_name = '%s-%s' % (sane_name, id)
-        # dir_name = '%s (%s)' % (collection_name, id)
-        # dir_name = '%s' % (id)
+        #dir_name = '%s-%s' % (sane_name, id)
+        # Use repository name instead of hash
+        dir_name = '%s (%s)' % (sane_name, sane_repo_name)
+        # #dir_name = '%s (%s)' % (collection_name, id)
+        # #dir_name = '%s' % (id)
         # path = lcPath / dir_name
         path = os.path.join(lcPath, dir_name)
         # Check if the "old" directory name exists

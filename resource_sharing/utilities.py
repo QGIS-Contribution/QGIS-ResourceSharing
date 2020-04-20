@@ -134,6 +134,14 @@ def local_collection_path(id=None):
         # dir_name = '%s' % (id)
         # path = path / dir_name
         path = os.path.join(path, dir_name)
+        # Check if the "old" directory name exists
+        old_dir_name = '%s' % (id)
+        old_path = os.path.join(path, old_dir_name)
+        if os.path.exists(old_path)
+            try:
+                os.rename(old_path, path)
+            except:
+                #
     return path
 
 

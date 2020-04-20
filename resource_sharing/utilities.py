@@ -125,6 +125,7 @@ def local_collection_path(id=None):
     #     QDir.toNativeSeparators(QDir.homePath()),
     #     'QGIS',
     #     'Resource Sharing')
+    path = lcPath
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         sane_name = sanitize_filename(collection_name)

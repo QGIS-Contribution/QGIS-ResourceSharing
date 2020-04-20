@@ -349,11 +349,12 @@ class RepositoryManager(QObject):
                 collection['repository_name'] = repo
                 config.COLLECTIONS[collection_id] = collection
 
+                # Get the collection path (updating if neccessary)
+                collection_path = local_collection_path(collection_id)
                 # Check the file system to see if the collection exists.
                 # If not, also uninstall its resources
                 current_status = config.COLLECTIONS[collection_id]['status']
                 if current_status == COLLECTION_INSTALLED_STATUS:
-                    collection_path = local_collection_path(collection_id)
                     if not os.path.exists(collection_path):
                         # Uninstall the collection
                         self._collections_manager.uninstall(collection_id)

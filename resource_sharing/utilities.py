@@ -5,7 +5,7 @@ import os
 import logging
 
 import ntpath
-from from ext_libs.pathvalidate import sanitize_filename
+from ext_libs.pathvalidate import sanitize_filename
 
 from qgis.PyQt.QtCore import QDir, QSettings
 from qgis.core import QgsSettings

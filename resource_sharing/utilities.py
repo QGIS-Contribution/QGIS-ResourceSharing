@@ -5,6 +5,7 @@ import os
 import logging
 
 import ntpath
+from pathvalidate import sanitize_filename
 
 from qgis.PyQt.QtCore import QDir, QSettings
 from qgis.core import QgsSettings
@@ -126,8 +127,11 @@ def local_collection_path(id=None):
     #     'Resource Sharing')
     if id:
         collection_name = config.COLLECTIONS[id]['name']
+        sane_name = sanitize_filename(collection_name)
+
+        dir_name = '%s-%s' % (sane_name, id)
         # dir_name = '%s (%s)' % (collection_name, id)
-        dir_name = '%s' % (id)
+        # dir_name = '%s' % (id)
         # path = path / dir_name
         path = os.path.join(path, dir_name)
     return path

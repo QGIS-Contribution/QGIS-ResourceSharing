@@ -142,6 +142,7 @@ def local_collection_path(id=None):
                 os.rename(old_path, path)
             except:
                 #
+                pass
     return path
 
 

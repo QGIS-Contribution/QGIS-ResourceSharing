@@ -93,20 +93,20 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         try:
             # QGIS 2
             return self.style.symbolsOfGroup(
-                QgsStyle.SymbolEntity, child_group_or_tag_id)
+                symbol_type, child_group_or_tag_id)
         except AttributeError:
             # not QGIS 2, so hopefully QGIS 3
             return self.style.symbolsWithTag(
-                QgsStyle.SymbolEntity, child_group_or_tag_id)
+                symbol_type, child_group_or_tag_id)
 
     def _group_or_tag(self, symbol_type, symbol_name, tag_or_group):
         """Add the symbol to a group (QGIS2) or tag the symbol (QGIS3)."""
         try:
             # QGIS 2
-            self.style.group(QgsStyle.SymbolEntity, symbol_name, tag_or_group)
+            self.style.group(symbol_type, symbol_name, tag_or_group)
         except AttributeError:
             # not QGIS 2, so hopefully QGIS 3
-            self.style.tagSymbol(QgsStyle.SymbolEntity, symbol_name,
+            self.style.tagSymbol(symbol_type, symbol_name,
                                  [self.style.tag(tag_or_group)])
 
     def _group_or_tag_remove(self, group_or_tag_id):
@@ -172,8 +172,8 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                     colorramp['name'], self.collection['repository_name'])
                 if self.style.addColorRamp(
                         colorramp_name, colorramp['colorramp'], True):
-                    self._group_or_tag(
-                        QgsStyle.ColorrampEntity, colorramp_name, groupOrTag_id)
+                    self._group_or_tag(QgsStyle.ColorrampEntity,
+                                       colorramp_name, groupOrTag_id)
 
         if valid >= 0:
             self.collection[SYMBOL] = valid

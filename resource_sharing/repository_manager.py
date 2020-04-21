@@ -127,19 +127,25 @@ class RepositoryManager(QObject):
             settings.endGroup()
 
     def load_directories(self):
-        """Load directories of repository registered in settings."""
+        """Update the repository directory."""
         self._directories = {}
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
 
-        # Write the online directory to QgsSettings first, if needed
+        # Loop through the repositories from the official directory
         for online_dir_name in self._online_directories:
+            # Check if the repository is already present
             repo_present = False
             for repo_name in settings.childGroups():
                 url = settings.value(repo_name + '/url', '', type=unicode)
                 if url == self._online_directories[online_dir_name]:
                     repo_present = True
                     break
+                if online_dir_name == repo_name:
+                    repo_present = True
+                    nameWarn = ("The repository " + repo_name + " is masking "
+                                "an official repository with the same name")
+                    LOGGER.warning(nameWarn)
             if not repo_present:
                 self.add_directory(
                     online_dir_name, self._online_directories[online_dir_name])

@@ -146,6 +146,7 @@ class RepositoryManager(QObject):
                     nameWarn = ("The repository " + repo_name + " is masking "
                                 "an official repository with the same name")
                     LOGGER.warning(nameWarn)
+                    break
             if not repo_present:
                 self.add_directory(
                     online_dir_name, self._online_directories[online_dir_name])

@@ -35,7 +35,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         or parent tag (for QGIS3) for the styles.
         Returns the id of the (existing or new) group or tag."""
         parent_group_name = '%s (%s)' % (
-            self.collection['name'], self.collection_id)
+            self.collection['name'], self.collection['repository_name'])
         try:
             # QGIS 2
             group = self.style.groupId(parent_group_name)
@@ -67,7 +67,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         except AttributeError:
             # not QGIS 2, so hopefully QGIS 3
             #tag_name = self.style.tag(group_or_tag_id) + '/' + file_name
-            tag_name = ('%s (%s)/') % (self.collection['name'], self.collection_id) + file_name
+            tag_name = ('%s (%s)/') % (self.collection['name'], self.collection['repository_name']) + file_name
             tag = self.style.tagId(tag_name)
             if tag != 0:
                 return tag
@@ -76,7 +76,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     def _get_child_groups_tags_ids(self):
         """Retrieve ids for the child groups (for QGIS2) or tags (for QGIS3)."""
         parent_group_name = '%s (%s)' % (
-            self.collection['name'], self.collection_id)
+            self.collection['name'], self.collection['repository_name'])
         try:
             # QGIS 2
             return [self.style.groupId(n) for n in
@@ -162,14 +162,14 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             # Add all symbols and colorramps and group / tag them
             symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
             for symbol in symbol_xml_extractor.symbols:
-                symbol_name = '%s (%s)' % (symbol['name'], self.collection_id)
+                symbol_name = '%s (%s)' % (symbol['name'], self.collection['repository_name'])
                 # self.resolve_dependency(symbol[SYMBOL])
                 if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
                     self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
                                        groupOrTag_id)
             for colorramp in symbol_xml_extractor.colorramps:
                 colorramp_name = '%s (%s)' % (
-                    colorramp['name'], self.collection_id)
+                    colorramp['name'], self.collection['repository_name'])
                 if self.style.addColorRamp(
                         colorramp_name, colorramp['colorramp'], True):
                     self._group_or_tag(

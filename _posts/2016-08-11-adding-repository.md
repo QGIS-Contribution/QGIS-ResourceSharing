@@ -34,7 +34,7 @@ GitLab |  https://gitlab.com/test/MyResources.git |
 Bitbucket |  https://bitbucket.org/gisuser/qgis-style-repo-useful.git | Works only for Bitbucket public repositories
 Gogs |  | 
 File system | file:///home/gisuser/dev/repositories/qgis_resources | Pointing to the repository root in your local file system 
-HTTP(s) with zip collections | https://github.com/qgis/QGIS-Resources | Pointing to the base URL of the repository. Metadata must be available, with this URL: http(s)://[base_url]/metadata.ini. The collections should be in http(s)://[base_url]/collections/[collection_name].zip
+HTTP(s) with zip collections | https://yourdomain.com/qgis/QGIS-Resources | Providing the base URL of the repository. Metadata must be available, with this URL: [base_url]/metadata.ini. The collections should be in [base_url]/collections/[collection_name].zip
 
 Adding a repository (and loading one or more of its collections) means that
 a copy of the repository will be placed in the local file system

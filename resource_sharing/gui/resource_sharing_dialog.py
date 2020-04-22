@@ -317,18 +317,26 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         if not dlg.exec_():
             return
 
-        # Check if the changed URL is already present
+        # Check if the changed URL is already present and that
+        # the new repository name is unique
         new_url = dlg.line_edit_url.text().strip()
         old_url = self.repository_manager.directories[repo_name]['url']
-        for repo in self.repository_manager.directories.values():
+        new_name = dlg.line_edit_name.text().strip()
+        for repoName, repo in self.repository_manager.directories.items():
             if new_url == repo['url'] and (old_url != new_url):
                 self.message_bar.pushMessage(
                     self.tr('Unable to add another repository with the same '
                             'URL!'),
                     Qgis.Warning, 5)
                 return
+            if new_name == repoName and (repo_name != new_name):
+                self.message_bar.pushMessage(
+                    self.tr(
+                        'Repositories must have unique names!'),
+                    Qgis.Warning, 5)
+                return
 
-        new_name = dlg.line_edit_name.text()
+        # Redundant
         if (new_name in self.repository_manager.directories) and (
                     new_name != repo_name):
             new_name += '(2)'

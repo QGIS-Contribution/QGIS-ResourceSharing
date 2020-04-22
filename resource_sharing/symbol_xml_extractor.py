@@ -1,10 +1,13 @@
 # coding=utf-8
 import os
+import logging
 
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.PyQt.QtCore import QFile, QIODevice
 from qgis.core import QgsSymbolLayerUtils, QgsReadWriteContext, QgsProject
+from qgis.core import QgsPalLayerSettings, QgsTextFormat
 
+LOGGER = logging.getLogger('QGIS Resource Sharing')
 
 class SymbolXMLExtractor(object):
     """Parses the given file and returns the symbols and colorramps"""
@@ -68,6 +71,37 @@ class SymbolXMLExtractor(object):
 
             ramp_element = ramp_element.nextSiblingElement()
 
+        # Get all the TextFormats - textformats - textformat
+        self._textformats = []
+        textformats_element = document_element.firstChildElement('textformats')
+        textformat_element = textformats_element.firstChildElement()
+        while not textformat_element.isNull():
+            if textformat_element.tagName() == 'textformat':
+                textformat = QgsTextFormat()
+                textformat.readXml(textformat_element, QgsReadWriteContext())
+                if textformat:
+                    self._textformats.append({
+                        'name': textformat_element.attribute('name'),
+                        'textformat': textformat
+                    })
+            textformat_element = textformat_element.nextSiblingElement()
+
+        # Get all the LabelSettings - labelsettings - labelsetting -
+        #  QgsPalLayerSettings.readXML?
+        self._labelsettings = []
+        labels_element = document_element.firstChildElement('labelsettings')
+        label_element = labels_element.firstChildElement()
+
+        while not label_element.isNull():
+            if label_element.tagName() == 'labelsetting':
+                labelsettings = QgsPalLayerSettings()
+                labelsettings.readXml(label_element, QgsReadWriteContext())
+                if labelsettings:
+                    self._labelsettings.append({
+                        'name': label_element.attribute('name'),
+                        'labelsettings': labelsettings
+                    })
+            label_element = label_element.nextSiblingElement()
         return True
 
     @property
@@ -97,3 +131,29 @@ class SymbolXMLExtractor(object):
         ]
         """
         return self._colorramps
+
+    @property
+    def textformats(self):
+        """Return a list of the textformats in the XML file.
+        The structure of the property:
+        textformats = [
+            {
+                'name': str
+                'textformat': QgsTextFormat???
+            }
+        ]
+        """
+        return self._textformats
+
+    @property
+    def labelsettings(self):
+        """Return a list of the labelsettings in the XML file.
+        The structure of the property:
+        labelsettings = [
+            {
+                'name': str
+                'labelsettings': QgsPalLayerSettings???
+            }
+        ]
+        """
+        return self._labelsettings

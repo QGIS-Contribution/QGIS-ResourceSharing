@@ -49,14 +49,16 @@ The SVGs will be available when editing symbols (under the
 ![SVG Group]({{ site.baseurl }}/assets/svg_group.png)
   
 #### Symbol
-The symbols and colorramps from the collection (defined by an XML 
-file) will become available in the Style Manager. 
+The symbols, colorramps, textformats and labelsettings from the style
+XML files in the collection will become available in the Style Manager. 
 
 ![Style Manager]({{ site.baseurl }}/assets/style_manager.png)
 
-For each symbol XML file, the plugin will create a child group with the same
-name as the XML file.
-Click on the tab ```Marker```, ```Line```, ```Fill```, or ```Color ramp```
+For each symbol XML file, the plugin will create a tag where the last
+part of the name is the filename of the XML file (without the *.xml*).
+The first part of the tag name identifies the collection.
+Click on the tabs ```All```, ```Marker```, ```Line```, ```Fill```,
+```Color Ramp```, ```Text Format``` or ```Label Settings```
 to see the items installed from the collection.
  
 #### Style

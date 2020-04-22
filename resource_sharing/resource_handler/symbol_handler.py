@@ -93,20 +93,20 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         try:
             # QGIS 2
             return self.style.symbolsOfGroup(
-                QgsStyle.SymbolEntity, child_group_or_tag_id)
+                symbol_type, child_group_or_tag_id)
         except AttributeError:
             # not QGIS 2, so hopefully QGIS 3
             return self.style.symbolsWithTag(
-                QgsStyle.SymbolEntity, child_group_or_tag_id)
+                symbol_type, child_group_or_tag_id)
 
     def _group_or_tag(self, symbol_type, symbol_name, tag_or_group):
         """Add the symbol to a group (QGIS2) or tag the symbol (QGIS3)."""
         try:
             # QGIS 2
-            self.style.group(QgsStyle.SymbolEntity, symbol_name, tag_or_group)
+            self.style.group(symbol_type, symbol_name, tag_or_group)
         except AttributeError:
             # not QGIS 2, so hopefully QGIS 3
-            self.style.tagSymbol(QgsStyle.SymbolEntity, symbol_name,
+            self.style.tagSymbol(symbol_type, symbol_name,
                                  [self.style.tag(tag_or_group)])
 
     def _group_or_tag_remove(self, group_or_tag_id):
@@ -172,9 +172,22 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                     colorramp['name'], self.collection['repository_name'])
                 if self.style.addColorRamp(
                         colorramp_name, colorramp['colorramp'], True):
-                    self._group_or_tag(
-                        QgsStyle.ColorrampEntity, colorramp_name, groupOrTag_id)
-
+                    self._group_or_tag(QgsStyle.ColorrampEntity,
+                                       colorramp_name, groupOrTag_id)
+            for textformat in symbol_xml_extractor.textformats:
+                textformat_name = '%s (%s)' % (
+                    textformat['name'], self.collection['repository_name'])
+                if self.style.addTextFormat(
+                        textformat_name, textformat['textformat'], True):
+                    self._group_or_tag(QgsStyle.TextFormatEntity,
+                                       textformat_name, groupOrTag_id)
+            for labelsetting in symbol_xml_extractor.labelsettings:
+                labelsetting_name = '%s (%s)' % (
+                    labelsetting['name'], self.collection['repository_name'])
+                if self.style.addLabelSettings(
+                        labelsetting_name, labelsetting['labelsettings'], True):
+                    self._group_or_tag(QgsStyle.LabelSettingsEntity,
+                                       labelsetting_name, groupOrTag_id)
         if valid >= 0:
             self.collection[SYMBOL] = valid
 
@@ -195,6 +208,16 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 QgsStyle.ColorrampEntity, child_group_id)
             for colorramp in colorramps:
                 self.style.removeColorRamp(colorramp)
+            # Get all the textformats for this tag / child group and remove them
+            textformats = self._get_symbols_for_group_or_tag(
+                QgsStyle.TextFormatEntity, child_group_id)
+            for textformat in textformats:
+                self.style.removeTextFormat(textformat)
+            # Get all the labelsettings for this tag / child group and remove them
+            labelsettings = self._get_symbols_for_group_or_tag(
+                QgsStyle.LabelSettingsEntity, child_group_id)
+            for labelsetting in labelsettings:
+                self.style.removeLabelSettings(labelsetting)
 
             # Remove this tag / child group
             self._group_or_tag_remove(child_group_id)

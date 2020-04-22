@@ -15,8 +15,8 @@ in the screenshot below.
 
 You can add other repositories by clicking the ```Add repository...```
 button and specify a *Name* for the repository (you are free to call
-it whatever you like) and its *URL* (remember to use ``https`` for
-github and similar repositories).
+it whatever you like, as long as the name is unique) and its *URL*
+(remember to use ``https`` for github and similar repositories).
 If authentication is needed to access the repository, *Add* the
 configuration.
 

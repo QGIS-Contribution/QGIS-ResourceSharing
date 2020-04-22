@@ -127,18 +127,25 @@ class RepositoryManager(QObject):
             settings.endGroup()
 
     def load_directories(self):
-        """Load directories of repository registered in settings."""
+        """Update the repository directory."""
         self._directories = {}
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
 
-        # Write the online directory to QgsSettings first, if needed
+        # Loop through the repositories from the official directory
         for online_dir_name in self._online_directories:
+            # Check if the repository is already present
             repo_present = False
             for repo_name in settings.childGroups():
                 url = settings.value(repo_name + '/url', '', type=unicode)
                 if url == self._online_directories[online_dir_name]:
                     repo_present = True
+                    break
+                if online_dir_name == repo_name:
+                    repo_present = True
+                    nameWarn = ("The repository " + repo_name + " is masking "
+                                "an official repository with the same name")
+                    LOGGER.warning(nameWarn)
                     break
             if not repo_present:
                 self.add_directory(
@@ -178,7 +185,7 @@ class RepositoryManager(QObject):
                 collections = repo_handler.parse_metadata()
             except MetadataError as me:
                 metadata_warning = ("Error parsing metadata for " +
-                                    str(new_repo_name) + ":\n" + str(me))
+                                    str(repo_name) + ":\n" + str(me))
                 LOGGER.warning(metadata_warning)
                 return False, metadata_warning
 
@@ -349,11 +356,12 @@ class RepositoryManager(QObject):
                 collection['repository_name'] = repo
                 config.COLLECTIONS[collection_id] = collection
 
+                # Get the collection path (updating if neccessary)
+                collection_path = local_collection_path(collection_id)
                 # Check the file system to see if the collection exists.
                 # If not, also uninstall its resources
                 current_status = config.COLLECTIONS[collection_id]['status']
                 if current_status == COLLECTION_INSTALLED_STATUS:
-                    collection_path = local_collection_path(collection_id)
                     if not os.path.exists(collection_path):
                         # Uninstall the collection
                         self._collections_manager.uninstall(collection_id)

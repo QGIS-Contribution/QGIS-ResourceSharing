@@ -236,11 +236,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         if not dlg.exec_():
             return
 
-        for repo in self.repository_manager.directories.values():
+        for repoName, repo in self.repository_manager.directories.items():
             if dlg.line_edit_url.text().strip() == repo['url']:
                 self.message_bar.pushMessage(
                     self.tr(
                         'Unable to add another repository with the same URL!'),
+                    Qgis.Warning, 5)
+                return
+            if dlg.line_edit_name.text().strip() == repoName:
+                self.message_bar.pushMessage(
+                    self.tr(
+                        'Repositories must have unique names!'),
                     Qgis.Warning, 5)
                 return
 

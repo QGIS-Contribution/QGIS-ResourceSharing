@@ -172,7 +172,7 @@ class BaseRepositoryHandler(object):
                     Qgis.QGIS_VERSION, qgis_min_version, qgis_max_version):
                 LOGGER.warning(
                     'Collection %s is not compatible with this QGIS '
-                    'version. QGIS ver:%s, QGIS min ver:%s, QGIS max ver: '
+                    'version. QGIS ver: %s, QGIS min ver: %s, QGIS max ver: '
                     '%s' % (
                         collection, Qgis.QGIS_VERSION, qgis_min_version,
                         qgis_max_version))

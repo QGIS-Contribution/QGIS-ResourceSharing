@@ -5,6 +5,7 @@ import os
 import logging
 
 import ntpath
+from ext_libs.pathvalidate import sanitize_filename
 
 from qgis.PyQt.QtCore import QDir, QSettings
 from qgis.core import QgsSettings
@@ -100,36 +101,52 @@ def local_collection_path(id=None):
     settings.beginGroup(resource_sharing_group())
     if settings.contains(local_collection_root_dir_key()):
         # The path is defined in the settings - use it
-        path = settings.value(local_collection_root_dir_key())
+        lcPath = settings.value(local_collection_root_dir_key())
     else:
         # The path is not defined in the settings
         if os.path.exists(old_local_collection_path()):
             # The pre-version 0.10 directory exists - so use it
-            path = old_local_collection_path()
+            lcPath = old_local_collection_path()
         else:
             # Use the new default directory
-            path = default_local_collection_root_dir()
-        LOGGER.info('Setting the collection path to ' + path)
+            lcPath = default_local_collection_root_dir()
+        LOGGER.info('Setting the collection path to ' + lcPath)
         settings.setValue(local_collection_root_dir_key(),
-                          path)
+                          lcPath)
     settings.endGroup()
     # If the directory does not exist, create it!
-    if not os.path.exists(path):
+    if not os.path.exists(lcPath):
         LOGGER.debug('coll_mgr - creating local collection dir: ' +
-                     str(path))
-        os.makedirs(path)
+                     str(lcPath))
+        os.makedirs(lcPath)
 
-    # # path = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
-    # path = os.path.join(
+    # # lcPath = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
+    # lcPath = os.path.join(
     #     QDir.toNativeSeparators(QDir.homePath()),
     #     'QGIS',
     #     'Resource Sharing')
+    path = lcPath
     if id:
         collection_name = config.COLLECTIONS[id]['name']
-        # dir_name = '%s (%s)' % (collection_name, id)
-        dir_name = '%s' % (id)
-        # path = path / dir_name
-        path = os.path.join(path, dir_name)
+        sane_name = sanitize_filename(collection_name)
+        repository_name = config.COLLECTIONS[id]['repository_name']
+        sane_repo_name = sanitize_filename(repository_name)
+
+        #dir_name = '%s-%s' % (sane_name, id)
+        # Use repository name instead of hash
+        dir_name = '%s (%s)' % (sane_name, sane_repo_name)
+        # #dir_name = '%s (%s)' % (collection_name, id)
+        # #dir_name = '%s' % (id)
+        # path = lcPath / dir_name
+        path = os.path.join(lcPath, dir_name)
+        # Check if the "old" directory name exists
+        old_dir_name = '%s' % (id)
+        old_path = os.path.join(lcPath, old_dir_name)
+        if os.path.exists(old_path):
+            try:
+                os.rename(old_path, path)
+            except:
+                pass
     return path
 
 

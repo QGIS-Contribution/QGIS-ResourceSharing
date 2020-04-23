@@ -228,8 +228,8 @@ class RepositoryManager(QObject):
         :return: (status, error)
         :rtype: (boolean, string)
         """
+        old_collections = self._repositories.get(old_repo_name, [])
         if (old_repo_name != new_repo_name) and (old_url == new_url):
-            old_collections = self._repositories.get(old_repo_name, [])
             # Renaming a repository (same URL)
             for old_collection in old_collections:
                 coll_id = self._collections_manager.get_collection_id(

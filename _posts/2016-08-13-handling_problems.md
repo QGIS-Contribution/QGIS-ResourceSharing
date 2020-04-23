@@ -86,35 +86,38 @@ to remove all installed collections and clean up, you can:
 
 ***Installing developing versions***
 
-If you would like to test the latest features of the plugin,
-it is possible to download the plugin directly from github.
+If you would like to test upcoming features of the plugin,
+or help fixing bugs, it is possible to download the plugin
+directly from github.
 
 The most common would be to download the *master* branch
 (*https://github.com/QGIS-Contribution/QGIS-ResourceSharing/archive/master.zip*),
-but other branches can also be downloaded.
-Start a web browser and open
-*https://github.com/QGIS-Contribution/QGIS-ResourceSharing*,
-choose the *Branch* you would like to download, click
-*Clone or download* and *Download ZIP*.
+but all branches can be downloaded.
 
-![Choose branch on github]({{ site.baseurl }}/assets/github-branch.png)
+1. Start a web browser and open
+   *https://github.com/QGIS-Contribution/QGIS-ResourceSharing*.
 
-Once you have downloaded the zip-file,
+2. Choose the *Branch* you would like to download, click
+   *Clone or download* and *Download ZIP*.
 
-1. Go to the plugin directory (`python/plugins`, in your QGIS user directory)
+   ![Choose branch on github]({{ site.baseurl }}/assets/github-branch.png)
 
-2. Remove the currently installed version of the plugin
+   Save the ZIP file.
+
+3. Go to the plugin directory (`python/plugins`, in your QGIS user directory)
+
+4. Remove the currently installed version of the plugin
    (`qgis_resource_sharing`, if you have installed from the
    official QGIS plugin repository).
 
-3. Unzip the downloaded file in the plugin directory.
+5. Unzip the downloaded file in the plugin directory.
    If you downloaded the master branch, the subdirectory with
    the plugin will be named `QGIS-ResourceSharing-master`.
 
-4. Start QGIS.
+6. Start QGIS.
    If the name of the plugin subdirectory of the Resource Sharing
    plugin has changed, the plugin may have become disabled, and
    the next step will be necessary.
 
-5. Open the Plugin Manager and (re)enable the plugin.
+7. Open the Plugin Manager and (re)enable the plugin.
 

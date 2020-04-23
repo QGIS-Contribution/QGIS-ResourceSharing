@@ -229,17 +229,19 @@ class RepositoryManager(QObject):
         :rtype: (boolean, string)
         """
         if (old_repo_name != new_repo_name) and (old_url == new_url):
-            # If the repository is renamed (same URL), the directories
-            # of its collections should be renamed accordingly (so that
-            # they remain accessible)
             old_collections = self._repositories.get(old_repo_name, [])
+            # Renaming a repository (same URL)
             for old_collection in old_collections:
                 coll_id = self._collections_manager.get_collection_id(
                                              old_collection['register_name'],
                                              old_collection['repository_url'])
                 old_path = local_collection_path(coll_id)
+                # Update the repository name for this collection
                 config.COLLECTIONS[coll_id]['repository_name'] = new_repo_name
                 new_path = local_collection_path(coll_id)
+                # If the repository is renamed (same URL), the directories
+                # of its collections should be renamed accordingly (so that
+                # they remain accessible)
                 if os.path.exists(old_path):
                     os.rename(old_path, new_path)
             new_collections = old_collections

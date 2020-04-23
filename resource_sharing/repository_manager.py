@@ -234,7 +234,6 @@ class RepositoryManager(QObject):
         if (old_repo_name != new_repo_name) and (old_url == new_url):
             old_collections = self._repositories.get(old_repo_name, [])
             for old_collection in old_collections:
-repurl: ' + old_collection['repository_url'])
                 coll_id = self._collections_manager.get_collection_id(
                                              old_collection['register_name'],
                                              old_collection['repository_url'])
@@ -243,7 +242,7 @@ repurl: ' + old_collection['repository_url'])
                 new_path = local_collection_path(coll_id)
                 if os.path.exists(old_path):
                     os.rename(old_path, new_path)
-            # new_collections = old_collections
+            new_collections = old_collections
             # return True, 
         else:
             # old_repo_name == new_repo_name and old_url == new_url

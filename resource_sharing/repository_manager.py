@@ -314,20 +314,20 @@ class RepositoryManager(QObject):
                     if not is_present:
                         new_collections.append(installed_collection)
 
-            # Remove the old repository and add the new one
-            self._repositories.pop(old_repo_name, None)
-            self._repositories[new_repo_name] = new_collections
-            self.rebuild_collections()
+        # Remove the old repository and add the new one
+        self._repositories.pop(old_repo_name, None)
+        self._repositories[new_repo_name] = new_collections
+        self.rebuild_collections()
 
-            # Update QgsSettings
-            settings = QgsSettings()
-            settings.beginGroup(repo_settings_group())
-            settings.remove(old_repo_name)
-            settings.setValue(new_repo_name + '/url', new_url)
-            settings.setValue(new_repo_name + '/auth_cfg', new_auth_cfg)
-            settings.endGroup()
-            # Serialize repositories every time we successfully edited repo
-            self.serialize_repositories()
+        # Update QgsSettings
+        settings = QgsSettings()
+        settings.beginGroup(repo_settings_group())
+        settings.remove(old_repo_name)
+        settings.setValue(new_repo_name + '/url', new_url)
+        settings.setValue(new_repo_name + '/auth_cfg', new_auth_cfg)
+        settings.endGroup()
+        # Serialize repositories every time we successfully edited repo
+        self.serialize_repositories()
         return status, fetcherror
 
     def remove_directory(self, repo_name):

@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Handling problems"
+title: "Problems and solutions"
 category: user
 date: 2016-08-13 17:11:10
 order: 5

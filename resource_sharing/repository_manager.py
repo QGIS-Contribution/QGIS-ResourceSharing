@@ -245,7 +245,8 @@ class RepositoryManager(QObject):
                 if os.path.exists(old_path):
                     os.rename(old_path, new_path)
             new_collections = old_collections
-            # return True, 
+            status = True
+            fetcherror = ''
         else:
             # old_repo_name == new_repo_name and old_url == new_url
             # or new_url != old_url

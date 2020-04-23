@@ -213,7 +213,7 @@ class RepositoryManager(QObject):
             new_auth_cfg):
         """Edit the directory of repositories and update the
         collections.
-        Used to reload repositories (old == new for url and repo_name)
+        Also used to reload repositories (old == new for url and repo_name)
 
         :param old_repo_name: The old name of the repository
         :type old_repo_name: str
@@ -228,10 +228,10 @@ class RepositoryManager(QObject):
         :return: (status, error)
         :rtype: (boolean, string)
         """
-        #########################
-        # If the repository is renamed (same URL), the directories of its
-        # collections should also be renamed (so that they remain accessible)
         if (old_repo_name != new_repo_name) and (old_url == new_url):
+            # If the repository is renamed (same URL), the directories
+            # of its collections should also be renamed (so that they
+            # remain accessible)
             old_collections = self._repositories.get(old_repo_name, [])
             for old_collection in old_collections:
                 coll_id = self._collections_manager.get_collection_id(

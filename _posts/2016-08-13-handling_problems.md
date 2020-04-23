@@ -30,9 +30,9 @@ collections back in the Style Manager.
 
 ***Empty tags in Style Manager***
 
-Earlier versions may also have tag names that have no associated
-elements.
-In the Style Manager right-click on the "empty" tag and *Remove*.
+Earlier versions of the plugin may have introduced tags
+without associated elements.
+In the Style Manager right-click on the "empty" tag, and *Remove*.
 
 ***Collection directories are not removed***
 If there are subdirectories in the collections directory

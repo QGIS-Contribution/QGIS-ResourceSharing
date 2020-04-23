@@ -16,16 +16,20 @@ Old locations can be removed from the search path by editing
 (*Settings-> Options-> Advanced*), or in the QGIS3.ini file
 that is located under `QGIS` in the user QGIS folder.
 
-***Strange tag names in Style Manager***
+***Strange and/or old tag names in Style Manager***
 
 Earlier versions of the plugin used non-inutitive tag names
 for grouping symbols, colormaps, labelsettings and textformats
 in the Style Manager. This has been improved in later versions.
 
-To clean up the "mess", right-click the strange tag names in
-the right part of the Style Manager dialogue and *Remove*.
+When a repository is been renamed, new tag names are generated
+in Style Manager, but the old ones will remain.
 
-Reload the collections to get the style elements from the
+To clean up the "mess", remove the strang / old tags by
+right-clicking on the tag name in the left part of the
+Style Manager dialogue and *Remove*.
+
+Reload the collections to get missing style elements from the
 collections back in the Style Manager.
 
 ***Empty tags in Style Manager***

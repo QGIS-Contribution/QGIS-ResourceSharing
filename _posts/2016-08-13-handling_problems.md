@@ -83,3 +83,38 @@ to remove all installed collections and clean up, you can:
   the QGIS3.ini file that is located under `QGIS` in the user
   QGIS folder.
 * Reinstall the plugin
+
+***Installing developing versions***
+
+If you would like to test the latest features of the plugin,
+it is possible to download the plugin directly from github.
+
+The most common would be to download the *master* branch
+(*https://github.com/QGIS-Contribution/QGIS-ResourceSharing/archive/master.zip*),
+but other branches can also be downloaded.
+Start a web browser and open
+*https://github.com/QGIS-Contribution/QGIS-ResourceSharing*,
+choose the *Branch* you would like to download, click
+*Clone or download* and *Download ZIP*.
+
+![Choose branch on github]({{ site.baseurl }}/assets/github-branch.png)
+
+Once you have downloaded the zip-file,
+
+1. Go to the plugin directory (`python/plugins`, in your QGIS user directory)
+
+2. Remove the currently installed version of the plugin
+   (`qgis_resource_sharing`, if you have installed from the
+   official QGIS plugin repository).
+
+3. Unzip the downloaded file in the plugin directory.
+   If you downloaded the master branch, the subdirectory with
+   the plugin will be named `QGIS-ResourceSharing-master`.
+
+4. Start QGIS.
+   If the name of the plugin subdirectory of the Resource Sharing
+   plugin has changed, the plugin may have become disabled, and
+   the next step will be necessary.
+
+5. Open the Plugin Manager and (re)enable the plugin.
+

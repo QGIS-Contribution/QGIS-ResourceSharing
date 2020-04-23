@@ -213,6 +213,7 @@ class RepositoryManager(QObject):
             new_auth_cfg):
         """Edit the directory of repositories and update the
         collections.
+        Also used to reload repositories (old == new for url and repo_name)
 
         :param old_repo_name: The old name of the repository
         :type old_repo_name: str
@@ -227,85 +228,106 @@ class RepositoryManager(QObject):
         :return: (status, error)
         :rtype: (boolean, string)
         """
-        # Fetch the metadata from the new url
-        repo_handler = BaseRepositoryHandler.get_handler(new_url)
-        if repo_handler is None:
-            repo_warning = "No handler for URL '" + str(new_url) + "'!"
-            LOGGER.warning(repo_warning)
-            return(False, repo_warning)
-        if new_auth_cfg:
-            repo_handler.auth_cfg = new_auth_cfg
-
-        status, fetcherror = repo_handler.fetch_metadata()
-
-        if status:
-            # Parse metadata
-            try:
-                new_collections = repo_handler.parse_metadata()
-            except MetadataError as me:
-                metadata_warning = ("Error parsing metadata for " +
-                                    str(new_repo_name) + ":\n" + str(me))
-                LOGGER.warning(metadata_warning)
-                return(False, metadata_warning)
-                # raise MetadataError(metadata_warning)
-            old_collections = self._repositories.get(old_repo_name, [])
-            # Get all the installed collections from the old repository
-            installed_old_collections = []
+        old_collections = self._repositories.get(old_repo_name, [])
+        if (old_repo_name != new_repo_name) and (old_url == new_url):
+            # Renaming a repository (same URL)
             for old_collection in old_collections:
-                if old_collection['status'] == COLLECTION_INSTALLED_STATUS:
-                    installed_old_collections.append(old_collection)
+                coll_id = self._collections_manager.get_collection_id(
+                                             old_collection['register_name'],
+                                             old_collection['repository_url'])
+                old_path = local_collection_path(coll_id)
+                # Update the repository name for this collection
+                config.COLLECTIONS[coll_id]['repository_name'] = new_repo_name
+                new_path = local_collection_path(coll_id)
+                # If the repository is renamed (same URL), the directories
+                # of its collections should be renamed accordingly (so that
+                # they remain accessible)
+                if os.path.exists(old_path):
+                    os.rename(old_path, new_path)
+            new_collections = old_collections
+            status = True
+            fetcherror = ''
+        else:
+            # old_repo_name == new_repo_name and old_url == new_url
+            # or new_url != old_url
 
-            # Handling installed collections
-            # An old collection that is present in the new URL is
-            # identified by its register name.
-            # Cases for installed collections:
-            # 1. Old collection exists in the new, same URL: use the new
-            # one, else: update the status to INSTALLED
-            # 2. Old collection exists in the new, different URL: keep them
-            # both (add the old one). Because they should be treated as
-            # different collections
-            # 3. Old collection doesn't exist in the new, same URL: keep
-            # the old collection
-            # 4. Old collection doesn't exist in the new, different URL:
-            # same as 3
-            for installed_collection in installed_old_collections:
-                reg_name = installed_collection['register_name']
-                is_present = False
+            # Fetch the metadata (metadata.ini) from the new url
+            repo_handler = BaseRepositoryHandler.get_handler(new_url)
+            if repo_handler is None:
+                repo_warning = "No handler for URL '" + str(new_url) + "'!"
+                LOGGER.warning(repo_warning)
+                return(False, repo_warning)
+            if new_auth_cfg:
+                repo_handler.auth_cfg = new_auth_cfg
+            status, fetcherror = repo_handler.fetch_metadata()
 
-                for collection in new_collections:
-                    # Look for collections that are already present
-                    if collection['register_name'] == reg_name:
-                        # Already present
-                        is_present = True
-                        if old_url == new_url:
-                            # Set the status to installed
-                            collection['status'] = COLLECTION_INSTALLED_STATUS
-                            # Keep the collection statistics
-                            for key in installed_collection.keys():
-                                if key in ['models', 'processing', 'rscripts', 'style', 'svg', 'symbol']:
-                                    collection[key] = installed_collection[key]
+            if status:
+                # Parse metadata
+                try:
+                    new_collections = repo_handler.parse_metadata()
+                except MetadataError as me:
+                    metadata_warning = ("Error parsing metadata for " +
+                                        str(new_repo_name) + ":\n" + str(me))
+                    LOGGER.warning(metadata_warning)
+                    return(False, metadata_warning)
+                    # raise MetadataError(metadata_warning)
+                # Get all the installed collections from the old repository
+                installed_old_collections = []
+                for old_collection in old_collections:
+                    if old_collection['status'] == COLLECTION_INSTALLED_STATUS:
+                        installed_old_collections.append(old_collection)
 
-                        else:
-                            # Different repository URLs, so append
-                            new_collections.append(installed_collection)
-                        break
-                if not is_present:
-                    new_collections.append(installed_collection)
+                # Handling installed collections
+                # An old collection that is present in the new location
+                # (URL) is identified by its register name.
+                # Cases for installed collections:
+                # 1. Old collection exists in the new, same URL: use the new
+                # one, else: update the status to INSTALLED
+                # 2. Old collection exists in the new, different URL: keep them
+                # both (add the old one). Because they should be treated as
+                # different collections
+                # 3. Old collection doesn't exist in the new, same URL: keep
+                # the old collection
+                # 4. Old collection doesn't exist in the new, different URL:
+                # same as 3
+                for installed_collection in installed_old_collections:
+                    reg_name = installed_collection['register_name']
+                    is_present = False
 
-            # Remove the old repository and add the new one
-            self._repositories.pop(old_repo_name, None)
-            self._repositories[new_repo_name] = new_collections
-            self.rebuild_collections()
+                    for collection in new_collections:
+                        # Look for collections that are already present
+                        if collection['register_name'] == reg_name:
+                            # Already present
+                            is_present = True
+                            if old_url == new_url:
+                                # Set the status to installed
+                                collection['status'] = COLLECTION_INSTALLED_STATUS
+                                # Keep the collection statistics
+                                for key in installed_collection.keys():
+                                    if key in ['models', 'processing', 'rscripts', 'style', 'svg', 'symbol']:
+                                        collection[key] = installed_collection[key]
 
-            # Update QgsSettings
-            settings = QgsSettings()
-            settings.beginGroup(repo_settings_group())
-            settings.remove(old_repo_name)
-            settings.setValue(new_repo_name + '/url', new_url)
-            settings.setValue(new_repo_name + '/auth_cfg', new_auth_cfg)
-            settings.endGroup()
-            # Serialize repositories every time we successfully edited repo
-            self.serialize_repositories()
+                            else:
+                                # Different repository URLs, so append
+                                new_collections.append(installed_collection)
+                            break
+                    if not is_present:
+                        new_collections.append(installed_collection)
+
+        # Remove the old repository and add the new one
+        self._repositories.pop(old_repo_name, None)
+        self._repositories[new_repo_name] = new_collections
+        self.rebuild_collections()
+
+        # Update QgsSettings
+        settings = QgsSettings()
+        settings.beginGroup(repo_settings_group())
+        settings.remove(old_repo_name)
+        settings.setValue(new_repo_name + '/url', new_url)
+        settings.setValue(new_repo_name + '/auth_cfg', new_auth_cfg)
+        settings.endGroup()
+        # Serialize repositories every time we successfully edited repo
+        self.serialize_repositories()
         return status, fetcherror
 
     def remove_directory(self, repo_name):

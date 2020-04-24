@@ -18,10 +18,10 @@ deprecated=False
 icon=resources/icon.png
 changelog=
         0.14.0 - Style import improvements (fix colorramp support, add support for label settings and text formats, clean up Style Manager tags) (#113, #114, #116, #118)
-               - Change collection directory names from a hash to more user friendly name (composition of the name of the collection its repository) (#110)
+               - Change collection directory names from a hash to more user friendly name (composition of the name of the collection and its repository) (#110)
                - Preserve the installed collections when renaming a repository (#121)
                - Documentation updates (#105, #109, #113)
-        0.13.1 - Files removed from repository are still being installed from cache (#44)
+        0.13.1 - Fix #44 (files removed from repository are still being installed from cache)
         0.13.0 - GUI updates (#100)
                - Provide installation summary (#6)
                - Avoid (parent) tag with no members in QGIS 3 style documents (#101)

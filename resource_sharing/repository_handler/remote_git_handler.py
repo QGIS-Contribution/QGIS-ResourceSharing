@@ -139,8 +139,10 @@ class RemoteGitHandler(BaseRepositoryHandler):
             # Hack until dulwich/porcelain handles file removal
             collDir = os.path.join(local_repo_dir, 'collections')
             # ????!!!!
-            if os.path.exists(collDir):
-                shutil.rmtree(collDir)
+            #if os.path.exists(collDir):
+            #    shutil.rmtree(collDir)
+            if os.path.exists(local_repo_dir):
+                shutil.rmtree(local_repo_dir)
             try:
                 porcelain.pull(
                     local_repo_dir,

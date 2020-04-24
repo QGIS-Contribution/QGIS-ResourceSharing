@@ -12,6 +12,7 @@ from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 from resource_sharing.resource_handler.symbol_resolver_mixin import \
     SymbolResolverMixin
+from resource_sharing.utilities import qgis_version
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 SYMBOL = 'symbol'
@@ -174,6 +175,9 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                         colorramp_name, colorramp['colorramp'], True):
                     self._group_or_tag(QgsStyle.ColorrampEntity,
                                        colorramp_name, groupOrTag_id)
+            # textformat and labelsettings were introduced in QGIS 3.10
+            if qgis_version() < 31000:
+                continue
             for textformat in symbol_xml_extractor.textformats:
                 textformat_name = '%s (%s)' % (
                     textformat['name'], self.collection['repository_name'])
@@ -208,6 +212,12 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 QgsStyle.ColorrampEntity, child_group_id)
             for colorramp in colorramps:
                 self.style.removeColorRamp(colorramp)
+
+            # textformat and labelsettings were introduced in QGIS 3.10
+            if qgis_version() < 31000:
+                # Remove this tag / child group
+                self._group_or_tag_remove(child_group_id)
+                continue
             # Get all the textformats for this tag / child group and remove them
             textformats = self._get_symbols_for_group_or_tag(
                 QgsStyle.TextFormatEntity, child_group_id)

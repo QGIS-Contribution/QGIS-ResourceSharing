@@ -29,7 +29,7 @@ def resources_path(*args):
     :return: Absolute path to the resources folder.
     :rtype: str
     """
-    path = Path(__file__).parent()
+    path = Path(__file__).parent
     # path = os.path.dirname(os.path.dirname(__file__))
     path = (path / 'resources')
     # path = os.path.abspath(os.path.join(path, 'resources'))
@@ -50,7 +50,7 @@ def ui_path(*args):
     :return: Absolute path to the ui file.
     :rtype: str
     """
-    path = Path(__file__).parent()
+    path = Path(__file__).parent
     # path = os.path.dirname(__file__)
     path = (path / 'gui' / 'ui')
     # path = os.path.abspath(os.path.join(path, 'gui', 'ui'))
@@ -204,8 +204,8 @@ def render_template(filename, context):
     :param context: The context passed for the template
     :type context: dict
     """
-    path = Path(__file__).parent()
-    path = (Path(path).parent() / 'resources' / 'template')
+    path = Path(__file__).parent
+    path = (Path(path).parent / 'resources' / 'template')
     #path = os.path.dirname(__file__)
     #path = os.path.abspath(
     #    os.path.join(path, os.pardir, 'resources', 'template'))

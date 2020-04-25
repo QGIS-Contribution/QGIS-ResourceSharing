@@ -50,7 +50,7 @@ def ui_path(*args):
     :return: Absolute path to the ui file.
     :rtype: str
     """
-    path = Path(os.path.dirname(__file__))
+    path = Path(__file__)
     # path = os.path.dirname(__file__)
     path = (path / 'gui' / 'ui')
     # path = os.path.abspath(os.path.join(path, 'gui', 'ui'))

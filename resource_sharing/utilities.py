@@ -105,7 +105,7 @@ def local_collection_path(id=None):
     settings.beginGroup(resource_sharing_group())
     if settings.contains(local_collection_root_dir_key()):
         # The path is defined in the settings - use it
-        lcPath = settings.value(local_collection_root_dir_key())
+        lcPath = Path(settings.value(local_collection_root_dir_key()))
     else:
         # The path is not defined in the settings
         #if os.path.exists(old_local_collection_path()):

@@ -168,7 +168,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                             errstream=writeOut
                         )
                     except Exception as e:
-                       error_message = 'Error: %s' % str(e)
+                        error_message = 'Error: %s' % str(e)
                         LOGGER.exception(traceback.format_exc())
                         return False, error_message
                 else:

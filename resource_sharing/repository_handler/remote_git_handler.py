@@ -98,13 +98,19 @@ class RemoteGitHandler(BaseRepositoryHandler):
         """
         # Hack to avoid irritating Dulwich / Porcelain ResourceWarning
         warnings.filterwarnings("ignore", category=ResourceWarning)
-         # Clone or pull the repositories first
+        # Clone or pull the repositories first
         local_repo_dir = os.path.join(
             QgsApplication.qgisSettingsDirPath(),
             'resource_sharing',
             'repositories',
             self.git_host, self.git_owner, self.git_repository
         )
+        # Hack to try to avoid sharing errors
+        if os.path.exists(local_repo_dir):
+            try:
+                shutil.rmtree(local_repo_dir)
+            except:
+                pass
         if not os.path.exists(os.path.join(local_repo_dir, '.git')):
             os.makedirs(local_repo_dir)
             try:
@@ -137,7 +143,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 return False, error_message
         else:
             # Hack until dulwich/porcelain handles file removal
-            collDir = os.path.join(local_repo_dir, 'collections')
+            #collDir = os.path.join(local_repo_dir, 'collections')
             # ????!!!!
             #if os.path.exists(collDir):
             #    shutil.rmtree(collDir)
@@ -162,7 +168,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                             errstream=writeOut
                         )
                     except Exception as e:
-                        error_message = 'Error: %s' % str(e)
+                       error_message = 'Error: %s' % str(e)
                         LOGGER.exception(traceback.format_exc())
                         return False, error_message
                 else:

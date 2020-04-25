@@ -31,10 +31,10 @@ def resources_path(*args):
     """
     path = Path(__file__).parent()
     # path = os.path.dirname(os.path.dirname(__file__))
-    path = (path / 'resources').absolute
+    path = (path / 'resources')
     # path = os.path.abspath(os.path.join(path, 'resources'))
     for item in args:
-        path = (path / item).absolute
+        path = (path / item)
         #path = os.path.abspath(os.path.join(path, item))
 
     #return path
@@ -52,10 +52,10 @@ def ui_path(*args):
     """
     path = Path(os.path.dirname(__file__))
     # path = os.path.dirname(__file__)
-    path = (path / 'gui' / 'ui').absolute
+    path = (path / 'gui' / 'ui')
     # path = os.path.abspath(os.path.join(path, 'gui', 'ui'))
     for item in args:
-        path = (path / item).absolute
+        path = (path / item)
         # path = os.path.abspath(os.path.join(path, item))
 
     #return path
@@ -74,8 +74,8 @@ def resource_sharing_group():
 
 def repositories_cache_path():
     """Get the path to the repositories cache."""
-    return Path(QgsApplication.qgisSettingsDirPath()) /
-                'resource_sharing' / 'repositories_cache'
+    return ( Path(QgsApplication.qgisSettingsDirPath()) /
+                'resource_sharing' / 'repositories_cache' )
     #return os.path.join(
     #    QgsApplication.qgisSettingsDirPath(),
     #    'resource_sharing',
@@ -88,8 +88,8 @@ def local_collection_root_dir_key():
 
 
 def default_local_collection_root_dir():
-    return Path(QgsApplication.qgisSettingsDirPath()) /
-                'resource_sharing' / 'collections'
+    return ( Path(QgsApplication.qgisSettingsDirPath()) /
+                'resource_sharing' / 'collections' )
     #return os.path.join(QgsApplication.qgisSettingsDirPath(),
     #                    'resource_sharing',
     #                    'collections')
@@ -166,7 +166,7 @@ def old_local_collection_path(id=None):
     If id is not passed, it will just return the root dir of the
     collections.
     """
-    path = (PATH(QDir.homePath()) / 'QGIS' / 'Resource Sharing').absolute()
+    path = (PATH(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
     #path = os.path.join(
     #    QDir.homePath(),
     #    'QGIS',
@@ -205,7 +205,7 @@ def render_template(filename, context):
     :type context: dict
     """
     path = Path(__file__).parent()
-    path = (Path(path).parent() / 'resources' / 'template').absolute()
+    path = (Path(path).parent() / 'resources' / 'template')
     #path = os.path.dirname(__file__)
     #path = os.path.abspath(
     #    os.path.join(path, os.pardir, 'resources', 'template'))

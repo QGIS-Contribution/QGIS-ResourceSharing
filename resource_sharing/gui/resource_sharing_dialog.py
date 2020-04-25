@@ -470,7 +470,16 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
     def install_finished(self):
         # Process the result
         self.progress_dialog.hide()
-        if self.installer_worker.install_status:
+        installStatus = self.installer_worker.install_status
+        if not installStatus:
+            message = self.installer_worker.error_message
+        # Clean up the worker and thread
+        self.installer_worker.deleteLater()
+        self.installer_thread.quit()
+        self.installer_thread.wait()
+        self.installer_thread.deleteLater()
+
+        if installStatus:
             self.reload_collections_model()
             # Report what has been installed
             message = '<b>%s</b> was successfully installed, containing:\n<ul>' % (
@@ -507,14 +516,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 if number > 1:
                     message = message + 's'
             message = message + '\n</ul>'
-        else:
-            message = self.installer_worker.error_message
         QMessageBox.information(self, 'Resource Sharing', message)
-        # Clean up the worker and thread
-        self.installer_worker.deleteLater()
-        self.installer_thread.quit()
-        self.installer_thread.wait()
-        self.installer_thread.deleteLater()
         self.populate_repositories_widget()
         # Set the selection
         oldRow = self.current_index.row()

@@ -29,7 +29,7 @@ def resources_path(*args):
     :return: Absolute path to the resources folder.
     :rtype: str
     """
-    path = Path(__file__).parent
+    path = Path(__file__).parent.parent
     # path = os.path.dirname(os.path.dirname(__file__))
     path = (path / 'resources')
     # path = os.path.abspath(os.path.join(path, 'resources'))

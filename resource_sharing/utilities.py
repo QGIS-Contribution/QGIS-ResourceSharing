@@ -210,5 +210,5 @@ def render_template(filename, context):
     #path = os.path.abspath(
     #    os.path.join(path, os.pardir, 'resources', 'template'))
     return jinja2.Environment(
-        loader=jinja2.FileSystemLoader(path)
+        loader=jinja2.FileSystemLoader(str(path))
     ).get_template(filename).render(context)

@@ -161,13 +161,13 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
         for symbol_file in symbol_files:
             #file_name = os.path.splitext(os.path.basename(symbol_file))[0]
-            file_name = Path(symbol_file).stem
+            file_name = symbol_file.stem
             # Groups in QGIS2, tags in QGIS3...
             groupOrTag_id = self._get_child_group_tag(group_or_tag_id, file_name)
             # Modify the symbol file to fix image and SVG paths
-            self.resolve_dependency(symbol_file)
+            self.resolve_dependency(str(symbol_file))
             # Add all symbols and colorramps and group / tag them
-            symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
+            symbol_xml_extractor = SymbolXMLExtractor(str(symbol_file))
             for symbol in symbol_xml_extractor.symbols:
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection['repository_name'])
                 # self.resolve_dependency(symbol[SYMBOL])

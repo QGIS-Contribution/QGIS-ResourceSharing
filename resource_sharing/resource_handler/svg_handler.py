@@ -76,6 +76,7 @@ class SVGResourceHandler(BaseResourceHandler):
         valid = 0
         #for dirpath, dirnames, filenames in os.walk(self.resource_dir):
         for filename in Path(self.resource_dir).rglob('*'):
+            LOGGER.info('filename: ' + str(filename))
             #for filename in [f for f in filenames if f.lower().endswith(".svg")]:
             if filename.suffix.lower() == "svg":
                 valid += 1

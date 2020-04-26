@@ -145,7 +145,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         symbol_files = []
         valid = 0
         #for item in os.listdir(self.resource_dir):
-        for item in File(self.resource_dir).glob('*.xml'):
+        for item in Path(self.resource_dir).glob('*.xml'):
             #file_path = os.path.join(self.resource_dir, item)
             file_path = Path(self.resource_dir, item)
             #if fnmatch.fnmatch(file_path, '*.xml'):

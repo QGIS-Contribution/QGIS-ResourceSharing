@@ -1,7 +1,7 @@
 # coding=utf-8
-import os
+#import os
 # Use pathlib instead of os.path?
-# from pathlib import Path
+from pathlib import Path
 import fnmatch
 import shutil
 import logging
@@ -36,17 +36,19 @@ class ModelHandler(BaseResourceHandler):
         model directory and refresh the provider.
         """
         # Return silently if the directory does not exist
-        # if Path(self.resource_dir).exists():
-        if not os.path.exists(self.resource_dir):
+        #if not os.path.exists(self.resource_dir):
+        if Path(self.resource_dir).exists():
             return
 
         # Get all the model files under self.resource_dir
         model_files = []
-        for item in os.listdir(self.resource_dir):
-            # file_path = self.resource_dir / item)
-            file_path = os.path.join(self.resource_dir, item)
-            if fnmatch.fnmatch(file_path, '*.model3'):
-                model_files.append(file_path)
+        #for item in os.listdir(self.resource_dir):
+        for item in Path(self.resource_dir).glob('*.model3'):
+            #file_path = os.path.join(self.resource_dir, item)
+            file_path = Path(self.resource_dir, item)
+            model_files.append(file_path)
+            #if fnmatch.fnmatch(file_path, '*.model3'):
+                #model_files.append(file_path)
         valid = 0
         for model_file in model_files:
             # Install the model file silently
@@ -62,17 +64,21 @@ class ModelHandler(BaseResourceHandler):
 
     def uninstall(self):
         """Uninstall the models from processing toolbox."""
-        # if not Path(self.resource_dir).exists():
-        if not os.path.exists(self.resource_dir):
+        #if not os.path.exists(self.resource_dir):
+        if not Path(self.resource_dir).exists():
             return
         # Remove the model files that are present in this collection
-        for item in os.listdir(self.resource_dir):
-            # file_path = self.resource_dir / item)
-            file_path = os.path.join(self.resource_dir, item)
+        #for item in os.listdir(self.resource_dir):
+        for item in Path(self.resource_dir).glob(*):
+            #file_path = os.path.join(self.resource_dir, item)
+            file_path = Path(self.resource_dir, item)
             if fnmatch.fnmatch(file_path, '*%s*' % self.collection_id):
-                model_path = os.path.join(self.Models_folder(), item)
-                if os.path.exists(model_path):
-                    os.remove(model_path)
+                #model_path = os.path.join(self.Models_folder(), item)
+                model_path = Path(self.Models_folder(), item)
+                #if os.path.exists(model_path):
+                if model_path.exists():
+                    #os.remove(model_path)
+                    model_path.unlink()
 
         self.refresh_Model_provider()
 
@@ -84,11 +90,11 @@ class ModelHandler(BaseResourceHandler):
 
     def default_models_folder(self):
         """Return the default location of the processing models folder."""
-        # folder = userFolder() / MODELS_PROCESSING_FOLDER
-        folder = str(os.path.join(userFolder(), MODELS_PROCESSING_FOLDER))
+        #folder = str(os.path.join(userFolder(), MODELS_PROCESSING_FOLDER))
+        folder = Path(userFolder(), MODELS_PROCESSING_FOLDER)
         mkdir(folder)
-        # return folder.absolute()
-        return os.path.abspath(folder)
+        #return os.path.abspath(folder)
+        return str(folder)
 
     def Models_folder(self):
         """Return the folder where processing expects to find models."""

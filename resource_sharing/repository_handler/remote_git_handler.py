@@ -1,5 +1,7 @@
 # coding=utf-8
-import os
+#import os
+# Use pathlib instead of os.path?
+from pathlib import Path
 import shutil
 import logging
 import traceback
@@ -99,20 +101,27 @@ class RemoteGitHandler(BaseRepositoryHandler):
         # Hack to avoid irritating Dulwich / Porcelain ResourceWarning
         warnings.filterwarnings("ignore", category=ResourceWarning)
         # Clone or pull the repositories first
-        local_repo_dir = os.path.join(
-            QgsApplication.qgisSettingsDirPath(),
-            'resource_sharing',
-            'repositories',
-            self.git_host, self.git_owner, self.git_repository
-        )
+        #local_repo_dir = os.path.join(
+        #    QgsApplication.qgisSettingsDirPath(),
+        #    'resource_sharing',
+        #    'repositories',
+        #    self.git_host, self.git_owner, self.git_repository
+        #)
+        local_repo_dir = Path(QgsApplication.qgisSettingsDirPath(),
+                              'resource_sharing', 'repositories',
+                              self.git_host, self.git_owner,
+                              self.git_repository)
         # Hack to try to avoid sharing errors
-        if os.path.exists(local_repo_dir):
+        #if os.path.exists(local_repo_dir):
+        if local_repo_dir.exists():
             try:
-                shutil.rmtree(local_repo_dir)
+                shutil.rmtree(str(local_repo_dir))
             except:
                 pass
-        if not os.path.exists(os.path.join(local_repo_dir, '.git')):
-            os.makedirs(local_repo_dir)
+        #if not os.path.exists(os.path.join(local_repo_dir, '.git')):
+        if not (local_repo_dir / '.git').exists():
+            #os.makedirs(local_repo_dir)
+            local_repo_dir.mkdir(parents=True)
             try:
                 repo = porcelain.clone(
                     self.url, local_repo_dir,
@@ -147,11 +156,12 @@ class RemoteGitHandler(BaseRepositoryHandler):
             # ????!!!!
             #if os.path.exists(collDir):
             #    shutil.rmtree(collDir)
-            if os.path.exists(local_repo_dir):
-                shutil.rmtree(local_repo_dir)
+            #if os.path.exists(local_repo_dir):
+            if local_repo_dir.exists():
+                shutil.rmtree(str(local_repo_dir))
             try:
                 porcelain.pull(
-                    local_repo_dir,
+                    str(local_repo_dir),
                     self.url,
                     b'refs/heads/master',
                     errstream=writeOut
@@ -162,7 +172,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 if self.url == git_parsed.url2ssh:
                     try:
                         porcelain.pull(
-                            local_repo_dir,
+                            str(local_repo_dir),
                             git_parsed.url2https,
                             b'refs/heads/master',
                             errstream=writeOut
@@ -177,16 +187,18 @@ class RemoteGitHandler(BaseRepositoryHandler):
                     return False, error_message
 
         # Copy the specific downloaded collection to the collections dir
-        src_dir = os.path.join(local_repo_dir, 'collections', register_name)
-        if not os.path.exists(src_dir):
+        #src_dir = os.path.join(local_repo_dir, 'collections', register_name)
+        src_dir = local_repo_dir / 'collections' / register_name
+        #if not os.path.exists(src_dir):
+        if not src_dir.exists():
             error_message = ('Error: The collection does not exist in the '
                              'repository.')
             return False, error_message
 
-        dest_dir = local_collection_path(id)
-        if os.path.exists(dest_dir):
+        dest_dir = Path(local_collection_path(id))
+        if dest_dir.exists():
             # Remove the existing collection directory
-            shutil.rmtree(dest_dir)
-        shutil.copytree(src_dir, dest_dir)
+            shutil.rmtree(str(dest_dir))
+        shutil.copytree(str(src_dir), str(dest_dir))
 
         return True, None

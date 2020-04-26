@@ -2,7 +2,9 @@
 import logging
 
 import csv
-import os
+#import os
+# Use pathlib instead of os.path?
+from pathlib import Path
 import pickle
 
 from qgis.PyQt.QtCore import QObject, QSettings, QTemporaryFile
@@ -235,15 +237,19 @@ class RepositoryManager(QObject):
                 coll_id = self._collections_manager.get_collection_id(
                                              old_collection['register_name'],
                                              old_collection['repository_url'])
-                old_path = local_collection_path(coll_id)
+                #old_path = local_collection_path(coll_id)
+                old_path = Path(local_collection_path(coll_id))
                 # Update the repository name for this collection
                 config.COLLECTIONS[coll_id]['repository_name'] = new_repo_name
-                new_path = local_collection_path(coll_id)
+                #new_path = local_collection_path(coll_id)
+                new_path = path(local_collection_path(coll_id))
                 # If the repository is renamed (same URL), the directories
                 # of its collections should be renamed accordingly (so that
                 # they remain accessible)
-                if os.path.exists(old_path):
-                    os.rename(old_path, new_path)
+                #if os.path.exists(old_path):
+                if old_path.exists():
+                    #os.rename(old_path, new_path)
+                    old_path.rename(new_path)
             new_collections = old_collections
             status = True
             fetcherror = ''
@@ -384,7 +390,8 @@ class RepositoryManager(QObject):
                 # If not, also uninstall its resources
                 current_status = config.COLLECTIONS[collection_id]['status']
                 if current_status == COLLECTION_INSTALLED_STATUS:
-                    if not os.path.exists(collection_path):
+                    #if not os.path.exists(collection_path):
+                    if not collection_path.exists():
                         # Uninstall the collection
                         self._collections_manager.uninstall(collection_id)
 
@@ -405,8 +412,10 @@ class RepositoryManager(QObject):
 
     def serialize_repositories(self):
         """Save repositories to cache."""
-        if not os.path.exists(os.path.dirname(repositories_cache_path())):
-            os.makedirs(os.path.dirname(repositories_cache_path()))
+        #if not os.path.exists(os.path.dirname(repositories_cache_path())):
+        #    os.makedirs(os.path.dirname(repositories_cache_path()))
+        if not Path(repositories_cache_path()).parent.exists():
+            Path(repositories_cache_path()).parent.mkdir(parents=True)
 
         self.resync_repository()
         with open(repositories_cache_path(), 'wb') as f:
@@ -415,7 +424,8 @@ class RepositoryManager(QObject):
     def load_repositories(self):
         """Load repositories from cache and rebuild collections."""
         repo_collections = {}
-        if os.path.exists(repositories_cache_path()):
+        #if os.path.exists(repositories_cache_path()):
+        if Path(repositories_cache_path()).exists():
             with open(repositories_cache_path(), 'rb') as f:
                 repo_collections = pickle.load(f)
         self._repositories = repo_collections

@@ -1,8 +1,8 @@
 # coding=utf-8
 import hashlib
-import os
+#import os
 # Use pathlib instead of os.path?
-# from pathlib import Path
+from pathlib import Path
 import shutil
 import logging
 import traceback
@@ -217,10 +217,12 @@ class CollectionManager(object):
             resource_handler_instance.uninstall()
 
         # Remove the collection directory
-        collection_dir = local_collection_path(collection_id)
+        #collection_dir = local_collection_path(collection_id)
+        collection_dir = Path(local_collection_path(collection_id))
         # if collection_dir.exists():
-        if os.path.exists(collection_dir):
-            shutil.rmtree(collection_dir)
+        #if os.path.exists(collection_dir):
+        if collection_dir.exists():
+            shutil.rmtree(str(collection_dir))
 
         config.COLLECTIONS[collection_id]['status'] = \
             COLLECTION_NOT_INSTALLED_STATUS

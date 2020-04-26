@@ -1,6 +1,8 @@
 # coding=utf-8
-import os
-import fnmatch
+#import os
+# Use pathlib instead of os.path?
+from pathlib import Path
+#import fnmatch
 import logging
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
@@ -28,15 +30,19 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         Resolve the symbol SVG/image paths in the QML file
         """
         # Check if the dir exists, pass silently if it doesn't
-        if not os.path.exists(self.resource_dir):
+        #if not os.path.exists(self.resource_dir):
+        if not Path(self.resource_dir).exists():
             return
 
         # Get all the style XML files under resource dirs
         style_files = []
-        for item in os.listdir(self.resource_dir):
-            file_path = os.path.join(self.resource_dir, item)
-            if fnmatch.fnmatch(file_path, '*.qml'):
-                style_files.append(file_path)
+        #for item in os.listdir(self.resource_dir):
+        for item in Path(self.resource_dir).glob('*.qml'):
+            #file_path = os.path.join(self.resource_dir, item)
+            file_path = Path(self.resource_dir, item)
+            style_files.append(file_path)
+            #if fnmatch.fnmatch(file_path, '*.qml'):
+                #style_files.append(file_path)
 
         # Nothing to do if there are no symbol files
         if len(style_files) == 0:
@@ -45,7 +51,7 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         valid = 0
         for style_file in style_files:
             # Try to fix image and SVG paths in the QML file
-            self.resolve_dependency(style_file)
+            self.resolve_dependency(str(style_file))
             valid += 1
         if valid >= 0:
             self.collection[STYLE] = valid

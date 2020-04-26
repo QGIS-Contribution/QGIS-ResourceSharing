@@ -160,7 +160,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         group_or_tag_id = self._get_parent_group_or_tag()
 
         for symbol_file in symbol_files:
-            LOGGER.info('symbol_file: ' + symbol_file)
+            LOGGER.info('symbol_file: ' + str(symbol_file))
             #file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             file_name = symbol_file.stem
             LOGGER.info('file_name: ' + file_name)

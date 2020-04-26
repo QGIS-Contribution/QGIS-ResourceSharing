@@ -135,7 +135,7 @@ class CollectionManager(object):
            if config.COLLECTIONS[collection_id]['rscripts'] > 1:
                html = html + 's'
            resource_types = resource_types + 1
-        html = html + '.\n<i>Reinstall</i> to update'
+        html = html + '.<br><i>Reinstall</i> to update'
         if resource_types == 0:
            html = '<i>Reinstall</i> the collection to get statistics'
         if config.COLLECTIONS[collection_id]['status'] != COLLECTION_INSTALLED_STATUS:

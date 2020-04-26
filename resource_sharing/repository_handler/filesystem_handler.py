@@ -70,7 +70,8 @@ class FileSystemHandler(BaseRepositoryHandler):
                              'repository.')
             return False, error_message
 
-        dest_dir = Path(local_collection_path(id))
+        #dest_dir = Path(local_collection_path(id))
+        dest_dir = local_collection_path(id)
         #if os.path.exists(dest_dir):
         if dest_dir.exists():
             shutil.rmtree(str(dest_dir))

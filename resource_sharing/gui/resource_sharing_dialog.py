@@ -606,7 +606,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
     def open_collection(self):
         """Slot for when user clicks 'Open' button."""
         collection_path = local_collection_path(self._selected_collection_id)
-        directory_url = QUrl.fromLocalFile(collection_path)
+        directory_url = QUrl.fromLocalFile(str(collection_path))
         QDesktopServices.openUrl(directory_url)
 
     def reload_data_and_widget(self):

@@ -46,6 +46,7 @@ class BaseResourceHandler(object):
         """Return the collection dictionary."""
         return self._collection
 
+    # Not used???
     @property
     def collection_path(self):
         """Return the local collection path."""
@@ -59,8 +60,9 @@ class BaseResourceHandler(object):
     @property
     def resource_dir(self):
         """The root of the resource dir from this resource type."""
-        resource_dir = Path(local_collection_path(self.collection_id),
-                            self.dir_name())
+        #resource_dir = Path(local_collection_path(self.collection_id),
+        #                    self.dir_name())
+        resource_dir = local_collection_path(self.collection_id) / self.dir_name()
         #resource_dir = os.path.join(
         #    local_collection_path(self.collection_id), self.dir_name())
         return resource_dir

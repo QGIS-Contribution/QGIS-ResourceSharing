@@ -237,12 +237,12 @@ class RepositoryManager(QObject):
                 coll_id = self._collections_manager.get_collection_id(
                                              old_collection['register_name'],
                                              old_collection['repository_url'])
-                #old_path = local_collection_path(coll_id)
-                old_path = Path(local_collection_path(coll_id))
+                #old_path = Path(local_collection_path(coll_id))
+                old_path = local_collection_path(coll_id)
                 # Update the repository name for this collection
                 config.COLLECTIONS[coll_id]['repository_name'] = new_repo_name
-                #new_path = local_collection_path(coll_id)
-                new_path = path(local_collection_path(coll_id))
+                #new_path = path(local_collection_path(coll_id))
+                new_path = local_collection_path(coll_id)
                 # If the repository is renamed (same URL), the directories
                 # of its collections should be renamed accordingly (so that
                 # they remain accessible)
@@ -385,8 +385,8 @@ class RepositoryManager(QObject):
                 config.COLLECTIONS[collection_id] = collection
 
                 # Get the collection path (updating if neccessary)
-                #collection_path = local_collection_path(collection_id)
-                collection_path = Path(local_collection_path(collection_id))
+                #collection_path = Path(local_collection_path(collection_id))
+                collection_path = local_collection_path(collection_id)
                 # Check the file system to see if the collection exists.
                 # If not, also uninstall its resources
                 current_status = config.COLLECTIONS[collection_id]['status']

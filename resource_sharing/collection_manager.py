@@ -217,8 +217,8 @@ class CollectionManager(object):
             resource_handler_instance.uninstall()
 
         # Remove the collection directory
-        #collection_dir = local_collection_path(collection_id)
-        collection_dir = Path(local_collection_path(collection_id))
+        #collection_dir = Path(local_collection_path(collection_id))
+        collection_dir = local_collection_path(collection_id)
         # if collection_dir.exists():
         #if os.path.exists(collection_dir):
         if collection_dir.exists():

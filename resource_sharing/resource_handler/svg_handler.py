@@ -67,8 +67,9 @@ class SVGResourceHandler(BaseResourceHandler):
         # Add to the SVG search paths
         search_paths = self.svg_search_paths()
 
-        if local_collection_path() not in search_paths:
-            search_paths.append(local_collection_path())
+        #if local_collection_path() not in search_paths:
+        if str(local_collection_path()) not in search_paths:
+            search_paths.append(str(local_collection_path()))
         LOGGER.info('set svg search_paths: ' + search_paths)
         self.set_svg_search_paths(search_paths)
 
@@ -94,13 +95,14 @@ class SVGResourceHandler(BaseResourceHandler):
         shutil.rmtree(self.resource_dir)
         svgCount = 0
         #for dirpath, dirnames, filenames in os.walk(local_collection_path()):
-        for filename in Path(local_collection_path()).rglob('*'):
+        #for filename in Path(local_collection_path()).rglob('*'):
+        for filename in local_collection_path().rglob('*'):
             #for filename in [f for f in filenames if f.lower().endswith(".svg")]:
             if filename.suffix.lower() == "svg":
                 svgCount += 1
                 break
         search_paths = self.svg_search_paths()
         if svgCount == 0:
-            if local_collection_path() in search_paths:
-                search_paths.remove(local_collection_path())
+            if str(local_collection_path()) in search_paths:
+                search_paths.remove(str(local_collection_path()))
         self.set_svg_search_paths(search_paths)

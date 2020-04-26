@@ -88,8 +88,8 @@ def local_collection_root_dir_key():
 
 
 def default_local_collection_root_dir():
-    return str(Path(QgsApplication.qgisSettingsDirPath(),
-                      'resource_sharing', 'collections'))
+    return Path(QgsApplication.qgisSettingsDirPath(),
+                      'resource_sharing', 'collections')
     #return os.path.join(QgsApplication.qgisSettingsDirPath(),
     #                    'resource_sharing',
     #                    'collections')
@@ -109,12 +109,12 @@ def local_collection_path(id=None):
     else:
         # The path is not defined in the settings
         #if os.path.exists(old_local_collection_path()):
-        if Path(old_local_collection_path()).exists():
+        if old_local_collection_path().exists():
             # The pre-version 0.10 directory exists - so use it
-            lcPath = Path(old_local_collection_path())
+            lcPath = old_local_collection_path()
         else:
             # Use the new default directory
-            lcPath = Path(default_local_collection_root_dir())
+            lcPath = default_local_collection_root_dir()
         LOGGER.info('Setting the collection path to ' + str(lcPath))
         settings.setValue(local_collection_root_dir_key(),
                           str(lcPath))
@@ -157,7 +157,8 @@ def local_collection_path(id=None):
                 #os.rename(old_path, path)
             except:
                 pass
-    return str(path)
+    #return str(path)
+    return path
 
 
 def old_local_collection_path(id=None):
@@ -176,8 +177,8 @@ def old_local_collection_path(id=None):
         dir_name = '%s (%s)' % (collection_name, id)
         path = path / dir_name
         #path = os.path.join(path, dir_name)
-    #return path
-    return str(path)
+    #return str(path)
+    return path
 
 
 def path_leaf(path):

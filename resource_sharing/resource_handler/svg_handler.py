@@ -78,7 +78,7 @@ class SVGResourceHandler(BaseResourceHandler):
         for filename in Path(self.resource_dir).rglob('*'):
             LOGGER.info('filename: ' + str(filename))
             #for filename in [f for f in filenames if f.lower().endswith(".svg")]:
-            if filename.suffix.lower() == "svg":
+            if filename.suffix.lower().endswith("svg"):
                 valid += 1
         if valid >= 0:
             self.collection[SVG] = valid

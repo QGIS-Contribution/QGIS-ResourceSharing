@@ -74,8 +74,8 @@ def resource_sharing_group():
 
 def repositories_cache_path():
     """Get the path to the repositories cache."""
-    return ( Path(QgsApplication.qgisSettingsDirPath()) /
-                'resource_sharing' / 'repositories_cache' )
+    return str(Path(QgsApplication.qgisSettingsDirPath(),
+                'resource_sharing' / 'repositories_cache')
     #return os.path.join(
     #    QgsApplication.qgisSettingsDirPath(),
     #    'resource_sharing',
@@ -88,8 +88,8 @@ def local_collection_root_dir_key():
 
 
 def default_local_collection_root_dir():
-    return ( Path(QgsApplication.qgisSettingsDirPath()) /
-                'resource_sharing' / 'collections' )
+    return str(Path(QgsApplication.qgisSettingsDirPath(),
+                      'resource_sharing', 'collections'))
     #return os.path.join(QgsApplication.qgisSettingsDirPath(),
     #                    'resource_sharing',
     #                    'collections')

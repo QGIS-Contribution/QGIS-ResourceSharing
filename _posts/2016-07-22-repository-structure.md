@@ -44,10 +44,31 @@ this:
             ├── svg (optional, containing SVG files)
             ├── symbol (optional, containing symbol definition XML files)
             └── lisence file (encouraged)
-        
+
+If the *QGIS Resource Sharing plugin* shall be able to make the
+resources available to QGIS users in a convenient way, you have
+to place them where the plugin expects them to be:
+
+* Layer style (QML) files belong in the ***style*** directory.
+
+* Processing models belong in the ***models*** directory.
+
+* Processing (Python) scripts belong in the ***processing*** directory.
+
+* R script (for use with the Processing R plugin) belong in in the
+  ***rscripts*** directory.
+
+* Symbol XML files belong in the ***symbol*** directory.
+  Symbol images are expected to be in the ***image*** directory and
+  symbol SVGs are expected to be in the ***svg*** directory.
+
+* SVGs belong in the ***svg*** directory.
+
+* Images belong in the ***image*** directory.
+
 Check the
 [QGIS Resources Repository](https://github.com/QGIS/QGIS-Resources) and
-[this test repository](https://github.com/akbargumbira/qgis_resources_data/)
+[this test repository](https://github.com/QGIS-Contribution/QGIS_Test-Resources)
 for github repository examples.
 
               

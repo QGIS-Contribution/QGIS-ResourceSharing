@@ -45,7 +45,7 @@ class RScriptHandler(BaseResourceHandler):
         # Get all the R script files under self.resource_dir
         R_files = []
         #for item in os.listdir(self.resource_dir):
-        for item in Path(self.resource_dir).glob(*):
+        for item in Path(self.resource_dir).glob('*'):
             #file_path = os.path.join(self.resource_dir, item)
             file_path = Path(self.resource_dir, item)
             #if fnmatch.fnmatch(file_path, '*.rsx'):

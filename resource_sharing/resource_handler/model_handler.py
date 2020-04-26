@@ -69,7 +69,7 @@ class ModelHandler(BaseResourceHandler):
             return
         # Remove the model files that are present in this collection
         #for item in os.listdir(self.resource_dir):
-        for item in Path(self.resource_dir).glob(*):
+        for item in Path(self.resource_dir).glob('*'):
             #file_path = os.path.join(self.resource_dir, item)
             file_path = Path(self.resource_dir, item)
             if fnmatch.fnmatch(file_path, '*%s*' % self.collection_id):

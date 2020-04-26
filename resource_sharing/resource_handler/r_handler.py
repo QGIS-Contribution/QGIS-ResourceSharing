@@ -39,7 +39,7 @@ class RScriptHandler(BaseResourceHandler):
         """
         # Check if the dir exists, return silently if it doesn't
         #if not os.path.exists(self.resource_dir):
-        if Path(self.resource_dir).exists():
+        if not Path(self.resource_dir).exists():
             return
 
         # Get all the R script files under self.resource_dir

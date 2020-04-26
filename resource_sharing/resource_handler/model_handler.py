@@ -37,7 +37,7 @@ class ModelHandler(BaseResourceHandler):
         """
         # Return silently if the directory does not exist
         #if not os.path.exists(self.resource_dir):
-        if Path(self.resource_dir).exists():
+        if not Path(self.resource_dir).exists():
             return
 
         # Get all the model files under self.resource_dir

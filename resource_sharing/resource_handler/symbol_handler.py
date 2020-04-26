@@ -160,8 +160,10 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         group_or_tag_id = self._get_parent_group_or_tag()
 
         for symbol_file in symbol_files:
+            LOGGER.info('symbol_file: ' + symbol_file)
             #file_name = os.path.splitext(os.path.basename(symbol_file))[0]
             file_name = symbol_file.stem
+            LOGGER.info('file_name: ' + file_name)
             # Groups in QGIS2, tags in QGIS3...
             groupOrTag_id = self._get_child_group_tag(group_or_tag_id, file_name)
             # Modify the symbol file to fix image and SVG paths
@@ -169,12 +171,14 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             # Add all symbols and colorramps and group / tag them
             symbol_xml_extractor = SymbolXMLExtractor(str(symbol_file))
             for symbol in symbol_xml_extractor.symbols:
+                LOGGER.info("symbol['name']: " + symbol['name'])
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection['repository_name'])
                 # self.resolve_dependency(symbol[SYMBOL])
                 if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
                     self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
                                        groupOrTag_id)
             for colorramp in symbol_xml_extractor.colorramps:
+                LOGGER.info("colorramp['name']: " + colorramp['name'])
                 colorramp_name = '%s (%s)' % (
                     colorramp['name'], self.collection['repository_name'])
                 if self.style.addColorRamp(

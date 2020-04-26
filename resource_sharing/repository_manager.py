@@ -385,7 +385,8 @@ class RepositoryManager(QObject):
                 config.COLLECTIONS[collection_id] = collection
 
                 # Get the collection path (updating if neccessary)
-                collection_path = local_collection_path(collection_id)
+                #collection_path = local_collection_path(collection_id)
+                collection_path = Path(local_collection_path(collection_id))
                 # Check the file system to see if the collection exists.
                 # If not, also uninstall its resources
                 current_status = config.COLLECTIONS[collection_id]['status']

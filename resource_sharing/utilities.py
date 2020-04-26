@@ -166,7 +166,7 @@ def old_local_collection_path(id=None):
     If id is not passed, it will just return the root dir of the
     collections.
     """
-    path = (PATH(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
+    path = (Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
     #path = os.path.join(
     #    QDir.homePath(),
     #    'QGIS',

@@ -52,7 +52,7 @@ class RScriptHandler(BaseResourceHandler):
             if file_path.suffix.lower() == 'rsx':
                 R_files.append(file_path)
             #if fnmatch.fnmatch(file_path, '*.rsx.help'):
-            if file_path.suffixes.lower().endswith('rsx.help'):
+            if ''.join(file_path.suffixes).lower().endswith('rsx.help'):
                 R_files.append(file_path)
 
         valid = 0

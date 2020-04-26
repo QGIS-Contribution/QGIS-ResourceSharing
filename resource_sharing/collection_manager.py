@@ -1,7 +1,6 @@
 # coding=utf-8
 import hashlib
-#import os
-# Use pathlib instead of os.path?
+# Use pathlib instead of os.path
 from pathlib import Path
 import shutil
 import logging
@@ -143,7 +142,7 @@ class CollectionManager(object):
 
         config.COLLECTIONS[collection_id]['resources_html'] = html
         context = {
-            'resources_path': resources_path(),
+            'resources_path': str(resources_path()),
             'collection': config.COLLECTIONS[collection_id]
         }
         return render_template('collection_details.html', context)
@@ -217,10 +216,7 @@ class CollectionManager(object):
             resource_handler_instance.uninstall()
 
         # Remove the collection directory
-        #collection_dir = Path(local_collection_path(collection_id))
         collection_dir = local_collection_path(collection_id)
-        # if collection_dir.exists():
-        #if os.path.exists(collection_dir):
         if collection_dir.exists():
             shutil.rmtree(str(collection_dir))
 

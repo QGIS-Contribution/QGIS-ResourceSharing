@@ -1,6 +1,5 @@
 # coding=utf-8
-#import os
-# Use pathlib instead of os.path?
+# Use pathlib instead of os.path
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -31,7 +30,7 @@ class SymbolResolverMixin(object):
             symbol_xml = xml_file.read()
 
         updated_xml = fix_xml_node(
-            symbol_xml, self.collection_path, QgsApplication.svgPaths())
+            symbol_xml, str(self.collection_path), QgsApplication.svgPaths())
 
         with open(xml_path, 'wb') as xml_file:
             xml_file.write(updated_xml)
@@ -100,20 +99,17 @@ def resolve_path(path, collection_path, search_paths):
 
     # Check in the 'svg' directory of the collection
     file_name = path_leaf(path)
-    #svg_collection_path = os.path.join(collection_path, 'svg', file_name)
     svg_collection_path = Path(collection_path, 'svg', file_name)
     if QFile(str(svg_collection_path)).exists():
         return QFileInfo(str(svg_collection_path)).canonicalFilePath()
 
     # Check in the 'image' directory of the collection
-    #image_collection_path = os.path.join(collection_path, 'image', file_name)
     image_collection_path = Path(collection_path, 'image', file_name)
     if QFile(str(image_collection_path)).exists():
         return QFileInfo(str(image_collection_path)).canonicalFilePath()
 
     # Still not found, check the search_paths
     for search_path in search_paths:
-        #local_path = os.path.join(search_path, path)
         local_path = Path(search_path, path)
         if QFile(str(local_path)).exists():
             return QFileInfo(str(local_path)).canonicalFilePath()

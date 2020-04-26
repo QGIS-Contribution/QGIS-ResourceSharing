@@ -1,6 +1,5 @@
 # coding=utf-8
-#import os
-# Use pathlib instead of os.path?
+# Use pathlib instead of os.path
 from pathlib import Path
 import logging
 
@@ -27,18 +26,13 @@ def resources_path(*args):
     :type args: list
 
     :return: Absolute path to the resources folder.
-    :rtype: str
+    :rtype: Path
     """
     path = Path(__file__).parent.parent
-    # path = os.path.dirname(os.path.dirname(__file__))
     path = (path / 'resources')
-    # path = os.path.abspath(os.path.join(path, 'resources'))
     for item in args:
         path = (path / item)
-        #path = os.path.abspath(os.path.join(path, item))
-
-    #return path
-    return str(path)
+    return path
 
 
 def ui_path(*args):
@@ -48,18 +42,13 @@ def ui_path(*args):
     :type args: list
 
     :return: Absolute path to the ui file.
-    :rtype: str
+    :rtype: Path
     """
     path = Path(__file__).parent
-    # path = os.path.dirname(__file__)
     path = (path / 'gui' / 'ui')
-    # path = os.path.abspath(os.path.join(path, 'gui', 'ui'))
     for item in args:
         path = (path / item)
-        # path = os.path.abspath(os.path.join(path, item))
-
-    #return path
-    return str(path)
+    return path
 
 
 def repo_settings_group():
@@ -74,12 +63,8 @@ def resource_sharing_group():
 
 def repositories_cache_path():
     """Get the path to the repositories cache."""
-    return str(Path(QgsApplication.qgisSettingsDirPath(),
+    return Path(QgsApplication.qgisSettingsDirPath(),
                 'resource_sharing', 'repositories_cache'))
-    #return os.path.join(
-    #    QgsApplication.qgisSettingsDirPath(),
-    #    'resource_sharing',
-    #    'repositories_cache')
 
 
 def local_collection_root_dir_key():
@@ -90,9 +75,6 @@ def local_collection_root_dir_key():
 def default_local_collection_root_dir():
     return Path(QgsApplication.qgisSettingsDirPath(),
                       'resource_sharing', 'collections')
-    #return os.path.join(QgsApplication.qgisSettingsDirPath(),
-    #                    'resource_sharing',
-    #                    'collections')
 
 
 def local_collection_path(id=None):
@@ -108,7 +90,6 @@ def local_collection_path(id=None):
         lcPath = Path(settings.value(local_collection_root_dir_key()))
     else:
         # The path is not defined in the settings
-        #if os.path.exists(old_local_collection_path()):
         if old_local_collection_path().exists():
             # The pre-version 0.10 directory exists - so use it
             lcPath = old_local_collection_path()
@@ -121,43 +102,26 @@ def local_collection_path(id=None):
     settings.endGroup()
     # If the directory does not exist, create it!
     if not lcPath.exists():
-    #if not os.path.exists(lcPath):
         LOGGER.debug('coll_mgr - creating local collection dir: ' +
                      str(lcPath))
         lcPath.mkdir(parents=True, exist_ok=True)
-        #os.makedirs(lcPath)
-
-    # # lcPath = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
-    # lcPath = os.path.join(
-    #     QDir.toNativeSeparators(QDir.homePath()),
-    #     'QGIS',
-    #     'Resource Sharing')
     path = lcPath
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         sane_name = sanitize_filename(collection_name)
         repository_name = config.COLLECTIONS[id]['repository_name']
         sane_repo_name = sanitize_filename(repository_name)
-
-        #dir_name = '%s-%s' % (sane_name, id)
         # Use repository name instead of hash
         dir_name = '%s (%s)' % (sane_name, sane_repo_name)
-        # #dir_name = '%s (%s)' % (collection_name, id)
-        # #dir_name = '%s' % (id)
         path = lcPath / dir_name
-        #path = os.path.join(lcPath, dir_name)
-        # Check if the "old" directory name exists
+        # Check if the "old" directory name exists (should eventuall be removed)
         old_dir_name = '%s' % (id)
         old_path = lcPath / old_dir_name
-        #old_path = os.path.join(lcPath, old_dir_name)
-        #if os.path.exists(old_path):
         if old_path.exists():
             try:
                 old_path.rename(path)
-                #os.rename(old_path, path)
             except:
                 pass
-    #return str(path)
     return path
 
 
@@ -168,16 +132,10 @@ def old_local_collection_path(id=None):
     collections.
     """
     path = (Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
-    #path = os.path.join(
-    #    QDir.homePath(),
-    #    'QGIS',
-    #    'Resource Sharing')
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         dir_name = '%s (%s)' % (collection_name, id)
         path = path / dir_name
-        #path = os.path.join(path, dir_name)
-    #return str(path)
     return path
 
 
@@ -207,9 +165,6 @@ def render_template(filename, context):
     """
     path = Path(__file__).parent
     path = (Path(path).parent / 'resources' / 'template')
-    #path = os.path.dirname(__file__)
-    #path = os.path.abspath(
-    #    os.path.join(path, os.pardir, 'resources', 'template'))
     return jinja2.Environment(
         loader=jinja2.FileSystemLoader(str(path))
     ).get_template(filename).render(context)

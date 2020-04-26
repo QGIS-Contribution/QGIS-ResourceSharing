@@ -46,7 +46,6 @@ class BaseResourceHandler(object):
         """Return the collection dictionary."""
         return self._collection
 
-    # Not used???
     @property
     def collection_path(self):
         """Return the local collection path."""

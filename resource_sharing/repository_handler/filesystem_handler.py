@@ -1,6 +1,5 @@
 # coding=utf-8
-#import os
-# Use pathlib instead of os.path?
+# Use pathlib instead of os.path
 from pathlib import Path
 import shutil
 import logging
@@ -36,15 +35,13 @@ class FileSystemHandler(BaseRepositoryHandler):
     def fetch_metadata(self):
         """Fetch the metadata file from the repository."""
         # Check if the metadata exists
-        #metadata_path = os.path.join(self._path, self.METADATA_FILE)
         metadata_path = Path(self._path) / self.METADATA_FILE
-        #if not os.path.exists(metadata_path):
         if not metadata_path.exists():
             message = 'The metadata file could not be found in the repository'
             return False, message
 
         # Read the metadata file:
-        with open(metadata_path, 'r') as metadata_file:
+        with open(str(metadata_path), 'r') as metadata_file:
             metadata_content = metadata_file.read()
         self.metadata = metadata_content
         message = 'Metadata successfully fetched'
@@ -62,17 +59,13 @@ class FileSystemHandler(BaseRepositoryHandler):
         :type register_name: unicode
         """
         # Copy the specific downloaded collection to collections dir
-        #src_dir = os.path.join(self._path, 'collections', register_name)
         src_dir = Path(self._path) / 'collections' / register_name
-        #if not os.path.exists(src_dir):
         if not src_dir.exists():
             error_message = ('Error: The collection does not exist in the '
                              'repository.')
             return False, error_message
 
-        #dest_dir = Path(local_collection_path(id))
         dest_dir = local_collection_path(id)
-        #if os.path.exists(dest_dir):
         if dest_dir.exists():
             shutil.rmtree(str(dest_dir))
         shutil.copytree(str(src_dir), str(dest_dir))
@@ -80,6 +73,5 @@ class FileSystemHandler(BaseRepositoryHandler):
         return True, None
 
     def file_url(self, relative_path):
-        #file_path = os.path.abspath(os.path.join(self._path, relative_path))
         file_path = Path(self._path, relative_path)
         return urljoin('file:', pathname2url(str(file_path)))

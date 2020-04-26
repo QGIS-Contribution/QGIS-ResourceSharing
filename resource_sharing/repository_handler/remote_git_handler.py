@@ -1,6 +1,5 @@
 # coding=utf-8
-#import os
-# Use pathlib instead of os.path?
+# Use pathlib instead of os.path
 from pathlib import Path
 import shutil
 import logging
@@ -101,26 +100,17 @@ class RemoteGitHandler(BaseRepositoryHandler):
         # Hack to avoid irritating Dulwich / Porcelain ResourceWarning
         warnings.filterwarnings("ignore", category=ResourceWarning)
         # Clone or pull the repositories first
-        #local_repo_dir = os.path.join(
-        #    QgsApplication.qgisSettingsDirPath(),
-        #    'resource_sharing',
-        #    'repositories',
-        #    self.git_host, self.git_owner, self.git_repository
-        #)
         local_repo_dir = Path(QgsApplication.qgisSettingsDirPath(),
                               'resource_sharing', 'repositories',
                               self.git_host, self.git_owner,
                               self.git_repository)
-        # Hack to try to avoid sharing errors
-        #if os.path.exists(local_repo_dir):
+        # Hack to try to avoid locking errors
         if local_repo_dir.exists():
             try:
                 shutil.rmtree(str(local_repo_dir))
             except:
                 pass
-        #if not os.path.exists(os.path.join(local_repo_dir, '.git')):
         if not (local_repo_dir / '.git').exists():
-            #os.makedirs(local_repo_dir)
             local_repo_dir.mkdir(parents=True)
             try:
                 repo = porcelain.clone(
@@ -154,9 +144,6 @@ class RemoteGitHandler(BaseRepositoryHandler):
             # Hack until dulwich/porcelain handles file removal
             #collDir = os.path.join(local_repo_dir, 'collections')
             # ????!!!!
-            #if os.path.exists(collDir):
-            #    shutil.rmtree(collDir)
-            #if os.path.exists(local_repo_dir):
             if local_repo_dir.exists():
                 shutil.rmtree(str(local_repo_dir))
             try:
@@ -187,15 +174,12 @@ class RemoteGitHandler(BaseRepositoryHandler):
                     return False, error_message
 
         # Copy the specific downloaded collection to the collections dir
-        #src_dir = os.path.join(local_repo_dir, 'collections', register_name)
         src_dir = local_repo_dir / 'collections' / register_name
-        #if not os.path.exists(src_dir):
         if not src_dir.exists():
             error_message = ('Error: The collection does not exist in the '
                              'repository.')
             return False, error_message
 
-        #dest_dir = Path(local_collection_path(id))
         dest_dir = local_collection_path(id)
         if dest_dir.exists():
             # Remove the existing collection directory

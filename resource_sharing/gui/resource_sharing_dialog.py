@@ -80,7 +80,7 @@ from resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS)
 from resource_sharing import config
 
-FORM_CLASS, _ = uic.loadUiType(ui_path('resource_sharing_dialog_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(str(ui_path('resource_sharing_dialog_base.ui')))
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 REPOSITORY_ITEM = 1000
 COLLECTION_ITEM = 2000
@@ -115,7 +115,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # All collections
         icon_all = QIcon()
         icon_all.addFile(
-            resources_path('img', 'plugin.svg'),
+            str(resources_path('img', 'plugin.svg')),
             QSize(),
             QIcon.Normal,
             QIcon.Off)
@@ -125,7 +125,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # Installed collections
         icon_installed = QIcon()
         icon_installed.addFile(
-            resources_path('img', 'plugin-installed.svg'),
+            str(resources_path('img', 'plugin-installed.svg')),
             QSize(),
             QIcon.Normal,
             QIcon.Off)
@@ -136,7 +136,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # Settings / repositories
         icon_settings = QIcon()
         icon_settings.addFile(
-            resources_path('img', 'settings.svg'),
+            str(resources_path('img', 'settings.svg')),
             QSize(),
             QIcon.Normal,
             QIcon.Off)
@@ -222,7 +222,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     'Installed collections are emphasized (in <b>bold</b>).')
 
             context = {
-                'resources_path': resources_path(),
+                'resources_path': str(resources_path()),
                 'title': title,
                 'description': description
             }

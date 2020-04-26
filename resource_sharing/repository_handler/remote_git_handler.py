@@ -124,7 +124,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
             local_repo_dir.mkdir(parents=True)
             try:
                 repo = porcelain.clone(
-                    self.url, local_repo_dir,
+                    self.url, str(local_repo_dir),
                     errstream=writeOut
                 )
                 repo.close()  # Try to avoid WinErr 32
@@ -134,7 +134,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 if self.url == git_parsed.url2ssh:
                     try:
                         repo = porcelain.clone(
-                            git_parsed.url2https, local_repo_dir,
+                            git_parsed.url2https, str(local_repo_dir),
                             errstream=writeOut)
                         repo.close()  # Try to avoid WinErr 32
                     except Exception as e:

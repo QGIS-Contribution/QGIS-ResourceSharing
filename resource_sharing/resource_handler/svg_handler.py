@@ -85,7 +85,8 @@ class SVGResourceHandler(BaseResourceHandler):
 
     def uninstall(self):
         """Uninstall the SVGs."""
-        if not os.path.exists(self.resource_dir):
+        #if not os.path.exists(self.resource_dir):
+        if not Path(self.resource_dir).exists():
             return
         # Remove from the SVG search paths if there are no SVGs left
         # in any collection

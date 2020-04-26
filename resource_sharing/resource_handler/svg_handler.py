@@ -70,7 +70,7 @@ class SVGResourceHandler(BaseResourceHandler):
         #if local_collection_path() not in search_paths:
         if str(local_collection_path()) not in search_paths:
             search_paths.append(str(local_collection_path()))
-        #LOGGER.info('set svg search_paths: ' + ','.join(search_paths))
+        #LOGGER.info('set svg search_paths: ' + ','.join(search_paths)) # crash
         self.set_svg_search_paths(search_paths)
 
         # Count the SVGs

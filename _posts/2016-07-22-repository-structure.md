@@ -47,7 +47,7 @@ this:
 
 If the *QGIS Resource Sharing plugin* shall be able to make the
 resources available to QGIS users in a convenient way, you have
-to place them where the plugin expects them to be:
+to place them where the plugin expects to find them:
 
 * Layer style (QML) files belong in the ***style*** directory.
 

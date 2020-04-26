@@ -94,7 +94,7 @@ class SVGResourceHandler(BaseResourceHandler):
         shutil.rmtree(self.resource_dir)
         svgCount = 0
         #for dirpath, dirnames, filenames in os.walk(local_collection_path()):
-        for filenames in Path(local_collection_path()).rglob('*'):
+        for filename in Path(local_collection_path()).rglob('*'):
             #for filename in [f for f in filenames if f.lower().endswith(".svg")]:
             if filename.suffix.lower() == "svg":
                 svgCount += 1

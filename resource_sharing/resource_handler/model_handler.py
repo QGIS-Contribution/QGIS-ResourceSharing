@@ -92,7 +92,7 @@ class ModelHandler(BaseResourceHandler):
         """Return the default location of the processing models folder."""
         #folder = str(os.path.join(userFolder(), MODELS_PROCESSING_FOLDER))
         folder = Path(userFolder(), MODELS_PROCESSING_FOLDER)
-        mkdir(folder)
+        mkdir(str(folder))
         #return os.path.abspath(folder)
         return str(folder)
 

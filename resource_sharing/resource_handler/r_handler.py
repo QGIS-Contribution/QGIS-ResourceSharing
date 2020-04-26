@@ -49,7 +49,7 @@ class RScriptHandler(BaseResourceHandler):
             #file_path = os.path.join(self.resource_dir, item)
             file_path = Path(self.resource_dir, item)
             #if fnmatch.fnmatch(file_path, '*.rsx'):
-            if file_path.suffix.lower() == 'rsx'):
+            if file_path.suffix.lower() == 'rsx':
                 R_files.append(file_path)
             #if fnmatch.fnmatch(file_path, '*.rsx.help'):
             if file_path.suffixes.lower().endswith('rsx.help'):

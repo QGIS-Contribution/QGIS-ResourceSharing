@@ -40,7 +40,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
         # Get all the script files under self.resource_dir
         processing_files = []
         #for item in os.listdir(self.resource_dir):
-        for item in Path(self.resource_dir).glob(*.py):
+        for item in Path(self.resource_dir).glob('*.py'):
             file_path = Path(self.resource_dir, item)
             processing_files.append(file_path)
             #file_path = os.path.join(self.resource_dir, item)

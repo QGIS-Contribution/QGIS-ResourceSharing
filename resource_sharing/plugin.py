@@ -19,7 +19,8 @@
  *                                                                         *
  ***************************************************************************/
 """
-import os.path
+# Use pathlib instead of os.path
+from pathlib import Path
 
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
@@ -46,15 +47,13 @@ class Plugin:
         # Save the reference to the QGIS interface
         self.iface = iface
         # initialize the plugin directory
-        self.plugin_dir = os.path.dirname(__file__)
+        self.plugin_dir = Path(__file__).parent
         # initialize the locale
         locale = QSettings().value('locale/userLocale')[0:2]
-        locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'QgsResourceSharing_{}.qm'.format(locale))
+        locale_path = Path(self.plugin_dir, 'i18n',
+                           'QgsResourceSharing_{}.qm'.format(locale))
 
-        if os.path.exists(locale_path):
+        if Path(locale_path).exists():
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
@@ -164,7 +163,7 @@ class Plugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = resources_path('icon.png')
+        icon_path = str(resources_path('icon.png'))
         self.add_action(
             icon_path,
             text=self.tr(u'Resource Sharing'),

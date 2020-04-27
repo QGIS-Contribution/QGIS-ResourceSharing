@@ -30,7 +30,7 @@ except ImportError:
 
 from resource_sharing.utilities import ui_path, qgis_version
 
-FORM_CLASS, _ = uic.loadUiType(ui_path('manage_repository.ui'))
+FORM_CLASS, _ = uic.loadUiType(str(ui_path('manage_repository.ui')))
 
 
 class ManageRepositoryDialog(QDialog, FORM_CLASS):

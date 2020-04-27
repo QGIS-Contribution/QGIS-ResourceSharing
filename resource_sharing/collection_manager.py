@@ -1,8 +1,7 @@
 # coding=utf-8
 import hashlib
-import os
-# Use pathlib instead of os.path?
-# from pathlib import Path
+# Use pathlib instead of os.path
+from pathlib import Path
 import shutil
 import logging
 import traceback
@@ -103,14 +102,14 @@ class CollectionManager(object):
         if 'style' in config.COLLECTIONS[collection_id].keys():
            if resource_types > 0:
                html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['style']) + ' Layer style'
+           html = html + str(config.COLLECTIONS[collection_id]['style']) + ' Layer style (QML) file'
            if config.COLLECTIONS[collection_id]['style'] > 1:
                html = html + 's'
            resource_types = resource_types + 1
         if 'symbol' in config.COLLECTIONS[collection_id].keys():
            if resource_types > 0:
                html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol file'
+           html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol (XML) file'
            if config.COLLECTIONS[collection_id]['symbol'] > 1:
                html = html + 's'
            resource_types = resource_types + 1
@@ -135,15 +134,15 @@ class CollectionManager(object):
            if config.COLLECTIONS[collection_id]['rscripts'] > 1:
                html = html + 's'
            resource_types = resource_types + 1
-        html = html + ' (<i>Reinstall</i> to update)'
+        html = html + '.<br><i>Reinstall</i> to update'
         if resource_types == 0:
-           html = 'Reinstall the collection to get statistics'
+           html = '<i>Reinstall</i> the collection to get statistics'
         if config.COLLECTIONS[collection_id]['status'] != COLLECTION_INSTALLED_STATUS:
-           html = 'Unknown before installation'
+           html = '<i>Unknown before installation</i>'
 
         config.COLLECTIONS[collection_id]['resources_html'] = html
         context = {
-            'resources_path': resources_path(),
+            'resources_path': str(resources_path()),
             'collection': config.COLLECTIONS[collection_id]
         }
         return render_template('collection_details.html', context)
@@ -218,9 +217,8 @@ class CollectionManager(object):
 
         # Remove the collection directory
         collection_dir = local_collection_path(collection_id)
-        # if collection_dir.exists():
-        if os.path.exists(collection_dir):
-            shutil.rmtree(collection_dir)
+        if collection_dir.exists():
+            shutil.rmtree(str(collection_dir))
 
         config.COLLECTIONS[collection_id]['status'] = \
             COLLECTION_NOT_INSTALLED_STATUS

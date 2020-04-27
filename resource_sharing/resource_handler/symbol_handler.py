@@ -1,6 +1,7 @@
 # coding=utf-8
-import os
-import fnmatch
+# Use pathlib instead of os.path
+from pathlib import Path
+#import fnmatch
 import logging
 
 try:
@@ -132,7 +133,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         defined in that XML file.
         """
         # Skip installation if the directory does not exist
-        if not os.path.exists(self.resource_dir):
+        if not Path(self.resource_dir).exists():
             return
 
         # Uninstall first (in case it is a reinstall)
@@ -141,10 +142,9 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         # Get all the symbol XML files in the collection
         symbol_files = []
         valid = 0
-        for item in os.listdir(self.resource_dir):
-            file_path = os.path.join(self.resource_dir, item)
-            if fnmatch.fnmatch(file_path, '*.xml'):
-                symbol_files.append(file_path)
+        for item in Path(self.resource_dir).glob('*.xml'):
+            file_path = Path(self.resource_dir, item)
+            symbol_files.append(file_path)
             valid += 1
 
         # If there are no symbol files, there is nothing to do
@@ -155,13 +155,13 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         group_or_tag_id = self._get_parent_group_or_tag()
 
         for symbol_file in symbol_files:
-            file_name = os.path.splitext(os.path.basename(symbol_file))[0]
+            file_name = symbol_file.stem
             # Groups in QGIS2, tags in QGIS3...
             groupOrTag_id = self._get_child_group_tag(group_or_tag_id, file_name)
             # Modify the symbol file to fix image and SVG paths
-            self.resolve_dependency(symbol_file)
+            self.resolve_dependency(str(symbol_file))
             # Add all symbols and colorramps and group / tag them
-            symbol_xml_extractor = SymbolXMLExtractor(symbol_file)
+            symbol_xml_extractor = SymbolXMLExtractor(str(symbol_file))
             for symbol in symbol_xml_extractor.symbols:
                 symbol_name = '%s (%s)' % (symbol['name'], self.collection['repository_name'])
                 # self.resolve_dependency(symbol[SYMBOL])

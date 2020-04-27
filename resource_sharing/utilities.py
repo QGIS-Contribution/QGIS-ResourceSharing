@@ -1,7 +1,6 @@
 # coding=utf-8
-import os
-# Use pathlib instead of os.path?
-# from pathlib import Path
+# Use pathlib instead of os.path
+from pathlib import Path
 import logging
 
 import ntpath
@@ -27,16 +26,12 @@ def resources_path(*args):
     :type args: list
 
     :return: Absolute path to the resources folder.
-    :rtype: str
+    :rtype: Path
     """
-    # path = Path(os.path.dirname(__file__))
-    path = os.path.dirname(os.path.dirname(__file__))
-    # path = (path / 'resources').absolute
-    path = os.path.abspath(os.path.join(path, 'resources'))
+    path = Path(__file__).parent.parent
+    path = (path / 'resources')
     for item in args:
-        # path = (path / item).absolute
-        path = os.path.abspath(os.path.join(path, item))
-
+        path = (path / item)
     return path
 
 
@@ -47,16 +42,12 @@ def ui_path(*args):
     :type args: list
 
     :return: Absolute path to the ui file.
-    :rtype: str
+    :rtype: Path
     """
-    # path = Path(os.path.dirname(__file__))
-    path = os.path.dirname(__file__)
-    # path = (path / 'gui' / 'ui').absolute
-    path = os.path.abspath(os.path.join(path, 'gui', 'ui'))
+    path = Path(__file__).parent
+    path = (path / 'gui' / 'ui')
     for item in args:
-        # path = (path / item).absolute
-        path = os.path.abspath(os.path.join(path, item))
-
+        path = (path / item)
     return path
 
 
@@ -72,12 +63,8 @@ def resource_sharing_group():
 
 def repositories_cache_path():
     """Get the path to the repositories cache."""
-    # return Path(QgsApplication.qgisSettingsDirPath()) /
-    #             'resource_sharing' / 'repositories_cache'
-    return os.path.join(
-        QgsApplication.qgisSettingsDirPath(),
-        'resource_sharing',
-        'repositories_cache')
+    return Path(QgsApplication.qgisSettingsDirPath(),
+                'resource_sharing', 'repositories_cache')
 
 
 def local_collection_root_dir_key():
@@ -86,9 +73,8 @@ def local_collection_root_dir_key():
 
 
 def default_local_collection_root_dir():
-    return os.path.join(QgsApplication.qgisSettingsDirPath(),
-                        'resource_sharing',
-                        'collections')
+    return Path(QgsApplication.qgisSettingsDirPath(),
+                      'resource_sharing', 'collections')
 
 
 def local_collection_path(id=None):
@@ -101,50 +87,39 @@ def local_collection_path(id=None):
     settings.beginGroup(resource_sharing_group())
     if settings.contains(local_collection_root_dir_key()):
         # The path is defined in the settings - use it
-        lcPath = settings.value(local_collection_root_dir_key())
+        lcPath = Path(settings.value(local_collection_root_dir_key()))
     else:
         # The path is not defined in the settings
-        if os.path.exists(old_local_collection_path()):
+        if old_local_collection_path().exists():
             # The pre-version 0.10 directory exists - so use it
             lcPath = old_local_collection_path()
         else:
             # Use the new default directory
             lcPath = default_local_collection_root_dir()
-        LOGGER.info('Setting the collection path to ' + lcPath)
+        LOGGER.info('Setting the collection path to ' + str(lcPath))
         settings.setValue(local_collection_root_dir_key(),
-                          lcPath)
+                          str(lcPath))
     settings.endGroup()
     # If the directory does not exist, create it!
-    if not os.path.exists(lcPath):
+    if not lcPath.exists():
         LOGGER.debug('coll_mgr - creating local collection dir: ' +
                      str(lcPath))
-        os.makedirs(lcPath)
-
-    # # lcPath = Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
-    # lcPath = os.path.join(
-    #     QDir.toNativeSeparators(QDir.homePath()),
-    #     'QGIS',
-    #     'Resource Sharing')
+        lcPath.mkdir(parents=True, exist_ok=True)
     path = lcPath
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         sane_name = sanitize_filename(collection_name)
         repository_name = config.COLLECTIONS[id]['repository_name']
         sane_repo_name = sanitize_filename(repository_name)
-
-        #dir_name = '%s-%s' % (sane_name, id)
         # Use repository name instead of hash
         dir_name = '%s (%s)' % (sane_name, sane_repo_name)
-        # #dir_name = '%s (%s)' % (collection_name, id)
-        # #dir_name = '%s' % (id)
-        # path = lcPath / dir_name
-        path = os.path.join(lcPath, dir_name)
-        # Check if the "old" directory name exists
+        path = lcPath / dir_name
+        # Check if the "old" directory name exists (should eventuall be removed)
         old_dir_name = '%s' % (id)
-        old_path = os.path.join(lcPath, old_dir_name)
-        if os.path.exists(old_path):
+        old_path = lcPath / old_dir_name
+        if old_path.exists():
             try:
-                os.rename(old_path, path)
+                old_path.rename(path)
             except:
                 pass
     return path
@@ -156,14 +131,11 @@ def old_local_collection_path(id=None):
     If id is not passed, it will just return the root dir of the
     collections.
     """
-    path = os.path.join(
-        QDir.homePath(),
-        'QGIS',
-        'Resource Sharing')
+    path = (Path(QDir.homePath()) / 'QGIS' / 'Resource Sharing')
     if id:
         collection_name = config.COLLECTIONS[id]['name']
         dir_name = '%s (%s)' % (collection_name, id)
-        path = os.path.join(path, dir_name)
+        path = path / dir_name
     return path
 
 
@@ -191,10 +163,8 @@ def render_template(filename, context):
     :param context: The context passed for the template
     :type context: dict
     """
-    path = os.path.dirname(__file__)
-    # path = path / os.pardir / 'resources' / 'template').absolute()
-    path = os.path.abspath(
-        os.path.join(path, os.pardir, 'resources', 'template'))
+    path = Path(__file__).parent
+    path = (Path(path).parent / 'resources' / 'template')
     return jinja2.Environment(
-        loader=jinja2.FileSystemLoader(path)
+        loader=jinja2.FileSystemLoader(str(path))
     ).get_template(filename).render(context)

@@ -1,6 +1,7 @@
 # coding=utf-8
-import os
-import fnmatch
+# Use pathlib instead of os.path
+from pathlib import Path
+#import fnmatch
 import shutil
 import logging
 
@@ -59,39 +60,39 @@ class SVGResourceHandler(BaseResourceHandler):
         Add the collection root directory path to the SVG search path.
         """
         # Check if the dir exists, pass silently if it doesn't
-        if not os.path.exists(self.resource_dir):
+        if not Path(self.resource_dir).exists():
             return
         # Add to the SVG search paths
         search_paths = self.svg_search_paths()
 
-        if local_collection_path() not in search_paths:
-            search_paths.append(local_collection_path())
-
+        #if local_collection_path() not in search_paths:
+        if str(local_collection_path()) not in search_paths:
+            search_paths.append(str(local_collection_path()))
         self.set_svg_search_paths(search_paths)
 
         # Count the SVGs
         valid = 0
-        for dirpath, dirnames, filenames in os.walk(self.resource_dir):
-            for filename in [f for f in filenames if f.lower().endswith(".svg")]:
+        for filename in Path(self.resource_dir).rglob('*'):
+            if filename.suffix.lower().endswith("svg"):
                 valid += 1
         if valid >= 0:
             self.collection[SVG] = valid
 
     def uninstall(self):
         """Uninstall the SVGs."""
-        if not os.path.exists(self.resource_dir):
+        if not Path(self.resource_dir).exists():
             return
         # Remove from the SVG search paths if there are no SVGs left
         # in any collection
         # Have to remove now, to be able to update the SVG search path
         shutil.rmtree(self.resource_dir)
         svgCount = 0
-        for dirpath, dirnames, filenames in os.walk(local_collection_path()):
-            for filename in [f for f in filenames if f.lower().endswith(".svg")]:
+        for filename in local_collection_path().rglob('*'):
+            if filename.suffix.lower() == "svg":
                 svgCount += 1
                 break
         search_paths = self.svg_search_paths()
         if svgCount == 0:
-            if local_collection_path() in search_paths:
-                search_paths.remove(local_collection_path())
+            if str(local_collection_path()) in search_paths:
+                search_paths.remove(str(local_collection_path()))
         self.set_svg_search_paths(search_paths)

@@ -2,7 +2,8 @@
 import logging
 
 import csv
-import os
+# Use pathlib instead of os.path
+from pathlib import Path
 import pickle
 
 from qgis.PyQt.QtCore import QObject, QSettings, QTemporaryFile
@@ -242,8 +243,8 @@ class RepositoryManager(QObject):
                 # If the repository is renamed (same URL), the directories
                 # of its collections should be renamed accordingly (so that
                 # they remain accessible)
-                if os.path.exists(old_path):
-                    os.rename(old_path, new_path)
+                if old_path.exists():
+                    old_path.rename(new_path)
             new_collections = old_collections
             status = True
             fetcherror = ''
@@ -384,7 +385,7 @@ class RepositoryManager(QObject):
                 # If not, also uninstall its resources
                 current_status = config.COLLECTIONS[collection_id]['status']
                 if current_status == COLLECTION_INSTALLED_STATUS:
-                    if not os.path.exists(collection_path):
+                    if not collection_path.exists():
                         # Uninstall the collection
                         self._collections_manager.uninstall(collection_id)
 
@@ -405,18 +406,18 @@ class RepositoryManager(QObject):
 
     def serialize_repositories(self):
         """Save repositories to cache."""
-        if not os.path.exists(os.path.dirname(repositories_cache_path())):
-            os.makedirs(os.path.dirname(repositories_cache_path()))
+        if not repositories_cache_path().parent.exists():
+            repositories_cache_path().parent.mkdir(parents=True)
 
         self.resync_repository()
-        with open(repositories_cache_path(), 'wb') as f:
+        with open(str(repositories_cache_path()), 'wb') as f:
             pickle.dump(self._repositories, f)
 
     def load_repositories(self):
         """Load repositories from cache and rebuild collections."""
         repo_collections = {}
-        if os.path.exists(repositories_cache_path()):
-            with open(repositories_cache_path(), 'rb') as f:
+        if repositories_cache_path().exists():
+            with open(str(repositories_cache_path()), 'rb') as f:
                 repo_collections = pickle.load(f)
         self._repositories = repo_collections
         self.rebuild_collections()

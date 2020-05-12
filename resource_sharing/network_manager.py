@@ -24,6 +24,26 @@ class NetworkManager(object):
         self._auth_cfg = auth_cfg
         self._content = None
 
+        # Proxy part
+        proxy = QNetworkProxy()
+        proxy.setType(QNetworkProxy.HttpProxy)
+        s = QSettings()
+        proxyEnabled = s.value("proxy/proxyEnabled", "")
+        proxyType = s.value("proxy/proxyType", "" )
+        proxyHost = s.value("proxy/proxyHost", "" )
+        proxy.setHostName(proxyHost)
+        proxyPort = s.value("proxy/proxyPort", "" )
+        proxy.setPort(int(proxyPort))
+        proxyUser = s.value("proxy/proxyUser", "" )
+        proxy.setUser(proxyUser)
+        proxyPassword = s.value("proxy/proxyPassword", "" )
+        proxy.setPassword(proxyPassword)
+        QNetworkProxy.setApplicationProxy(proxy)
+
+        stringlist= ""
+        self._network_manager.setupDefaultProxyAndCache ()
+        self._network_manager.setFallbackProxyAndExcludes(proxy, stringlist)
+
     @property
     def content(self):
         return self._content

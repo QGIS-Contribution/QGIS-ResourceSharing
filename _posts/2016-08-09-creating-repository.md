@@ -70,9 +70,9 @@ choose this option:
     ```http://www.mydomain.com/qgisrepository/metadata.ini```
   * Each collection must be zipped.  The zip file of a collection
     must be named <name of collection>.zip, and the zip shall combine
-    the subdirectories of the collection (one or more of `image`,
-    `models`, `processing`, `rscripts`, `svg` and `symbol`), in
-    addition to a `preview` subdirectory for preview images.
+    the subdirectories of the collection (one or more of `expressions`,
+    `image`, `models`, `processing`, `rscripts`, `svg` and `symbol`),
+    in addition to a `preview` subdirectory for preview images.
 
     For example, if you have a collection named ```test_collection```,
     the collection must be present as:
@@ -81,6 +81,7 @@ choose this option:
     that contain resources you would like to share):
 
             test_collection.zip
+            ├── expressions
             ├── image
             ├── models
             ├── preview
@@ -104,6 +105,10 @@ choose this option:
         ├── metadata.ini
         └── collections
             └── test_collection.zip
+                ├── expressions
+                |   ├── expressions1.json
+                |   ├── ...
+                |   └── lastexpressions.json
                 ├── image
                 |   ├── image1.png
                 |   ├── ...

@@ -60,7 +60,13 @@ The first part of the tag name identifies the collection.
 Click on the tabs ```All```, ```Marker```, ```Line```, ```Fill```,
 ```Color Ramp```, ```Text Format``` or ```Label Settings```
 to see the items installed from the collection.
- 
+
+#### Expression
+Expression export files (JSON) are made available in the collections
+directory.
+You can click on the ```Open folder``` button to see where in the file
+system the files are located, and import them later.
+
 #### Style
 For QML styles, the plugin will resolve the image or SVG paths for you.
 You can click on the ```Open folder``` button to see where in the file

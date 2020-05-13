@@ -53,7 +53,7 @@ def ui_path(*args):
 
 def user_expressions_group():
     """Get the user expressions group."""
-    return '/Expressions/user'
+    return '/expressions/user'
 
 
 def repo_settings_group():

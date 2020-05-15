@@ -141,9 +141,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
                                  'collection failed.')
                 return False, error_message
         else:
-            # Hack until dulwich/porcelain handles file removal
-            #collDir = os.path.join(local_repo_dir, 'collections')
-            # ????!!!!
+            # Hack until dulwich/porcelain handles file removal ???!!!
             if local_repo_dir.exists():
                 shutil.rmtree(str(local_repo_dir))
             try:

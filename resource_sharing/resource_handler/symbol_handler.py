@@ -1,7 +1,6 @@
 # coding=utf-8
 # Use pathlib instead of os.path
 from pathlib import Path
-#import fnmatch
 import logging
 
 try:
@@ -135,25 +134,19 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         # Skip installation if the directory does not exist
         if not Path(self.resource_dir).exists():
             return
-
         # Uninstall first (in case it is a reinstall)
         self.uninstall()
-
         # Get all the symbol XML files in the collection
         symbol_files = []
         valid = 0
         for item in Path(self.resource_dir).glob('*.xml'):
-            file_path = Path(self.resource_dir, item)
-            symbol_files.append(file_path)
+            symbol_files.append(item)
             valid += 1
-
         # If there are no symbol files, there is nothing to do
         if len(symbol_files) == 0:
             return
-
         # Only relevant for QGIS 2!
         group_or_tag_id = self._get_parent_group_or_tag()
-
         for symbol_file in symbol_files:
             file_name = symbol_file.stem
             # Groups in QGIS2, tags in QGIS3...
@@ -212,7 +205,6 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 QgsStyle.ColorrampEntity, child_group_id)
             for colorramp in colorramps:
                 self.style.removeColorRamp(colorramp)
-
             # textformat and labelsettings were introduced in QGIS 3.10
             if qgis_version() < 31000:
                 # Remove this tag / child group
@@ -228,9 +220,8 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 QgsStyle.LabelSettingsEntity, child_group_id)
             for labelsetting in labelsettings:
                 self.style.removeLabelSettings(labelsetting)
-
             # Remove this tag / child group
             self._group_or_tag_remove(child_group_id)
-
         # Remove the group / tag:
         self._group_or_tag_remove(group_or_tag_id)
+

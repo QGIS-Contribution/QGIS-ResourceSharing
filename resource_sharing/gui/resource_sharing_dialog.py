@@ -487,27 +487,27 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             number = 0
             if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['style']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['style']) + ' Layer style (QML) file'
+                message = message + '\n<li> ' + str(number) + ' Layer style (QML) file'
                 if number > 1:
                     message = message + 's'
             if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['symbol']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['symbol']) + ' XML symbol file'
+                message = message + '\n<li> ' + str(number) + ' XML symbol file'
                 if number > 1:
                     message = message + 's'
             if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['svg']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['svg']) + ' SVG file'
+                message = message + '\n<li> ' + str(number) + ' SVG file'
                 if number > 1:
                     message = message + 's'
             if 'models' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['models']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['models']) + ' model'
+                message = message + '\n<li> ' + str(number) + ' model'
                 if number > 1:
                     message = message + 's'
             if 'processing' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['processing']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['processing']) + ' processing script'
+                message = message + '\n<li> ' + str(number) + ' processing script'
                 if number > 1:
                     message = message + 's'
             if 'rscripts' in config.COLLECTIONS[self._selected_collection_id].keys():

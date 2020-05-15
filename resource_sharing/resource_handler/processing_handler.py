@@ -1,8 +1,6 @@
 # coding=utf-8
-#import os
-# Use pathlib instead of os.path?
+# Use pathlib instead of os.path
 from pathlib import Path
-import fnmatch
 import shutil
 import logging
 
@@ -27,32 +25,25 @@ class ProcessingScriptHandler(BaseResourceHandler):
         return PROCESSING
 
     def install(self):
-        """Install the processing scripts of the collection.
+        """Install the collection's processing scripts.
 
         We copy the processing scripts to the user's processing
         scripts directory, and refresh the provider.
         """
         # Pass silently if the directory does not exist
-        #if not os.path.exists(self.resource_dir):
         if not Path(self.resource_dir).exists():
             return
-
-        # Get all the script files under self.resource_dir
+        # Handle the script files located in self.resource_dir
         processing_files = []
-        #for item in os.listdir(self.resource_dir):
         for item in Path(self.resource_dir).glob('*.py'):
-            file_path = Path(self.resource_dir, item)
-            processing_files.append(file_path)
-            #file_path = os.path.join(self.resource_dir, item)
-            #if fnmatch.fnmatch(file_path, '*.py'):
-                #processing_files.append(file_path)
-
+            processing_files.append(item)
         valid = 0
         for processing_file in processing_files:
             # Install the processing file silently
             try:
                 shutil.copy(processing_file, self.scripts_folder())
-                valid += 1
+                if processing_file.suffix.lower().endswith('py'):
+                    valid += 1
             except OSError as e:
                 LOGGER.error("Could not copy script '" +
                                  str(processing_file) + "'\n" + str(e))
@@ -61,32 +52,27 @@ class ProcessingScriptHandler(BaseResourceHandler):
             self.collection[PROCESSING] = valid
 
     def uninstall(self):
-        """Uninstall the processing scripts from processing toolbox."""
-        # if not Path(self.resource_dir).exists():
-        #if not os.path.exists(self.resource_dir):
+        """Uninstall the processing scripts from the processing toolbox."""
         if not Path(self.resource_dir).exists():
             return
-        # Remove the processing script files that are present in this
-        # collection
-        #for item in os.listdir(self.resource_dir):
-        for item in Path(self.resource_dir).glob('*'):
-            #file_path = os.path.join(self.resource_dir, item)
-            file_path = Path(self.resource_dir, item)
-            if fnmatch.fnmatch(str(file_path), '*%s*' % self.collection_id):
-                #script_path = os.path.join(self.scripts_folder(), item)
-                script_path = Path(self.scripts_folder(), item)
-                #if os.path.exists(script_path):
-                if script_path.exists():
-                    #os.remove(script_path)
-                    script_path.unlink()
+        # Remove the collection's processing script files
+        for item in Path(self.resource_dir).glob('*.py'):
+            script_path = Path(self.scripts_folder(), item.name)
+            if script_path.exists():
+                script_path.unlink()
         self.refresh_script_provider()
 
     def refresh_script_provider(self):
         """Refresh the processing script provider."""
         script_pr = QgsApplication.processingRegistry().providerById("script")
         if script_pr is not None:
-            script_pr.refreshAlgorithms()
-
+            try:
+                script_pr.refreshAlgorithms()
+            except Error as e:
+                LOGGER.error("Exception refreshing algorithms:\n" +
+                             str(e))
+ 
     def scripts_folder(self):
         """Return the default processing scripts folder."""
         return ScriptUtils.defaultScriptsFolder()
+

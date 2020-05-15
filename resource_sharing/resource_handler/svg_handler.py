@@ -1,11 +1,9 @@
 # coding=utf-8
 # Use pathlib instead of os.path
 from pathlib import Path
-#import fnmatch
 import shutil
 import logging
 
-from qgis.PyQt.QtCore import QSettings
 from qgis.core import QgsSettings
 try:
     from qgis.core import Qgis
@@ -43,7 +41,6 @@ class SVGResourceHandler(BaseResourceHandler):
     @classmethod
     def set_svg_search_paths(cls, paths):
         """Write the list of SVG paths to settings"""
-        # settings = QSettings()
         settings = QgsSettings()
         if Qgis.QGIS_VERSION_INT < 29900:
             settings.setValue('svg/searchPathsForSVG', '|'.join(paths))
@@ -83,9 +80,10 @@ class SVGResourceHandler(BaseResourceHandler):
         if not Path(self.resource_dir).exists():
             return
         # Remove from the SVG search paths if there are no SVGs left
-        # in any collection
+        # under local_collection_path.
         # Have to remove now, to be able to update the SVG search path
         shutil.rmtree(self.resource_dir)
+        # Check if there are no SVG files in the collections directory
         svgCount = 0
         for filename in local_collection_path().rglob('*'):
             if filename.suffix.lower() == "svg":
@@ -96,3 +94,4 @@ class SVGResourceHandler(BaseResourceHandler):
             if str(local_collection_path()) in search_paths:
                 search_paths.remove(str(local_collection_path()))
         self.set_svg_search_paths(search_paths)
+

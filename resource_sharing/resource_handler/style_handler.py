@@ -1,8 +1,6 @@
 # coding=utf-8
-#import os
-# Use pathlib instead of os.path?
+# Use pathlib instead of os.path
 from pathlib import Path
-#import fnmatch
 import logging
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
@@ -26,28 +24,19 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
 
     def install(self):
         """Install the style.
-
-        Resolve the symbol SVG/image paths in the QML file
+        Resolve the symbol SVG/image paths in the QML files
         """
         # Check if the dir exists, pass silently if it doesn't
-        #if not os.path.exists(self.resource_dir):
         if not Path(self.resource_dir).exists():
             return
-
-        # Get all the style XML files under resource dirs
+        # Get all the collection's layer style QML files located in
+        # self.resource_dir
         style_files = []
-        #for item in os.listdir(self.resource_dir):
         for item in Path(self.resource_dir).glob('*.qml'):
-            #file_path = os.path.join(self.resource_dir, item)
-            file_path = Path(self.resource_dir, item)
-            style_files.append(file_path)
-            #if fnmatch.fnmatch(file_path, '*.qml'):
-                #style_files.append(file_path)
-
+            style_files.append(item)
         # Nothing to do if there are no symbol files
         if len(style_files) == 0:
             return
-
         valid = 0
         for style_file in style_files:
             # Try to fix image and SVG paths in the QML file
@@ -60,3 +49,4 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         """Uninstall the style."""
         # Styles are not installed, so do nothing.
         pass
+

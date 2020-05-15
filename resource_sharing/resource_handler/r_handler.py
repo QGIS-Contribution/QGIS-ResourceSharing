@@ -78,13 +78,14 @@ class RScriptHandler(BaseResourceHandler):
         for item in Path(self.resource_dir).glob('*'):
             #file_path = os.path.join(self.resource_dir, item)
             file_path = Path(self.resource_dir, item)
-            if fnmatch.fnmatch(str(file_path), '*%s*' % self.collection_id):
-                #script_path = os.path.join(self.RScripts_folder(), item)
-                script_path = Path(self.RScripts_folder(), item)
-                #if os.path.exists(script_path):
-                if script_path.exists():
-                    #os.remove(script_path)
-                    script_path.unlink()
+            #if fnmatch.fnmatch(str(file_path), '*%s*' % self.collection_id):
+            #script_path = os.path.join(self.RScripts_folder(), item)
+            script_path = Path(self.RScripts_folder(), item)
+            #if os.path.exists(script_path):
+            LOGGER.info("R uninstall - script_path '" + str(script_path))
+            if script_path.exists():
+                #os.remove(script_path)
+                script_path.unlink()
         self.refresh_Rscript_provider()
 
     def refresh_Rscript_provider(self):

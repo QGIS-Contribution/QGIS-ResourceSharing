@@ -18,7 +18,7 @@ Item | Notes
 --- | ---
 Expressions (0.15) | JSON files with user expressions (QGIS 3.12 and later).
 Images | SVG files or other image files that can be used as svg markers or raster fills. Can be referenced from symbols and styles.
-Symbols | XML files that can contain marker, line and fill symbols and also colorramps, textformattings and labelsettings.
+Symbols | XML files that can contain marker, line and fill symbols and also colorramps, textformattings (0.14) and labelsettings (0.14).
 Layer styles | QML files.
 Processing scripts | Python processing scripts.
 Models (0.10) | Models for the *Graphical modeler*.

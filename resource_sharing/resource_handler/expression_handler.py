@@ -29,7 +29,6 @@ EXPRESSIONS = 'expressions'
 class ExpressionHandler(BaseResourceHandler):
     """Concrete class of the Expression handler."""
     IS_DISABLED = False
-    prefix = ''
 
     def __init__(self, collection_id):
         """Constructor of the base class."""
@@ -59,20 +58,13 @@ class ExpressionHandler(BaseResourceHandler):
             if item.suffix.lower().endswith("json"):
                 file_path = Path(self.resource_dir, item)
                 json_files.append(file_path)
-                #valid += 1
         # If there are no json files, there is nothing to do
         if len(json_files) == 0:
             return
         settings = QgsSettings()
-        settings.beginGroup(repo_settings_group())
-        # OK
-        settings.setValue('userexpression', 'testing')
-        settings.endGroup()
-
         settings.beginGroup(user_expressions_group())
-        #settings.setValue('Test', 'Testverdi')
         for json_file in json_files:
-            prefix = json_file.stem + '_'
+            namePrefix = json_file.stem + '_'
             LOGGER.info("Installing expressions from " + str(json_file))
 
             with open(json_file, 'rb') as expr_file:
@@ -83,7 +75,7 @@ class ExpressionHandler(BaseResourceHandler):
 
             expressions = jsontext['expressions']
             for expr in expressions:
-                expr_name = prefix + expr['name']
+                expr_name = namePrefix + expr['name']
                 LOGGER.info("Expr. name: " + expr_name)
                 expr_value =expr['expression']
                 LOGGER.info("Expr. expression: " + expr_value)
@@ -120,14 +112,14 @@ class ExpressionHandler(BaseResourceHandler):
         settings = QgsSettings()
         settings.beginGroup(user_expressions_group())
         for json_file in json_files:
-            prefix = json_file.stem + '_'
+            namePrefix = json_file.stem + '_'
             LOGGER.info("Removing expressions from " + str(json_file))
             with open(json_file, 'rb') as expr_file:
                 expr_json = expr_file.read()
             jsontext = json.loads(expr_json)
             expressions = jsontext['expressions']
             for expr in expressions:
-                expr_name = prefix + expr['name']
+                expr_name = namePrefix + expr['name']
                 LOGGER.info("Expr. name: " + expr_name)
                 if settings.contains(expr_name + '/expression'):
                    LOGGER.info("Exists - removing")

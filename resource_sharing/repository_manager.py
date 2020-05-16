@@ -305,7 +305,7 @@ class RepositoryManager(QObject):
                                 collection['status'] = COLLECTION_INSTALLED_STATUS
                                 # Keep the collection statistics
                                 for key in installed_collection.keys():
-                                    if key in ['models', 'processing', 'rscripts', 'style', 'svg', 'symbol']:
+                                    if key in ['models', 'processing', 'rscripts', 'style', 'svg', 'symbol', 'expressions']:
                                         collection[key] = installed_collection[key]
 
                             else:

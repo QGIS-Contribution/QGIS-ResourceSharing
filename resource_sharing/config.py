@@ -25,6 +25,7 @@ collections. It has this structure:
             'preview': ['preview/image1.png', 'preview/image2.png']
             # Additional entries (for resource statistics):
             'models': count of models in the collection,
+            'expressions': count of expression files in the collection,
             'processing': count of processing scripts in the collection,
             'rscripts': count of R scripts in the collection,
             'style': count of layer styles (QML) in the collection,

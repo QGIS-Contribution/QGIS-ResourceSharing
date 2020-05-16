@@ -51,6 +51,11 @@ def ui_path(*args):
     return path
 
 
+def user_expressions_group():
+    """Get the user expressions group."""
+    return '/expressions/user'
+
+
 def repo_settings_group():
     """Get the settings group for Resource Sharing Dialog."""
     return '/ResourceSharing/repository'

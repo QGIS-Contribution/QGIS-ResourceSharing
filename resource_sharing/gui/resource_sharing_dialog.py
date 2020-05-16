@@ -507,7 +507,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     message = message + 's'
             if 'expressions' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['expressions']
-                message = message + '\n<li> ' + str(config.COLLECTIONS[self._selected_collection_id]['expressions']) + ' expression file'
+                message = message + '\n<li> ' + str(number) + ' expression file'
                 if number > 1:
                     message = message + 's'
             if 'processing' in config.COLLECTIONS[self._selected_collection_id].keys():

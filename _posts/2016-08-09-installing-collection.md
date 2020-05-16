@@ -49,8 +49,9 @@ The SVGs will be available when editing symbols (under the
 ![SVG Group]({{ site.baseurl }}/assets/svg_group.png)
   
 #### Symbol
-The symbols, colorramps, textformats and labelsettings from the style
-XML files in the collection will become available in the Style Manager. 
+The symbols, colorramps, textformats (since version 0.14.0) and
+labelsettings (since version 0.14.0) from the style XML files in the
+collection will become available in the Style Manager. 
 
 ![Style Manager]({{ site.baseurl }}/assets/style_manager.png)
 
@@ -61,11 +62,11 @@ Click on the tabs ```All```, ```Marker```, ```Line```, ```Fill```,
 ```Color Ramp```, ```Text Format``` or ```Label Settings```
 to see the items installed from the collection.
 
-#### Expression
-Expression export files (JSON) are made available in the collections
-directory.
-You can click on the ```Open folder``` button to see where in the file
-system the files are located, and import them later.
+#### Expression (since version 0.15.0)
+The expressions defined in the collection's expression (JSON) files
+are made available under *User expressions* in the expression
+dialogue for QGIS versions 3.12 and higher.
+The (JSON) file name is used as a prefix in the expression name.
 
 #### Style
 For QML styles, the plugin will resolve the image or SVG paths for you.
@@ -79,14 +80,14 @@ thereby become available for use in the Processing Toolbox under the
 
 ![Processing Toolbox Scripts]({{ site.baseurl }}/assets/processing_toolbox_scipts.png)
 
-#### Processing Model
+#### Processing Model (since version 0.10.0)
 The model fioles will be copied to the processing models folder and
 become available for use in the Processing Toolbox under the
 ```Models``` menu.
 
 ![Processing Toolbox Models]({{ site.baseurl }}/assets/processing_toolbox_models.png)
 
-#### R Script
+#### R Script (since version 0.9.0)
 The R scripts in the collection will be copied to the R scripts folder
 and become available for use in the Processing Toolbox under the
 ```R``` menu.

@@ -42,8 +42,6 @@ class ExpressionHandler(BaseResourceHandler):
     def install(self):
         """Add the expressions from this collection to QGIS settings.
         """
-        LOGGER.info("Installing expressions")
-        #return
         # Skip installation if the directory does not exist
         if not Path(self.resource_dir).exists():
             return
@@ -65,27 +63,19 @@ class ExpressionHandler(BaseResourceHandler):
         settings.beginGroup(user_expressions_group())
         for json_file in json_files:
             namePrefix = json_file.stem + '_'
-            LOGGER.info("Installing expressions from " + str(json_file))
-
             with open(json_file, 'rb') as expr_file:
                 expr_json = expr_file.read()
             jsontext = json.loads(expr_json)
-
             #QgsExpressionBuilderWidget loadExpressionsFromJson
 
             expressions = jsontext['expressions']
             for expr in expressions:
                 expr_name = namePrefix + expr['name']
-                LOGGER.info("Expr. name: " + expr_name)
                 expr_value =expr['expression']
-                LOGGER.info("Expr. expression: " + expr_value)
                 expr_help = expr['description']
-                LOGGER.info("Expr. description: " + expr_help)
-
                 settings.setValue(expr_name + '/expression', expr_value)
                 settings.setValue(expr_name + '/helpText', expr_help)
                 aftervalue = settings.value(expr_name + '/expression', '', type=unicode).strip()
-                LOGGER.info("after - expr: " + aftervalue)
             valid += 1
         settings.endGroup()
         if valid >= 0:
@@ -94,9 +84,7 @@ class ExpressionHandler(BaseResourceHandler):
     def uninstall(self):
         """Remove the expressions in this collection from QGIS settings.
         """
-
         # Remove from settings
-        LOGGER.info("Removing expressions")
         # Skip removal if the directory does not exist
         if not Path(self.resource_dir).exists():
             return
@@ -113,16 +101,13 @@ class ExpressionHandler(BaseResourceHandler):
         settings.beginGroup(user_expressions_group())
         for json_file in json_files:
             namePrefix = json_file.stem + '_'
-            LOGGER.info("Removing expressions from " + str(json_file))
             with open(json_file, 'rb') as expr_file:
                 expr_json = expr_file.read()
             jsontext = json.loads(expr_json)
             expressions = jsontext['expressions']
             for expr in expressions:
                 expr_name = namePrefix + expr['name']
-                LOGGER.info("Expr. name: " + expr_name)
                 if settings.contains(expr_name + '/expression'):
-                   LOGGER.info("Exists - removing")
                    settings.remove(expr_name)
         settings.endGroup()
         # Remove files - nothing to remove

@@ -40,8 +40,13 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         valid = 0
         for style_file in style_files:
             # Try to fix image and SVG paths in the QML file
-            self.resolve_dependency(str(style_file))
-            valid += 1
+            try:
+                self.resolve_dependency(str(style_file))
+            except Exception as e:
+                LOGGER.error("Could not handle style (QML) file '" +
+                             str(style_file) + "':\n" + str(e))
+            else:
+                valid += 1
         if valid >= 0:
             self.collection[STYLE] = valid
 

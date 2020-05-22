@@ -24,7 +24,7 @@ this:
         │   ├── style (optional, containing QML files - QGIS Layer style)
         │   ├── svg (optional, containing SVG files)
         │   ├── symbol (optional, containing symbol definition XML files)
-        │   └── lisence file (encouraged)
+        │   └── license file (encouraged)
         ├── [Collection2 register id] (the id string used in "collections" in metadata.ini)
         │   ├── expressions (optional, containing JSON files with QGIS Expressions)
         │   ├── image (optional, containing all kinds of image files)
@@ -35,7 +35,7 @@ this:
         │   ├── style (optional, containing QML files - QGIS Layer style)
         │   ├── svg (optional, containing SVG files)
         │   ├── symbol (optional, containing symbol definition XML files)
-        │   └── lisence file (encouraged)
+        │   └── license file (encouraged)
         ├── ...
         └── [CollectionN register id] (the id string used in "collections" in metadata.ini)
         │   ├── expressions (optional, containing JSON files with QGIS Expressions)
@@ -46,7 +46,7 @@ this:
             ├── style (optional, containing QML files - QGIS Layer style)
             ├── svg (optional, containing SVG files)
             ├── symbol (optional, containing symbol definition XML files)
-            └── lisence file (encouraged)
+            └── license file (encouraged)
 
 If the *QGIS Resource Sharing plugin* shall be able to make the
 resources available to QGIS users in a convenient way, you have

@@ -26,16 +26,25 @@ class SVGResourceHandler(BaseResourceHandler):
 
     @classmethod
     def svg_search_paths(cls):
-        """Read the SVG paths from settings"""
+        """Read the SVG paths from settings
+
+        Return the SVG search path as a list"""
         settings = QgsSettings()
-        search_paths_str = settings.value('svg/searchPathsForSVG')
-        if not search_paths_str:
+        search_paths_settings = settings.value('svg/searchPathsForSVG')
+        if not search_paths_settings:
             search_paths = []
         else:
             if Qgis.QGIS_VERSION_INT < 29900:
-                search_paths = search_paths_str.split('|')
+                # QGIS 2
+                search_paths = search_paths_settings.split('|')
             else:
-                search_paths = search_paths_str
+                # QGIS 3
+                # Check if it is a string (single directory) 
+                if isinstance(search_paths_settings, str):
+                    search_paths = [search_paths_settings]
+                else:
+                    # It is a list
+                    search_paths = search_paths_settings
         return search_paths
 
     @classmethod
@@ -61,7 +70,6 @@ class SVGResourceHandler(BaseResourceHandler):
             return
         # Add to the SVG search paths
         search_paths = self.svg_search_paths()
-
         #if local_collection_path() not in search_paths:
         if str(local_collection_path()) not in search_paths:
             search_paths.append(str(local_collection_path()))

@@ -18,6 +18,7 @@ deprecated=False
 icon=resources/icon.png
 changelog=
         0.15.1 - Handle XML parsing exceptions for QML files
+               - Fix incorrect handling of one element SVG search path in settings (#135)
         0.15.0 - Support expressions (#130). Switch to Python pathlib.
         0.14.1 - Also support QGIS 3.4 (avoid install of style labelsettings and textformatting for v. < 3.10 - #127)
                - Try another way to avoid [WinError 5] on Microsoft Windows (#103)

@@ -54,7 +54,14 @@ class SVGResourceHandler(BaseResourceHandler):
         if Qgis.QGIS_VERSION_INT < 29900:
             settings.setValue('svg/searchPathsForSVG', '|'.join(paths))
         else:
-            settings.setValue('svg/searchPathsForSVG', paths)
+            if len(paths) == 0:
+                settings.remove('svg/searchPathsForSVG')
+            else:
+                if len(paths) == 1:
+                    svgpaths = str(paths[0])
+                else:
+                    svgpaths = paths
+                settings.setValue('svg/searchPathsForSVG', svgpaths)
 
     @classmethod
     def dir_name(cls):

@@ -27,20 +27,28 @@
         <blockquote>{{ collection.description }}</blockquote>
         <table class="table">
           <tr>
-            <td><b>URL</b></td><td>{{ collection.repository_url }}</td>
-          </tr>
-          <tr>
             <td><b>Tags</b></td><td>{{ collection.tags }}</td>
           </tr>
+          {% if collection.resources_html != '<i>Unknown before installation</i>' %}
           <tr>
             <td><b>Resources</b></td><td>{{ collection.resources_html }}</td>
           </tr>
-
+          {% endif %}
+          {% if collection.preview|length > 0 %}
           <tr>
-            <td><b>Author</b></td><td>{{ collection.author }}</td>
+            <td><b>Preview{% if collection.preview|length > 1 %}s</b>&nbsp;({{ collection.preview|length }}){% endif %}</td>
+            <td>
+            {% for preview in collection.preview %}
+            {% if loop.index > 1 %}
+            <hr>
+            {% endif %}
+            <img src="{{ preview }}">
+            {% endfor %}
+            </td>
           </tr>
+          {% endif %}
           <tr>
-            <td><b>E-mail</b></td><td>{{ collection.author_email }}</td>
+            <td><b>URL</b></td><td>{{ collection.repository_url }}</td>
           </tr>
           {% if collection.license and collection.license != None %}
           <tr>
@@ -61,50 +69,14 @@
             </tr>
             {% endif %}
           {% endif %}
-
+          <tr>
+            <td><b>Author</b></td><td>{{ collection.author }}</td>
+          </tr>
+          <tr>
+            <td><b>E-mail</b></td><td>{{ collection.author_email }}</td>
+          </tr>
         </table>
 
-         {% if collection.preview|length != 0 %}
-            <!-- Preview Images -->
-          <div id="preview-carousel" class="carousel slide" data-ride="carousel">
-            <!-- Indicators -->
-            <ol class="carousel-indicators">
-              {% for preview in collection.preview %}
-                {% if loop.index == 1 %}
-                  <li data-target="#preview-carousel"
-                      data-slide-to="{{ loop.index - 1 }}" class="active">
-                  </li>
-                {% else %}
-                  <li data-target="#preview-carousel"
-                          data-slide-to="{{ loop.index - 1 }}">
-                  </li>
-                {% endif %}
-              {% endfor %}
-            </ol>
-
-            <!-- Wrapper for slides -->
-            <div class="carousel-inner"  role="listbox">
-              {% for preview in collection.preview %}
-                {% if loop.index == 1 %}
-                  <div class="item active">
-                {% else %}
-                  <div class="item">
-                {% endif %}
-                  <img src="{{ preview }}">
-                </div>
-              {% endfor %}
-            </div> <!-- endof carouse-inner -->
-
-            <!-- Controls -->
-            <a class="left carousel-control" href="#preview-carousel" role="button" data-slide="prev">
-              <span class="glyphicon glyphicon-chevron-left"></span>
-            </a>
-            <a class="right carousel-control" href="#preview-carousel" role="button" data-slide="next">
-              <span class="glyphicon glyphicon-chevron-right"></span>
-            </a>
-
-          </div> <!-- endof preview-carousel -->
-        {% endif %}
       </div>
 
     </div> <!-- endof panel panel-primary -->

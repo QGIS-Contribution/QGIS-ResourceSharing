@@ -23,7 +23,7 @@
 import logging
 
 from qgis.PyQt import uic
-from qgis.PyQt.Qt import QSize, QFont
+from qgis.PyQt.Qt import QSize, QFont, QBrush, QColor
 from qgis.PyQt.QtCore import (
     Qt, QSettings, pyqtSlot, QRegExp, QUrl, QThread)
 
@@ -631,6 +631,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         installed_collections = \
             self.collection_manager.get_installed_collections()
         # Export the updated ones from the repository manager
+        repo_with_installed_Font = QFont()
+        repo_with_installed_Font.setWeight(60)
+        collection_brush = QBrush(Qt.darkGray)
+        installed_collection_brush = QBrush(QColor(60, 25, 10))
         for repo_name in self.repository_manager.directories:
             url = self.repository_manager.directories[repo_name]['url']
             item = QTreeWidgetItem(self.tree_repositories, REPOSITORY_ITEM)
@@ -642,13 +646,19 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     coll_name = config.COLLECTIONS[coll_id]['name']
                     coll_tags = config.COLLECTIONS[coll_id]['tags']
                     collectionItem = QTreeWidgetItem(item, COLLECTION_ITEM)
+                    brush = collection_brush
+                    collectionFont = QFont()
+                    collectionFont.setStyle(QFont.StyleItalic)
                     collitemtext = coll_name
                     if installed_collections and coll_id in installed_collections.keys():
                        collitemtext = coll_name + ' (installed)'
-                       collectionFont = QFont()
-                       collectionFont.setWeight(60)
-                       collectionItem.setFont(0, collectionFont)
+                       brush = installed_collection_brush
+                       item.setFont(0,repo_with_installed_Font)
+                    collectionItem.setFont(0, collectionFont)
+                    collectionItem.setForeground(0, brush)
                     collectionItem.setText(0, collitemtext)
+                    collectionItem.setFont(1, collectionFont)
+                    collectionItem.setForeground(1, brush)
                     collectionItem.setText(1, coll_tags)
         self.tree_repositories.resizeColumnToContents(0)
         self.tree_repositories.resizeColumnToContents(1)

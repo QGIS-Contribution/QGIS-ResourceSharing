@@ -6,17 +6,18 @@ author=Akbar Gumbira, Håvard Tveite
 qgisMinimumVersion=3.0
 description=Download shared collections
 about=Search for published collections and install them for use with QGIS. Symbology (SVG, images, styles), Processing scripts, Processing models and R scripts are supported. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S).
-version=0.15.1
+version=0.15.2
 tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing.git
 
-qgisMaximumVersion=3.99
+qgisMaximumVersion=3.98
 tags=collections,sharing,processing,algorithms,Python,R,model,script,style,svg,symbol,repository,design,maps
 homepage=http://qgis-contribution.github.io/QGIS-ResourceSharing/
 experimental=False
 deprecated=False
 icon=resources/icon.png
 changelog=
+        0.15.2 - GUI improvements (#138, #139, #140, #141)
         0.15.1 - Fix incorrect handling of searchPathsForSVG setting (#135)
                - Handle XML parsing exceptions for QML files
         0.15.0 - Support expressions (#130). Switch to Python pathlib.

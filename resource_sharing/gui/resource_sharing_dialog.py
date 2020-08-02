@@ -175,6 +175,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_edit.clicked.connect(self.edit_repository)
         self.button_delete.clicked.connect(self.delete_repository)
         self.button_reload.clicked.connect(self.reload_repositories)
+        self.button_reload_dir.clicked.connect(self.reload_directories)
         self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
         self.list_view_collections.selectionModel().currentChanged.connect(
             self.on_list_view_collections_clicked)
@@ -418,6 +419,19 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.button_edit.setEnabled(False)
             self.button_delete.setEnabled(False)
 
+    def reload_directories(self):
+        """Slot the reload directories button."""
+        # Show progress dialog?
+        self.repository_manager._online_directories = {}
+        # Registered directories
+        self.repository_manager._directories = {}
+        self.repository_manager.fetch_online_directories()
+        # Load directory of repositories from settings
+        self.repository_manager.load_directories()
+        self.message_bar.pushMessage('On-line directory reloaded', Qgis.Info, 5)
+        #self.reload_repositories()
+        self.reload_data_and_widget()
+
     def reload_repositories(self):
         """Slot for when user clicks reload repositories button."""
         # Show progress dialog
@@ -649,6 +663,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             item.setText(0, repo_name)
             item.setText(1, url)
             item.setFont(0,repo_Font)
+
             for coll_id in config.COLLECTIONS:
                 if ('repository_name' in config.COLLECTIONS[coll_id].keys() and
                     config.COLLECTIONS[coll_id]['repository_name'] == repo_name):

@@ -69,7 +69,16 @@
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -143,7 +152,16 @@
        <property name="spacing">
         <number>5</number>
        </property>
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -338,11 +356,20 @@
                   <enum>QFrame::Sunken</enum>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_12">
-                  <property name="margin">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QWebView" name="web_view_details" native="true">
+                   <widget class="QWebView" name="web_view_details">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -355,7 +382,7 @@
                       <height>0</height>
                      </size>
                     </property>
-                    <property name="url" stdset="0">
+                    <property name="url">
                      <url>
                       <string>about:blank</string>
                      </url>
@@ -438,7 +465,16 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
-              <property name="margin">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
                <number>0</number>
               </property>
               <item>
@@ -460,8 +496,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>596</width>
-                   <height>534</height>
+                   <width>689</width>
+                   <height>537</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -508,7 +544,17 @@
                           <string/>
                          </property>
                          <property name="text">
-                          <string>Reload Repositories</string>
+                          <string>Reload repositories</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="button_reload_dir">
+                         <property name="toolTip">
+                          <string>Reload the official QGIS online directory of repositories</string>
+                         </property>
+                         <property name="text">
+                          <string>Reload directory</string>
                          </property>
                         </widget>
                        </item>

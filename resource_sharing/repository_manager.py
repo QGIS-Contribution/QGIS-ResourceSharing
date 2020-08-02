@@ -24,8 +24,9 @@ LOGGER = logging.getLogger('QGIS Resource Sharing')
 class RepositoryManager(QObject):
     """Class to handle repositories."""
 
-    DIRECTORY_URL = ('https://raw.githubusercontent.com/qgis/'
-                     'QGIS-Resources/master/directory.csv')
+    #DIRECTORY_URL = ('https://raw.githubusercontent.com/qgis/'
+    #                 'QGIS-Resources/master/directory.csv')
+    DIRECTORY_URL = ('http://arken.nmbu.no/~havatv/gis/qgis/directory.csv')
 
     def __init__(self):
         """Constructor.
@@ -70,12 +71,14 @@ class RepositoryManager(QObject):
         self._repositories = {}
         # Collection manager instance to deal with collections
         self._collections_manager = CollectionManager()
+        # Load repositories from cache
+        self.load_repositories()
         # Fetch online directories
         self.fetch_online_directories()
         # Load directory of repositories from settings
         self.load_directories()
-        # Load repositories from cache
-        self.load_repositories()
+        ## Load repositories from cache
+        #self.load_repositories()
 
     @property
     def directories(self):
@@ -100,6 +103,7 @@ class RepositoryManager(QObject):
             with open(directory_file.fileName()) as csv_file:
                 reader = csv.DictReader(csv_file, fieldnames=('name', 'url'))
                 for row in reader:
+                    LOGGER.info("dir row - name: " + str(row['name']))
                     repName = row['name']
                     repUrl = row['url']
                     # Check name and URL for None before stripping and adding
@@ -109,19 +113,19 @@ class RepositoryManager(QObject):
                         if repName is None:
                             # No name
                             LOGGER.warning("Missing name for repository"
-                                           " in the on-line directory - not added")
+                                           " - not added")
                         else:
                             # No URL
-                            LOGGER.warning("Missing URL for repository " +
+                            LOGGER.warning("Missing URL for repository" +
                                            str(row['name']) +
-                                           " in the on-line directory - not added")
-            # Save it to cache
+                                           " - not added")
+            # Save to settings
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             settings.setValue('online_directories', self._online_directories)
             settings.endGroup()
         else:
-            # Just use cache from previous use
+            # Use settings
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
             self._online_directories = settings.value('online_directories', {})
@@ -135,12 +139,15 @@ class RepositoryManager(QObject):
 
         # Loop through the repositories from the official directory
         for online_dir_name in self._online_directories:
+            LOGGER.info("load_dir, off. repo: " + str(online_dir_name))
             # Check if the repository is already present
             repo_present = False
             for repo_name in settings.childGroups():
+                LOGGER.info("load_dir, repo (settings): " + str(repo_name))
                 url = settings.value(repo_name + '/url', '', type=unicode)
                 if url == self._online_directories[online_dir_name]:
                     repo_present = True
+                    LOGGER.info("---- present: " + str(repo_name))
                     break
                 if online_dir_name == repo_name:
                     repo_present = True
@@ -171,6 +178,7 @@ class RepositoryManager(QObject):
         :param url: The URL of the repository
         :type url: str
         """
+        LOGGER.info("add_dir, repo: " + str(repo_name))
         repo_handler = BaseRepositoryHandler.get_handler(url)
         if repo_handler is None:
             LOGGER.warning("There is no handler available for URL '" +
@@ -370,8 +378,11 @@ class RepositoryManager(QObject):
         """Rebuild the collections for all the repositories."""
         config.COLLECTIONS = {}
         for repo in self._repositories.keys():
+            LOGGER.info("rebuild coll, repo: " + str(repo))
+
             repo_collections = self._repositories[repo]
             for collection in repo_collections:
+                LOGGER.info("--------- coll: " + str(collection))
                 collection_id = self._collections_manager.get_collection_id(
                     collection['register_name'],
                     collection['repository_url']

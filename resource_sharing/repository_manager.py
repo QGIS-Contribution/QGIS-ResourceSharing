@@ -109,12 +109,12 @@ class RepositoryManager(QObject):
                         if repName is None:
                             # No name
                             LOGGER.warning("Missing name for repository"
-                                           " - not added")
+                                           " in the on-line directory - not added")
                         else:
                             # No URL
-                            LOGGER.warning("Missing URL for repository" +
+                            LOGGER.warning("Missing URL for repository " +
                                            str(row['name']) +
-                                           " - not added")
+                                           " in the on-line directory - not added")
             # Save it to cache
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())

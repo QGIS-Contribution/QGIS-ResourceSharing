@@ -631,6 +631,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         installed_collections = \
             self.collection_manager.get_installed_collections()
         # Export the updated ones from the repository manager
+        repo_Font = QFont()
         repo_with_installed_Font = QFont()
         repo_with_installed_Font.setWeight(60)
         collection_brush = QBrush(Qt.darkGray)
@@ -638,8 +639,16 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         for repo_name in self.repository_manager.directories:
             url = self.repository_manager.directories[repo_name]['url']
             item = QTreeWidgetItem(self.tree_repositories, REPOSITORY_ITEM)
+            # Is the repository in the QGIS resource directory?
+            if url in self.repository_manager._online_directories.values():
+                repo_with_installed_Font.setUnderline(True)
+                repo_Font.setUnderline(True)
+            else:
+                repo_with_installed_Font.setUnderline(False)
+                repo_Font.setUnderline(False)
             item.setText(0, repo_name)
             item.setText(1, url)
+            item.setFont(0,repo_Font)
             for coll_id in config.COLLECTIONS:
                 if ('repository_name' in config.COLLECTIONS[coll_id].keys() and
                     config.COLLECTIONS[coll_id]['repository_name'] == repo_name):
@@ -654,6 +663,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                        collitemtext = coll_name + ' (installed)'
                        brush = installed_collection_brush
                        item.setFont(0,repo_with_installed_Font)
+                       item.setForeground(0, brush)
+                       item.setForeground(1, brush)
                     collectionItem.setFont(0, collectionFont)
                     collectionItem.setForeground(0, brush)
                     collectionItem.setText(0, collitemtext)

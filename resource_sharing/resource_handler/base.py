@@ -1,5 +1,4 @@
 # coding=utf-8
-# Use pathlib instead of os.path
 from pathlib import Path
 
 from six import add_metaclass

@@ -1,18 +1,14 @@
 # coding=utf-8
-# Use pathlib instead of os.path
 from pathlib import Path
 import logging
-
 import ntpath
 from ext_libs.pathvalidate import sanitize_filename
-
 from qgis.PyQt.QtCore import QDir, QSettings
 from qgis.core import QgsSettings
 try:
     from qgis.core import QgsApplication, QGis as Qgis
 except ImportError:
     from qgis.core import QgsApplication, Qgis
-
 from resource_sharing import config
 import jinja2
 

@@ -1,6 +1,5 @@
 # coding=utf-8
 import hashlib
-# Use pathlib instead of os.path
 from pathlib import Path
 import shutil
 import logging

@@ -169,14 +169,14 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.collection_proxy.setSourceModel(self.collections_model)
         self.list_view_collections.setModel(self.collection_proxy)
         # Active selected collection
-        self._selected_collection_id = None
+        self._sel_coll_id = None
 
         # Slots
         self.button_add.clicked.connect(self.add_repository)
         self.button_edit.clicked.connect(self.edit_repository)
         self.button_delete.clicked.connect(self.delete_repository)
         self.button_reload.clicked.connect(self.reload_repositories)
-        self.button_reload_dir.clicked.connect(self.reload_directories)
+        self.button_reload_dir.clicked.connect(self.reload_off_res_directory)
         self.menu_list_widget.currentRowChanged.connect(self.set_current_tab)
         self.list_view_collections.selectionModel().currentChanged.connect(
             self.on_list_view_collections_clicked)
@@ -420,7 +420,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.button_edit.setEnabled(False)
             self.button_delete.setEnabled(False)
 
-    def reload_directories(self):
+    def reload_off_res_directory(self):
         """Slot the reload directories button."""
         # Show progress dialog?
         self.repository_manager._online_directories = {}
@@ -474,7 +474,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
         self.installer_thread = QThread()
         self.installer_worker = CollectionInstaller(
-            self.collection_manager, self._selected_collection_id)
+            self.collection_manager, self._sel_coll_id)
         self.installer_worker.moveToThread(self.installer_thread)
         self.installer_worker.finished.connect(self.install_finished)
         self.installer_worker.aborted.connect(self.install_aborted)
@@ -499,42 +499,43 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             # Report what has been installed
             message = ('<b>%s</b> was successfully installed, '
                        'containing:\n<ul>' %
-                       (config.COLLECTIONS[self._selected_collection_id]['name']))
+                       (config.COLLECTIONS[self._sel_coll_id]['name']))
             number = 0
-            if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['style']
+            if 'style' in config.COLLECTIONS[self._sel_coll_id].keys():
+                number = config.COLLECTIONS[self._sel_coll_id]['style']
                 message = (message + '\n<li> ' + str(number) +
                            ' Layer style (QML) file')
                 if number > 1:
                     message = message + 's'
-            if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['symbol']
+            if 'symbol' in config.COLLECTIONS[self._sel_coll_id].keys():
+                number = config.COLLECTIONS[self._sel_coll_id]['symbol']
                 message = (message + '\n<li> ' + str(number) +
                            ' XML symbol file')
                 if number > 1:
                     message = message + 's'
-            if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['svg']
+            if 'svg' in config.COLLECTIONS[self._sel_coll_id].keys():
+                number = config.COLLECTIONS[self._sel_coll_id]['svg']
                 message = message + '\n<li> ' + str(number) + ' SVG file'
                 if number > 1:
                     message = message + 's'
-            if 'models' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['models']
+            if 'models' in config.COLLECTIONS[self._sel_coll_id].keys():
+                number = config.COLLECTIONS[self._sel_coll_id]['models']
                 message = message + '\n<li> ' + str(number) + ' model'
                 if number > 1:
                     message = message + 's'
-            if 'expressions' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['expressions']
+            if 'expressions' in config.COLLECTIONS[self._sel_coll_id].keys():
+                number = config.COLLECTIONS[self._sel_coll_id]['expressions']
                 message = message + '\n<li> ' + str(number) + ' expression file'
                 if number > 1:
                     message = message + 's'
-            if 'processing' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['processing']
-                message = message + '\n<li> ' + str(number) + ' processing script'
+            if 'processing' in config.COLLECTIONS[self._sel_coll_id].keys():
+                number = config.COLLECTIONS[self._sel_coll_id]['processing']
+                message = (message + '\n<li> ' + str(number) +
+                           ' processing script')
                 if number > 1:
                     message = message + 's'
-            if 'rscripts' in config.COLLECTIONS[self._selected_collection_id].keys():
-                number = config.COLLECTIONS[self._selected_collection_id]['rscripts']
+            if 'rscripts' in config.COLLECTIONS[self._sel_coll_id].keys():
+                number = config.COLLECTIONS[self._sel_coll_id]['rscripts']
                 message = message + '\n<li> ' + str(number) + ' R script'
                 if number > 1:
                     message = message + 's'
@@ -554,7 +555,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_open.setEnabled(True)
         self.button_uninstall.setEnabled(True)
 
-        self.show_collection_metadata(self._selected_collection_id)
+        self.show_collection_metadata(self._sel_coll_id)
 
     def install_canceled(self):
         self.progress_dialog.hide()
@@ -573,7 +574,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         """Slot called when user clicks the uninstall button."""
         # get the QModelIndex for the item to be uninstalled
         uninstall_index = self.list_view_collections.currentIndex()
-        coll_id = self._selected_collection_id
+        coll_id = self._sel_coll_id
         try:
             self.collection_manager.uninstall(coll_id)
         except Exception as e:
@@ -607,7 +608,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 proxyModel = self.list_view_collections.model()
                 proxyIndex = proxyModel.index(newRow, 0)
                 current_coll_id = proxyIndex.data(COLLECTION_ID_ROLE)
-                self._selected_collection_id = current_coll_id
+                self._sel_coll_id = current_coll_id
                 # Update buttons
                 status = config.COLLECTIONS[current_coll_id]['status']
                 if status == COLLECTION_INSTALLED_STATUS:
@@ -630,7 +631,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
     def open_collection(self):
         """Slot for when user clicks 'Open' button."""
-        collection_path = local_collection_path(self._selected_collection_id)
+        collection_path = local_collection_path(self._sel_coll_id)
         directory_url = QUrl.fromLocalFile(str(collection_path))
         QDesktopServices.openUrl(directory_url)
 
@@ -741,7 +742,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 return
             repo_url = self.repository_manager.directories[repo_name]['url']
             # Disable the edit and delete buttons for "official" repositories
-            if repo_url in self.repository_manager._online_directories.values():
+            if (repo_url in
+                    self.repository_manager._online_directories.values()):
                 self.button_edit.setEnabled(False)
                 self.button_delete.setEnabled(False)
             else:
@@ -761,10 +763,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         if real_index.row() != -1:
             collection_item = self.collections_model.itemFromIndex(real_index)
             collection_id = collection_item.data(COLLECTION_ID_ROLE)
-            self._selected_collection_id = collection_id
+            self._sel_coll_id = collection_id
 
             # Enable / disable buttons
-            status = config.COLLECTIONS[self._selected_collection_id]['status']
+            status = config.COLLECTIONS[self._sel_coll_id]['status']
             is_installed = status == COLLECTION_INSTALLED_STATUS
             if is_installed:
                 self.button_install.setEnabled(True)

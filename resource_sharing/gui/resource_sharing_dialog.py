@@ -85,6 +85,7 @@ LOGGER = logging.getLogger('QGIS Resource Sharing')
 REPOSITORY_ITEM = 1000
 COLLECTION_ITEM = 2000
 
+
 class ResourceSharingDialog(QDialog, FORM_CLASS):
     TAB_ALL = 0
     TAB_INSTALLED = 1
@@ -428,8 +429,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.repository_manager.fetch_online_directories()
         # Load directory of repositories from settings
         self.repository_manager.load_directories()
-        self.message_bar.pushMessage('On-line directory reloaded', Qgis.Info, 5)
-        #self.reload_repositories()
+        self.message_bar.pushMessage('On-line directory reloaded',
+                                     Qgis.Info, 5)
         self.reload_data_and_widget()
 
     def reload_repositories(self):
@@ -496,17 +497,20 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         if installStatus:
             self.reload_collections_model()
             # Report what has been installed
-            message = '<b>%s</b> was successfully installed, containing:\n<ul>' % (
-                config.COLLECTIONS[self._selected_collection_id]['name'])
+            message = ('<b>%s</b> was successfully installed, '
+                       'containing:\n<ul>' %
+                       (config.COLLECTIONS[self._selected_collection_id]['name']))
             number = 0
             if 'style' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['style']
-                message = message + '\n<li> ' + str(number) + ' Layer style (QML) file'
+                message = (message + '\n<li> ' + str(number) +
+                           ' Layer style (QML) file')
                 if number > 1:
                     message = message + 's'
             if 'symbol' in config.COLLECTIONS[self._selected_collection_id].keys():
                 number = config.COLLECTIONS[self._selected_collection_id]['symbol']
-                message = message + '\n<li> ' + str(number) + ' XML symbol file'
+                message = (message + '\n<li> ' + str(number) +
+                           ' XML symbol file')
                 if number > 1:
                     message = message + 's'
             if 'svg' in config.COLLECTIONS[self._selected_collection_id].keys():
@@ -541,7 +545,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         oldRow = self.current_index.row()
         newIndex = self.collections_model.createIndex(oldRow, 0)
         selection_model = self.list_view_collections.selectionModel()
-        selection_model.setCurrentIndex(newIndex, selection_model.ClearAndSelect)
+        selection_model.setCurrentIndex(newIndex,
+                                        selection_model.ClearAndSelect)
         selection_model.select(newIndex, selection_model.ClearAndSelect)
         # Update the buttons
         self.button_install.setEnabled(True)
@@ -592,14 +597,15 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 # Check if this was the last element
                 rowCount = self.collection_proxy.rowCount()
                 if newRow == rowCount:
-                   newRow = newRow - 1
+                    newRow = newRow - 1
                 # Select the new current element
                 newIndex = self.collections_model.createIndex(newRow, 0)
                 selection_model = self.list_view_collections.selectionModel()
-                selection_model.setCurrentIndex(newIndex, selection_model.ClearAndSelect)
+                selection_model.setCurrentIndex(newIndex,
+                                                selection_model.ClearAndSelect)
                 # Get the id of the current collection
                 proxyModel = self.list_view_collections.model()
-                proxyIndex = proxyModel.index(newRow,0)
+                proxyIndex = proxyModel.index(newRow, 0)
                 current_coll_id = proxyIndex.data(COLLECTION_ID_ROLE)
                 self._selected_collection_id = current_coll_id
                 # Update buttons
@@ -662,11 +668,12 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 repo_Font.setUnderline(False)
             item.setText(0, repo_name)
             item.setText(1, url)
-            item.setFont(0,repo_Font)
+            item.setFont(0, repo_Font)
 
             for coll_id in config.COLLECTIONS:
                 if ('repository_name' in config.COLLECTIONS[coll_id].keys() and
-                    config.COLLECTIONS[coll_id]['repository_name'] == repo_name):
+                        config.COLLECTIONS[coll_id]['repository_name'] ==
+                        repo_name):
                     coll_name = config.COLLECTIONS[coll_id]['name']
                     coll_tags = config.COLLECTIONS[coll_id]['tags']
                     collectionItem = QTreeWidgetItem(item, COLLECTION_ITEM)
@@ -674,12 +681,13 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     collectionFont = QFont()
                     collectionFont.setStyle(QFont.StyleItalic)
                     collitemtext = coll_name
-                    if installed_collections and coll_id in installed_collections.keys():
-                       collitemtext = coll_name + ' (installed)'
-                       brush = installed_collection_brush
-                       item.setFont(0,repo_with_installed_Font)
-                       item.setForeground(0, brush)
-                       item.setForeground(1, brush)
+                    if (installed_collections and
+                            coll_id in installed_collections.keys()):
+                        collitemtext = coll_name + ' (installed)'
+                        brush = installed_collection_brush
+                        item.setFont(0, repo_with_installed_Font)
+                        item.setForeground(0, brush)
+                        item.setForeground(1, brush)
                     collectionItem.setFont(0, collectionFont)
                     collectionItem.setForeground(0, brush)
                     collectionItem.setText(0, collitemtext)
@@ -703,8 +711,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             collection_status = config.COLLECTIONS[id]['status']
             repository_name = ''
             if 'repository_name' in config.COLLECTIONS[id].keys():
-              repository_name = config.COLLECTIONS[id]['repository_name']
-            item = QStandardItem(collection_name + ' (' + repository_name + ')')
+                repository_name = config.COLLECTIONS[id]['repository_name']
+            item = QStandardItem(collection_name + ' (' +
+                                 repository_name + ')')
             item.setEditable(False)
             item.setData(id, COLLECTION_ID_ROLE)
             item.setData(collection_name, COLLECTION_NAME_ROLE)
@@ -728,7 +737,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 repo_name = selected_item.text(0)
             if not repo_name:
                 return
-            if not repo_name in self.repository_manager.directories.keys():
+            if repo_name not in self.repository_manager.directories.keys():
                 return
             repo_url = self.repository_manager.directories[repo_name]['url']
             # Disable the edit and delete buttons for "official" repositories

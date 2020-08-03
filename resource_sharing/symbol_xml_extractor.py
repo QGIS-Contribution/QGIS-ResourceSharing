@@ -9,6 +9,7 @@ from qgis.core import QgsPalLayerSettings, QgsTextFormat
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
+
 class SymbolXMLExtractor(object):
     """Parses the given file and returns the symbols and colorramps"""
     def __init__(self, xml_path):

@@ -46,7 +46,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
                     valid += 1
             except OSError as e:
                 LOGGER.error("Could not copy script '" +
-                                 str(processing_file) + "'\n" + str(e))
+                             str(processing_file) + "'\n" + str(e))
         if valid > 0:
             self.refresh_script_provider()
             self.collection[PROCESSING] = valid
@@ -71,8 +71,7 @@ class ProcessingScriptHandler(BaseResourceHandler):
             except Error as e:
                 LOGGER.error("Exception refreshing algorithms:\n" +
                              str(e))
- 
+
     def scripts_folder(self):
         """Return the default processing scripts folder."""
         return ScriptUtils.defaultScriptsFolder()
-

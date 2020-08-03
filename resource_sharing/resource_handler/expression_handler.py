@@ -10,21 +10,23 @@ except ImportError:
     from qgis.core import QGis as Qgis
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
-from resource_sharing.utilities import (user_expressions_group, repo_settings_group, qgis_version)
+from resource_sharing.utilities import (user_expressions_group,
+                                        repo_settings_group, qgis_version)
 
 hasExprBuilder = False
-#try:
-#    from qgis.core import QgsExpressions
+# try:
+#     from qgis.core import QgsExpressions
 
 try:
     from qgis.gui import QgsExpressionBuilderWidget
-except:
+except ImportError:
     hasExprBuilder = False
 else:
     hasExprBuilder = True
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 EXPRESSIONS = 'expressions'
+
 
 class ExpressionHandler(BaseResourceHandler):
     """Concrete class of the Expression handler."""
@@ -47,7 +49,7 @@ class ExpressionHandler(BaseResourceHandler):
             return
 
         # Uninstall first (in case it is a reinstall)
-        #self.uninstall()
+        # self.uninstall()
 
         # Get all the expressions in the collection
         json_files = []
@@ -66,16 +68,17 @@ class ExpressionHandler(BaseResourceHandler):
             with open(json_file, 'rb') as expr_file:
                 expr_json = expr_file.read()
             jsontext = json.loads(expr_json)
-            #QgsExpressionBuilderWidget loadExpressionsFromJson
+            # QgsExpressionBuilderWidget loadExpressionsFromJson
 
             expressions = jsontext['expressions']
             for expr in expressions:
                 expr_name = namePrefix + expr['name']
-                expr_value =expr['expression']
+                expr_value = expr['expression']
                 expr_help = expr['description']
                 settings.setValue(expr_name + '/expression', expr_value)
                 settings.setValue(expr_name + '/helpText', expr_help)
-                aftervalue = settings.value(expr_name + '/expression', '', type=unicode).strip()
+                aftervalue = settings.value(expr_name + '/expression', '',
+                                            type=unicode).strip()
             valid += 1
         settings.endGroup()
         if valid >= 0:
@@ -108,7 +111,6 @@ class ExpressionHandler(BaseResourceHandler):
             for expr in expressions:
                 expr_name = namePrefix + expr['name']
                 if settings.contains(expr_name + '/expression'):
-                   settings.remove(expr_name)
+                    settings.remove(expr_name)
         settings.endGroup()
         # Remove files - nothing to remove
-

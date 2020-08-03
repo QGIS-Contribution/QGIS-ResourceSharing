@@ -86,4 +86,3 @@ class ModelHandler(BaseResourceHandler):
         """Return the folder where processing expects to find models."""
         # Use the default location
         return self.default_models_folder()
-

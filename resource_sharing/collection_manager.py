@@ -95,57 +95,57 @@ class CollectionManager(object):
         html = ''
         resource_types = 0
         if 'svg' in config.COLLECTIONS[collection_id].keys():
-           html = html + str(config.COLLECTIONS[collection_id]['svg']) + ' SVG'
-           if config.COLLECTIONS[collection_id]['svg'] > 1:
-               html = html + 's'
-           resource_types = resource_types + 1
+            html = html + str(config.COLLECTIONS[collection_id]['svg']) + ' SVG'
+            if config.COLLECTIONS[collection_id]['svg'] > 1:
+                html = html + 's'
+            resource_types = resource_types + 1
         if 'style' in config.COLLECTIONS[collection_id].keys():
-           if resource_types > 0:
-               html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['style']) + ' Layer style (QML) file'
-           if config.COLLECTIONS[collection_id]['style'] > 1:
-               html = html + 's'
-           resource_types = resource_types + 1
+            if resource_types > 0:
+                html = html + ', '
+            html = html + str(config.COLLECTIONS[collection_id]['style']) + ' Layer style (QML) file'
+            if config.COLLECTIONS[collection_id]['style'] > 1:
+                html = html + 's'
+            resource_types = resource_types + 1
         if 'symbol' in config.COLLECTIONS[collection_id].keys():
-           if resource_types > 0:
-               html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol (XML) file'
-           if config.COLLECTIONS[collection_id]['symbol'] > 1:
-               html = html + 's'
-           resource_types = resource_types + 1
+            if resource_types > 0:
+                html = html + ', '
+            html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol (XML) file'
+            if config.COLLECTIONS[collection_id]['symbol'] > 1:
+                html = html + 's'
+            resource_types = resource_types + 1
         if 'models' in config.COLLECTIONS[collection_id].keys():
-           if resource_types > 0:
-               html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['models']) + ' Processing model'
-           if config.COLLECTIONS[collection_id]['models'] > 1:
-               html = html + 's'
-           resource_types = resource_types + 1
+            if resource_types > 0:
+                html = html + ', '
+            html = html + str(config.COLLECTIONS[collection_id]['models']) + ' Processing model'
+            if config.COLLECTIONS[collection_id]['models'] > 1:
+                html = html + 's'
+            resource_types = resource_types + 1
         if 'expressions' in config.COLLECTIONS[collection_id].keys():
-           if resource_types > 0:
-               html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['expressions']) + ' Expression (JSON) file'
-           if config.COLLECTIONS[collection_id]['expressions'] > 1:
-               html = html + 's'
-           resource_types = resource_types + 1
+            if resource_types > 0:
+                html = html + ', '
+            html = html + str(config.COLLECTIONS[collection_id]['expressions']) + ' Expression (JSON) file'
+            if config.COLLECTIONS[collection_id]['expressions'] > 1:
+                html = html + 's'
+            resource_types = resource_types + 1
         if 'processing' in config.COLLECTIONS[collection_id].keys():
-           if resource_types > 0:
-               html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['processing']) + ' Processing script'
-           if config.COLLECTIONS[collection_id]['processing'] > 1:
-               html = html + 's'
-           resource_types = resource_types + 1
+            if resource_types > 0:
+                html = html + ', '
+            html = html + str(config.COLLECTIONS[collection_id]['processing']) + ' Processing script'
+            if config.COLLECTIONS[collection_id]['processing'] > 1:
+                html = html + 's'
+            resource_types = resource_types + 1
         if 'rscripts' in config.COLLECTIONS[collection_id].keys():
-           if resource_types > 0:
-               html = html + ', '
-           html = html + str(config.COLLECTIONS[collection_id]['rscripts']) + ' R script'
-           if config.COLLECTIONS[collection_id]['rscripts'] > 1:
-               html = html + 's'
-           resource_types = resource_types + 1
+            if resource_types > 0:
+                html = html + ', '
+            html = html + str(config.COLLECTIONS[collection_id]['rscripts']) + ' R script'
+            if config.COLLECTIONS[collection_id]['rscripts'] > 1:
+                html = html + 's'
+            resource_types = resource_types + 1
         html = html + '.<br><i>Reinstall</i> to update'
         if resource_types == 0:
-           html = '<i>No standard resources found</i>.'
+            html = '<i>No standard resources found</i>.'
         if config.COLLECTIONS[collection_id]['status'] != COLLECTION_INSTALLED_STATUS:
-           html = '<i>Unknown before installation</i>'
+            html = '<i>Unknown before installation</i>'
 
         config.COLLECTIONS[collection_id]['resources_html'] = html
         context = {

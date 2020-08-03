@@ -16,6 +16,7 @@ from resource_sharing.utilities import local_collection_path
 SVG = 'svg'
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
+
 class SVGResourceHandler(BaseResourceHandler):
     """The SVG resource handler class."""
     IS_DISABLED = False
@@ -39,7 +40,7 @@ class SVGResourceHandler(BaseResourceHandler):
                 search_paths = search_paths_settings.split('|')
             else:
                 # QGIS 3
-                # Check if it is a string (single directory) 
+                # Check if it is a string (single directory)
                 if isinstance(search_paths_settings, str):
                     search_paths = [search_paths_settings]
                 else:
@@ -77,7 +78,6 @@ class SVGResourceHandler(BaseResourceHandler):
             return
         # Add to the SVG search paths
         search_paths = self.svg_search_paths()
-        #if local_collection_path() not in search_paths:
         if str(local_collection_path()) not in search_paths:
             search_paths.append(str(local_collection_path()))
         self.set_svg_search_paths(search_paths)
@@ -109,4 +109,3 @@ class SVGResourceHandler(BaseResourceHandler):
             if str(local_collection_path()) in search_paths:
                 search_paths.remove(str(local_collection_path()))
         self.set_svg_search_paths(search_paths)
-

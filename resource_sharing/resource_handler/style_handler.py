@@ -10,6 +10,7 @@ from resource_sharing.resource_handler.symbol_resolver_mixin import \
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 STYLE = 'style'
 
+
 class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     """Style handler class."""
     IS_DISABLED = False
@@ -54,4 +55,3 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         """Uninstall the style."""
         # Styles are not installed, so do nothing.
         pass
-

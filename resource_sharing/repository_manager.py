@@ -24,9 +24,9 @@ LOGGER = logging.getLogger('QGIS Resource Sharing')
 class RepositoryManager(QObject):
     """Class to handle repositories."""
 
-    #DIRECTORY_URL = ('https://raw.githubusercontent.com/qgis/'
-    #                 'QGIS-Resources/master/directory.csv')
-    DIRECTORY_URL = ('http://arken.nmbu.no/~havatv/gis/qgis/directory.csv')
+    DIRECTORY_URL = ('https://raw.githubusercontent.com/qgis/'
+                     'QGIS-Resources/master/directory.csv')
+    # DIRECTORY_URL = ('http://arken.nmbu.no/~havatv/gis/qgis/directory.csv')
 
     def __init__(self):
         """Constructor.
@@ -77,8 +77,6 @@ class RepositoryManager(QObject):
         self.fetch_online_directories()
         # Load directory of repositories from settings
         self.load_directories()
-        ## Load repositories from cache
-        #self.load_repositories()
 
     @property
     def directories(self):
@@ -313,7 +311,9 @@ class RepositoryManager(QObject):
                                 collection['status'] = COLLECTION_INSTALLED_STATUS
                                 # Keep the collection statistics
                                 for key in installed_collection.keys():
-                                    if key in ['models', 'processing', 'rscripts', 'style', 'svg', 'symbol', 'expressions']:
+                                    if key in ['models', 'processing',
+                                               'rscripts', 'style', 'svg',
+                                               'symbol', 'expressions']:
                                         collection[key] = installed_collection[key]
 
                             else:

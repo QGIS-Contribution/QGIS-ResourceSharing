@@ -8,7 +8,7 @@ If you have ever wanted to share QGIS resources easily with your peers,
 this plugin comes to the rescue!
 
 The QGIS Resource Sharing plugin allows QGIS users to share resources
-(symbols, SVGs, images, processing models, processing scripts and R
+(symbols, layer styles, SVGs, images, expressions, processing models, processing scripts and R
 scripts) in repositories that other users can access.
 
 A QGIS Resource Sharing repository could be a remote GIT repository
@@ -23,7 +23,11 @@ the Web.
 Collections are stored locally. By default, they are placed under
 the user's QGIS directory.
 Git based collections are downloaded using git *clone* and updated using
-git *pull*.
+git *pull*, meaning that the complete repository will be stored locally,
+and that you can use a git client to suggest changes, keep it updated
+(pull), ...
+The plugin lets you update the repositories through the GUI (the
+*Reload repositories* button in *Settings*).
 
 The plugin was initially implemented as a Google Summer of Code project
 in 2016 for QGIS under the OSGeo organization by Akbar Gumbira (student),

@@ -51,11 +51,9 @@ except ImportError:
         QProgressDialog,
         QDialogButtonBox)
 
-
 from qgis.gui import QgsMessageBar
 from qgis.core import Qgis
 from qgis.core import QgsSettings
-
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 from resource_sharing.repository_manager import RepositoryManager
 from resource_sharing.collection_manager import (
@@ -79,7 +77,6 @@ from resource_sharing.config import (
     COLLECTION_ALL_STATUS,
     COLLECTION_INSTALLED_STATUS)
 from resource_sharing import config
-
 FORM_CLASS, _ = uic.loadUiType(str(ui_path('resource_sharing_dialog_base.ui')))
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 REPOSITORY_ITEM = 1000
@@ -103,7 +100,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         super(ResourceSharingDialog, self).__init__(parent)
         self.setupUi(self)
         self.iface = iface
-
         # Reconfigure UI
         self.setModal(True)
         self.button_edit.setEnabled(False)
@@ -111,7 +107,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_install.setEnabled(False)
         self.button_open.setEnabled(False)
         self.button_uninstall.setEnabled(False)
-
         # Set up the "main menu" - QListWidgetItem
         # All collections
         icon_all = QIcon()
@@ -145,20 +140,16 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         item_settings.setIcon(icon_settings)
         item_settings.setText(self.tr('Settings'))
         item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-
         # Add the items to the list widget
         self.menu_list_widget.addItem(item_all)
         self.menu_list_widget.addItem(item_installed)
         self.menu_list_widget.addItem(item_settings)
-
         # Init the message bar
         self.message_bar = QgsMessageBar(self)
         self.message_bar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.vlayoutRightColumn.insertWidget(0, self.message_bar)
-
         # Progress dialog for long running processes
         self.progress_dialog = None
-
         # Init the repository manager dialog
         self.repository_manager = RepositoryManager()
         self.collection_manager = CollectionManager()
@@ -170,7 +161,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.list_view_collections.setModel(self.collection_proxy)
         # Active selected collection
         self._sel_coll_id = None
-
         # Slots
         self.button_add.clicked.connect(self.add_repository)
         self.button_edit.clicked.connect(self.edit_repository)
@@ -186,7 +176,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_uninstall.clicked.connect(self.uninstall_collection)
         self.button_box.button(QDialogButtonBox.Help).clicked.connect(
             self.open_help)
-
         # Populate the repositories widget and collections list view
         self.populate_repositories_widget()
         self.reload_collections_model()
@@ -237,7 +226,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         dlg = ManageRepositoryDialog(self)
         if not dlg.exec_():
             return
-
         for repoName, repo in self.repository_manager.directories.items():
             if dlg.line_edit_url.text().strip() == repo['url']:
                 self.message_bar.pushMessage(
@@ -251,16 +239,13 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                         'Repositories must have unique names!'),
                     Qgis.Warning, 5)
                 return
-
         repo_name = dlg.line_edit_name.text()
         repo_url = dlg.line_edit_url.text().strip()
         repo_auth_cfg = dlg.line_edit_auth_id.text().strip()
         if repo_name in self.repository_manager.directories:
             repo_name += '(2)'
-
         # Show progress dialog
         self.show_progress_dialog("Fetching repository's metadata")
-
         # Add repository
         try:
             status, adderror = self.repository_manager.add_directory(
@@ -281,10 +266,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 Qgis.Warning, 5)
         finally:
             self.progress_dialog.hide()
-
         # Reload data and widget
         self.reload_data_and_widget()
-
         # Deactivate edit and delete button
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
@@ -294,10 +277,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         selected_item = self.tree_repositories.currentItem()
         if selected_item:
             repo_name = selected_item.text(0)
-
         if not repo_name:
             return
-
         # Check if it is among the officially approved QGIS repositories
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
@@ -308,17 +289,14 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     'You can not edit the official repositories!'),
                 Qgis.Warning, 5)
             return
-
         dlg = ManageRepositoryDialog(self)
         dlg.line_edit_name.setText(repo_name)
         dlg.line_edit_url.setText(
             self.repository_manager.directories[repo_name]['url'])
         dlg.line_edit_auth_id.setText(
             self.repository_manager.directories[repo_name]['auth_cfg'])
-
         if not dlg.exec_():
             return
-
         # Check if the changed URL is already present and that
         # the new repository name is unique
         new_url = dlg.line_edit_url.text().strip()
@@ -337,17 +315,13 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                         'Repositories must have unique names!'),
                     Qgis.Warning, 5)
                 return
-
         # Redundant
         if (new_name in self.repository_manager.directories) and (
                     new_name != repo_name):
             new_name += '(2)'
-
         new_auth_cfg = dlg.line_edit_auth_id.text()
-
         # Show progress dialog
         self.show_progress_dialog("Fetching repository's metadata")
-
         # Edit repository
         try:
             status, editerror = self.repository_manager.edit_directory(
@@ -370,10 +344,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.tr('%s') % e, Qgis.Warning, 5)
         finally:
             self.progress_dialog.hide()
-
         # Reload data and widget
         self.reload_data_and_widget()
-
         # Deactivate the edit and delete buttons
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)
@@ -383,7 +355,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         selected_item = self.tree_repositories.currentItem()
         if selected_item:
             repo_name = selected_item.text(0)
-
         if not repo_name:
             return
         # Check if it is among the offical repositories
@@ -394,7 +365,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     'You can not remove official repositories!'),
                 Qgis.Warning, 5)
             return
-
         warning = self.tr('Are you sure you want to remove the following '
                           'repository?') + '\n' + repo_name
         if QMessageBox.warning(
@@ -421,8 +391,11 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.button_delete.setEnabled(False)
 
     def reload_off_res_directory(self):
-        """Slot the reload directories button."""
-        # Show progress dialog?
+        """Slot called when the user clicks the 'Reload directory'
+           button."""
+        # Show progress dialog
+        self.show_progress_dialog('Reloading the official QGIS resource'
+                                  ' directory')
         self.repository_manager._online_directories = {}
         # Registered directories
         self.repository_manager._directories = {}
@@ -431,13 +404,15 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.repository_manager.load_directories()
         self.message_bar.pushMessage('On-line directory reloaded',
                                      Qgis.Info, 5)
+        self.progress_dialog.hide()
+        # Reload data and widget
         self.reload_data_and_widget()
 
     def reload_repositories(self):
-        """Slot for when user clicks reload repositories button."""
+        """Slot called when the user clicks the 'Reload repositories'
+           button."""
         # Show progress dialog
         self.show_progress_dialog('Reloading all repositories')
-
         for repo_name in self.repository_manager.directories:
             directory = self.repository_manager.directories[repo_name]
             url = directory['url']
@@ -460,18 +435,16 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.message_bar.pushMessage(
                     self.tr('%s') % e,
                     Qgis.Warning, 5)
-
         self.progress_dialog.hide()
         # Reload data and widget
         self.reload_data_and_widget()
 
     def install_collection(self):
-        """Slot for when the user clicks the install/reinstall button."""
+        """Slot called when the user clicks the Install/Reinstall button."""
         # Save the current index to enable selection after installation
         self.current_index = self.list_view_collections.currentIndex()
         self.show_progress_dialog('Starting installation...')
         self.progress_dialog.canceled.connect(self.install_canceled)
-
         self.installer_thread = QThread()
         self.installer_worker = CollectionInstaller(
             self.collection_manager, self._sel_coll_id)
@@ -493,7 +466,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.installer_thread.quit()
         self.installer_thread.wait()
         self.installer_thread.deleteLater()
-
         if installStatus:
             self.reload_collections_model()
             # Report what has been installed
@@ -554,7 +526,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_install.setText('Reinstall')
         self.button_open.setEnabled(True)
         self.button_uninstall.setEnabled(True)
-
         self.show_collection_metadata(self._sel_coll_id)
 
     def install_canceled(self):
@@ -571,7 +542,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.progress_dialog.setLabelText(text)
 
     def uninstall_collection(self):
-        """Slot called when user clicks the uninstall button."""
+        """Slot called when the user clicks the 'Uninstall' button."""
         # get the QModelIndex for the item to be uninstalled
         uninstall_index = self.list_view_collections.currentIndex()
         coll_id = self._sel_coll_id
@@ -590,7 +561,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             currentMenuRow = self.menu_list_widget.currentRow()
             self.set_current_tab(currentMenuRow)
             self.populate_repositories_widget()
-
             rowCount = self.collection_proxy.rowCount()
             if rowCount > 0:
                 # Set the current (and selected) row in the listview
@@ -630,7 +600,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.button_uninstall.setEnabled(False)
 
     def open_collection(self):
-        """Slot for when user clicks 'Open' button."""
+        """Slot called when the user clicks the 'Open' button."""
         collection_path = local_collection_path(self._sel_coll_id)
         directory_url = QUrl.fromLocalFile(str(collection_path))
         QDesktopServices.openUrl(directory_url)
@@ -670,7 +640,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             item.setText(0, repo_name)
             item.setText(1, url)
             item.setFont(0, repo_Font)
-
             for coll_id in config.COLLECTIONS:
                 if ('repository_name' in config.COLLECTIONS[coll_id].keys() and
                         config.COLLECTIONS[coll_id]['repository_name'] ==
@@ -758,13 +727,13 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.button_delete.setEnabled(False)
 
     def on_list_view_collections_clicked(self, index):
-        """Slot for when the list_view_collections is clicked."""
+        """Slot called when the user clicks an item in
+           list_view_collections."""
         real_index = self.collection_proxy.mapToSource(index)
         if real_index.row() != -1:
             collection_item = self.collections_model.itemFromIndex(real_index)
             collection_id = collection_item.data(COLLECTION_ID_ROLE)
             self._sel_coll_id = collection_id
-
             # Enable / disable buttons
             status = config.COLLECTIONS[self._sel_coll_id]['status']
             is_installed = status == COLLECTION_INSTALLED_STATUS
@@ -778,7 +747,6 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.button_install.setText('Install')
                 self.button_open.setEnabled(False)
                 self.button_uninstall.setEnabled(False)
-
             # Show  metadata
             self.show_collection_metadata(collection_id)
 
@@ -796,7 +764,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.web_view_details.setHtml(html)
 
     def reject(self):
-        """Slot when the dialog is closed."""
+        """Slot called when the dialog is closed."""
         # Serialize collections to settings
         self.repository_manager.serialize_repositories()
         self.done(0)
@@ -824,5 +792,4 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self.progress_dialog.setMinimum(0)
             self.progress_dialog.setValue(0)
             self.progress_dialog.setLabelText(text)
-
         self.progress_dialog.show()

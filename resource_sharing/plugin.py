@@ -19,16 +19,13 @@
  *                                                                         *
  ***************************************************************************/
 """
-# Use pathlib instead of os.path
 from pathlib import Path
-
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 try:
     from qgis.PyQt.QtGui import QAction    # QT 4 - could be removed
 except ImportError:
     from qgis.PyQt.QtWidgets import QAction    # QT 5
-
 from .gui.resource_sharing_dialog import ResourceSharingDialog
 from .utilities import resources_path
 

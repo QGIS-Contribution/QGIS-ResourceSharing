@@ -1,5 +1,4 @@
 # coding=utf-8
-# Use pathlib instead of os.path
 from pathlib import Path
 import shutil
 import logging
@@ -79,7 +78,8 @@ class RScriptHandler(BaseResourceHandler):
             try:
                 r_provider.refreshAlgorithms()
             except Error as e:
-                LOGGER.error("Exception when refreshing after adding R scripts:\n" +
+                LOGGER.error("Exception when refreshing after adding"
+                             " R scripts:\n" +
                              str(e))
 
     def default_rscripts_folder(self):
@@ -93,4 +93,3 @@ class RScriptHandler(BaseResourceHandler):
     def RScripts_folder(self):
         """Return the default R scripts folder."""
         return self.default_rscripts_folder()
-

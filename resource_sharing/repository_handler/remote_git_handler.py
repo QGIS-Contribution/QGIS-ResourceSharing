@@ -1,5 +1,4 @@
 # coding=utf-8
-# Use pathlib instead of os.path
 from pathlib import Path
 import shutil
 import logging
@@ -108,7 +107,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
         if local_repo_dir.exists():
             try:
                 shutil.rmtree(str(local_repo_dir))
-            except:
+            except Exception:
                 pass
         if not (local_repo_dir / '.git').exists():
             local_repo_dir.mkdir(parents=True)

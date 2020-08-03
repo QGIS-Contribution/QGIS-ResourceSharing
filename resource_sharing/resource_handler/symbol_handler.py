@@ -1,5 +1,4 @@
 # coding=utf-8
-# Use pathlib instead of os.path
 from pathlib import Path
 import logging
 
@@ -16,6 +15,7 @@ from resource_sharing.utilities import qgis_version
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 SYMBOL = 'symbol'
+
 
 class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     """Concrete class of the Symbol handler."""
@@ -44,12 +44,12 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 return group
             return self.style.addGroup(parent_group_name)
         except AttributeError:
-            # not QGIS 2, so hopefully QGIS 3
-            #tag = self.style.tagId(parent_group_name)
-            #if tag != 0:
-            #    return tag
-            #return self.style.addTag(parent_group_name)
-            # We don't want to create an empty "parent" tag
+            # # not QGIS 2, so hopefully QGIS 3
+            # tag = self.style.tagId(parent_group_name)
+            # if tag != 0:
+            #     return tag
+            # return self.style.addTag(parent_group_name)
+            # # We don't want to create an empty "parent" tag
             return None
 
     def _get_child_group_tag(self, group_or_tag_id, file_name):
@@ -67,15 +67,17 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             return self.style.addGroup(file_name, group_or_tag_id)
         except AttributeError:
             # not QGIS 2, so hopefully QGIS 3
-            #tag_name = self.style.tag(group_or_tag_id) + '/' + file_name
-            tag_name = ('%s (%s)/') % (self.collection['name'], self.collection['repository_name']) + file_name
+            # tag_name = self.style.tag(group_or_tag_id) + '/' + file_name
+            tag_name = ('%s (%s)/') % (self.collection['name'],
+                                       self.collection['repository_name']) + file_name
             tag = self.style.tagId(tag_name)
             if tag != 0:
                 return tag
             return self.style.addTag(tag_name)
 
     def _get_child_groups_tags_ids(self):
-        """Retrieve ids for the child groups (for QGIS2) or tags (for QGIS3)."""
+        """Retrieve ids for the child groups (for QGIS2) or tags
+           (for QGIS3)."""
         parent_group_name = '%s (%s)' % (
             self.collection['name'], self.collection['repository_name'])
         try:
@@ -150,13 +152,15 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         for symbol_file in symbol_files:
             file_name = symbol_file.stem
             # Groups in QGIS2, tags in QGIS3...
-            groupOrTag_id = self._get_child_group_tag(group_or_tag_id, file_name)
+            groupOrTag_id = self._get_child_group_tag(group_or_tag_id,
+                                                      file_name)
             # Modify the symbol file to fix image and SVG paths
             self.resolve_dependency(str(symbol_file))
             # Add all symbols and colorramps and group / tag them
             symbol_xml_extractor = SymbolXMLExtractor(str(symbol_file))
             for symbol in symbol_xml_extractor.symbols:
-                symbol_name = '%s (%s)' % (symbol['name'], self.collection['repository_name'])
+                symbol_name = '%s (%s)' % (symbol['name'],
+                                           self.collection['repository_name'])
                 # self.resolve_dependency(symbol[SYMBOL])
                 if self.style.addSymbol(symbol_name, symbol[SYMBOL], True):
                     self._group_or_tag(QgsStyle.SymbolEntity, symbol_name,
@@ -181,8 +185,9 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             for labelsetting in symbol_xml_extractor.labelsettings:
                 labelsetting_name = '%s (%s)' % (
                     labelsetting['name'], self.collection['repository_name'])
-                if self.style.addLabelSettings(
-                        labelsetting_name, labelsetting['labelsettings'], True):
+                if self.style.addLabelSettings(labelsetting_name,
+                                               labelsetting['labelsettings'],
+                                               True):
                     self._group_or_tag(QgsStyle.LabelSettingsEntity,
                                        labelsetting_name, groupOrTag_id)
         if valid >= 0:
@@ -210,12 +215,14 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
                 # Remove this tag / child group
                 self._group_or_tag_remove(child_group_id)
                 continue
-            # Get all the textformats for this tag / child group and remove them
+            # Get all the textformats for this tag / child group
+            # and remove them
             textformats = self._get_symbols_for_group_or_tag(
                 QgsStyle.TextFormatEntity, child_group_id)
             for textformat in textformats:
                 self.style.removeTextFormat(textformat)
-            # Get all the labelsettings for this tag / child group and remove them
+            # Get all the labelsettings for this tag / child group
+            # and remove them
             labelsettings = self._get_symbols_for_group_or_tag(
                 QgsStyle.LabelSettingsEntity, child_group_id)
             for labelsetting in labelsettings:
@@ -224,4 +231,3 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             self._group_or_tag_remove(child_group_id)
         # Remove the group / tag:
         self._group_or_tag_remove(group_or_tag_id)
-

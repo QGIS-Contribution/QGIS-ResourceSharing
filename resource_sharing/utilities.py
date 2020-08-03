@@ -1,18 +1,14 @@
 # coding=utf-8
-# Use pathlib instead of os.path
 from pathlib import Path
 import logging
-
 import ntpath
 from ext_libs.pathvalidate import sanitize_filename
-
 from qgis.PyQt.QtCore import QDir, QSettings
 from qgis.core import QgsSettings
 try:
     from qgis.core import QgsApplication, QGis as Qgis
 except ImportError:
     from qgis.core import QgsApplication, Qgis
-
 from resource_sharing import config
 import jinja2
 
@@ -79,7 +75,7 @@ def local_collection_root_dir_key():
 
 def default_local_collection_root_dir():
     return Path(QgsApplication.qgisSettingsDirPath(),
-                      'resource_sharing', 'collections')
+                'resource_sharing', 'collections')
 
 
 def local_collection_path(id=None):
@@ -119,13 +115,14 @@ def local_collection_path(id=None):
         # Use repository name instead of hash
         dir_name = '%s (%s)' % (sane_name, sane_repo_name)
         path = lcPath / dir_name
-        # Check if the "old" directory name exists (should eventuall be removed)
+        # Check if the "old" directory name exists
+        # (should eventuall be removed)
         old_dir_name = '%s' % (id)
         old_path = lcPath / old_dir_name
         if old_path.exists():
             try:
                 old_path.rename(path)
-            except:
+            except Exception:
                 pass
     return path
 

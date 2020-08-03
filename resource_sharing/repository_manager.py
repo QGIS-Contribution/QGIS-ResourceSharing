@@ -1,14 +1,10 @@
 # coding=utf-8
 import logging
-
 import csv
-# Use pathlib instead of os.path
 from pathlib import Path
 import pickle
-
 from qgis.PyQt.QtCore import QObject, QSettings, QTemporaryFile
 from qgis.core import QgsSettings
-
 from resource_sharing.utilities import (
     repo_settings_group, local_collection_path, repositories_cache_path)
 from resource_sharing.repository_handler import BaseRepositoryHandler
@@ -26,7 +22,6 @@ class RepositoryManager(QObject):
 
     DIRECTORY_URL = ('https://raw.githubusercontent.com/qgis/'
                      'QGIS-Resources/master/directory.csv')
-    # DIRECTORY_URL = ('http://arken.nmbu.no/~havatv/gis/qgis/directory.csv')
 
     def __init__(self):
         """Constructor.
@@ -97,11 +92,9 @@ class RepositoryManager(QObject):
             if directory_file.open():
                 directory_file.write(downloader.content)
                 directory_file.close()
-
             with open(directory_file.fileName()) as csv_file:
                 reader = csv.DictReader(csv_file, fieldnames=('name', 'url'))
                 for row in reader:
-                    LOGGER.info("dir row - name: " + str(row['name']))
                     repName = row['name']
                     repUrl = row['url']
                     # Check name and URL for None before stripping and adding
@@ -134,18 +127,14 @@ class RepositoryManager(QObject):
         self._directories = {}
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
-
         # Loop through the repositories from the official directory
         for online_dir_name in self._online_directories:
-            LOGGER.info("load_dir, off. repo: " + str(online_dir_name))
             # Check if the repository is already present
             repo_present = False
             for repo_name in settings.childGroups():
-                LOGGER.info("load_dir, repo (settings): " + str(repo_name))
                 url = settings.value(repo_name + '/url', '', type=unicode)
                 if url == self._online_directories[online_dir_name]:
                     repo_present = True
-                    LOGGER.info("---- present: " + str(repo_name))
                     break
                 if online_dir_name == repo_name:
                     repo_present = True
@@ -156,7 +145,6 @@ class RepositoryManager(QObject):
             if not repo_present:
                 self.add_directory(
                     online_dir_name, self._online_directories[online_dir_name])
-
         for repo_name in settings.childGroups():
             self._directories[repo_name] = {}
             url = settings.value(
@@ -176,14 +164,12 @@ class RepositoryManager(QObject):
         :param url: The URL of the repository
         :type url: str
         """
-        LOGGER.info("add_dir, repo: " + str(repo_name))
         repo_handler = BaseRepositoryHandler.get_handler(url)
         if repo_handler is None:
             LOGGER.warning("There is no handler available for URL '" +
                            str(url) + "'!")
         if auth_cfg:
             repo_handler.auth_cfg = auth_cfg
-
         # Fetch metadata
         status, fetcherror = repo_handler.fetch_metadata()
         if status:
@@ -195,7 +181,6 @@ class RepositoryManager(QObject):
                                     str(repo_name) + ":\n" + str(me))
                 LOGGER.warning(metadata_warning)
                 return False, metadata_warning
-
             # Add the repository and its collections
             self._repositories[repo_name] = collections
             self.rebuild_collections()
@@ -208,7 +193,6 @@ class RepositoryManager(QObject):
             settings.endGroup()
             # Serialize repositories every time we successfully added a repo
             self.serialize_repositories()
-
         return status, fetcherror
 
     def edit_directory(
@@ -257,7 +241,6 @@ class RepositoryManager(QObject):
         else:
             # old_repo_name == new_repo_name and old_url == new_url
             # or new_url != old_url
-
             # Fetch the metadata (metadata.ini) from the new url
             repo_handler = BaseRepositoryHandler.get_handler(new_url)
             if repo_handler is None:
@@ -267,7 +250,6 @@ class RepositoryManager(QObject):
             if new_auth_cfg:
                 repo_handler.auth_cfg = new_auth_cfg
             status, fetcherror = repo_handler.fetch_metadata()
-
             if status:
                 # Parse metadata
                 try:
@@ -283,7 +265,6 @@ class RepositoryManager(QObject):
                 for old_collection in old_collections:
                     if old_collection['status'] == COLLECTION_INSTALLED_STATUS:
                         installed_old_collections.append(old_collection)
-
                 # Handling installed collections
                 # An old collection that is present in the new location
                 # (URL) is identified by its register name.
@@ -300,7 +281,6 @@ class RepositoryManager(QObject):
                 for installed_collection in installed_old_collections:
                     reg_name = installed_collection['register_name']
                     is_present = False
-
                     for collection in new_collections:
                         # Look for collections that are already present
                         if collection['register_name'] == reg_name:
@@ -315,19 +295,16 @@ class RepositoryManager(QObject):
                                                'rscripts', 'style', 'svg',
                                                'symbol', 'expressions']:
                                         collection[key] = installed_collection[key]
-
                             else:
                                 # Different repository URLs, so append
                                 new_collections.append(installed_collection)
                             break
                     if not is_present:
                         new_collections.append(installed_collection)
-
         # Remove the old repository and add the new one
         self._repositories.pop(old_repo_name, None)
         self._repositories[new_repo_name] = new_collections
         self.rebuild_collections()
-
         # Update QgsSettings
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
@@ -378,18 +355,14 @@ class RepositoryManager(QObject):
         """Rebuild the collections for all the repositories."""
         config.COLLECTIONS = {}
         for repo in self._repositories.keys():
-            LOGGER.info("rebuild coll, repo: " + str(repo))
-
             repo_collections = self._repositories[repo]
             for collection in repo_collections:
-                LOGGER.info("--------- coll: " + str(collection))
                 collection_id = self._collections_manager.get_collection_id(
                     collection['register_name'],
                     collection['repository_url']
                 )
                 collection['repository_name'] = repo
                 config.COLLECTIONS[collection_id] = collection
-
                 # Get the collection path (updating if neccessary)
                 collection_path = local_collection_path(collection_id)
                 # Check the file system to see if the collection exists.
@@ -419,7 +392,6 @@ class RepositoryManager(QObject):
         """Save repositories to cache."""
         if not repositories_cache_path().parent.exists():
             repositories_cache_path().parent.mkdir(parents=True)
-
         self.resync_repository()
         with open(str(repositories_cache_path()), 'wb') as f:
             pickle.dump(self._repositories, f)

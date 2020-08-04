@@ -25,7 +25,7 @@ in the Style Manager. This has been improved in later versions.
 When a repository is been renamed, new tag names are generated
 in Style Manager, but the old ones will remain.
 
-To clean up the "mess", remove the strang / old tags by
+To clean up the "mess", remove the strange / old tags by
 right-clicking on the tag name in the left part of the
 Style Manager dialogue and *Remove*.
 
@@ -39,6 +39,7 @@ without associated elements.
 In the Style Manager right-click on the "empty" tag, and *Remove*.
 
 ***Collection directories are not removed***
+
 If there are subdirectories in the collections directory
 (``/.local/share/QGIS/QGIS3/profiles/default/resource_sharing/collections``
 on Ubuntu,
@@ -63,7 +64,7 @@ If everything has turned out to be a mess (might happen after
 plugin upgrades that adds new "features"), and you would like
 to remove all installed collections and clean up, you can:
 
-* Remove the resource_sharing directory in your QGIS user
+* Remove the ``resource_sharing`` directory in your QGIS user
   folder
   (``/.local/share/QGIS/QGIS3/profiles/default/QGIS``
   on Ubuntu,
@@ -75,10 +76,11 @@ to remove all installed collections and clean up, you can:
   QGIS settings (*Settings-> Options-> Advanced*), or in
   the QGIS3.ini file that is located under QGIS in the user
   QGIS folder.
-* Remove ``repository`` under ``[ResourceSharing]`` in
-  QGIS settings (*Settings-> Options-> Advanced*), or in
-  the QGIS3.ini file that is located under QGIS in the user
-  QGIS folder).
+* Remove the ``repository`` group (the group has one entry for each
+  repository and one entry for the ``online_directories``) under
+  ``[ResourceSharing]`` in QGIS settings
+  (*Settings-> Options-> Advanced*), or in the QGIS3.ini file that
+  is located under QGIS in the user QGIS folder).
 * If you have used an early version (pre 0.10.0), you may also
   want to remove the ``~/QGIS/Resource Sharing`` directory.
 * Remove all Resource Sharing related directories from the SVG
@@ -102,7 +104,7 @@ but all branches can be downloaded.
    *https://github.com/QGIS-Contribution/QGIS-ResourceSharing*.
 
 2. Choose the *Branch* you would like to download, click
-   *Clone or download* and *Download ZIP*.
+   the *Clone or download* button/pull-down and *Download ZIP*.
 
    ![Choose branch on github]({{ site.baseurl }}/assets/github-branch.png)
 
@@ -117,11 +119,17 @@ but all branches can be downloaded.
 5. Unzip the downloaded file in the plugin directory.
    If you downloaded the master branch, the subdirectory with
    the plugin will be named `QGIS-ResourceSharing-master`.
+   If you rename the subdirectory to `qgis_resource_sharing`, you
+   can start QGIS and run the new version of the plugin.
+   If you choose not to rename the directory, you have to go through
+   the last two steps.
 
 6. Start QGIS.
-   If the name of the plugin subdirectory of the Resource Sharing
-   plugin has changed, the plugin may have become disabled, and
-   the next step will be necessary.
+   Since the name of the plugin subdirectory of the Resource Sharing
+   plugin has changed from `qgis_resource_sharing` to
+   `QGIS-ResourceSharing-master` (if you have downloaded the master
+   branch), the plugin has become disabled, and the next step will
+   be necessary.
 
 7. Open the Plugin Manager and (re)enable the plugin.
 

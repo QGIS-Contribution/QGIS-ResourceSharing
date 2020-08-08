@@ -23,7 +23,7 @@ This is the  contents of the collection section:
 **Name** | **Status** | **Description**
 name | Required | The name of the collection
 author | Required | Author's name
-email | Required | Author's email
+email | Optional | Author's email
 tags | Required | Comma separated list of tags
 description | Required | Additional information about the collection
 preview | Optional | Comma separated list of preview images (paths relative to the collection root)

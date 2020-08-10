@@ -24,8 +24,12 @@ Expressions (0.15) | expressions | JSON files with user expressions (QGIS 3.12 a
 Processing scripts | processing | Python processing scripts.
 Models (0.10) | models | Models for the *Graphical modeler*.
 R scripts (0.9) | rscripts | *Processing R Provider* plugin **R scripts**.
+Checklists | checklists | Checklist files for the [QGIS Dataset QA Workbench] plugin.
 
 Note that you can include other QGIS resources in the repository 
 (composer templates, project files, ...) as well.
 They will be available in the collection directory, but the
 plugin will not do anything with them.
+
+
+[QGIS Dataset QA Workbench]: https://github.com/kartoza/qgis_dataset_qa_workbench

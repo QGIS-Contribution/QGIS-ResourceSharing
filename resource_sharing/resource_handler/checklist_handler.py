@@ -4,7 +4,6 @@ from pathlib import Path
 import shutil
 import typing
 
-from processing.tools.system import userFolder, mkdir
 from qgis.core import (
     QgsApplication,
     QgsMessageLog,

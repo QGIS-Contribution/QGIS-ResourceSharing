@@ -12,6 +12,7 @@ from resource_sharing import config
 from resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
 from resource_sharing.utilities import (
+    RESOURCE_MAP,
     local_collection_path,
     render_template,
     resources_path)
@@ -93,53 +94,14 @@ class CollectionManager(object):
         """
         html = ''
         resource_types = 0
-        if 'svg' in config.COLLECTIONS[collection_id].keys():
-            html = html + str(config.COLLECTIONS[collection_id]['svg']) + ' SVG'
-            if config.COLLECTIONS[collection_id]['svg'] > 1:
-                html = html + 's'
-            resource_types = resource_types + 1
-        if 'style' in config.COLLECTIONS[collection_id].keys():
-            if resource_types > 0:
-                html = html + ', '
-            html = html + str(config.COLLECTIONS[collection_id]['style']) + ' Layer style (QML) file'
-            if config.COLLECTIONS[collection_id]['style'] > 1:
-                html = html + 's'
-            resource_types = resource_types + 1
-        if 'symbol' in config.COLLECTIONS[collection_id].keys():
-            if resource_types > 0:
-                html = html + ', '
-            html = html + str(config.COLLECTIONS[collection_id]['symbol']) + ' Symbol (XML) file'
-            if config.COLLECTIONS[collection_id]['symbol'] > 1:
-                html = html + 's'
-            resource_types = resource_types + 1
-        if 'models' in config.COLLECTIONS[collection_id].keys():
-            if resource_types > 0:
-                html = html + ', '
-            html = html + str(config.COLLECTIONS[collection_id]['models']) + ' Processing model'
-            if config.COLLECTIONS[collection_id]['models'] > 1:
-                html = html + 's'
-            resource_types = resource_types + 1
-        if 'expressions' in config.COLLECTIONS[collection_id].keys():
-            if resource_types > 0:
-                html = html + ', '
-            html = html + str(config.COLLECTIONS[collection_id]['expressions']) + ' Expression (JSON) file'
-            if config.COLLECTIONS[collection_id]['expressions'] > 1:
-                html = html + 's'
-            resource_types = resource_types + 1
-        if 'processing' in config.COLLECTIONS[collection_id].keys():
-            if resource_types > 0:
-                html = html + ', '
-            html = html + str(config.COLLECTIONS[collection_id]['processing']) + ' Processing script'
-            if config.COLLECTIONS[collection_id]['processing'] > 1:
-                html = html + 's'
-            resource_types = resource_types + 1
-        if 'rscripts' in config.COLLECTIONS[collection_id].keys():
-            if resource_types > 0:
-                html = html + ', '
-            html = html + str(config.COLLECTIONS[collection_id]['rscripts']) + ' R script'
-            if config.COLLECTIONS[collection_id]['rscripts'] > 1:
-                html = html + 's'
-            resource_types = resource_types + 1
+        for type_, description in RESOURCE_MAP.items():
+            if type_ in config.COLLECTIONS[collection_id].keys():
+                if resource_types > 0:
+                    html += ', '
+                html += f'{config.COLLECTIONS[collection_id][type_]} {description}'
+                if config.COLLECTIONS[collection_id][type_] > 1:
+                    html += 's'
+                resource_types += 1
         html = html + '.<br><i>Reinstall</i> to update'
         if resource_types == 0:
             html = '<i>No standard resources found</i>.'

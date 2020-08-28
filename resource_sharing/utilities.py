@@ -14,6 +14,17 @@ import jinja2
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
+RESOURCE_MAP = {
+    'svg': 'SVG file',
+    'style': 'Layer style (QML) file',
+    'symbol': 'Symbol (XML) file',
+    'models': 'Processing model',
+    'expressions': 'Expression (JSON) file',
+    'processing': 'Processing script',
+    'rscripts': 'R script',
+    'checklists': 'Checklist',
+}
+
 
 def resources_path(*args):
     """Get the absolute path to resources in the resources dir.
@@ -170,3 +181,7 @@ def render_template(filename, context):
     return jinja2.Environment(
         loader=jinja2.FileSystemLoader(str(path))
     ).get_template(filename).render(context)
+
+
+def get_profile_base_path() -> Path:
+    return Path(QgsApplication.qgisSettingsDirPath())

@@ -22,7 +22,7 @@ SUPPORTED_RESOURCES_MAP = {
     'processing': 'Processing script',
     'models': 'Processing model',
     'rscripts': 'R script',
-    'checklists': 'Checklist',
+    'checklists': 'QA Workbench checklist',
 }
 
 

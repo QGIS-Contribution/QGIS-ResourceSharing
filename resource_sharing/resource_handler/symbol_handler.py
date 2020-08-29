@@ -57,8 +57,7 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         (QGIS3, no hierarchy) for the styles.
         Returns the id of the group or tag id.
         Use a slash and the file_name as a way of simulating a tree
-        in QGIS3.
-        """
+        in QGIS3."""
         try:
             # QGIS 2
             group = self.style.groupId(file_name)
@@ -68,8 +67,9 @@ class SymbolResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         except AttributeError:
             # not QGIS 2, so hopefully QGIS 3
             # tag_name = self.style.tag(group_or_tag_id) + '/' + file_name
-            tag_name = ('%s (%s)/') % (self.collection['name'],
-                                       self.collection['repository_name']) + file_name
+            tag_name = (('%s (%s)/') %
+                        (self.collection['name'],
+                         self.collection['repository_name'])) + file_name
             tag = self.style.tagId(tag_name)
             if tag != 0:
                 return tag

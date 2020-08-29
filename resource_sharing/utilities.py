@@ -25,6 +25,7 @@ SUPPORTED_RESOURCES_MAP = {
     'checklists': 'Dataset QA Workbench checklist',
 }
 
+
 def resources_path(*args):
     """Get the absolute path to resources in the resources dir.
 
@@ -39,6 +40,7 @@ def resources_path(*args):
     for item in args:
         path = (path / item)
     return path
+
 
 def ui_path(*args):
     """Get the absolute path to the ui file from the UI dir.
@@ -55,30 +57,37 @@ def ui_path(*args):
         path = (path / item)
     return path
 
+
 def user_expressions_group():
     """Get the user expressions group."""
     return '/expressions/user'
+
 
 def repo_settings_group():
     """Get the settings group for Resource Sharing Dialog."""
     return '/ResourceSharing/repository'
 
+
 def resource_sharing_group():
     """Get the settings group for the local collection directories."""
     return '/ResourceSharing'
+
 
 def repositories_cache_path():
     """Get the path to the repositories cache."""
     return Path(QgsApplication.qgisSettingsDirPath(),
                 'resource_sharing', 'repositories_cache')
 
+
 def local_collection_root_dir_key():
     """The QSettings key for the local collections root dir."""
     return 'localCollectionDir'
 
+
 def default_local_collection_root_dir():
     return Path(QgsApplication.qgisSettingsDirPath(),
                 'resource_sharing', 'collections')
+
 
 def local_collection_path(id=None):
     """Get the path to the local collection dir.
@@ -128,6 +137,7 @@ def local_collection_path(id=None):
                 pass
     return path
 
+
 def old_local_collection_path(id=None):
     """Get the path to the old local collection dir.
     (in case we would like to help the users migrate)
@@ -157,6 +167,7 @@ def qgis_version():
     version = int(version)
     return version
 
+
 def render_template(filename, context):
     """Render a template with the specified filename.
     :param filename: The filename (must be in the template directory)
@@ -170,4 +181,3 @@ def render_template(filename, context):
     return jinja2.Environment(
         loader=jinja2.FileSystemLoader(str(path))
     ).get_template(filename).render(context)
-

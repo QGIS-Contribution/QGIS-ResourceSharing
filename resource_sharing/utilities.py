@@ -22,7 +22,7 @@ SUPPORTED_RESOURCES_MAP = {
     'processing': 'Processing script',
     'models': 'Processing model',
     'rscripts': 'R script',
-    'checklists': 'QA Workbench checklist',
+    'checklists': 'Dataset QA Workbench checklist',
 }
 
 def resources_path(*args):

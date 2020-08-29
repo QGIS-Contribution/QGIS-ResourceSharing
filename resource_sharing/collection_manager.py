@@ -12,7 +12,7 @@ from resource_sharing import config
 from resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
 from resource_sharing.utilities import (
-    SUPPORTED_RESOURCES_MAP,
+    RESOURCE_MAP,
     local_collection_path,
     render_template,
     resources_path)
@@ -94,19 +94,18 @@ class CollectionManager(object):
         """
         html = ''
         resource_types = 0
-        for type_, desc in SUPPORTED_RESOURCES_MAP.items():
+        for type_, description in RESOURCE_MAP.items():
             if type_ in config.COLLECTIONS[collection_id].keys():
                 if resource_types > 0:
                     html += ', '
-                html += f'{config.COLLECTIONS[collection_id][type_]} {desc}'
+                html += f'{config.COLLECTIONS[collection_id][type_]} {description}'
                 if config.COLLECTIONS[collection_id][type_] > 1:
                     html += 's'
                 resource_types += 1
         html = html + '.<br><i>Reinstall</i> to update'
         if resource_types == 0:
             html = '<i>No standard resources found</i>.'
-        if (config.COLLECTIONS[collection_id]['status'] !=
-                COLLECTION_INSTALLED_STATUS):
+        if config.COLLECTIONS[collection_id]['status'] != COLLECTION_INSTALLED_STATUS:
             html = '<i>Unknown before installation</i>'
 
         config.COLLECTIONS[collection_id]['resources_html'] = html

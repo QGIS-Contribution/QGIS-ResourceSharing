@@ -11,16 +11,15 @@ tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing.git
 
 qgisMaximumVersion=3.98
-tags=collections,sharing,processing,algorithms,Python,R,model,script,style,svg,symbol,checklist,repository,design,maps
+tags=collections,sharing,processing,algorithms,Python,R,model,script,style,svg,symbol,repository,design,maps,checklist
 homepage=http://qgis-contribution.github.io/QGIS-ResourceSharing/
 experimental=False
 deprecated=False
 icon=resources/icon.png
 changelog=
-        0.16.0 - GUI improvements (#138, #139, #140, #141)
+        0.15.2 - GUI improvements (#138, #139, #140, #141)
                - Add button for reloading the QGIS directory of approved resources (#145)
                - Fix bug in the handling of QGIS directory updates (#146)
-               - Add support for checklists (#151)
         0.15.1 - Fix incorrect handling of searchPathsForSVG setting (#135)
                - Handle XML parsing exceptions for QML files
         0.15.0 - Support expressions (#130). Switch to Python pathlib.

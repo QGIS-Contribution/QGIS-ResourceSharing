@@ -14,13 +14,13 @@ import jinja2
 
 LOGGER = logging.getLogger('QGIS Resource Sharing')
 
-SUPPORTED_RESOURCES_MAP = {
-    'svg': 'SVG',
+RESOURCE_MAP = {
+    'svg': 'SVG file',
     'style': 'Layer style (QML) file',
     'symbol': 'Symbol (XML) file',
+    'models': 'Processing model',
     'expressions': 'Expression (JSON) file',
     'processing': 'Processing script',
-    'models': 'Processing model',
     'rscripts': 'R script',
     'checklists': 'Checklist',
 }
@@ -182,3 +182,6 @@ def render_template(filename, context):
         loader=jinja2.FileSystemLoader(str(path))
     ).get_template(filename).render(context)
 
+
+def get_profile_base_path() -> Path:
+    return Path(QgsApplication.qgisSettingsDirPath())

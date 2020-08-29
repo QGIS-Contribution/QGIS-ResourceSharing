@@ -1,12 +1,17 @@
 # coding=utf-8
+import logging
 from pathlib import Path
 import shutil
-import logging
+import typing
 
-from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QDir, QSettings
+from qgis.core import (
+    QgsApplication,
+    QgsMessageLog,
+)
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
+from resource_sharing.utilities import get_profile_base_path
+
 
 CHECKLISTS_FOLDER = 'checklists'
 CHECKLISTS = 'checklists'  # Resource Sharing collection subdirectory name
@@ -20,8 +25,7 @@ class ChecklistHandler(BaseResourceHandler):
 
     @property
     def checklists_directory(self) -> Path:
-        chkl_path = Path(QgsApplication.qgisSettingsDirPath()) / 'checklists/'
-        return Path(chkl_path)
+        return get_profile_base_path() / 'checklists'
 
     @classmethod
     def dir_name(cls):
@@ -36,10 +40,10 @@ class ChecklistHandler(BaseResourceHandler):
         """
 
         valid = 0
-        self.checklists_directory.mkdir(parents=False, exist_ok=True)
         for item in self.resource_dir.glob(self._GLOB_PATTERN):
+            QgsMessageLog.logMessage(f'Processing file {item!r}...')
             try:
-                shutil.copy(item, self.checklists_directory / Path(item).name)
+                shutil.copy(item, self.checklists_directory)
                 valid += 1
             except OSError as exc:
                 LOGGER.error(f"Could not copy checklist {item!r}:\n{str(exc)}")
@@ -48,18 +52,7 @@ class ChecklistHandler(BaseResourceHandler):
 
     def uninstall(self):
         """Uninstall the collection's checklists."""
-        if self.checklists_directory.exists():
-            for item in self.resource_dir.glob(self._GLOB_PATTERN):
-                chkl_file = Path(self.checklists_directory, item.name)
-                if chkl_file.exists():
-                    chkl_file.unlink()
-                else:
-                    LOGGER.info('Item already removed: ' + str(chkl_file))
-            # Remove the user's checklist directory, if empty
-            # (unlink will not remove a non-empty directory, but raises
-            # an exception)
-            if not any(self.checklists_directory.iterdir()):
-                self.checklists_directory.rmdir()
-        else:
-            LOGGER.info('No checklist directory')
-
+        for item in self.resource_dir.glob(self._GLOB_PATTERN):
+            checklist_path = Path(self.checklists_directory, item.name)
+            if checklist_path.exists():
+                checklist_path.unlink()

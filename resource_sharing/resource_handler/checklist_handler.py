@@ -61,4 +61,3 @@ class ChecklistHandler(BaseResourceHandler):
                 self.checklists_directory.rmdir()
         else:
             LOGGER.info('No checklist directory')
-

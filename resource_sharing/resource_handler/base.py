@@ -57,7 +57,8 @@ class BaseResourceHandler(object):
     @property
     def resource_dir(self):
         """The root of the resource dir from this resource type."""
-        resource_dir = local_collection_path(self.collection_id) / self.dir_name()
+        resource_dir = (local_collection_path(self.collection_id) /
+                        self.dir_name())
         return resource_dir
 
     def install(self):

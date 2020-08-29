@@ -281,20 +281,20 @@ class RepositoryManager(QObject):
                 for installed_collection in installed_old_collections:
                     reg_name = installed_collection['register_name']
                     is_present = False
-                    for collection in new_collections:
+                    for n_coll in new_collections:
                         # Look for collections that are already present
-                        if collection['register_name'] == reg_name:
+                        if n_coll['register_name'] == reg_name:
                             # Already present
                             is_present = True
                             if old_url == new_url:
                                 # Set the status to installed
-                                collection['status'] = COLLECTION_INSTALLED_STATUS
+                                n_coll['status'] = COLLECTION_INSTALLED_STATUS
                                 # Keep the collection statistics
                                 for key in installed_collection.keys():
                                     if key in ['models', 'processing',
                                                'rscripts', 'style', 'svg',
                                                'symbol', 'expressions']:
-                                        collection[key] = installed_collection[key]
+                                        n_coll[key] = installed_collection[key]
                             else:
                                 # Different repository URLs, so append
                                 new_collections.append(installed_collection)

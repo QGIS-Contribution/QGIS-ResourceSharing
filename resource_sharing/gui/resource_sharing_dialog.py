@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
-                                 A QGIS plugin
+                       QGIS Resource Sharing - a QGIS plugin
  Download collections shared by other users
                              -------------------
         begin                : 2016-05-29

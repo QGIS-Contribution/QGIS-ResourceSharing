@@ -10,7 +10,8 @@ from qgis.PyQt.QtCore import (
 
 from resource_sharing import config
 from resource_sharing.config import (
-    COLLECTION_INSTALLED_STATUS, COLLECTION_NOT_INSTALLED_STATUS)
+    COLLECTION_INSTALLED_STATUS,
+    COLLECTION_NOT_INSTALLED_STATUS)
 from resource_sharing.utilities import (
     SUPPORTED_RESOURCES_MAP,
     local_collection_path,

@@ -32,7 +32,6 @@ class ChecklistHandler(BaseResourceHandler):
 
         Copy the checklists in the checklists directory of the Resource
         Sharing collection to the user's checklists directory.
-
         """
 
         valid = 0

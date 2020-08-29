@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
-                                 A QGIS plugin
+                       QGIS Resource Sharing - a QGIS plugin
  Download collections shared by other users
                              -------------------
         begin                : 2016-05-29
@@ -60,7 +60,7 @@ from resource_sharing.collection_manager import (
     CollectionManager,
     CollectionInstaller)
 from resource_sharing.utilities import (
-    RESOURCE_MAP,
+    SUPPORTED_RESOURCES_MAP,
     resources_path,
     ui_path,
     repo_settings_group,
@@ -473,15 +473,17 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             message = ('<b>%s</b> was successfully installed, '
                        'containing:\n<ul>' %
                        (config.COLLECTIONS[self._sel_coll_id]['name']))
-            for type_, description in RESOURCE_MAP.items():
+            number = 0
+            for type_, description in SUPPORTED_RESOURCES_MAP.items():
                 if type_ in config.COLLECTIONS[self._sel_coll_id].keys():
-                    num = config.COLLECTIONS[self._sel_coll_id][type_]
+                    number = config.COLLECTIONS[self._sel_coll_id][type_]
                     message += (
-                        f'\n<li>{num} {description}{"s" if num > 1 else ""}'
+                        f'\n<li>{number} {description}'
+                        f'{"s" if number > 1 else ""}'
                         f'</li>'
                     )
             message += '\n</ul>'
-            QMessageBox.information(self, 'Resource Sharing', message)
+        QMessageBox.information(self, 'Resource Sharing', message)
         self.populate_repositories_widget()
         # Set the selection
         oldRow = self.current_index.row()

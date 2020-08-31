@@ -68,19 +68,22 @@ choose this option:
     is ```http://www.mydomain.com/qgisrepository/```, you must make the 
     metadata available on:
     ```http://www.mydomain.com/qgisrepository/metadata.ini```
-  * Each collection must be zipped.  The zip file of a collection
-    must be named <name of collection>.zip, and the zip shall combine
-    the subdirectories of the collection (one or more of `expressions`,
-    `image`, `models`, `processing`, `rscripts`, `svg` and `symbol`),
-    in addition to a `preview` subdirectory for preview images.
+  * Each collection must be zipped.
+    The zip file of a collection  must be named
+    <name of collection>.zip, and the zip shall combine the
+    subdirectories of the collection (one or more of
+    `collections`, `expressions`, `image`, `models`, `processing`,
+    `rscripts`, `svg` and `symbol`), in addition to a `preview`
+    subdirectory for preview images.
 
     For example, if you have a collection named ```test_collection```,
     the collection must be present as:
     ```http://www.mydomain.com/qgisrepository/collections/test_collection.zip```,
-    and the structure of this zip file must be (only include directories
-    that contain resources you would like to share):
+    and the structure of this zip file must be (only include
+    directories that contain resources you would like to share):
 
             test_collection.zip
+            ├── checklists
             ├── expressions
             ├── image
             ├── models
@@ -94,7 +97,8 @@ choose this option:
   * Preview images that illustrates the collection should be included.
     If you define preview images for collection ```test_collection```
     in metadata (```preview=preview/prev1.png,prev2.png```), you have
-    to place these preview images in the zip-file in a separate directory
+    to place these preview images in the zip-file in a separate
+    directory 
     - `preview` is the recommended name for that directory.
     
     An example server directory setup for the repository
@@ -105,6 +109,10 @@ choose this option:
         ├── metadata.ini
         └── collections
             └── test_collection.zip
+                ├── checlists
+                |   ├── checklist1.json
+                |   ├── ...
+                |   └── lastchecklist.json
                 ├── expressions
                 |   ├── expressions1.json
                 |   ├── ...

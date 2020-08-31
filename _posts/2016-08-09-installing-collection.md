@@ -29,8 +29,9 @@ in the file system depends on their type).
 **Note**: When you have installed a collection from a repository,
   the complete *repository* will be duplicated in your local file
   system (under ``resource_sharing/repositories`` in the QGIS
-  user directory). In addition, the *collection* will be added under
-  the *collections* directory (``resource_sharing/collections``).
+  user directory).
+  In addition, the *collection* will be added under the *collections*
+  directory (``resource_sharing/collections``).
   The directory name is composed of the collection name and the
   repository name (the *QGIS R script collection* from the
   *QGIS Official Repository* is located in the
@@ -51,7 +52,7 @@ The SVGs will be available when editing symbols (under the
 #### Symbol
 The symbols, colorramps, textformats (since version 0.14.0) and
 labelsettings (since version 0.14.0) from the style XML files in the
-collection will become available in the Style Manager. 
+collection will become available in the Style Manager.
 
 ![Style Manager]({{ site.baseurl }}/assets/style_manager.png)
 

@@ -24,6 +24,7 @@ this:
         │   ├── style (optional, containing QML files - QGIS Layer style)
         │   ├── svg (optional, containing SVG files)
         │   ├── symbol (optional, containing symbol definition XML files)
+        │   ├── checklists (optional, containing checklist definition JSON files)
         │   └── license file (encouraged)
         │
         ├── [Collection2 register id] (the id string used in "collections" in metadata.ini)
@@ -36,6 +37,7 @@ this:
         │   ├── style (optional, containing QML files - QGIS Layer style)
         │   ├── svg (optional, containing SVG files)
         │   ├── symbol (optional, containing symbol definition XML files)
+        │   ├── checklists (optional, containing checklist definition JSON files)
         │   └── license file (encouraged)
         │
         ├── ...
@@ -50,6 +52,7 @@ this:
             ├── style (optional, containing QML files - QGIS Layer style)
             ├── svg (optional, containing SVG files)
             ├── symbol (optional, containing symbol definition XML files)
+        │   ├── checklists (optional, containing checklist definition JSON files)
             └── license file (encouraged)
 
 If the *QGIS Resource Sharing plugin* shall be able to make the
@@ -74,6 +77,9 @@ to place them where the plugin expects to find them:
 * Images belong in the ***image*** directory.
 
 * Expression JSON files belong in the ***expressions*** directory.
+
+* Checklist JSON files belong in the ***checklists*** directory.
+
 
 Check the
 [QGIS Resources Repository](https://github.com/QGIS/QGIS-Resources) and

@@ -6,15 +6,16 @@ date: 2016-07-22 17:04:29
 order: 3
 ---
 
-In order for the plugin to be able to read the repository correctly, the 
-repository must have a specific structure. Generally the structure looks like
-this:
+In order for the plugin to be able to read the repository correctly,
+the repository must have a specific structure.
+Generally the structure looks like this:
 
     Repository root
     ├── README (encouraged)
     ├── metadata.ini (required)
     └── collections
         ├── [Collection1 register id] (the id string used in "collections" in metadata.ini)
+        │   ├── checklists (optional, containing checklist definition JSON files)
         │   ├── expressions (optional, containing JSON files with QGIS Expressions)
         │   ├── image (optional, containing all kinds of image files)
         │   ├── models (optional, containing Processing models)
@@ -24,10 +25,10 @@ this:
         │   ├── style (optional, containing QML files - QGIS Layer style)
         │   ├── svg (optional, containing SVG files)
         │   ├── symbol (optional, containing symbol definition XML files)
-        │   ├── checklists (optional, containing checklist definition JSON files)
         │   └── license file (encouraged)
         │
         ├── [Collection2 register id] (the id string used in "collections" in metadata.ini)
+        │   ├── checklists (optional, containing checklist definition JSON files)
         │   ├── expressions (optional, containing JSON files with QGIS Expressions)
         │   ├── image (optional, containing all kinds of image files)
         │   ├── models (optional, containing Processing models)
@@ -37,13 +38,13 @@ this:
         │   ├── style (optional, containing QML files - QGIS Layer style)
         │   ├── svg (optional, containing SVG files)
         │   ├── symbol (optional, containing symbol definition XML files)
-        │   ├── checklists (optional, containing checklist definition JSON files)
         │   └── license file (encouraged)
         │
         ├── ...
         ├── ...
         │
         └── [CollectionN register id] (the id string used in "collections" in metadata.ini)
+            ├── checklists (optional, containing checklist definition JSON files)
             ├── expressions (optional, containing JSON files with QGIS Expressions)
             ├── image (optional, containing all kinds of image files)
             ├── models (optional, containing Processing models)
@@ -52,7 +53,6 @@ this:
             ├── style (optional, containing QML files - QGIS Layer style)
             ├── svg (optional, containing SVG files)
             ├── symbol (optional, containing symbol definition XML files)
-        │   ├── checklists (optional, containing checklist definition JSON files)
             └── license file (encouraged)
 
 If the *QGIS Resource Sharing plugin* shall be able to make the
@@ -63,7 +63,8 @@ to place them where the plugin expects to find them:
 
 * Processing models belong in the ***models*** directory.
 
-* Processing (Python) scripts belong in the ***processing*** directory.
+* Processing (Python) scripts belong in the ***processing***
+  directory.
 
 * R script (for use with the Processing R plugin) belong in in the
   ***rscripts*** directory.
@@ -78,7 +79,8 @@ to place them where the plugin expects to find them:
 
 * Expression JSON files belong in the ***expressions*** directory.
 
-* Checklist JSON files belong in the ***checklists*** directory.
+* Data QA Workbench checklist JSON files belong in the
+  ***checklists*** directory.
 
 
 Check the

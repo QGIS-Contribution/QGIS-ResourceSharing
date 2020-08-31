@@ -11,11 +11,11 @@ order: 1
 To install the plugin, you use **QGIS Plugin Manager**.
 
 1. Go to the ```Plugin``` menu and choose
- ```Manage and Install Plugins...```
+   ```Manage and Install Plugins...```
 2. Search for ```QGIS Resource Sharing``` in the search box
- of the dialog in the ```All``` tab
+   of the dialog in the ```All``` tab
 3. Select the ```QGIS Resource Sharing``` plugin and click
- ```Install```
+   ```Install```
 
 ![Search Plugin]({{ site.baseurl }}/assets/search_plugin.png)
 

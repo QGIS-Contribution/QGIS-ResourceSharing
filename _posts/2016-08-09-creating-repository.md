@@ -6,30 +6,33 @@ date: 2016-08-09 11:13:38
 order: 1
 ---
 #### Preparing the Repository
-In order for the tools to parse the repository correctly, the repository
-must have a certain structure. This is what you need to do:
+In order for the tools to parse the repository correctly, the
+repository must have a certain structure. This is what you need to do:
   
-  * Go to [this page]({{site.baseurl }}/author/repository-structure.html)
+  * Go to
+    [this page]({{site.baseurl }}/author/repository-structure.html)
     to get information about the structure.
   * Create correct metadata for the repository (consult
     [this page]({{ site.baseurl }}/author/creating-metadata.html)).
-  * When you have prepared your repository, you can check if the repository
-    is all good by trying it using the file system handler.
-    In the plugin, go to the ```Settings``` tab and add a new repository
-    pointing to the root of the repository in your local file system.
+  * When you have prepared your repository, you can check if the
+    repository is all good by trying it using the file system handler.
+    In the plugin, go to the ```Settings``` tab and add a new
+    repository pointing to the root of the repository in your local
+    file system.
     The repository URL looks like this on Linux:
     ```file:///home/pointing/to/repository_root``` and like this:
     ```file://C:/home/pointing/to/repository_root``` on Windows.
 
 #### Where can you  share it?
-These are the options for sharing: on Github, GitLab, Bitbucket (they need to be
-public repositories), Gogs (*Go Git Service*), local file system (if you want to share the
-collections with your colleagues on the network), or in your own server
-with the HTTP(S) protocol.
+These are the options for sharing: on Github, GitLab, Bitbucket (they
+need to be public repositories), Gogs (*Go Git Service*), local file
+system (if you want to share the collections with your colleagues on
+the network), or in your own server with the HTTP(S) protocol.
 
 **Github, GitLab and Bitbucket**
 
-There is nothing complicated here if you are already familiar with git.
+There is nothing complicated here if you are already familiar with
+git.
 After preparing the repository on your local machine, you can make it
 into a git repository as usual. In general, you can do:
 
@@ -48,10 +51,11 @@ for your repository.
 
 **Local File System**
 
-This is even simpler. After preparing the repository, you can use 
-it right away. In the ```Settings``` tab, you add a repository with URL 
-pointing to the repository root in your local machine (absolute path,
-example: `file:/home/user/QGIS-collections/mycollection`).
+This is even simpler.
+After preparing the repository, you can use it right away.
+In the ```Settings``` tab, you add a repository with URL pointing to
+the repository root in your local machine (absolute path, example:
+`file:/home/user/QGIS-collections/mycollection`).
 It's as simple as that.
 If there is a problem with metadata or other issues when adding the 
 repository, you will be told.
@@ -59,14 +63,14 @@ repository, you will be told.
 
 **Your Own Server**
 
-This option could be useful in some cases, e.g. if you want to make private 
-collections available for your customers.
-There are some additional requirements that you need to be aware of if you
-choose this option:
+This option could be useful in some cases, e.g. if you want to make
+private collections available for your customers.
+There are some additional requirements that you need to be aware of if
+you choose this option:
 
   * The URL structure of the repository. If your repository URL 
-    is ```http://www.mydomain.com/qgisrepository/```, you must make the 
-    metadata available on:
+    is ```http://www.mydomain.com/qgisrepository/```, you must make
+    the metadata available on:
     ```http://www.mydomain.com/qgisrepository/metadata.ini```
   * Each collection must be zipped.
     The zip file of a collection  must be named

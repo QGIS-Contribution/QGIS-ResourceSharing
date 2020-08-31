@@ -72,7 +72,7 @@ choose this option:
     The zip file of a collection  must be named
     <name of collection>.zip, and the zip shall combine the
     subdirectories of the collection (one or more of
-    `collections`, `expressions`, `image`, `models`, `processing`,
+    `checklists`, `expressions`, `image`, `models`, `processing`,
     `rscripts`, `svg` and `symbol`), in addition to a `preview`
     subdirectory for preview images.
 

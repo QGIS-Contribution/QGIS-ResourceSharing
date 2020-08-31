@@ -8,8 +8,9 @@ If you have ever wanted to share QGIS resources easily with your peers,
 this plugin comes to the rescue!
 
 The QGIS Resource Sharing plugin allows QGIS users to share resources
-(symbols, layer styles, SVGs, images, expressions, processing models, processing scripts and R
-scripts) in repositories that other users can access.
+(symbols, layer styles, SVGs, images, expressions, processing models,
+processing scripts, Dataset QA checklists,  and R scripts) in
+repositories that other users can access.
 
 A QGIS Resource Sharing repository could be a remote GIT repository
 (currently Github, Gitlab and Bitbucket public repositories are

@@ -6,11 +6,11 @@ date: 2016-07-25 14:58:04
 order: 4
 ---
 
-In the root of the repository, there has to be a metadata file describing
-the repository and its collections.
+In the root of the repository, there has to be a metadata file
+describing the repository and its collections.
 
-The metadata file (```metadata.ini```) must have a ```general``` section 
-with this information:
+The metadata file (```metadata.ini```) must have a ```general```
+section with this information:
 
 **Name** | **Status** | **Description**
 collection | Required | Comma separated list of collection names

@@ -27,17 +27,17 @@ The repository is on Github -
 There are 2 ways to get the plugin:
 
 * Download the zip from github:
-[ZIP Master](https://github.com/QGIS-Contribution/QGIS-ResourceSharing/archive/master.zip),
-extract the zip, and copy the extracted root directory into your
-local QGIS plugin directory
-(for QGIS3 on Linux:
-```~/.local/share/QGIS/QGIS3/profiles/default/python/plugins```,
-on Windows:
-```C:\Users\{username}\AppData\Roaming\QGIS\QGIS3\profiles\default\\python\plugins```)
+  [ZIP Master](https://github.com/QGIS-Contribution/QGIS-ResourceSharing/archive/master.zip),
+  extract the zip, and copy the extracted root directory into your
+  local QGIS plugin directory
+  (for QGIS3 on Linux:
+  ```~/.local/share/QGIS/QGIS3/profiles/default/python/plugins```,
+  on Windows:
+  ```C:\Users\{username}\AppData\Roaming\QGIS\QGIS3\profiles\default\\python\plugins```)
 
 * Use git to clone the repository in your plugin directory, or clone
-it somewhere else and add a symbolic link to it in your plugin
-directory.
+  it somewhere else and add a symbolic link to it in your plugin
+  directory.
 
 #### Locating and starting the plugin in the QGIS GUI
 The plugin has its own toolbar (*Resource Sharing*, with only one

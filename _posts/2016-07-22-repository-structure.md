@@ -29,7 +29,8 @@ Generally the structure looks like this:
         │
         ├── [Collection2 register id] (the id string used in "collections" in metadata.ini)
         │   ├── checklists (optional, containing checklist definition JSON files)
-        │   ├── expressions (optional, containing JSON files with QGIS Expressions)v│   ├── image (optional, containing all kinds of image files)
+        │   ├── expressions (optional, containing JSON files with QGIS Expressions)
+        |   ├── image (optional, containing all kinds of image files)
         │   ├── models (optional, containing Processing models)
         │   ├── preview (encouraged, containing previews for the collection, referenced in metadata.ini)
         │   ├── processing (optional, containing Python Processing scripts)

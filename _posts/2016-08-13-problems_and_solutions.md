@@ -110,7 +110,8 @@ but all branches can be downloaded.
 
    Save the ZIP file.
 
-3. Go to the plugin directory (`python/plugins`, in your QGIS user directory)
+3. Go to the plugin directory (`python/plugins`, in your QGIS user
+   directory)
 
 4. Remove the currently installed version of the plugin
    (`qgis_resource_sharing`, if you have installed from the

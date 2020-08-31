@@ -19,7 +19,7 @@ and make sure that the tests are not broken by running:
 pep8 resource_sharing
 nose2-3 -s test --with-coverage
 ```
- 
+
 This project uses git submodules for the test data.
 To clone the project completely, do:
 

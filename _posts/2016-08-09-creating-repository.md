@@ -8,7 +8,7 @@ order: 1
 #### Preparing the Repository
 In order for the tools to parse the repository correctly, the
 repository must have a certain structure. This is what you need to do:
-  
+
   * Go to
     [this page]({{site.baseurl }}/author/repository-structure.html)
     to get information about the structure.
@@ -57,7 +57,7 @@ In the ```Settings``` tab, you add a repository with URL pointing to
 the repository root in your local machine (absolute path, example:
 `file:/home/user/QGIS-collections/mycollection`).
 It's as simple as that.
-If there is a problem with metadata or other issues when adding the 
+If there is a problem with metadata or other issues when adding the
 repository, you will be told.
 
 
@@ -68,7 +68,7 @@ private collections available for your customers.
 There are some additional requirements that you need to be aware of if
 you choose this option:
 
-  * The URL structure of the repository. If your repository URL 
+  * The URL structure of the repository. If your repository URL
     is ```http://www.mydomain.com/qgisrepository/```, you must make
     the metadata available on:
     ```http://www.mydomain.com/qgisrepository/metadata.ini```
@@ -96,15 +96,16 @@ you choose this option:
             ├── rscripts
             ├── svg
             ├── symbol
-    
-  
-  * Preview images that illustrates the collection should be included.
+
+
+  * Preview images that illustrates the collection should be
+    included.
     If you define preview images for collection ```test_collection```
     in metadata (```preview=preview/prev1.png,prev2.png```), you have
     to place these preview images in the zip-file in a separate
-    directory 
+    directory
     - `preview` is the recommended name for that directory.
-    
+
     An example server directory setup for the repository
     `myfirstrepository` with one collection (`test_collection`)
     that contains resources to share in a lot of resource categories:
@@ -158,9 +159,9 @@ you choose this option:
 
     The repository URL to be used when adding the repository (in the
     *QGIS Resource Sharing* plugin):
-    
+
         http://www.mydomain.com/qgisrepository/
 
 You can also use authentication for this repository.
-Users can configure authentication details in the plugin, so that they
-will be able to fetch the repository and the collections inside.
+Users can configure authentication details in the plugin, so that
+they will be able to fetch the repository and the collections inside.

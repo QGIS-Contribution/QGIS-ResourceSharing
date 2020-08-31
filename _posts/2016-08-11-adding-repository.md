@@ -23,19 +23,21 @@ configuration.
 ![Add repository]({{ site.baseurl }}/assets/settings.png)
 
 If the repository is successfully added, you can now also see its
-collections in the ``All collections`` tab and install them from there.
+collections in the ``All collections`` tab and install them from
+there.
 
 The table below lists the types of repositories that can be added.
 
 Type | URL Example | Description
 --- | --- | ---
 GitHub |  https://github.com/qgis/QGIS-Resources.git | Works only for GitHub public repositories
-GitLab |  https://gitlab.com/test/MyResources.git | 
+GitLab |  https://gitlab.com/test/MyResources.git |
 Bitbucket |  https://bitbucket.org/gisuser/qgis-style-repo-useful.git | Works only for Bitbucket public repositories
-Gogs |  | 
-File system | file:///home/gisuser/dev/repositories/qgis_resources | Pointing to the repository root in your local file system 
+Gogs |  |
+File system | file:///home/gisuser/dev/repositories/qgis_resources | Pointing to the repository root in your local file system
 HTTP(s) with zip collections | https://yourdomain.com/qgis/QGIS-Resources | Providing the base URL of the repository. Metadata must be available, with this URL: [base_url]/metadata.ini. The collections should be in [base_url]/collections/[collection_name].zip
 
-Adding a repository (and loading one or more of its collections) means that
-a copy of the repository will be placed in the local file system
-(under ``resource_sharing/repositories`` in the QGIS user directory).
+Adding a repository (and loading one or more of its collections)
+means that a copy of the repository will be placed in the local file
+system (under ``resource_sharing/repositories`` in the QGIS user
+directory).

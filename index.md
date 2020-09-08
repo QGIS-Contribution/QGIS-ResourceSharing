@@ -37,7 +37,6 @@ Richard Duivenvoorde, Tim Sutton, and others in the QGIS community.
 
 **Changelog**
 
-
 * 0.16.0
   * GUI improvements (#138, #139, #140, #141)
   * Add button for reloading the QGIS directory of approved resources (#145)

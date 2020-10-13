@@ -35,7 +35,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
 
     IS_DISABLED = True
 
-    def __init__(self, url):
+    def __init__(self, url: str):
         """Constructor."""
         BaseRepositoryHandler.__init__(self, url)
         self._git_platform = None
@@ -50,7 +50,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
         return False
 
     @BaseRepositoryHandler.url.setter
-    def url(self, url):
+    def url(self, url: str):
         """Setter to the repository's URL."""
         if validate(url):
             self._url = url
@@ -81,7 +81,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
     def git_repository(self):
         return self._git_repository
 
-    def download_collection(self, id, register_name):
+    def download_collection(self, id: str, register_name: str) -> tuple:
         """Download a collection given its ID.
 
         For remote git repositories, we will clone the repository (or
@@ -146,7 +146,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
 
             if not repo:
                 error_message = (
-                    "Error: Cloning the repository of the " "collection failed."
+                    "Error: Cloning the repository of the collection failed."
                 )
                 return False, error_message
         else:
@@ -183,7 +183,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
         # Copy the specific downloaded collection to the collections dir
         src_dir = local_repo_dir / "collections" / register_name
         if not src_dir.exists():
-            error_message = "Error: The collection does not exist in the " "repository."
+            error_message = "Error: The collection does not exist in the repository."
             return False, error_message
 
         dest_dir = local_collection_path(id)

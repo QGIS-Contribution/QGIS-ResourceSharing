@@ -33,3 +33,11 @@ nosetests.xml
 coverage.xml
 *,cover
 
+# Sphinx documentation
+docs/_build/
+
+# virtualenv
+venv/
+ENV/
+.venv*
+.venv/*

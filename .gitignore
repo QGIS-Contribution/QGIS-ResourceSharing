@@ -20,6 +20,7 @@ lib64/
 parts/
 sdist/
 var/
+*.dist-info/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -36,7 +37,11 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# virtualenv
+#############
+## Custom
+#############
+
+# virtualenvs
 venv/
 ENV/
 .venv*

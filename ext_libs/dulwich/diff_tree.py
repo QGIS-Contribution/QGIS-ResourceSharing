@@ -19,7 +19,7 @@
 #
 
 """Utilities for diffing files and trees."""
-import sys
+
 from collections import (
     defaultdict,
     namedtuple,
@@ -314,9 +314,8 @@ def _count_blocks(obj):
     block_truncate = block.truncate
     block_getvalue = block.getvalue
 
-    for c in chain(*obj.as_raw_chunks()):
-        if sys.version_info[0] == 3:
-            c = c.to_bytes(1, 'big')
+    for c in chain.from_iterable(obj.as_raw_chunks()):
+        c = c.to_bytes(1, 'big')
         block_write(c)
         n += 1
         if c == b'\n' or n == _BLOCK_SIZE:
@@ -619,6 +618,10 @@ _merge_entries_py = _merge_entries
 _count_blocks_py = _count_blocks
 try:
     # Try to import C versions
-    from dulwich._diff_tree import _is_tree, _merge_entries, _count_blocks
+    from dulwich._diff_tree import (  # type: ignore
+        _is_tree,
+        _merge_entries,
+        _count_blocks,
+        )
 except ImportError:
     pass

@@ -21,11 +21,25 @@
 """Parser for the git index file format."""
 
 import collections
-import errno
 import os
 import stat
 import struct
 import sys
+from typing import (
+    Any,
+    BinaryIO,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    TYPE_CHECKING,
+    Iterable,
+    Iterator,
+    Tuple,
+    )
+
+if TYPE_CHECKING:
+    from dulwich.object_store import BaseObjectStore
 
 from dulwich.file import GitFile
 from dulwich.objects import (
@@ -51,6 +65,9 @@ IndexEntry = collections.namedtuple(
 FLAG_STAGEMASK = 0x3000
 FLAG_VALID = 0x8000
 FLAG_EXTENDED = 0x4000
+
+
+DEFAULT_VERSION = 2
 
 
 def pathsplit(path):
@@ -146,7 +163,7 @@ def write_cache_entry(f, entry):
     f.write(b'\0' * ((beginoffset + real_size) - f.tell()))
 
 
-def read_index(f):
+def read_index(f: BinaryIO):
     """Read an index file, yielding the individual entries."""
     header = f.read(4)
     if header != b'DIRC':
@@ -169,36 +186,45 @@ def read_index_dict(f):
     return ret
 
 
-def write_index(f, entries):
+def write_index(
+        f: BinaryIO,
+        entries: List[Any], version: Optional[int] = None):
     """Write an index file.
 
     Args:
       f: File-like object to write to
+      version: Version number to write
       entries: Iterable over the entries to write
     """
+    if version is None:
+        version = DEFAULT_VERSION
     f.write(b'DIRC')
-    f.write(struct.pack(b'>LL', 2, len(entries)))
+    f.write(struct.pack(b'>LL', version, len(entries)))
     for x in entries:
         write_cache_entry(f, x)
 
 
-def write_index_dict(f, entries):
+def write_index_dict(
+        f: BinaryIO, entries: Dict[bytes, IndexEntry],
+        version: Optional[int] = None) -> None:
     """Write an index file based on the contents of a dictionary.
 
     """
     entries_list = []
     for name in sorted(entries):
         entries_list.append((name,) + tuple(entries[name]))
-    write_index(f, entries_list)
+    write_index(f, entries_list, version=version)
 
 
-def cleanup_mode(mode):
+def cleanup_mode(mode: int) -> int:
     """Cleanup a mode value.
 
     This will return a mode that can be stored in a tree object.
 
     Args:
       mode: Mode to clean up.
+    Returns:
+      mode
     """
     if stat.S_ISLNK(mode):
         return stat.S_IFLNK
@@ -222,6 +248,8 @@ class Index(object):
           filename: Path to the index file
         """
         self._filename = filename
+        # TODO(jelmer): Store the version returned by read_index
+        self._version = None
         self.clear()
         self.read()
 
@@ -232,12 +260,12 @@ class Index(object):
     def __repr__(self):
         return "%s(%r)" % (self.__class__.__name__, self._filename)
 
-    def write(self):
+    def write(self) -> None:
         """Write current contents of index to disk."""
         f = GitFile(self._filename, 'wb')
         try:
             f = SHA1Writer(f)
-            write_index_dict(f, self._byname)
+            write_index_dict(f, self._byname, version=self._version)
         finally:
             f.close()
 
@@ -256,11 +284,11 @@ class Index(object):
         finally:
             f.close()
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Number of entries in this index file."""
         return len(self._byname)
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: bytes) -> IndexEntry:
         """Retrieve entry by relative path.
 
         Returns: tuple with (ctime, mtime, dev, ino, mode, uid, gid, size, sha,
@@ -268,19 +296,19 @@ class Index(object):
         """
         return self._byname[name]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[bytes]:
         """Iterate over the paths in this index."""
         return iter(self._byname)
 
-    def get_sha1(self, path):
+    def get_sha1(self, path: bytes) -> bytes:
         """Return the (git object) SHA1 for the object at a path."""
         return self[path].sha
 
-    def get_mode(self, path):
+    def get_mode(self, path: bytes) -> int:
         """Return the POSIX file mode for the object at a path."""
         return self[path].mode
 
-    def iterobjects(self):
+    def iterobjects(self) -> Iterable[Tuple[bytes, bytes, int]]:
         """Iterate over path, sha, mode tuples for use with commit_tree."""
         for path in self:
             entry = self[path]
@@ -344,7 +372,9 @@ class Index(object):
         return commit_tree(object_store, self.iterobjects())
 
 
-def commit_tree(object_store, blobs):
+def commit_tree(
+        object_store: 'BaseObjectStore',
+        blobs: Iterable[Tuple[bytes, bytes, int]]) -> bytes:
     """Commit a new tree.
 
     Args:
@@ -353,8 +383,7 @@ def commit_tree(object_store, blobs):
     Returns:
       SHA1 of the created tree.
     """
-
-    trees = {b'': {}}
+    trees = {b'': {}}  # type: Dict[bytes, Any]
 
     def add_tree(path):
         if path in trees:
@@ -386,7 +415,7 @@ def commit_tree(object_store, blobs):
     return build_tree(b'')
 
 
-def commit_index(object_store, index):
+def commit_index(object_store: 'BaseObjectStore', index: Index) -> bytes:
     """Create a new tree from an index.
 
     Args:
@@ -398,8 +427,15 @@ def commit_index(object_store, index):
     return commit_tree(object_store, index.iterobjects())
 
 
-def changes_from_tree(names, lookup_entry, object_store, tree,
-                      want_unchanged=False):
+def changes_from_tree(
+        names: Iterable[bytes],
+        lookup_entry: Callable[[bytes], Tuple[bytes, int]],
+        object_store: 'BaseObjectStore', tree: Optional[bytes],
+        want_unchanged=False) -> Iterable[
+            Tuple[
+                Tuple[Optional[bytes], Optional[bytes]],
+                Tuple[Optional[int], Optional[int]],
+                Tuple[Optional[bytes], Optional[bytes]]]]:
     """Find the differences between the contents of a tree and
     a working copy.
 
@@ -437,7 +473,9 @@ def changes_from_tree(names, lookup_entry, object_store, tree,
             yield ((None, name), (None, other_mode), (None, other_sha))
 
 
-def index_entry_from_stat(stat_val, hex_sha, flags, mode=None):
+def index_entry_from_stat(
+        stat_val, hex_sha: bytes, flags: int,
+        mode: Optional[int] = None):
     """Create a new index entry from a stat value.
 
     Args:
@@ -454,7 +492,8 @@ def index_entry_from_stat(stat_val, hex_sha, flags, mode=None):
             stat_val.st_gid, stat_val.st_size, hex_sha, flags)
 
 
-def build_file_from_blob(blob, mode, target_path, honor_filemode=True):
+def build_file_from_blob(blob, mode, target_path, honor_filemode=True,
+                         tree_encoding='utf-8'):
     """Build a file or symlink on disk based on a Git object.
 
     Args:
@@ -467,20 +506,15 @@ def build_file_from_blob(blob, mode, target_path, honor_filemode=True):
     """
     try:
         oldstat = os.lstat(target_path)
-    except OSError as e:
-        if e.errno == errno.ENOENT:
-            oldstat = None
-        else:
-            raise
+    except FileNotFoundError:
+        oldstat = None
     contents = blob.as_raw_string()
     if stat.S_ISLNK(mode):
         # FIXME: This will fail on Windows. What should we do instead?
         if oldstat:
             os.unlink(target_path)
-        if sys.platform == 'win32' and sys.version_info[0] == 3:
+        if sys.platform == 'win32':
             # os.readlink on Python3 on Windows requires a unicode string.
-            # TODO(jelmer): Don't assume tree_encoding == fs_encoding
-            tree_encoding = sys.getfilesystemencoding()
             contents = contents.decode(tree_encoding)
             target_path = target_path.decode(tree_encoding)
         os.symlink(contents, target_path)
@@ -547,7 +581,7 @@ def build_index_from_tree(root_path, index_path, object_store, tree_id,
 
     index = Index(index_path)
     if not isinstance(root_path, bytes):
-        root_path = root_path.encode(sys.getfilesystemencoding())
+        root_path = os.fsencode(root_path)
 
     for entry in object_store.iter_tree_contents(tree_id):
         if not validate_path(entry.path, validate_path_element):
@@ -567,6 +601,7 @@ def build_index_from_tree(root_path, index_path, object_store, tree_id,
             obj = object_store[entry.sha]
             st = build_file_from_blob(
                 obj, entry.mode, full_path, honor_filemode=honor_filemode)
+
         # Add file to index
         if not honor_filemode or S_ISGITLINK(entry.mode):
             # we can not use tuple slicing to build a new tuple,
@@ -581,7 +616,7 @@ def build_index_from_tree(root_path, index_path, object_store, tree_id,
     index.write()
 
 
-def blob_from_path_and_stat(fs_path, st):
+def blob_from_path_and_mode(fs_path, mode, tree_encoding='utf-8'):
     """Create a blob from a path and a stat object.
 
     Args:
@@ -591,19 +626,28 @@ def blob_from_path_and_stat(fs_path, st):
     """
     assert isinstance(fs_path, bytes)
     blob = Blob()
-    if not stat.S_ISLNK(st.st_mode):
-        with open(fs_path, 'rb') as f:
-            blob.data = f.read()
-    else:
-        if sys.platform == 'win32' and sys.version_info[0] == 3:
+    if stat.S_ISLNK(mode):
+        if sys.platform == 'win32':
             # os.readlink on Python3 on Windows requires a unicode string.
-            # TODO(jelmer): Don't assume tree_encoding == fs_encoding
-            tree_encoding = sys.getfilesystemencoding()
-            fs_path = fs_path.decode(tree_encoding)
+            fs_path = os.fsdecode(fs_path)
             blob.data = os.readlink(fs_path).encode(tree_encoding)
         else:
             blob.data = os.readlink(fs_path)
+    else:
+        with open(fs_path, 'rb') as f:
+            blob.data = f.read()
     return blob
+
+
+def blob_from_path_and_stat(fs_path, st, tree_encoding='utf-8'):
+    """Create a blob from a path and a stat object.
+
+    Args:
+      fs_path: Full file system path to file
+      st: A stat object
+    Returns: A `Blob` object
+    """
+    return blob_from_path_and_mode(fs_path, st.st_mode, tree_encoding)
 
 
 def read_submodule_head(path):
@@ -618,7 +662,7 @@ def read_submodule_head(path):
     # Repo currently expects a "str", so decode if necessary.
     # TODO(jelmer): Perhaps move this into Repo() ?
     if not isinstance(path, str):
-        path = path.decode(sys.getfilesystemencoding())
+        path = os.fsdecode(path)
     try:
         repo = Repo(path)
     except NotGitRepository:
@@ -654,7 +698,7 @@ def _has_directory_changed(tree_path, entry):
     return False
 
 
-def get_unstaged_changes(index, root_path, filter_blob_callback=None):
+def get_unstaged_changes(index: Index, root_path, filter_blob_callback=None):
     """Walk through an index and check for differences against working tree.
 
     Args:
@@ -664,7 +708,7 @@ def get_unstaged_changes(index, root_path, filter_blob_callback=None):
     """
     # For each entry in the index check the sha1 & ensure not staged
     if not isinstance(root_path, bytes):
-        root_path = root_path.encode(sys.getfilesystemencoding())
+        root_path = os.fsencode(root_path)
 
     for tree_path, entry in index.iteritems():
         full_path = _tree_to_fs_path(root_path, tree_path)
@@ -675,17 +719,17 @@ def get_unstaged_changes(index, root_path, filter_blob_callback=None):
                     yield tree_path
                 continue
 
+            if not stat.S_ISREG(st.st_mode) and not stat.S_ISLNK(st.st_mode):
+                continue
+
             blob = blob_from_path_and_stat(full_path, st)
 
             if filter_blob_callback is not None:
                 blob = filter_blob_callback(blob, tree_path)
-        except EnvironmentError as e:
-            if e.errno == errno.ENOENT:
-                # The file was removed, so we assume that counts as
-                # different from whatever file used to exist.
-                yield tree_path
-            else:
-                raise
+        except FileNotFoundError:
+            # The file was removed, so we assume that counts as
+            # different from whatever file used to exist.
+            yield tree_path
         else:
             if blob.id != entry.sha:
                 yield tree_path
@@ -694,7 +738,7 @@ def get_unstaged_changes(index, root_path, filter_blob_callback=None):
 os_sep_bytes = os.sep.encode('ascii')
 
 
-def _tree_to_fs_path(root_path, tree_path):
+def _tree_to_fs_path(root_path, tree_path: bytes):
     """Convert a git tree path to a file system path.
 
     Args:
@@ -711,19 +755,16 @@ def _tree_to_fs_path(root_path, tree_path):
     return os.path.join(root_path, sep_corrected_path)
 
 
-def _fs_to_tree_path(fs_path, fs_encoding=None):
+def _fs_to_tree_path(fs_path):
     """Convert a file system path to a git tree path.
 
     Args:
       fs_path: File system path.
-      fs_encoding: File system encoding
 
     Returns:  Git tree path as bytes
     """
-    if fs_encoding is None:
-        fs_encoding = sys.getfilesystemencoding()
     if not isinstance(fs_path, bytes):
-        fs_path_bytes = fs_path.encode(fs_encoding)
+        fs_path_bytes = os.fsencode(fs_path)
     else:
         fs_path_bytes = fs_path
     if os_sep_bytes != b'/':
@@ -757,13 +798,17 @@ def index_entry_from_path(path, object_store=None):
                 st, head, 0, mode=S_IFGITLINK)
         return None
 
-    blob = blob_from_path_and_stat(path, st)
-    if object_store is not None:
-        object_store.add_object(blob)
-    return index_entry_from_stat(st, blob.id, 0)
+    if stat.S_ISREG(st.st_mode) or stat.S_ISLNK(st.st_mode):
+        blob = blob_from_path_and_stat(path, st)
+        if object_store is not None:
+            object_store.add_object(blob)
+        return index_entry_from_stat(st, blob.id, 0)
+
+    return None
 
 
-def iter_fresh_entries(paths, root_path, object_store=None):
+def iter_fresh_entries(
+        paths, root_path, object_store: Optional['BaseObjectStore'] = None):
     """Iterate over current versions of index entries on disk.
 
     Args:
@@ -776,11 +821,8 @@ def iter_fresh_entries(paths, root_path, object_store=None):
         p = _tree_to_fs_path(root_path, path)
         try:
             entry = index_entry_from_path(p, object_store=object_store)
-        except EnvironmentError as e:
-            if e.errno in (errno.ENOENT, errno.EISDIR):
-                entry = None
-            else:
-                raise
+        except (FileNotFoundError, IsADirectoryError):
+            entry = None
         yield path, entry
 
 
@@ -812,7 +854,6 @@ def iter_fresh_objects(paths, root_path, include_deleted=False,
     """Iterate over versions of objecs on disk referenced by index.
 
     Args:
-      index: Index file
       root_path: Root path to access from
       include_deleted: Include deleted entries with sha and
         mode set to None

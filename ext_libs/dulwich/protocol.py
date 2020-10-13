@@ -48,6 +48,7 @@ SIDE_BAND_CHANNEL_PROGRESS = 2
 # fatal error message just before stream aborts
 SIDE_BAND_CHANNEL_FATAL = 3
 
+CAPABILITY_ATOMIC = b'atomic'
 CAPABILITY_DEEPEN_SINCE = b'deepen-since'
 CAPABILITY_DEEPEN_NOT = b'deepen-not'
 CAPABILITY_DEEPEN_RELATIVE = b'deepen-relative'
@@ -66,6 +67,8 @@ CAPABILITY_SIDE_BAND_64K = b'side-band-64k'
 CAPABILITY_THIN_PACK = b'thin-pack'
 CAPABILITY_AGENT = b'agent'
 CAPABILITY_SYMREF = b'symref'
+CAPABILITY_ALLOW_TIP_SHA1_IN_WANT = b'allow-tip-sha1-in-want'
+CAPABILITY_ALLOW_REACHABLE_SHA1_IN_WANT = b'allow-reachable-sha1-in-want'
 
 # Magic ref that is used to attach capabilities to when
 # there are no refs. Should always be ste to ZERO_SHA.
@@ -87,9 +90,15 @@ KNOWN_UPLOAD_CAPABILITIES = set(COMMON_CAPABILITIES + [
     CAPABILITY_SHALLOW,
     CAPABILITY_DEEPEN_NOT,
     CAPABILITY_DEEPEN_RELATIVE,
+    CAPABILITY_ALLOW_TIP_SHA1_IN_WANT,
+    CAPABILITY_ALLOW_REACHABLE_SHA1_IN_WANT,
     ])
 KNOWN_RECEIVE_CAPABILITIES = set(COMMON_CAPABILITIES + [
-    CAPABILITY_REPORT_STATUS])
+    CAPABILITY_REPORT_STATUS,
+    CAPABILITY_DELETE_REFS,
+    CAPABILITY_QUIET,
+    CAPABILITY_ATOMIC,
+    ])
 
 
 def agent_string():

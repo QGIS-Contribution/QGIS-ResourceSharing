@@ -47,18 +47,17 @@ import os
 import socket
 import sys
 import time
+from typing import List, Tuple, Dict, Optional, Iterable
 import zlib
 
-try:
-    import SocketServer
-except ImportError:
-    import socketserver as SocketServer
+import socketserver
 
 from dulwich.archive import tar_stream
 from dulwich.errors import (
     ApplyDeltaError,
     ChecksumMismatch,
     GitProtocolError,
+    HookError,
     NotGitRepository,
     UnexpectedCommandError,
     ObjectFormatException,
@@ -75,6 +74,7 @@ from dulwich.protocol import (  # noqa: F401
     BufferedPktLineWriter,
     capability_agent,
     CAPABILITIES_REF,
+    CAPABILITY_AGENT,
     CAPABILITY_DELETE_REFS,
     CAPABILITY_INCLUDE_TAG,
     CAPABILITY_MULTI_ACK_DETAILED,
@@ -114,6 +114,7 @@ from dulwich.refs import (
     write_info_refs,
     )
 from dulwich.repo import (
+    BaseRepo,
     Repo,
     )
 
@@ -146,7 +147,7 @@ class BackendRepo(object):
     object_store = None
     refs = None
 
-    def get_refs(self):
+    def get_refs(self) -> Dict[bytes, bytes]:
         """
         Get all the refs in the repository
 
@@ -154,7 +155,7 @@ class BackendRepo(object):
         """
         raise NotImplementedError
 
-    def get_peeled(self, name):
+    def get_peeled(self, name: bytes) -> Optional[bytes]:
         """Return the cached peeled value of a ref, if available.
 
         Args:
@@ -185,7 +186,7 @@ class DictBackend(Backend):
     def __init__(self, repos):
         self.repos = repos
 
-    def open_repository(self, path):
+    def open_repository(self, path: str) -> BaseRepo:
         logger.debug('Opening repository at %s', path)
         try:
             return self.repos[path]
@@ -218,10 +219,10 @@ class FileSystemBackend(Backend):
 class Handler(object):
     """Smart protocol command handler base class."""
 
-    def __init__(self, backend, proto, http_req=None):
+    def __init__(self, backend, proto, stateless_rpc=None):
         self.backend = backend
         self.proto = proto
-        self.http_req = http_req
+        self.stateless_rpc = stateless_rpc
 
     def handle(self):
         raise NotImplementedError(self.handle)
@@ -230,8 +231,8 @@ class Handler(object):
 class PackHandler(Handler):
     """Protocol handler for packs."""
 
-    def __init__(self, backend, proto, http_req=None):
-        super(PackHandler, self).__init__(backend, proto, http_req)
+    def __init__(self, backend, proto, stateless_rpc=None):
+        super(PackHandler, self).__init__(backend, proto, stateless_rpc)
         self._client_capabilities = None
         # Flags needed for the no-done capability
         self._done_received = False
@@ -242,51 +243,53 @@ class PackHandler(Handler):
         return b"".join([b" " + c for c in capabilities])
 
     @classmethod
-    def capabilities(cls):
+    def capabilities(cls) -> Iterable[bytes]:
         raise NotImplementedError(cls.capabilities)
 
     @classmethod
-    def innocuous_capabilities(cls):
+    def innocuous_capabilities(cls) -> Iterable[bytes]:
         return [CAPABILITY_INCLUDE_TAG, CAPABILITY_THIN_PACK,
                 CAPABILITY_NO_PROGRESS, CAPABILITY_OFS_DELTA,
                 capability_agent()]
 
     @classmethod
-    def required_capabilities(cls):
+    def required_capabilities(cls) -> Iterable[bytes]:
         """Return a list of capabilities that we require the client to have."""
         return []
 
-    def set_client_capabilities(self, caps):
+    def set_client_capabilities(self, caps: Iterable[bytes]) -> None:
         allowable_caps = set(self.innocuous_capabilities())
         allowable_caps.update(self.capabilities())
         for cap in caps:
+            if cap.startswith(CAPABILITY_AGENT + b'='):
+                continue
             if cap not in allowable_caps:
-                raise GitProtocolError('Client asked for capability %s that '
+                raise GitProtocolError('Client asked for capability %r that '
                                        'was not advertised.' % cap)
         for cap in self.required_capabilities():
             if cap not in caps:
                 raise GitProtocolError('Client does not support required '
-                                       'capability %s.' % cap)
+                                       'capability %r.' % cap)
         self._client_capabilities = set(caps)
         logger.info('Client capabilities: %s', caps)
 
-    def has_capability(self, cap):
+    def has_capability(self, cap: bytes) -> bool:
         if self._client_capabilities is None:
-            raise GitProtocolError('Server attempted to access capability %s '
+            raise GitProtocolError('Server attempted to access capability %r '
                                    'before asking client' % cap)
         return cap in self._client_capabilities
 
-    def notify_done(self):
+    def notify_done(self) -> None:
         self._done_received = True
 
 
 class UploadPackHandler(PackHandler):
     """Protocol handler for uploading a pack to the client."""
 
-    def __init__(self, backend, args, proto, http_req=None,
+    def __init__(self, backend, args, proto, stateless_rpc=None,
                  advertise_refs=False):
         super(UploadPackHandler, self).__init__(
-                backend, proto, http_req=http_req)
+                backend, proto, stateless_rpc=stateless_rpc)
         self.repo = backend.open_repository(args[0])
         self._graph_walker = None
         self.advertise_refs = advertise_refs
@@ -352,8 +355,14 @@ class UploadPackHandler(PackHandler):
         graph_walker = _ProtocolGraphWalker(
                 self, self.repo.object_store, self.repo.get_peeled,
                 self.repo.refs.get_symrefs)
+        wants = []
+
+        def wants_wrapper(refs):
+            wants.extend(graph_walker.determine_wants(refs))
+            return wants
+
         objects_iter = self.repo.fetch_objects(
-            graph_walker.determine_wants, graph_walker, self.progress,
+            wants_wrapper, graph_walker, self.progress,
             get_tagged=self.get_tagged)
 
         # Note the fact that client is only processing responses related
@@ -367,7 +376,7 @@ class UploadPackHandler(PackHandler):
         # with a graph walker with an implementation that talks over the
         # wire (which is this instance of this class) this will actually
         # iterate through everything and write things out to the wire.
-        if len(objects_iter) == 0:
+        if len(wants) == 0:
             return
 
         # The provided haves are processed, and it is safe to send side-
@@ -530,7 +539,7 @@ class _ProtocolGraphWalker(object):
         self.get_peeled = get_peeled
         self.get_symrefs = get_symrefs
         self.proto = handler.proto
-        self.http_req = handler.http_req
+        self.stateless_rpc = handler.stateless_rpc
         self.advertise_refs = handler.advertise_refs
         self._wants = []
         self.shallow = set()
@@ -545,7 +554,7 @@ class _ProtocolGraphWalker(object):
         """Determine the wants for a set of heads.
 
         The given heads are advertised to the client, who then specifies which
-        refs he wants using 'want' lines. This portion of the protocol is the
+        refs they want using 'want' lines. This portion of the protocol is the
         same regardless of ack type, and in fact is used to set the ack type of
         the ProtocolGraphWalker.
 
@@ -561,7 +570,7 @@ class _ProtocolGraphWalker(object):
         """
         symrefs = self.get_symrefs()
         values = set(heads.values())
-        if self.advertise_refs or not self.http_req:
+        if self.advertise_refs or not self.stateless_rpc:
             for i, (ref, sha) in enumerate(sorted(heads.items())):
                 try:
                     peeled_sha = self.get_peeled(ref)
@@ -610,7 +619,7 @@ class _ProtocolGraphWalker(object):
             self.unread_proto_line(command, sha)
             self._handle_shallow_request(want_revs)
 
-        if self.http_req and self.proto.eof():
+        if self.stateless_rpc and self.proto.eof():
             # The client may close the socket at this point, expecting a
             # flush-pkt from the server. We might be ready to send a packfile
             # at this point, so we need to explicitly short-circuit in this
@@ -635,7 +644,7 @@ class _ProtocolGraphWalker(object):
 
     def next(self):
         if not self._cached:
-            if not self._impl and self.http_req:
+            if not self._impl and self.stateless_rpc:
                 return None
             return next(self._impl)
         self._cache_index += 1
@@ -844,7 +853,7 @@ class MultiAckDetailedGraphWalkerImpl(object):
                 if self.walker.all_wants_satisfied(self._common):
                     self.walker.send_ack(self._common[-1], b'ready')
                 self.walker.send_nak()
-                if self.walker.http_req:
+                if self.walker.stateless_rpc:
                     # The HTTP version of this request a flush-pkt always
                     # signifies an end of request, so we also return
                     # nothing here as if we are done (but not really, as
@@ -893,20 +902,22 @@ class MultiAckDetailedGraphWalkerImpl(object):
 class ReceivePackHandler(PackHandler):
     """Protocol handler for downloading a pack from the client."""
 
-    def __init__(self, backend, args, proto, http_req=None,
+    def __init__(self, backend, args, proto, stateless_rpc=None,
                  advertise_refs=False):
         super(ReceivePackHandler, self).__init__(
-                backend, proto, http_req=http_req)
+                backend, proto, stateless_rpc=stateless_rpc)
         self.repo = backend.open_repository(args[0])
         self.advertise_refs = advertise_refs
 
     @classmethod
-    def capabilities(cls):
+    def capabilities(cls) -> Iterable[bytes]:
         return [CAPABILITY_REPORT_STATUS, CAPABILITY_DELETE_REFS,
                 CAPABILITY_QUIET, CAPABILITY_OFS_DELTA,
                 CAPABILITY_SIDE_BAND_64K, CAPABILITY_NO_DONE]
 
-    def _apply_pack(self, refs):
+    def _apply_pack(
+            self, refs: List[Tuple[bytes, bytes, bytes]]
+            ) -> List[Tuple[bytes, bytes]]:
         all_exceptions = (IOError, OSError, ChecksumMismatch, ApplyDeltaError,
                           AssertionError, socket.error, zlib.error,
                           ObjectFormatException)
@@ -925,7 +936,8 @@ class ReceivePackHandler(PackHandler):
                 self.repo.object_store.add_thin_pack(self.proto.read, recv)
                 status.append((b'unpack', b'ok'))
             except all_exceptions as e:
-                status.append((b'unpack', str(e).replace('\n', '')))
+                status.append(
+                    (b'unpack', str(e).replace('\n', '').encode('utf-8')))
                 # The pack may still have been moved in, but it may contain
                 # broken objects. We trust a later GC to clean it up.
         else:
@@ -956,7 +968,7 @@ class ReceivePackHandler(PackHandler):
 
         return status
 
-    def _report_status(self, status):
+    def _report_status(self, status: List[Tuple[bytes, bytes]]) -> None:
         if self.has_capability(CAPABILITY_SIDE_BAND_64K):
             writer = BufferedPktLineWriter(
               lambda d: self.proto.write_sideband(SIDE_BAND_CHANNEL_DATA, d))
@@ -981,8 +993,19 @@ class ReceivePackHandler(PackHandler):
         write(None)
         flush()
 
-    def handle(self):
-        if self.advertise_refs or not self.http_req:
+    def _on_post_receive(self, client_refs):
+        hook = self.repo.hooks.get('post-receive', None)
+        if not hook:
+            return
+        try:
+            output = hook.execute(client_refs)
+            if output:
+                self.proto.write_sideband(SIDE_BAND_CHANNEL_PROGRESS, output)
+        except HookError as err:
+            self.proto.write_sideband(SIDE_BAND_CHANNEL_FATAL, repr(err))
+
+    def handle(self) -> None:
+        if self.advertise_refs or not self.stateless_rpc:
             refs = sorted(self.repo.get_refs().items())
             symrefs = sorted(self.repo.refs.get_symrefs().items())
 
@@ -1018,6 +1041,8 @@ class ReceivePackHandler(PackHandler):
         # backend can now deal with this refs and read a pack using self.read
         status = self._apply_pack(client_refs)
 
+        self._on_post_receive(client_refs)
+
         # when we have read all the pack from the client, send a status report
         # if the client asked for it
         if self.has_capability(CAPABILITY_REPORT_STATUS):
@@ -1026,8 +1051,9 @@ class ReceivePackHandler(PackHandler):
 
 class UploadArchiveHandler(Handler):
 
-    def __init__(self, backend, args, proto, http_req=None):
-        super(UploadArchiveHandler, self).__init__(backend, proto, http_req)
+    def __init__(self, backend, args, proto, stateless_rpc=None):
+        super(UploadArchiveHandler, self).__init__(
+            backend, proto, stateless_rpc)
         self.repo = backend.open_repository(args[0])
 
     def handle(self):
@@ -1071,11 +1097,11 @@ DEFAULT_HANDLERS = {
 }
 
 
-class TCPGitRequestHandler(SocketServer.StreamRequestHandler):
+class TCPGitRequestHandler(socketserver.StreamRequestHandler):
 
     def __init__(self, handlers, *args, **kwargs):
         self.handlers = handlers
-        SocketServer.StreamRequestHandler.__init__(self, *args, **kwargs)
+        socketserver.StreamRequestHandler.__init__(self, *args, **kwargs)
 
     def handle(self):
         proto = ReceivableProtocol(self.connection.recv, self.wfile.write)
@@ -1089,10 +1115,10 @@ class TCPGitRequestHandler(SocketServer.StreamRequestHandler):
         h.handle()
 
 
-class TCPGitServer(SocketServer.TCPServer):
+class TCPGitServer(socketserver.TCPServer):
 
     allow_reuse_address = True
-    serve = SocketServer.TCPServer.serve_forever
+    serve = socketserver.TCPServer.serve_forever
 
     def _make_handler(self, *args, **kwargs):
         return TCPGitRequestHandler(self.handlers, *args, **kwargs)
@@ -1104,7 +1130,7 @@ class TCPGitServer(SocketServer.TCPServer):
         self.backend = backend
         logger.info('Listening for TCP connections on %s:%d',
                     listen_addr, port)
-        SocketServer.TCPServer.__init__(self, (listen_addr, port),
+        socketserver.TCPServer.__init__(self, (listen_addr, port),
                                         self._make_handler)
 
     def verify_request(self, request, client_address):
@@ -1177,7 +1203,7 @@ def generate_objects_info_packs(repo):
     """Generate an index for for packs."""
     for pack in repo.object_store.packs:
         yield (
-            b'P ' + pack.data.filename.encode(sys.getfilesystemencoding()) +
+            b'P ' + os.fsencode(pack.data.filename) +
             b'\n')
 
 

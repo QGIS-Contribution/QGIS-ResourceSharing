@@ -1,0 +1,6 @@
+# Embedded requirements
+# -----------------------
+
+dulwich>=0.20,<0.21
+giturlparse>=0.9,<0.10 
+pathvalidate>=2.3,<2.4

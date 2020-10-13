@@ -108,11 +108,11 @@ class RemoteGitHandler(BaseRepositoryHandler):
             self.git_repository,
         )
         # Hack to try to avoid locking errors
-        if local_repo_dir.exists():
-            try:
-                shutil.rmtree(str(local_repo_dir))
-            except Exception:
-                pass
+        # if local_repo_dir.exists():
+        #     try:
+        #         shutil.rmtree(str(local_repo_dir))
+        #     except Exception:
+        #         pass
         if not (local_repo_dir / ".git").exists():
             local_repo_dir.mkdir(parents=True)
             try:
@@ -151,13 +151,13 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 return False, error_message
         else:
             # Hack until dulwich/porcelain handles file removal ???!!!
-            if local_repo_dir.exists():
-                shutil.rmtree(str(local_repo_dir))
+            # if local_repo_dir.exists():
+            #     shutil.rmtree(str(local_repo_dir))
             try:
                 porcelain.pull(
-                    str(local_repo_dir),
-                    self.url,
-                    b"refs/heads/master",
+                    repo=str(local_repo_dir),
+                    remote_location=self.url,
+                    refspecs=b"refs/heads/master",
                     errstream=writeOut,
                 )
             except Exception as e:
@@ -166,9 +166,9 @@ class RemoteGitHandler(BaseRepositoryHandler):
                 if self.url == git_parsed.url2ssh:
                     try:
                         porcelain.pull(
-                            str(local_repo_dir),
-                            git_parsed.url2https,
-                            b"refs/heads/master",
+                            repo=str(local_repo_dir),
+                            remote_location=git_parsed.url2https,
+                            refspecs=b"refs/heads/master",
                             errstream=writeOut,
                         )
                     except Exception as e:

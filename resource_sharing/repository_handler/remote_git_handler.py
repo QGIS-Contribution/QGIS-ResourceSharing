@@ -117,7 +117,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
             local_repo_dir.mkdir(parents=True)
             try:
                 repo = porcelain.clone(
-                    soucre=self.url,
+                    source=self.url,
                     target=str(local_repo_dir),
                     errstream=writeOut,
                     depth=1,

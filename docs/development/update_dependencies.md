@@ -1,12 +1,12 @@
 # Dependencies upgrade workflow
 
-This plugin is based on external dependencies:
+This plugin has external dependencies:
 
 - dulwich
 - giturlparse
 - pathvalidate
 
-Because it's still hard to instal Python 3rd party packages from an index (for example <https://pypi.org>), especially on Windows or Mac systems (or even on Linux if we want to do it properly in a virtual environment), those required packages are stored into the `ext_libs` folder.
+Because it's still hard to install Python 3rd party packages from an index (for example <https://pypi.org>), especially on Windows or Mac systems (or even on Linux if we want to do it properly in a virtual environment), those required packages are stored in the `ext_libs` folder.
 
 ## Upgrade workflow
 

@@ -1,6 +1,6 @@
 # The QGIS Resource Sharing Plugin
 
-QGIS Resource Sharing allows sharing of resources (currently SVGs, symbols,
+The QGIS Resource Sharing allows sharing of resources (currently SVGs, symbols,
 styles, color ramps, processing scripts, processing models and R scripts),
 and this plugin gives you access to shared collections.
 

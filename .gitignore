@@ -20,6 +20,7 @@ lib64/
 parts/
 sdist/
 var/
+*.dist-info/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -33,3 +34,21 @@ nosetests.xml
 coverage.xml
 *,cover
 
+# Sphinx documentation
+docs/_build/
+
+#############
+## Custom
+#############
+
+# virtualenvs
+venv/
+ENV/
+.venv*
+.venv/*
+
+# embedded libs
+ext_libs/bin
+ext_libs/docs
+ext_libs/*/contrib/
+ext_libs/*/tests/

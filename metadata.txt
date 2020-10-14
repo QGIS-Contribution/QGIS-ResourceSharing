@@ -18,7 +18,6 @@ deprecated=False
 icon=resources/icon.png
 changelog=
         0.17.0 - Improved integration of external libraries (#166)
-
         0.16.0 - GUI improvements (#138, #139, #140, #141)
                - Add button for reloading the QGIS directory of approved resources (#145 ) - thanks to @Guts
                - Fix bug in the handling of QGIS directory updates (#146)

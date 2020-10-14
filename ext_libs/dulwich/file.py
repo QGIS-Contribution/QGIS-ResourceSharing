@@ -20,20 +20,17 @@
 
 """Safe access to git files."""
 
-import errno
 import io
 import os
 import sys
-import tempfile
 
 
 def ensure_dir_exists(dirname):
     """Ensure a directory exists, creating if necessary."""
     try:
         os.makedirs(dirname)
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
+    except FileExistsError:
+        pass
 
 
 def _fancy_rename(oldname, newname):
@@ -45,6 +42,8 @@ def _fancy_rename(oldname, newname):
             raise
         return
 
+    # Defer the tempfile import since it pulls in a lot of other things.
+    import tempfile
     # destination file exists
     try:
         (fd, tmpfile) = tempfile.mkstemp(".tmp", prefix=oldname, dir=".")
@@ -127,10 +126,8 @@ class _GitFile(object):
                 self._lockfilename,
                 os.O_RDWR | os.O_CREAT | os.O_EXCL |
                 getattr(os, "O_BINARY", 0))
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                raise FileLocked(filename, self._lockfilename)
-            raise
+        except FileExistsError:
+            raise FileLocked(filename, self._lockfilename)
         self._file = os.fdopen(fd, mode, bufsize)
         self._closed = False
 
@@ -148,10 +145,8 @@ class _GitFile(object):
         try:
             os.remove(self._lockfilename)
             self._closed = True
-        except OSError as e:
+        except FileNotFoundError:
             # The file may have been removed already, which is ok.
-            if e.errno != errno.ENOENT:
-                raise
             self._closed = True
 
     def close(self):

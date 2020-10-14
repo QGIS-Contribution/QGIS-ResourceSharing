@@ -1,19 +1,22 @@
-# Imports
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function, unicode_literals
+
 import re
+
 
 class BasePlatform(object):
     FORMATS = {
         'ssh': r"%(_user)s@%(host)s:%(repo)s.git",
         'http': r"http://%(host)s/%(repo)s.git",
-        'https': r"http://%(host)s/%(repo)s.git",
+        'https': r"https://%(host)s/%(repo)s.git",
         'git': r"git://%(host)s/%(repo)s.git"
     }
 
     PATTERNS = {
-        'ssh': r"(?P<_user>.+)s@(?P<domain>.+)s:(?P<repo>.+)s.git",
-        'http': r"http://(?P<domain>.+)s/(?P<repo>.+)s.git",
-        'https': r"http://(?P<domain>.+)s/(?P<repo>.+)s.git",
-        'git': r"git://(?P<domain>.+)s/(?P<repo>.+)s.git"
+        'ssh': r"(?P<_user>.+)@(?P<domain>.+):(?P<repo>.+).git",
+        'http': r"http://(?P<domain>.+)/(?P<repo>.+).git",
+        'https': r"https://(?P<domain>.+)/(?P<repo>.+).git",
+        'git': r"git://(?P<domain>.+)/(?P<repo>.+).git"
     }
 
     # None means it matches all domains

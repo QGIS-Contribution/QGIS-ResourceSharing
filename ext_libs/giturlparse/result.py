@@ -1,6 +1,7 @@
-# Imports
-from .platforms import PLATFORMS, PLATFORMS_MAP
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function, unicode_literals
 
+from .platforms import PLATFORMS
 
 # Possible values to extract from a Git Url
 REQUIRED_ATTRIBUTES = (
@@ -10,6 +11,8 @@ REQUIRED_ATTRIBUTES = (
 
 
 class GitUrlParsed(object):
+    platform = None
+
     def __init__(self, parsed_info):
         self._parsed = parsed_info
 
@@ -17,21 +20,22 @@ class GitUrlParsed(object):
         for k, v in parsed_info.items():
             setattr(self, k, v)
 
+        for name, platform in PLATFORMS:
+            if name == self.platform:
+                self._platform_obj = platform
+
+                break
+
     def _valid_attrs(self):
-        return all([
-            getattr(self, attr, None)
-            for attr in REQUIRED_ATTRIBUTES
-        ])
+        return all(
+            [getattr(self, attr, None) for attr in REQUIRED_ATTRIBUTES]
+        )
 
     @property
     def valid(self):
         return all([
             self._valid_attrs(),
         ])
-
-    @property
-    def _platform_obj(self):
-        return PLATFORMS_MAP[self.platform]
 
     ##
     # Alias properties
@@ -109,10 +113,6 @@ class GitUrlParsed(object):
     @property
     def gitlab(self):
         return self.platform == 'gitlab'
-
-    @property
-    def gogs(self):
-        return self.platform == 'gogs'
 
     ##
     # Get data as dict

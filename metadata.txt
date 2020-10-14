@@ -12,7 +12,7 @@ repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing.git
 
 qgisMaximumVersion=3.98
 tags=collections,sharing,processing,algorithms,Python,R,model,script,style,svg,symbol,checklist,repository,design,maps
-homepage=http://qgis-contribution.github.io/QGIS-ResourceSharing/
+homepage=https://qgis-contribution.github.io/QGIS-ResourceSharing/
 experimental=False
 deprecated=False
 icon=resources/icon.png

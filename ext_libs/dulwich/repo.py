@@ -29,11 +29,18 @@ local disk (Repo).
 """
 
 from io import BytesIO
-import errno
 import os
 import sys
 import stat
 import time
+from typing import Optional, Tuple, TYPE_CHECKING, List, Dict, Union, Iterable
+
+if TYPE_CHECKING:
+    # There are no circular imports here, but we try to defer imports as long
+    # as possible to reduce start-up time for anything that doesn't need
+    # these imports.
+    from dulwich.config import StackedConfig, ConfigFile
+    from dulwich.index import Index
 
 from dulwich.errors import (
     NoIndexPresent,
@@ -52,10 +59,12 @@ from dulwich.file import (
 from dulwich.object_store import (
     DiskObjectStore,
     MemoryObjectStore,
+    BaseObjectStore,
     ObjectStoreGraphWalker,
     )
 from dulwich.objects import (
     check_hexsha,
+    valid_hexsha,
     Blob,
     Commit,
     ShaFile,
@@ -67,9 +76,11 @@ from dulwich.pack import (
     )
 
 from dulwich.hooks import (
+    Hook,
     PreCommitShellHook,
     PostCommitShellHook,
     CommitMsgShellHook,
+    PostReceiveShellHook,
     )
 
 from dulwich.line_ending import BlobNormalizer
@@ -120,7 +131,7 @@ class InvalidUserIdentity(Exception):
         self.identity = identity
 
 
-def _get_default_identity():
+def _get_default_identity() -> Tuple[str, str]:
     import getpass
     import socket
     username = getpass.getuser()
@@ -143,19 +154,38 @@ def _get_default_identity():
     return (fullname, email)
 
 
-def get_user_identity(config, kind=None):
+def get_user_identity(
+        config: 'StackedConfig',
+        kind: Optional[str] = None) -> bytes:
     """Determine the identity to use for new commits.
+
+    If kind is set, this first checks
+    GIT_${KIND}_NAME and GIT_${KIND}_EMAIL.
+
+    If those variables are not set, then it will fall back
+    to reading the user.name and user.email settings from
+    the specified configuration.
+
+    If that also fails, then it will fall back to using
+    the current users' identity as obtained from the host
+    system (e.g. the gecos field, $EMAIL, $USER@$(hostname -f).
+
+    Args:
+      kind: Optional kind to return identity for,
+        usually either "AUTHOR" or "COMMITTER".
+
+    Returns:
+      A user identity
     """
+    user = None  # type: Optional[bytes]
+    email = None  # type: Optional[bytes]
     if kind:
-        user = os.environ.get("GIT_" + kind + "_NAME")
-        if user is not None:
-            user = user.encode('utf-8')
-        email = os.environ.get("GIT_" + kind + "_EMAIL")
-        if email is not None:
-            email = email.encode('utf-8')
-    else:
-        user = None
-        email = None
+        user_uc = os.environ.get("GIT_" + kind + "_NAME")
+        if user_uc is not None:
+            user = user_uc.encode('utf-8')
+        email_uc = os.environ.get("GIT_" + kind + "_EMAIL")
+        if email_uc is not None:
+            email = email_uc.encode('utf-8')
     if user is None:
         try:
             user = config.get(("user", ), "name")
@@ -168,16 +198,12 @@ def get_user_identity(config, kind=None):
             email = None
     default_user, default_email = _get_default_identity()
     if user is None:
-        user = default_user
-        if not isinstance(user, bytes):
-            user = user.encode('utf-8')
+        user = default_user.encode('utf-8')
     if email is None:
-        email = default_email
-        if not isinstance(email, bytes):
-            email = email.encode('utf-8')
+        email = default_email.encode('utf-8')
     if email.startswith(b'<') and email.endswith(b'>'):
         email = email[1:-1]
-    return (user + b" <" + email + b">")
+    return user + b" <" + email + b">"
 
 
 def check_user_identity(identity):
@@ -196,7 +222,8 @@ def check_user_identity(identity):
         raise InvalidUserIdentity(identity)
 
 
-def parse_graftpoints(graftpoints):
+def parse_graftpoints(
+        graftpoints: Iterable[bytes]) -> Dict[bytes, List[bytes]]:
     """Convert a list of graftpoints into a dict
 
     Args:
@@ -211,8 +238,8 @@ def parse_graftpoints(graftpoints):
     https://git.wiki.kernel.org/index.php/GraftPoint
     """
     grafts = {}
-    for l in graftpoints:
-        raw_graft = l.split(None, 1)
+    for line in graftpoints:
+        raw_graft = line.split(None, 1)
 
         commit = raw_graft[0]
         if len(raw_graft) == 2:
@@ -227,7 +254,7 @@ def parse_graftpoints(graftpoints):
     return grafts
 
 
-def serialize_graftpoints(graftpoints):
+def serialize_graftpoints(graftpoints: Dict[bytes, List[bytes]]) -> bytes:
     """Convert a dictionary of grafts into string
 
     The graft dictionary is:
@@ -263,11 +290,30 @@ def _set_filesystem_hidden(path):
             ("SetFileAttributesW", ctypes.windll.kernel32))
 
         if isinstance(path, bytes):
-            path = path.decode(sys.getfilesystemencoding())
+            path = os.fsdecode(path)
         if not SetFileAttributesW(path, FILE_ATTRIBUTE_HIDDEN):
             pass  # Could raise or log `ctypes.WinError()` here
 
     # Could implement other platform specific filesytem hiding here
+
+
+class ParentsProvider(object):
+
+    def __init__(self, store, grafts={}, shallows=[]):
+        self.store = store
+        self.grafts = grafts
+        self.shallows = set(shallows)
+
+    def get_parents(self, commit_id, commit=None):
+        try:
+            return self.grafts[commit_id]
+        except KeyError:
+            pass
+        if commit_id in self.shallows:
+            return []
+        if commit is None:
+            commit = self.store[commit_id]
+        return commit.parents
 
 
 class BaseRepo(object):
@@ -279,7 +325,7 @@ class BaseRepo(object):
         repository
     """
 
-    def __init__(self, object_store, refs):
+    def __init__(self, object_store: BaseObjectStore, refs: RefsContainer):
         """Open a repository.
 
         This shouldn't be called directly, but rather through one of the
@@ -292,17 +338,17 @@ class BaseRepo(object):
         self.object_store = object_store
         self.refs = refs
 
-        self._graftpoints = {}
-        self.hooks = {}
+        self._graftpoints = {}  # type: Dict[bytes, List[bytes]]
+        self.hooks = {}  # type: Dict[str, Hook]
 
-    def _determine_file_mode(self):
+    def _determine_file_mode(self) -> bool:
         """Probe the file-system to determine whether permissions can be trusted.
 
         Returns: True if permissions can be trusted, False otherwise.
         """
         raise NotImplementedError(self._determine_file_mode)
 
-    def _init_files(self, bare):
+    def _init_files(self, bare: bool) -> None:
         """Initialize a default set of named files."""
         from dulwich.config import ConfigFile
         self._put_named_file('description', b"Unnamed repository")
@@ -460,16 +506,30 @@ class BaseRepo(object):
             # commits aren't missing.
             haves = []
 
+        parents_provider = ParentsProvider(
+            self.object_store, shallows=shallows)
+
         def get_parents(commit):
-            if commit.id in shallows:
-                return []
-            return self.get_parents(commit.id, commit)
+            return parents_provider.get_parents(commit.id, commit)
 
         return self.object_store.iter_shas(
           self.object_store.find_missing_objects(
-              haves, wants, progress,
-              get_tagged,
+              haves, wants, self.get_shallow(),
+              progress, get_tagged,
               get_parents=get_parents))
+
+    def generate_pack_data(self, have, want, progress=None, ofs_delta=None):
+        """Generate pack data objects for a set of wants/haves.
+
+        Args:
+          have: List of SHA1s of objects that should not be sent
+          want: List of SHA1s of objects that should be sent
+          ofs_delta: Whether OFS deltas can be included
+          progress: Optional progress reporting method
+        """
+        return self.object_store.generate_pack_data(
+            have, want, shallow=self.get_shallow(),
+            progress=progress, ofs_delta=ofs_delta)
 
     def get_graph_walker(self, heads=None):
         """Retrieve a graph walker.
@@ -485,17 +545,18 @@ class BaseRepo(object):
             heads = [
                 sha for sha in self.refs.as_dict(b'refs/heads').values()
                 if sha in self.object_store]
+        parents_provider = ParentsProvider(self.object_store)
         return ObjectStoreGraphWalker(
-            heads, self.get_parents, shallow=self.get_shallow())
+            heads, parents_provider.get_parents, shallow=self.get_shallow())
 
-    def get_refs(self):
+    def get_refs(self) -> Dict[bytes, bytes]:
         """Get dictionary with all refs.
 
         Returns: A ``dict`` mapping ref names to SHA1s
         """
         return self.refs.as_dict()
 
-    def head(self):
+    def head(self) -> bytes:
         """Return the SHA1 pointed at by HEAD."""
         return self.refs[b'HEAD']
 
@@ -516,7 +577,7 @@ class BaseRepo(object):
                   ret.type_name, cls.type_name))
         return ret
 
-    def get_object(self, sha):
+    def get_object(self, sha: bytes) -> ShaFile:
         """Retrieve the object with the specified SHA.
 
         Args:
@@ -527,7 +588,12 @@ class BaseRepo(object):
         """
         return self.object_store[sha]
 
-    def get_parents(self, sha, commit=None):
+    def parents_provider(self):
+        return ParentsProvider(
+            self.object_store, grafts=self._graftpoints,
+            shallows=self.get_shallow())
+
+    def get_parents(self, sha: bytes, commit: Commit = None) -> List[bytes]:
         """Retrieve the parents of a specific commit.
 
         If the specific commit is a graftpoint, the graft parents
@@ -538,13 +604,7 @@ class BaseRepo(object):
           commit: Optional commit matching the sha
         Returns: List of parents
         """
-
-        try:
-            return self._graftpoints[sha]
-        except KeyError:
-            if commit is None:
-                commit = self[sha]
-            return commit.parents
+        return self.parents_provider().get_parents(sha, commit)
 
     def get_config(self):
         """Retrieve the config object.
@@ -569,7 +629,7 @@ class BaseRepo(object):
         """
         raise NotImplementedError(self.set_description)
 
-    def get_config_stack(self):
+    def get_config_stack(self) -> 'StackedConfig':
         """Return a config stack for this repository.
 
         This stack accesses the configuration for both this repository
@@ -591,7 +651,7 @@ class BaseRepo(object):
         if f is None:
             return set()
         with f:
-            return set(l.strip() for l in f)
+            return set(line.strip() for line in f)
 
     def update_shallow(self, new_shallow, new_unshallow):
         """Update the list of shallow objects.
@@ -682,18 +742,18 @@ class BaseRepo(object):
         except RefFormatError:
             raise KeyError(name)
 
-    def __contains__(self, name):
+    def __contains__(self, name: bytes) -> bool:
         """Check if a specific Git object or ref is present.
 
         Args:
           name: Git object SHA1 or ref name
         """
-        if len(name) in (20, 40):
+        if len(name) == 20 or (len(name) == 40 and valid_hexsha(name)):
             return name in self.object_store or name in self.refs
         else:
             return name in self.refs
 
-    def __setitem__(self, name, value):
+    def __setitem__(self, name: bytes, value: Union[ShaFile, bytes]):
         """Set a ref.
 
         Args:
@@ -710,7 +770,7 @@ class BaseRepo(object):
         else:
             raise ValueError(name)
 
-    def __delitem__(self, name):
+    def __delitem__(self, name: bytes):
         """Remove a ref.
 
         Args:
@@ -721,13 +781,14 @@ class BaseRepo(object):
         else:
             raise ValueError(name)
 
-    def _get_user_identity(self, config, kind=None):
+    def _get_user_identity(
+            self, config: 'StackedConfig', kind: str = None) -> bytes:
         """Determine the identity to use for new commits.
         """
         # TODO(jelmer): Deprecate this function in favor of get_user_identity
         return get_user_identity(config)
 
-    def _add_graftpoints(self, updated_graftpoints):
+    def _add_graftpoints(self, updated_graftpoints: Dict[bytes, List[bytes]]):
         """Add or modify graftpoints
 
         Args:
@@ -741,7 +802,7 @@ class BaseRepo(object):
 
         self._graftpoints.update(updated_graftpoints)
 
-    def _remove_graftpoints(self, to_remove=[]):
+    def _remove_graftpoints(self, to_remove: List[bytes] = []) -> None:
         """Remove graftpoints
 
         Args:
@@ -755,7 +816,7 @@ class BaseRepo(object):
         if f is None:
             return []
         with f:
-            return [l.strip() for l in f.readlines() if l.strip()]
+            return [line.strip() for line in f.readlines() if line.strip()]
 
     def do_commit(self, message=None, committer=None,
                   author=None, commit_timestamp=None,
@@ -764,10 +825,14 @@ class BaseRepo(object):
                   ref=b'HEAD', merge_heads=None):
         """Create a new commit.
 
+        If not specified, `committer` and `author` default to
+        get_user_identity(..., 'COMMITTER')
+        and get_user_identity(..., 'AUTHOR') respectively.
+
         Args:
           message: Commit message
           committer: Committer fullname
-          author: Author fullname (defaults to committer)
+          author: Author fullname
           commit_timestamp: Commit timestamp (defaults to now)
           commit_timezone: Commit timestamp timezone (defaults to GMT)
           author_timestamp: Author timestamp (defaults to commit
@@ -779,7 +844,9 @@ class BaseRepo(object):
           encoding: Encoding
           ref: Optional ref to commit to (defaults to current branch)
           merge_heads: Merge heads (defaults to .git/MERGE_HEADS)
-        Returns: New commit SHA1
+
+        Returns:
+          New commit SHA1
         """
         import time
         c = Commit()
@@ -929,13 +996,14 @@ class Repo(BaseRepo):
             with commondir:
                 self._commondir = os.path.join(
                     self.controldir(),
-                    commondir.read().rstrip(b"\r\n").decode(
-                        sys.getfilesystemencoding()))
+                    os.fsdecode(commondir.read().rstrip(b"\r\n")))
         else:
             self._commondir = self._controldir
         self.path = root
-        object_store = DiskObjectStore(
-            os.path.join(self.commondir(), OBJECTDIR))
+        config = self.get_config()
+        object_store = DiskObjectStore.from_config(
+            os.path.join(self.commondir(), OBJECTDIR),
+            config)
         refs = DiskRefsContainer(self.commondir(), self._controldir,
                                  logger=self._write_reflog)
         BaseRepo.__init__(self, object_store, refs)
@@ -955,18 +1023,16 @@ class Repo(BaseRepo):
         self.hooks['pre-commit'] = PreCommitShellHook(self.controldir())
         self.hooks['commit-msg'] = CommitMsgShellHook(self.controldir())
         self.hooks['post-commit'] = PostCommitShellHook(self.controldir())
+        self.hooks['post-receive'] = PostReceiveShellHook(self.controldir())
 
     def _write_reflog(self, ref, old_sha, new_sha, committer, timestamp,
                       timezone, message):
         from .reflog import format_reflog_line
-        path = os.path.join(
-                self.controldir(), 'logs',
-                ref.decode(sys.getfilesystemencoding()))
+        path = os.path.join(self.controldir(), 'logs', os.fsdecode(ref))
         try:
             os.makedirs(os.path.dirname(path))
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+        except FileExistsError:
+            pass
         if committer is None:
             config = self.get_config_stack()
             committer = self._get_user_identity(config)
@@ -1026,10 +1092,8 @@ class Repo(BaseRepo):
         st1 = os.lstat(fname)
         try:
             os.chmod(fname, st1.st_mode ^ stat.S_IXUSR)
-        except EnvironmentError as e:
-            if e.errno == errno.EPERM:
-                return False
-            raise
+        except PermissionError:
+            return False
         st2 = os.lstat(fname)
 
         os.unlink(fname)
@@ -1053,10 +1117,8 @@ class Repo(BaseRepo):
     def _del_named_file(self, path):
         try:
             os.unlink(os.path.join(self.controldir(), path))
-        except (IOError, OSError) as e:
-            if e.errno == errno.ENOENT:
-                return
-            raise
+        except FileNotFoundError:
+            return
 
     def get_named_file(self, path, basedir=None):
         """Get a file from the control dir with a specific name.
@@ -1078,16 +1140,14 @@ class Repo(BaseRepo):
         path = path.lstrip(os.path.sep)
         try:
             return open(os.path.join(basedir, path), 'rb')
-        except (IOError, OSError) as e:
-            if e.errno == errno.ENOENT:
-                return None
-            raise
+        except FileNotFoundError:
+            return None
 
     def index_path(self):
         """Return path to the index file."""
         return os.path.join(self.controldir(), INDEX_FILENAME)
 
-    def open_index(self):
+    def open_index(self) -> 'Index':
         """Open the index for this repository.
 
         Raises:
@@ -1112,7 +1172,7 @@ class Repo(BaseRepo):
           fs_paths: List of paths, relative to the repository path
         """
 
-        root_path_bytes = self.path.encode(sys.getfilesystemencoding())
+        root_path_bytes = os.fsencode(self.path)
 
         if not isinstance(fs_paths, list):
             fs_paths = [fs_paths]
@@ -1125,7 +1185,7 @@ class Repo(BaseRepo):
         blob_normalizer = self.get_blob_normalizer()
         for fs_path in fs_paths:
             if not isinstance(fs_path, bytes):
-                fs_path = fs_path.encode(sys.getfilesystemencoding())
+                fs_path = os.fsencode(fs_path)
             if os.path.isabs(fs_path):
                 raise ValueError(
                     "path %r should be relative to "
@@ -1141,16 +1201,17 @@ class Repo(BaseRepo):
                 except KeyError:
                     pass  # already removed
             else:
-                if not stat.S_ISDIR(st.st_mode):
-                    blob = blob_from_path_and_stat(full_path, st)
-                    blob = blob_normalizer.checkin_normalize(blob, fs_path)
-                    self.object_store.add_object(blob)
-                    index[tree_path] = index_entry_from_stat(st, blob.id, 0)
-                else:
+                if (not stat.S_ISREG(st.st_mode) and
+                        not stat.S_ISLNK(st.st_mode)):
                     try:
                         del index[tree_path]
                     except KeyError:
                         pass
+                else:
+                    blob = blob_from_path_and_stat(full_path, st)
+                    blob = blob_normalizer.checkin_normalize(blob, fs_path)
+                    self.object_store.add_object(blob)
+                    index[tree_path] = index_entry_from_stat(st, blob.id, 0)
         index.write()
 
     def clone(self, target_path, mkdir=True, bare=False,
@@ -1174,7 +1235,7 @@ class Repo(BaseRepo):
         self.fetch(target)
         encoded_path = self.path
         if not isinstance(encoded_path, bytes):
-            encoded_path = encoded_path.encode(sys.getfilesystemencoding())
+            encoded_path = os.fsencode(encoded_path)
         ref_message = b"clone: from " + encoded_path
         target.refs.import_refs(
             b'refs/remotes/' + origin, self.refs.as_dict(b'refs/heads'),
@@ -1234,7 +1295,7 @@ class Repo(BaseRepo):
             honor_filemode=honor_filemode,
             validate_path_element=validate_path_element)
 
-    def get_config(self):
+    def get_config(self) -> 'ConfigFile':
         """Retrieve the config object.
 
         Returns: `ConfigFile` object for the ``.git/config`` file.
@@ -1243,9 +1304,7 @@ class Repo(BaseRepo):
         path = os.path.join(self._controldir, 'config')
         try:
             return ConfigFile.from_path(path)
-        except (IOError, OSError) as e:
-            if e.errno != errno.ENOENT:
-                raise
+        except FileNotFoundError:
             ret = ConfigFile()
             ret.path = path
             return ret
@@ -1259,9 +1318,7 @@ class Repo(BaseRepo):
         try:
             with GitFile(path, 'rb') as f:
                 return f.read()
-        except (IOError, OSError) as e:
-            if e.errno != errno.ENOENT:
-                raise
+        except FileNotFoundError:
             return None
 
     def __repr__(self):
@@ -1323,21 +1380,17 @@ class Repo(BaseRepo):
         worktree_controldir = os.path.join(main_worktreesdir, identifier)
         gitdirfile = os.path.join(path, CONTROLDIR)
         with open(gitdirfile, 'wb') as f:
-            f.write(b'gitdir: ' +
-                    worktree_controldir.encode(sys.getfilesystemencoding()) +
-                    b'\n')
+            f.write(b'gitdir: ' + os.fsencode(worktree_controldir) + b'\n')
         try:
             os.mkdir(main_worktreesdir)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+        except FileExistsError:
+            pass
         try:
             os.mkdir(worktree_controldir)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+        except FileExistsError:
+            pass
         with open(os.path.join(worktree_controldir, GITDIR), 'wb') as f:
-            f.write(gitdirfile.encode(sys.getfilesystemencoding()) + b'\n')
+            f.write(os.fsencode(gitdirfile) + b'\n')
         with open(os.path.join(worktree_controldir, COMMONDIR), 'wb') as f:
             f.write(b'../..\n')
         with open(os.path.join(worktree_controldir, 'HEAD'), 'wb') as f:

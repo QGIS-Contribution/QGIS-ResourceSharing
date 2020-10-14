@@ -26,9 +26,10 @@ TODO:
    subsections
 """
 
-import errno
 import os
 import sys
+
+from typing import BinaryIO, Tuple, Optional
 
 from collections import (
     OrderedDict,
@@ -381,12 +382,17 @@ class ConfigFile(ConfigDict):
     """A Git configuration file, like .git/config or ~/.gitconfig.
     """
 
+    def __init__(self, values=None, encoding=None):
+        super(ConfigFile, self).__init__(values=values, encoding=encoding)
+        self.path = None
+
     @classmethod
-    def from_file(cls, f):
+    def from_file(cls, f: BinaryIO) -> 'ConfigFile':
         """Read configuration from a file-like object."""
         ret = cls()
-        section = None
+        section = None  # type: Optional[Tuple[bytes, ...]]
         setting = None
+        continuation = None
         for lineno, line in enumerate(f.readlines()):
             line = line.lstrip()
             if setting is None:
@@ -430,7 +436,7 @@ class ConfigFile(ConfigDict):
                     value = b"true"
                 setting = setting.strip()
                 if not _check_variable_name(setting):
-                    raise ValueError("invalid variable name %s" % setting)
+                    raise ValueError("invalid variable name %r" % setting)
                 if value.endswith(b"\\\n"):
                     continuation = value[:-2]
                 else:
@@ -450,21 +456,21 @@ class ConfigFile(ConfigDict):
         return ret
 
     @classmethod
-    def from_path(cls, path):
+    def from_path(cls, path) -> 'ConfigFile':
         """Read configuration from a file on disk."""
         with GitFile(path, 'rb') as f:
             ret = cls.from_file(f)
             ret.path = path
             return ret
 
-    def write_to_path(self, path=None):
+    def write_to_path(self, path=None) -> None:
         """Write configuration to a file on disk."""
         if path is None:
             path = self.path
         with GitFile(path, 'wb') as f:
             self.write_to_file(f)
 
-    def write_to_file(self, f):
+    def write_to_file(self, f: BinaryIO) -> None:
         """Write configuration to a file-like object."""
         for section, values in self._values.items():
             try:
@@ -485,6 +491,13 @@ class ConfigFile(ConfigDict):
                 else:
                     value = _format_string(value)
                 f.write(b"\t" + key + b" = " + value + b"\n")
+
+
+def get_xdg_config_home_path(*path_segments):
+    xdg_config_home = os.environ.get(
+        "XDG_CONFIG_HOME", os.path.expanduser("~/.config/"),
+    )
+    return os.path.join(xdg_config_home, *path_segments)
 
 
 class StackedConfig(Config):
@@ -509,11 +522,7 @@ class StackedConfig(Config):
         """
         paths = []
         paths.append(os.path.expanduser("~/.gitconfig"))
-
-        xdg_config_home = os.environ.get(
-            "XDG_CONFIG_HOME", os.path.expanduser("~/.config/"),
-        )
-        paths.append(os.path.join(xdg_config_home, "git", "config"))
+        paths.append(get_xdg_config_home_path("git", "config"))
 
         if "GIT_CONFIG_NOSYSTEM" not in os.environ:
             paths.append("/etc/gitconfig")
@@ -522,11 +531,8 @@ class StackedConfig(Config):
         for path in paths:
             try:
                 cf = ConfigFile.from_path(path)
-            except (IOError, OSError) as e:
-                if e.errno != errno.ENOENT:
-                    raise
-                else:
-                    continue
+            except FileNotFoundError:
+                continue
             backends.append(cf)
         return backends
 

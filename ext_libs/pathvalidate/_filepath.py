@@ -43,6 +43,7 @@ class FilePathSanitizer(AbstractSanitizer):
         max_len: Optional[int] = None,
         platform: PlatformType = None,
         check_reserved: bool = True,
+        normalize: bool = True,
     ) -> None:
         super().__init__(
             min_len=min_len, max_len=max_len, check_reserved=check_reserved, platform=platform,
@@ -61,6 +62,7 @@ class FilePathSanitizer(AbstractSanitizer):
             check_reserved=check_reserved,
             platform=self.platform,
         )
+        self.__normalize = normalize
 
         if self._is_universal() or self._is_windows():
             self.__split_drive = ntpath.splitdrive
@@ -73,9 +75,13 @@ class FilePathSanitizer(AbstractSanitizer):
 
         self.__fpath_validator.validate_abspath(value)
 
-        unicode_file_path = preprocess(value)
-        drive, unicode_file_path = self.__split_drive(unicode_file_path)
-        sanitized_path = self._sanitize_regexp.sub(replacement_text, unicode_file_path)
+        unicode_filepath = preprocess(value)
+
+        if self.__normalize:
+            unicode_filepath = os.path.normpath(unicode_filepath)
+
+        drive, unicode_filepath = self.__split_drive(unicode_filepath)
+        sanitized_path = self._sanitize_regexp.sub(replacement_text, unicode_filepath)
         if self._is_windows():
             path_separator = "\\"
         else:
@@ -158,9 +164,9 @@ class FilePathValidator(BaseValidator):
         if not value:
             return
 
-        file_path = os.path.normpath(value)
-        unicode_file_path = preprocess(file_path)
-        value_len = len(unicode_file_path)
+        filepath = os.path.normpath(value)
+        unicode_filepath = preprocess(filepath)
+        value_len = len(unicode_filepath)
 
         if value_len > self.max_len:
             raise InvalidLengthError(
@@ -173,18 +179,18 @@ class FilePathValidator(BaseValidator):
                 )
             )
 
-        self._validate_reserved_keywords(unicode_file_path)
-        unicode_file_path = unicode_file_path.replace("\\", "/")
-        for entry in unicode_file_path.split("/"):
+        self._validate_reserved_keywords(unicode_filepath)
+        unicode_filepath = unicode_filepath.replace("\\", "/")
+        for entry in unicode_filepath.split("/"):
             if not entry or entry in (".", ".."):
                 continue
 
             self.__fname_validator._validate_reserved_keywords(entry)
 
         if self._is_universal() or self._is_windows():
-            self.__validate_win_file_path(unicode_file_path)
+            self.__validate_win_filepath(unicode_filepath)
         else:
-            self.__validate_unix_file_path(unicode_file_path)
+            self.__validate_unix_filepath(unicode_filepath)
 
     def validate_abspath(self, value: PathType) -> None:
         value = str(value)
@@ -225,26 +231,26 @@ class FilePathValidator(BaseValidator):
         if not self._is_windows() and drive and is_nt_abs:
             raise err_object
 
-    def __validate_unix_file_path(self, unicode_file_path: str) -> None:
-        match = _RE_INVALID_PATH.findall(unicode_file_path)
+    def __validate_unix_filepath(self, unicode_filepath: str) -> None:
+        match = _RE_INVALID_PATH.findall(unicode_filepath)
         if match:
             raise InvalidCharError(
                 self._ERROR_MSG_TEMPLATE.format(
-                    invalid=findall_to_str(match), value=repr(unicode_file_path)
+                    invalid=findall_to_str(match), value=repr(unicode_filepath)
                 )
             )
 
-    def __validate_win_file_path(self, unicode_file_path: str) -> None:
-        match = _RE_INVALID_WIN_PATH.findall(unicode_file_path)
+    def __validate_win_filepath(self, unicode_filepath: str) -> None:
+        match = _RE_INVALID_WIN_PATH.findall(unicode_filepath)
         if match:
             raise InvalidCharError(
                 self._ERROR_MSG_TEMPLATE.format(
-                    invalid=findall_to_str(match), value=repr(unicode_file_path)
+                    invalid=findall_to_str(match), value=repr(unicode_filepath)
                 ),
                 platform=Platform.WINDOWS,
             )
 
-        _drive, value = self.__split_drive(unicode_file_path)
+        _drive, value = self.__split_drive(unicode_filepath)
         if value:
             match_reserved = self._RE_NTFS_RESERVED.search(value)
             if match_reserved:
@@ -334,6 +340,7 @@ def sanitize_filepath(
     platform: Optional[str] = None,
     max_len: Optional[int] = None,
     check_reserved: bool = True,
+    normalize: bool = True,
 ) -> PathType:
     """Make a valid file path from a string.
 
@@ -363,7 +370,7 @@ def sanitize_filepath(
         max_len:
             Maximum length of the ``file_path`` length. Truncate the name if the ``file_path``
             length exceedd this value. If the value is |None|,
-            automatically determined by the ``platform``:
+            ``max_len`` will automatically determined by the ``platform``:
 
                 - ``Linux``: 4096
                 - ``macOS``: 1024
@@ -371,6 +378,8 @@ def sanitize_filepath(
                 - ``universal``: 260
         check_reserved:
             If |True|, sanitize reserved names of the ``platform``.
+        normalize:
+            If |True|, normalize the the file path.
 
     Returns:
         Same type as the argument (str or PathLike object):
@@ -385,7 +394,7 @@ def sanitize_filepath(
     """
 
     return FilePathSanitizer(
-        platform=platform, max_len=max_len, check_reserved=check_reserved
+        platform=platform, max_len=max_len, check_reserved=check_reserved, normalize=normalize
     ).sanitize(file_path, replacement_text)
 
 

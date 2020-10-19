@@ -52,3 +52,4 @@ ext_libs/bin
 ext_libs/docs
 ext_libs/*/contrib/
 ext_libs/*/tests/
+# ext_libs/*

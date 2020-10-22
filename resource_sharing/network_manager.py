@@ -5,7 +5,7 @@ from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.PyQt.QtCore import QUrl, QCoreApplication
 from qgis.core import QgsNetworkAccessManager
 try:
-    from qgis.core import QgsAuthManager
+    from qgis.core import QgsApplication
 except ImportError:
     pass
 
@@ -53,7 +53,7 @@ class NetworkManager(object):
 
         if self._auth_cfg and qgis_version() >= 21200:
             LOGGER.debug('Update request with auth_cfg %s' % self._auth_cfg)
-            QgsAuthManager.instance().updateNetworkRequest(
+            QgsApplication.authManager().updateNetworkRequest(
                 request, self._auth_cfg
             )
 

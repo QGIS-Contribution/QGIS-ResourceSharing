@@ -1,22 +1,23 @@
-# coding=utf-8
 from pathlib import Path
 import shutil
 import logging
 
 from qgis.core import QgsApplication, Qgis
+
 # Worth a try? Should probably be present if the Processing R
 # Provider plugin is installed.
 # from processing_r.processing.utils import RUtils
 from processing.tools.system import userFolder, mkdir
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
-RSCRIPTS_PROCESSING_FOLDER = 'rscripts'  # Processing folder for R scripts
-RSCRIPTS_FOLDER = 'rscripts'  # Collection subfolder name
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+RSCRIPTS_PROCESSING_FOLDER = "rscripts"  # Processing folder for R scripts
+RSCRIPTS_FOLDER = "rscripts"  # Collection subfolder name
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class RScriptHandler(BaseResourceHandler):
     """Handler for R script resources."""
+
     IS_DISABLED = False
 
     def __init__(self, collection_id):
@@ -40,22 +41,21 @@ class RScriptHandler(BaseResourceHandler):
 
         # Handle the R script files located in self.resource_dir
         R_files = []
-        for item in Path(self.resource_dir).glob('*'):
+        for item in Path(self.resource_dir).glob("*"):
             file_path = Path(self.resource_dir, item)
-            if file_path.suffix.lower().endswith('rsx'):
+            if file_path.suffix.lower().endswith("rsx"):
                 R_files.append(file_path)
-            if ''.join(file_path.suffixes).lower().endswith('rsx.help'):
+            if "".join(file_path.suffixes).lower().endswith("rsx.help"):
                 R_files.append(file_path)
         valid = 0
         for R_file in R_files:
             # Install the R script file silently
             try:
                 shutil.copy(str(R_file), self.RScripts_folder())
-                if R_file.suffix.lower().endswith('rsx'):
+                if R_file.suffix.lower().endswith("rsx"):
                     valid += 1
             except OSError as e:
-                LOGGER.error("Could not copy script '" + str(R_file) +
-                             "'\n" + str(e))
+                LOGGER.error("Could not copy script '" + str(R_file) + "'\n" + str(e))
         if valid > 0:
             self.refresh_Rscript_provider()
             self.collection[RSCRIPTS_FOLDER] = valid
@@ -65,7 +65,7 @@ class RScriptHandler(BaseResourceHandler):
         if not Path(self.resource_dir).exists():
             return
         # Remove the collection's R script files
-        for item in Path(self.resource_dir).glob('*'):
+        for item in Path(self.resource_dir).glob("*"):
             rscript_path = Path(self.RScripts_folder(), item.name)
             if rscript_path.exists():
                 rscript_path.unlink()
@@ -78,9 +78,9 @@ class RScriptHandler(BaseResourceHandler):
             try:
                 r_provider.refreshAlgorithms()
             except Error as e:
-                LOGGER.error("Exception when refreshing after adding"
-                             " R scripts:\n" +
-                             str(e))
+                LOGGER.error(
+                    "Exception when refreshing after adding" " R scripts:\n" + str(e)
+                )
 
     def default_rscripts_folder(self):
         """Return the default user R scripts folder."""

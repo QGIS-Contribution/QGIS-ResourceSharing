@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  ManageRepositoryDialog
@@ -23,6 +22,7 @@
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
+
 try:
     from qgis.PyQt.QtGui import QDialog, QVBoxLayout, QDialogButtonBox
 except ImportError:
@@ -30,7 +30,7 @@ except ImportError:
 
 from resource_sharing.utilities import ui_path, qgis_version
 
-FORM_CLASS, _ = uic.loadUiType(str(ui_path('manage_repository.ui')))
+FORM_CLASS, _ = uic.loadUiType(str(ui_path("manage_repository.ui")))
 
 
 class ManageRepositoryDialog(QDialog, FORM_CLASS):
@@ -38,7 +38,7 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
         """Create the dialog and configure the UI."""
         super(ManageRepositoryDialog, self).__init__(parent)
         self.setupUi(self)
-        self.line_edit_url.setText('https://')
+        self.line_edit_url.setText("https://")
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
         self.line_edit_name.textChanged.connect(self.form_changed)
         self.line_edit_url.textChanged.connect(self.form_changed)
@@ -57,8 +57,9 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
 
     def form_changed(self):
         """Slot for when the form changed."""
-        is_enabled = (len(self.line_edit_name.text()) > 0 and
-                      len(self.line_edit_url.text()) > 0)
+        is_enabled = (
+            len(self.line_edit_name.text()) > 0 and len(self.line_edit_url.text()) > 0
+        )
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(is_enabled)
 
     def add_authentication(self):
@@ -76,9 +77,8 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
             layout.addWidget(acs)
 
             button_box = QDialogButtonBox(
-                QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
-                Qt.Horizontal,
-                dlg)
+                QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, dlg
+            )
             layout.addWidget(button_box)
             button_box.accepted.connect(dlg.accept)
             button_box.rejected.connect(dlg.close)

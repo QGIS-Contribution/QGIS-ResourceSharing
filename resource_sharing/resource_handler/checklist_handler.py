@@ -1,4 +1,3 @@
-# coding=utf-8
 from pathlib import Path
 import shutil
 import logging
@@ -8,19 +7,20 @@ from qgis.PyQt.QtCore import QDir, QSettings
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
-CHECKLISTS_FOLDER = 'checklists'
-CHECKLISTS = 'checklists'  # Resource Sharing collection subdirectory name
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+CHECKLISTS_FOLDER = "checklists"
+CHECKLISTS = "checklists"  # Resource Sharing collection subdirectory name
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class ChecklistHandler(BaseResourceHandler):
     """Handler for checklists."""
+
     IS_DISABLED = False
-    _GLOB_PATTERN = '*.json'
+    _GLOB_PATTERN = "*.json"
 
     @property
     def checklists_directory(self) -> Path:
-        chkl_path = Path(QgsApplication.qgisSettingsDirPath()) / 'checklists/'
+        chkl_path = Path(QgsApplication.qgisSettingsDirPath()) / "checklists/"
         return Path(chkl_path)
 
     @classmethod
@@ -53,11 +53,11 @@ class ChecklistHandler(BaseResourceHandler):
                 if chkl_file.exists():
                     chkl_file.unlink()
                 else:
-                    LOGGER.info('Item already removed: ' + str(chkl_file))
+                    LOGGER.info("Item already removed: " + str(chkl_file))
             # Remove the user's checklist directory, if empty
             # (unlink will not remove a non-empty directory, but raises
             # an exception)
             if not any(self.checklists_directory.iterdir()):
                 self.checklists_directory.rmdir()
         else:
-            LOGGER.info('No checklist directory')
+            LOGGER.info("No checklist directory")

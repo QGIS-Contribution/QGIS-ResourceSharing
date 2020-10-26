@@ -1,4 +1,3 @@
-# coding=utf-8
 import logging
 import csv
 from pathlib import Path
@@ -6,7 +5,10 @@ import pickle
 from qgis.PyQt.QtCore import QObject, QSettings, QTemporaryFile
 from qgis.core import QgsSettings
 from resource_sharing.utilities import (
-    repo_settings_group, local_collection_path, repositories_cache_path)
+    repo_settings_group,
+    local_collection_path,
+    repositories_cache_path,
+)
 from resource_sharing.repository_handler import BaseRepositoryHandler
 from resource_sharing.network_manager import NetworkManager
 from resource_sharing.collection_manager import CollectionManager
@@ -14,14 +16,15 @@ from resource_sharing.config import COLLECTION_INSTALLED_STATUS
 from resource_sharing import config
 from resource_sharing.exception import MetadataError
 
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class RepositoryManager(QObject):
     """Class to handle repositories."""
 
-    DIRECTORY_URL = ('https://raw.githubusercontent.com/qgis/'
-                     'QGIS-Resources/master/directory.csv')
+    DIRECTORY_URL = (
+        "https://raw.githubusercontent.com/qgis/" "QGIS-Resources/master/directory.csv"
+    )
 
     def __init__(self):
         """Constructor.
@@ -93,33 +96,34 @@ class RepositoryManager(QObject):
                 directory_file.write(downloader.content)
                 directory_file.close()
             with open(directory_file.fileName()) as csv_file:
-                reader = csv.DictReader(csv_file, fieldnames=('name', 'url'))
+                reader = csv.DictReader(csv_file, fieldnames=("name", "url"))
                 for row in reader:
-                    repName = row['name']
-                    repUrl = row['url']
+                    repName = row["name"]
+                    repUrl = row["url"]
                     # Check name and URL for None before stripping and adding
                     if repName is not None and repUrl is not None:
-                        self._online_directories[row['name']] = repUrl.strip()
+                        self._online_directories[row["name"]] = repUrl.strip()
                     else:
                         if repName is None:
                             # No name
-                            LOGGER.warning("Missing name for repository"
-                                           " - not added")
+                            LOGGER.warning("Missing name for repository" " - not added")
                         else:
                             # No URL
-                            LOGGER.warning("Missing URL for repository" +
-                                           str(row['name']) +
-                                           " - not added")
+                            LOGGER.warning(
+                                "Missing URL for repository"
+                                + str(row["name"])
+                                + " - not added"
+                            )
             # Save to settings
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
-            settings.setValue('online_directories', self._online_directories)
+            settings.setValue("online_directories", self._online_directories)
             settings.endGroup()
         else:
             # Use settings
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
-            self._online_directories = settings.value('online_directories', {})
+            self._online_directories = settings.value("online_directories", {})
             settings.endGroup()
 
     def load_directories(self):
@@ -132,27 +136,28 @@ class RepositoryManager(QObject):
             # Check if the repository is already present
             repo_present = False
             for repo_name in settings.childGroups():
-                url = settings.value(repo_name + '/url', '', type=unicode)
+                url = settings.value(repo_name + "/url", "", type=unicode)
                 if url == self._online_directories[online_dir_name]:
                     repo_present = True
                     break
                 if online_dir_name == repo_name:
                     repo_present = True
-                    nameWarn = ("The repository " + repo_name + " is masking "
-                                "an official repository with the same name")
+                    nameWarn = (
+                        "The repository " + repo_name + " is masking "
+                        "an official repository with the same name"
+                    )
                     LOGGER.warning(nameWarn)
                     break
             if not repo_present:
                 self.add_directory(
-                    online_dir_name, self._online_directories[online_dir_name])
+                    online_dir_name, self._online_directories[online_dir_name]
+                )
         for repo_name in settings.childGroups():
             self._directories[repo_name] = {}
-            url = settings.value(
-                repo_name + '/url', '', type=unicode)
-            self._directories[repo_name]['url'] = url
-            auth_cfg = settings.value(
-                repo_name + '/auth_cfg', '', type=unicode).strip()
-            self._directories[repo_name]['auth_cfg'] = auth_cfg
+            url = settings.value(repo_name + "/url", "", type=unicode)
+            self._directories[repo_name]["url"] = url
+            auth_cfg = settings.value(repo_name + "/auth_cfg", "", type=unicode).strip()
+            self._directories[repo_name]["auth_cfg"] = auth_cfg
         settings.endGroup()
 
     def add_directory(self, repo_name, url, auth_cfg=None):
@@ -166,8 +171,7 @@ class RepositoryManager(QObject):
         """
         repo_handler = BaseRepositoryHandler.get_handler(url)
         if repo_handler is None:
-            LOGGER.warning("There is no handler available for URL '" +
-                           str(url) + "'!")
+            LOGGER.warning("There is no handler available for URL '" + str(url) + "'!")
         if auth_cfg:
             repo_handler.auth_cfg = auth_cfg
         # Fetch metadata
@@ -177,8 +181,9 @@ class RepositoryManager(QObject):
             try:
                 collections = repo_handler.parse_metadata()
             except MetadataError as me:
-                metadata_warning = ("Error parsing metadata for " +
-                                    str(repo_name) + ":\n" + str(me))
+                metadata_warning = (
+                    "Error parsing metadata for " + str(repo_name) + ":\n" + str(me)
+                )
                 LOGGER.warning(metadata_warning)
                 return False, metadata_warning
             # Add the repository and its collections
@@ -187,21 +192,17 @@ class RepositoryManager(QObject):
             # Add to QgsSettings
             settings = QgsSettings()
             settings.beginGroup(repo_settings_group())
-            settings.setValue(repo_name + '/url', url)
+            settings.setValue(repo_name + "/url", url)
             if auth_cfg:
-                settings.setValue(repo_name + '/auth_cfg', auth_cfg)
+                settings.setValue(repo_name + "/auth_cfg", auth_cfg)
             settings.endGroup()
             # Serialize repositories every time we successfully added a repo
             self.serialize_repositories()
         return status, fetcherror
 
     def edit_directory(
-            self,
-            old_repo_name,
-            new_repo_name,
-            old_url,
-            new_url,
-            new_auth_cfg):
+        self, old_repo_name, new_repo_name, old_url, new_url, new_auth_cfg
+    ):
         """Edit the directory of repositories and update the
         collections.
         Also used to reload repositories (old == new for url and repo_name)
@@ -224,11 +225,11 @@ class RepositoryManager(QObject):
             # Renaming a repository (same URL)
             for old_collection in old_collections:
                 coll_id = self._collections_manager.get_collection_id(
-                                             old_collection['register_name'],
-                                             old_collection['repository_url'])
+                    old_collection["register_name"], old_collection["repository_url"]
+                )
                 old_path = local_collection_path(coll_id)
                 # Update the repository name for this collection
-                config.COLLECTIONS[coll_id]['repository_name'] = new_repo_name
+                config.COLLECTIONS[coll_id]["repository_name"] = new_repo_name
                 new_path = local_collection_path(coll_id)
                 # If the repository is renamed (same URL), the directories
                 # of its collections should be renamed accordingly (so that
@@ -237,7 +238,7 @@ class RepositoryManager(QObject):
                     old_path.rename(new_path)
             new_collections = old_collections
             status = True
-            fetcherror = ''
+            fetcherror = ""
         else:
             # old_repo_name == new_repo_name and old_url == new_url
             # or new_url != old_url
@@ -246,7 +247,7 @@ class RepositoryManager(QObject):
             if repo_handler is None:
                 repo_warning = "No handler for URL '" + str(new_url) + "'!"
                 LOGGER.warning(repo_warning)
-                return(False, repo_warning)
+                return (False, repo_warning)
             if new_auth_cfg:
                 repo_handler.auth_cfg = new_auth_cfg
             status, fetcherror = repo_handler.fetch_metadata()
@@ -255,15 +256,19 @@ class RepositoryManager(QObject):
                 try:
                     new_collections = repo_handler.parse_metadata()
                 except MetadataError as me:
-                    metadata_warning = ("Error parsing metadata for " +
-                                        str(new_repo_name) + ":\n" + str(me))
+                    metadata_warning = (
+                        "Error parsing metadata for "
+                        + str(new_repo_name)
+                        + ":\n"
+                        + str(me)
+                    )
                     LOGGER.warning(metadata_warning)
-                    return(False, metadata_warning)
+                    return (False, metadata_warning)
                     # raise MetadataError(metadata_warning)
                 # Get all the installed collections from the old repository
                 installed_old_collections = []
                 for old_collection in old_collections:
-                    if old_collection['status'] == COLLECTION_INSTALLED_STATUS:
+                    if old_collection["status"] == COLLECTION_INSTALLED_STATUS:
                         installed_old_collections.append(old_collection)
                 # Handling installed collections
                 # An old collection that is present in the new location
@@ -279,21 +284,27 @@ class RepositoryManager(QObject):
                 # 4. Old collection doesn't exist in the new, different URL:
                 # same as 3
                 for installed_collection in installed_old_collections:
-                    reg_name = installed_collection['register_name']
+                    reg_name = installed_collection["register_name"]
                     is_present = False
                     for n_coll in new_collections:
                         # Look for collections that are already present
-                        if n_coll['register_name'] == reg_name:
+                        if n_coll["register_name"] == reg_name:
                             # Already present
                             is_present = True
                             if old_url == new_url:
                                 # Set the status to installed
-                                n_coll['status'] = COLLECTION_INSTALLED_STATUS
+                                n_coll["status"] = COLLECTION_INSTALLED_STATUS
                                 # Keep the collection statistics
                                 for key in installed_collection.keys():
-                                    if key in ['models', 'processing',
-                                               'rscripts', 'style', 'svg',
-                                               'symbol', 'expressions']:
+                                    if key in [
+                                        "models",
+                                        "processing",
+                                        "rscripts",
+                                        "style",
+                                        "svg",
+                                        "symbol",
+                                        "expressions",
+                                    ]:
                                         n_coll[key] = installed_collection[key]
                             else:
                                 # Different repository URLs, so append
@@ -309,8 +320,8 @@ class RepositoryManager(QObject):
         settings = QgsSettings()
         settings.beginGroup(repo_settings_group())
         settings.remove(old_repo_name)
-        settings.setValue(new_repo_name + '/url', new_url)
-        settings.setValue(new_repo_name + '/auth_cfg', new_auth_cfg)
+        settings.setValue(new_repo_name + "/url", new_url)
+        settings.setValue(new_repo_name + "/auth_cfg", new_auth_cfg)
         settings.endGroup()
         # Serialize repositories every time we successfully edited repo
         self.serialize_repositories()
@@ -343,11 +354,7 @@ class RepositoryManager(QObject):
         """
         # We are basically editing a directory (same repo name and url)
         status, editerror = self.edit_directory(
-            repo_name,
-            repo_name,
-            url,
-            url,
-            auth_cfg
+            repo_name, repo_name, url, url, auth_cfg
         )
         return status, editerror
 
@@ -358,16 +365,15 @@ class RepositoryManager(QObject):
             repo_collections = self._repositories[repo]
             for collection in repo_collections:
                 collection_id = self._collections_manager.get_collection_id(
-                    collection['register_name'],
-                    collection['repository_url']
+                    collection["register_name"], collection["repository_url"]
                 )
-                collection['repository_name'] = repo
+                collection["repository_name"] = repo
                 config.COLLECTIONS[collection_id] = collection
                 # Get the collection path (updating if neccessary)
                 collection_path = local_collection_path(collection_id)
                 # Check the file system to see if the collection exists.
                 # If not, also uninstall its resources
-                current_status = config.COLLECTIONS[collection_id]['status']
+                current_status = config.COLLECTIONS[collection_id]["status"]
                 if current_status == COLLECTION_INSTALLED_STATUS:
                     if not collection_path.exists():
                         # Uninstall the collection
@@ -380,12 +386,9 @@ class RepositoryManager(QObject):
             synced_repo_collections = []
             for collection in repo_collections:
                 collection_id = self._collections_manager.get_collection_id(
-                    collection['register_name'],
-                    collection['repository_url']
+                    collection["register_name"], collection["repository_url"]
                 )
-                synced_repo_collections.append(
-                    config.COLLECTIONS[collection_id]
-                )
+                synced_repo_collections.append(config.COLLECTIONS[collection_id])
             self._repositories[repo] = synced_repo_collections
 
     def serialize_repositories(self):
@@ -393,14 +396,14 @@ class RepositoryManager(QObject):
         if not repositories_cache_path().parent.exists():
             repositories_cache_path().parent.mkdir(parents=True)
         self.resync_repository()
-        with open(str(repositories_cache_path()), 'wb') as f:
+        with open(str(repositories_cache_path()), "wb") as f:
             pickle.dump(self._repositories, f)
 
     def load_repositories(self):
         """Load repositories from cache and rebuild collections."""
         repo_collections = {}
         if repositories_cache_path().exists():
-            with open(str(repositories_cache_path()), 'rb') as f:
+            with open(str(repositories_cache_path()), "rb") as f:
                 repo_collections = pickle.load(f)
         self._repositories = repo_collections
         self.rebuild_collections()

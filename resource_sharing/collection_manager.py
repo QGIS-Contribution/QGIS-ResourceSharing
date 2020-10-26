@@ -1,26 +1,26 @@
-# coding=utf-8
 import hashlib
 from pathlib import Path
 import shutil
 import logging
 import traceback
 
-from qgis.PyQt.QtCore import (
-    pyqtSignal, QObject)
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from resource_sharing import config
 from resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS,
-    COLLECTION_NOT_INSTALLED_STATUS)
+    COLLECTION_NOT_INSTALLED_STATUS,
+)
 from resource_sharing.utilities import (
     SUPPORTED_RESOURCES_MAP,
     local_collection_path,
     render_template,
-    resources_path)
+    resources_path,
+)
 from resource_sharing.repository_handler import BaseRepositoryHandler
 from resource_sharing.resource_handler import BaseResourceHandler
 
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class CollectionInstaller(QObject):
@@ -37,12 +37,13 @@ class CollectionInstaller(QObject):
         self.killed = False
 
     def run(self):
-        self.progress.emit('Downloading the collection...')
+        self.progress.emit("Downloading the collection...")
 
         # We can't kill the process here, so let us finish it even if
         # the user cancels the download process
         download_status, error_message = self._collection_manager.download(
-            self._collection_id)
+            self._collection_id
+        )
 
         # If at this point it is killed, so abort and tell the main thread
         if self.killed:
@@ -58,7 +59,7 @@ class CollectionInstaller(QObject):
 
         # Downloading is fine, It is not killed, let us install it
         if not self.killed:
-            self.progress.emit('Installing the collection...')
+            self.progress.emit("Installing the collection...")
             try:
                 self._collection_manager.install(self._collection_id)
             except Exception as e:
@@ -83,7 +84,7 @@ class CollectionManager(object):
 
     def get_collection_id(self, register_name, repo_url):
         """Generate the collection ID."""
-        hash_object = hashlib.sha1((register_name + repo_url).encode('utf-8'))
+        hash_object = hashlib.sha1((register_name + repo_url).encode("utf-8"))
         hex_dig = hash_object.hexdigest()
         return hex_dig
 
@@ -93,29 +94,28 @@ class CollectionManager(object):
         :param collection_id: The id of the collection
         :type collection_id: str
         """
-        html = ''
+        html = ""
         resource_types = 0
         for type_, desc in SUPPORTED_RESOURCES_MAP.items():
             if type_ in config.COLLECTIONS[collection_id].keys():
                 if resource_types > 0:
-                    html += ', '
-                html += f'{config.COLLECTIONS[collection_id][type_]} {desc}'
+                    html += ", "
+                html += f"{config.COLLECTIONS[collection_id][type_]} {desc}"
                 if config.COLLECTIONS[collection_id][type_] > 1:
-                    html += 's'
+                    html += "s"
                 resource_types += 1
-        html = html + '.<br><i>Reinstall</i> to update'
+        html = html + ".<br><i>Reinstall</i> to update"
         if resource_types == 0:
-            html = '<i>No standard resources found</i>.'
-        if (config.COLLECTIONS[collection_id]['status'] !=
-                COLLECTION_INSTALLED_STATUS):
-            html = '<i>Unknown before installation</i>'
+            html = "<i>No standard resources found</i>."
+        if config.COLLECTIONS[collection_id]["status"] != COLLECTION_INSTALLED_STATUS:
+            html = "<i>Unknown before installation</i>"
 
-        config.COLLECTIONS[collection_id]['resources_html'] = html
+        config.COLLECTIONS[collection_id]["resources_html"] = html
         context = {
-            'resources_path': str(resources_path()),
-            'collection': config.COLLECTIONS[collection_id]
+            "resources_path": str(resources_path()),
+            "collection": config.COLLECTIONS[collection_id],
         }
-        return render_template('collection_details.html', context)
+        return render_template("collection_details.html", context)
 
     def get_installed_collections(self, repo_url=None):
         """Get all installed collections for a given repository URL.
@@ -131,11 +131,11 @@ class CollectionManager(object):
         """
         installed_collections = {}
         for id, collection in config.COLLECTIONS.items():
-            if collection['status'] != COLLECTION_INSTALLED_STATUS:
+            if collection["status"] != COLLECTION_INSTALLED_STATUS:
                 continue
 
             if repo_url:
-                if collection['repository_url'] != repo_url:
+                if collection["repository_url"] != repo_url:
                     continue
 
             installed_collections[id] = collection
@@ -150,15 +150,16 @@ class CollectionManager(object):
         :return: status (True or False), information from the repo handler
         :rtype: (boolean, string)
         """
-        repo_url = config.COLLECTIONS[collection_id]['repository_url']
+        repo_url = config.COLLECTIONS[collection_id]["repository_url"]
         repo_handler = BaseRepositoryHandler.get_handler(repo_url)
         if repo_handler is None:
-            message = 'There is no handler available for ' + str(repo_url)
+            message = "There is no handler available for " + str(repo_url)
             LOGGER.error(message)
             return False, message
-        register_name = config.COLLECTIONS[collection_id]['register_name']
+        register_name = config.COLLECTIONS[collection_id]["register_name"]
         status, information = repo_handler.download_collection(
-            collection_id, register_name)
+            collection_id, register_name
+        )
         return status, information
 
     def install(self, collection_id):
@@ -171,8 +172,7 @@ class CollectionManager(object):
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.install()
 
-        config.COLLECTIONS[collection_id]['status'] = \
-            COLLECTION_INSTALLED_STATUS
+        config.COLLECTIONS[collection_id]["status"] = COLLECTION_INSTALLED_STATUS
 
     def uninstall(self, collection_id):
         """Uninstall the collection.
@@ -190,8 +190,7 @@ class CollectionManager(object):
         if collection_dir.exists():
             shutil.rmtree(str(collection_dir))
 
-        config.COLLECTIONS[collection_id]['status'] = \
-            COLLECTION_NOT_INSTALLED_STATUS
+        config.COLLECTIONS[collection_id]["status"] = COLLECTION_NOT_INSTALLED_STATUS
 
         # Should items from other installed collections be reinstalled
         # "automatically"?

@@ -1,17 +1,16 @@
-# coding=utf-8
 from pathlib import Path
 import logging
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
-from resource_sharing.resource_handler.symbol_resolver_mixin import \
-    SymbolResolverMixin
+from resource_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin
 
-LOGGER = logging.getLogger('QGIS Resource Sharing')
-STYLE = 'style'
+LOGGER = logging.getLogger("QGIS Resource Sharing")
+STYLE = "style"
 
 
 class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     """Style handler class."""
+
     IS_DISABLED = False
 
     def __init__(self, collection_id):
@@ -32,7 +31,7 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
         # Get all the collection's layer style QML files located in
         # self.resource_dir
         style_files = []
-        for item in Path(self.resource_dir).glob('*.qml'):
+        for item in Path(self.resource_dir).glob("*.qml"):
             style_files.append(item)
         # Nothing to do if there are no symbol files
         if len(style_files) == 0:
@@ -43,8 +42,12 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
             try:
                 self.resolve_dependency(str(style_file))
             except Exception as e:
-                LOGGER.error("Could not handle style (QML) file '" +
-                             str(style_file) + "':\n" + str(e))
+                LOGGER.error(
+                    "Could not handle style (QML) file '"
+                    + str(style_file)
+                    + "':\n"
+                    + str(e)
+                )
             else:
                 valid += 1
         if valid >= 0:

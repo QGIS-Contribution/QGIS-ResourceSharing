@@ -1,9 +1,8 @@
-# coding=utf-8
 import logging
 
 from qgis.core import QgsMessageLog, Qgis
 
-LOGGERNAME = 'QGIS Resource Sharing'
+LOGGERNAME = "QGIS Resource Sharing"
 
 
 def setup_logger():
@@ -28,8 +27,8 @@ class QgisLogger(logging.Handler):
 
     def __init__(self):
         logging.Handler.__init__(self)
-        fmt = '%(asctime)s %(filename)-18s %(levelname)-8s: %(message)s'
-        fmt_date = '%Y-%m-%dT%T%Z'
+        fmt = "%(asctime)s %(filename)-18s %(levelname)-8s: %(message)s"
+        fmt_date = "%Y-%m-%dT%T%Z"
         formatter = logging.Formatter(fmt, fmt_date)
         self.setFormatter(formatter)
 
@@ -46,7 +45,4 @@ class QgisLogger(logging.Handler):
         elif record.levelno == logging.WARNING:
             qgislevel = Qgis.Warning
 
-        QgsMessageLog.logMessage(
-            record.getMessage(),
-            LOGGERNAME,
-            level=qgislevel)
+        QgsMessageLog.logMessage(record.getMessage(), LOGGERNAME, level=qgislevel)

@@ -1,9 +1,9 @@
-# coding=utf-8
 import logging
 
 from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.PyQt.QtCore import QUrl, QCoreApplication
 from qgis.core import QgsNetworkAccessManager
+
 try:
     from qgis.core import QgsAuthManager
 except ImportError:
@@ -11,11 +11,12 @@ except ImportError:
 
 from resource_sharing.utilities import qgis_version
 
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class NetworkManager(object):
     """Class to get the content of a file with a given URL."""
+
     def __init__(self, url, auth_cfg=None):
         self._network_manager = QgsNetworkAccessManager.instance()
         self._network_finished = False
@@ -48,14 +49,12 @@ class NetworkManager(object):
 
         request = QNetworkRequest(QUrl(self._url))
         request.setAttribute(
-            QNetworkRequest.CacheLoadControlAttribute,
-            QNetworkRequest.AlwaysNetwork)
+            QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork
+        )
 
         if self._auth_cfg and qgis_version() >= 21200:
-            LOGGER.debug('Update request with auth_cfg %s' % self._auth_cfg)
-            QgsAuthManager.instance().updateNetworkRequest(
-                request, self._auth_cfg
-            )
+            LOGGER.debug("Update request with auth_cfg %s" % self._auth_cfg)
+            QgsAuthManager.instance().updateNetworkRequest(request, self._auth_cfg)
 
         self._reply = self._network_manager.get(request)
         self._reply.finished.connect(self.fetch_finished)

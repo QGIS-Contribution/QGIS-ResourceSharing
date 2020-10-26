@@ -1,4 +1,3 @@
-# coding=utf-8
 """This module contains the base class for the repository handlers."""
 try:
     from io import StringIO
@@ -19,13 +18,14 @@ from resource_sharing.exception import MetadataError
 from resource_sharing.version_compare import isCompatible
 from resource_sharing.network_manager import NetworkManager
 
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class RepositoryHandlerMeta(type):
     """Resource handler meta class."""
+
     def __init__(cls, name, bases, dct):
-        if not hasattr(cls, 'registry'):
+        if not hasattr(cls, "registry"):
             # This is the base class.  Create an empty registry
             cls.registry = {}
         else:
@@ -42,7 +42,7 @@ class RepositoryHandlerMeta(type):
 class BaseRepositoryHandler(object):
     """Abstract class of handler."""
 
-    METADATA_FILE = 'metadata.ini'
+    METADATA_FILE = "metadata.ini"
     IS_DISABLED = False
 
     def __init__(self, url):
@@ -128,7 +128,7 @@ class BaseRepositoryHandler(object):
         network_manager = NetworkManager(self.metadata_url, self.auth_cfg)
         status, fetcherror = network_manager.fetch()
         if status:
-            self.metadata = bytes(network_manager.content).decode('utf8')
+            self.metadata = bytes(network_manager.content).decode("utf8")
         return status, fetcherror
 
     def parse_metadata(self):
@@ -138,7 +138,7 @@ class BaseRepositoryHandler(object):
         :rtype: (dict)
         """
         if not self.metadata:
-            msg = 'The metadata content is None'
+            msg = "The metadata content is None"
             LOGGER.error(msg)
             raise MetadataError(msg)
 
@@ -149,88 +149,102 @@ class BaseRepositoryHandler(object):
         try:
             parser = ConfigParser()
             parser.read_file(metadata_file)
-            collections_str = parser.get('general', 'collections')
+            collections_str = parser.get("general", "collections")
         except Exception as e:
-            raise MetadataError('Error parsing metadata: %s' % e)
+            raise MetadataError("Error parsing metadata: %s" % e)
 
         collection_list = [
-            collection.strip() for collection in collections_str.split(',')]
+            collection.strip() for collection in collections_str.split(",")
+        ]
         # Read all the collections
         for collection in collection_list:
             # Parse the version
-            qgis_min_version = parser.has_option(
-                collection, 'qgis_minimum_version') and parser.get(
-                collection, 'qgis_minimum_version') or None
-            qgis_max_version = parser.has_option(
-                collection, 'qgis_maximum_version') and parser.get(
-                collection, 'qgis_maximum_version') or None
+            qgis_min_version = (
+                parser.has_option(collection, "qgis_minimum_version")
+                and parser.get(collection, "qgis_minimum_version")
+                or None
+            )
+            qgis_max_version = (
+                parser.has_option(collection, "qgis_maximum_version")
+                and parser.get(collection, "qgis_maximum_version")
+                or None
+            )
             if not qgis_min_version:
-                qgis_min_version = '2.0'
+                qgis_min_version = "2.0"
             if not qgis_max_version:
-                qgis_max_version = '3.99'
-            if not isCompatible(
-                    Qgis.QGIS_VERSION, qgis_min_version, qgis_max_version):
+                qgis_max_version = "3.99"
+            if not isCompatible(Qgis.QGIS_VERSION, qgis_min_version, qgis_max_version):
                 LOGGER.warning(
-                    'Collection %s is not compatible with this QGIS '
-                    'version. QGIS ver: %s, QGIS min ver: %s, QGIS max ver: '
-                    '%s' % (
-                        collection, Qgis.QGIS_VERSION, qgis_min_version,
-                        qgis_max_version))
+                    "Collection %s is not compatible with this QGIS "
+                    "version. QGIS ver: %s, QGIS min ver: %s, QGIS max ver: "
+                    "%s"
+                    % (
+                        collection,
+                        Qgis.QGIS_VERSION,
+                        qgis_min_version,
+                        qgis_max_version,
+                    )
+                )
                 continue
 
             # Collection is compatible, continue parsing
             try:
                 # Parse general information
-                author = parser.get(collection, 'author')
-                email = parser.get(collection, 'email')
-                name = parser.get(collection, 'name')
-                tags = parser.get(collection, 'tags')
-                description = parser.get(collection, 'description')
+                author = parser.get(collection, "author")
+                email = parser.get(collection, "email")
+                name = parser.get(collection, "name")
+                tags = parser.get(collection, "tags")
+                description = parser.get(collection, "description")
 
                 # Parse licensing stuffs
-                license_str = parser.has_option(
-                    collection, 'license') and parser.get(
-                    collection, 'license') or None
-                license_path = parser.has_option(
-                    collection, 'license_file') and parser.get(
-                    collection, 'license_file') or None
+                license_str = (
+                    parser.has_option(collection, "license")
+                    and parser.get(collection, "license")
+                    or None
+                )
+                license_path = (
+                    parser.has_option(collection, "license_file")
+                    and parser.get(collection, "license_file")
+                    or None
+                )
                 license_url = None
                 if license_path:
                     license_url = self.collection_file_url(
-                        collection,
-                        license_path.strip()
+                        collection, license_path.strip()
                     )
 
                 # Parse the preview urls
-                preview_str = parser.has_option(collection, 'preview') and \
-                    parser.get(collection, 'preview') or ''
+                preview_str = (
+                    parser.has_option(collection, "preview")
+                    and parser.get(collection, "preview")
+                    or ""
+                )
                 preview_list = []
-                for preview in preview_str.split(','):
-                    if preview.strip() != '':
+                for preview in preview_str.split(","):
+                    if preview.strip() != "":
                         preview_url = self.collection_file_url(
-                            collection,
-                            preview.strip()
+                            collection, preview.strip()
                         )
                         preview_list.append(preview_url)
 
             except Exception as e:
-                raise MetadataError('Error parsing metadata: %s' % e)
+                raise MetadataError("Error parsing metadata: %s" % e)
 
             collection_dict = {
-                'register_name': collection,
-                'author': author,
-                'author_email': email,
-                'repository_url': self.url,
-                'repository_name': '',
-                'status': COLLECTION_NOT_INSTALLED_STATUS,
-                'name': name,
-                'tags': tags,
-                'description': description,
-                'qgis_min_version': qgis_min_version,
-                'qgis_max_version': qgis_max_version,
-                'preview': preview_list,
-                'license': license_str,
-                'license_url': license_url
+                "register_name": collection,
+                "author": author,
+                "author_email": email,
+                "repository_url": self.url,
+                "repository_name": "",
+                "status": COLLECTION_NOT_INSTALLED_STATUS,
+                "name": name,
+                "tags": tags,
+                "description": description,
+                "qgis_min_version": qgis_min_version,
+                "qgis_max_version": qgis_max_version,
+                "preview": preview_list,
+                "license": license_str,
+                "license_url": license_url,
             }
             collections.append(collection_dict)
 
@@ -277,5 +291,5 @@ class BaseRepositoryHandler(object):
         :param file_path: The file path relative to the collection root.
         :type file_path: str
         """
-        rel_path = 'collections/%s/%s' % (collection_name, file_path)
+        rel_path = "collections/%s/%s" % (collection_name, file_path)
         return self.file_url(rel_path)

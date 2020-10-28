@@ -8,4 +8,4 @@ from .style_handler import StyleResourceHandler  # noqa: F401
 from .r_handler import RScriptHandler  # noqa: F401
 from .model_handler import ModelHandler  # noqa: F401
 from .expression_handler import ExpressionHandler  # noqa: F401
-from .checklist_handler import Chec  # noqa: F401klistHandler
+from .checklist_handler import ChecklistHandler  # noqa: F401

@@ -2,7 +2,7 @@
 name=QGIS Resource Sharing
 
 email=havard.tveite@nmbu.no
-author=Akbar Gumbira, Håvard Tveite Julien Moura
+author=Akbar Gumbira, Håvard Tveite, Julien Moura
 qgisMinimumVersion=3.0
 description=Download shared collections
 about=Search for published collections and install them for use with QGIS. Symbology (SVG, images, styles), Processing scripts, Processing models, R scripts and checklists are supported. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S).

@@ -1,4 +1,7 @@
 # Embedded requirements
+#
+# Typical command to install:
+# python -m pip install --no-deps -U -r requirements/embedded.txt -t external_packages
 # -----------------------
 
 dulwich>=0.20,<0.21

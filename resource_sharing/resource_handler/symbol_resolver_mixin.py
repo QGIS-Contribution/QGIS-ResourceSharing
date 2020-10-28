@@ -1,4 +1,3 @@
-# coding=utf-8
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -25,13 +24,14 @@ class SymbolResolverMixin(object):
         :param xml_path: The path to the XML style file.
         :type xml_path: str
         """
-        with open(xml_path, 'rb') as xml_file:
+        with open(xml_path, "rb") as xml_file:
             symbol_xml = xml_file.read()
 
         updated_xml = fix_xml_node(
-            symbol_xml, str(self.collection_path), QgsApplication.svgPaths())
+            symbol_xml, str(self.collection_path), QgsApplication.svgPaths()
+        )
 
-        with open(xml_path, 'wb') as xml_file:
+        with open(xml_path, "wb") as xml_file:
             xml_file.write(updated_xml)
 
 
@@ -54,8 +54,8 @@ def fix_xml_node(xml, collection_path, search_paths):
     raster_fill_nodes = root.findall(".//layer/prop[@k='imageFile']")
     path_nodes = svg_marker_nodes + svg_fill_nodes + raster_fill_nodes
     for path_node in path_nodes:
-        path = resolve_path(path_node.get('v'), collection_path, search_paths)
-        path_node.set('v', path)
+        path = resolve_path(path_node.get("v"), collection_path, search_paths)
+        path_node.set("v", path)
 
     return ET.tostring(root)
 
@@ -84,10 +84,10 @@ def resolve_path(path, collection_path, search_paths):
         return QFileInfo(path).canonicalFilePath()
 
     # It might be a URL
-    if '://' in path:
+    if "://" in path:
         url = QUrl(path)
-        if url.isValid() and url.scheme() != '':
-            if url.scheme().lower() == 'file':
+        if url.isValid() and url.scheme() != "":
+            if url.scheme().lower() == "file":
                 # It's a url to local file
                 path = url.toLocalFile()
                 if QFile(path).exists():
@@ -98,12 +98,12 @@ def resolve_path(path, collection_path, search_paths):
 
     # Check in the 'svg' directory of the collection
     file_name = path_leaf(path)
-    svg_collection_path = Path(collection_path, 'svg', file_name)
+    svg_collection_path = Path(collection_path, "svg", file_name)
     if QFile(str(svg_collection_path)).exists():
         return QFileInfo(str(svg_collection_path)).canonicalFilePath()
 
     # Check in the 'image' directory of the collection
-    image_collection_path = Path(collection_path, 'image', file_name)
+    image_collection_path = Path(collection_path, "image", file_name)
     if QFile(str(image_collection_path)).exists():
         return QFileInfo(str(image_collection_path)).canonicalFilePath()
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
                                  A QGIS plugin
@@ -22,10 +21,11 @@
 from pathlib import Path
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
+
 try:
-    from qgis.PyQt.QtGui import QAction    # QT 4 - could be removed
+    from qgis.PyQt.QtGui import QAction  # QT 4 - could be removed
 except ImportError:
-    from qgis.PyQt.QtWidgets import QAction    # QT 5
+    from qgis.PyQt.QtWidgets import QAction  # QT 5
 from .gui.resource_sharing_dialog import ResourceSharingDialog
 from .utilities import resources_path
 
@@ -46,15 +46,16 @@ class Plugin:
         # initialize the plugin directory
         self.plugin_dir = Path(__file__).parent
         # initialize the locale
-        locale = QSettings().value('locale/userLocale')[0:2]
-        locale_path = Path(self.plugin_dir, 'i18n',
-                           'QgsResourceSharing_{}.qm'.format(locale))
+        locale = QSettings().value("locale/userLocale")[0:2]
+        locale_path = Path(
+            self.plugin_dir, "i18n", "QgsResourceSharing_{}.qm".format(locale)
+        )
 
         if Path(locale_path).exists():
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
+            if qVersion() > "4.3.3":
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
@@ -62,10 +63,10 @@ class Plugin:
 
         # Declare instance attributes
         self.actions = []
-        self.menuName = self.tr(u'&Resource Sharing')
+        self.menuName = self.tr("&Resource Sharing")
         # TODO: We may let the user set this up
         self.toolbar = self.iface.addToolBar(self.menuName)
-        self.toolbar.setObjectName(u'Resource Sharing')
+        self.toolbar.setObjectName("Resource Sharing")
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -81,19 +82,20 @@ class Plugin:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('QgsResourceSharing', message)
+        return QCoreApplication.translate("QgsResourceSharing", message)
 
     def add_action(
-            self,
-            icon_path,
-            text,
-            callback,
-            enabled_flag=True,
-            add_to_menu=True,
-            add_to_toolbar=True,
-            status_tip=None,
-            whats_this=None,
-            parent=None):
+        self,
+        icon_path,
+        text,
+        callback,
+        enabled_flag=True,
+        add_to_menu=True,
+        add_to_toolbar=True,
+        status_tip=None,
+        whats_this=None,
+        parent=None,
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -148,8 +150,8 @@ class Plugin:
             self.toolbar.addAction(action)
 
         if add_to_menu:
-            if hasattr(self.iface, 'addPluginToWebMenu'):
-                self.iface.addPluginToWebMenu('', action)
+            if hasattr(self.iface, "addPluginToWebMenu"):
+                self.iface.addPluginToWebMenu("", action)
             # We'll also keep it in the Plugin menu for the time being...
             # else:
             #     self.iface.addPluginToMenu(self.menuName, action)
@@ -160,19 +162,20 @@ class Plugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = str(resources_path('icon.png'))
+        icon_path = str(resources_path("icon.png"))
         self.add_action(
             icon_path,
-            text=self.tr(u'Resource Sharing'),
+            text=self.tr("Resource Sharing"),
             callback=self.run,
             parent=self.iface.mainWindow(),
-            add_to_toolbar=True)
+            add_to_toolbar=True,
+        )
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            if hasattr(self.iface, 'removePluginWebMenu'):
-                self.iface.removePluginWebMenu('', action)
+            if hasattr(self.iface, "removePluginWebMenu"):
+                self.iface.removePluginWebMenu("", action)
             # We'll also keep it in the Plugin menu for the time being...
             # else:
             #    self.iface.removePluginMenu(self.menuName, action)

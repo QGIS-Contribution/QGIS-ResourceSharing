@@ -53,14 +53,24 @@ import re
 
 def normalizeVersion(s):
     """ remove possible prefix from given string and convert to uppercase """
-    prefixes = ['VERSION', 'VER.', 'VER', 'V.', 'V', 'REVISION', 'REV.',
-                'REV', 'R.', 'R']
+    prefixes = [
+        "VERSION",
+        "VER.",
+        "VER",
+        "V.",
+        "V",
+        "REVISION",
+        "REV.",
+        "REV",
+        "R.",
+        "R",
+    ]
     if not s:
         return unicode()
     s = unicode(s).upper()
     for i in prefixes:
-        if s[:len(i)] == i:
-            s = s.replace(i, '')
+        if s[: len(i)] == i:
+            s = s.replace(i, "")
     s = s.strip()
     return s
 
@@ -98,8 +108,14 @@ def compareElements(s1, s2):
         return 0
     # try to compare as numeric values (but only if the first character is
     # not 0):
-    if s1 and s2 and s1.isnumeric() and s2.isnumeric() \
-            and s1[0] != '0' and s2[0] != '0':
+    if (
+        s1
+        and s2
+        and s1.isnumeric()
+        and s2.isnumeric()
+        and s1[0] != "0"
+        and s2[0] != "0"
+    ):
         if float(s1) == float(s2):
             return 0
         elif float(s1) > float(s2):
@@ -109,10 +125,10 @@ def compareElements(s1, s2):
     # if the strings aren't numeric or start from 0, compare them as a strings:
     # but first, set:
     # ALPHA < BETA < PREVIEW < RC < TRUNK < [NOTHING] < [ANYTHING_ELSE]
-    if s1 not in ['ALPHA', 'BETA', 'PREVIEW', 'RC', 'TRUNK']:
-        s1 = 'Z' + s1
-    if s2 not in ['ALPHA', 'BETA', 'PREVIEW', 'RC', 'TRUNK']:
-        s2 = 'Z' + s2
+    if s1 not in ["ALPHA", "BETA", "PREVIEW", "RC", "TRUNK"]:
+        s1 = "Z" + s1
+    if s2 not in ["ALPHA", "BETA", "PREVIEW", "RC", "TRUNK"]:
+        s2 = "Z" + s2
     # the final test:
     if s1 > s2:
         return 1
@@ -147,9 +163,9 @@ def compareVersions(a, b):
     # compare the odd tail with the simple space (because the 'alpha',
     # 'beta', 'preview' and 'rc' are LESS then nothing)
     if len(v1) > shorter:
-        return compareElements(v1[shorter], u' ')
+        return compareElements(v1[shorter], " ")
     if len(v2) > shorter:
-        return compareElements(u' ', v2[shorter])
+        return compareElements(" ", v2[shorter])
     # if everything else fails...
     if a > b:
         return 1
@@ -168,7 +184,7 @@ def splitVersion(s):
     """ split string into 2 or 3 numerical segments """
     if not s or type(s) != str:
         return None
-    versionlist = s.split('.')
+    versionlist = s.split(".")
     for c in versionlist:
         if not c.isnumeric():
             return None
@@ -185,9 +201,9 @@ def isCompatible(curVer, minVer, maxVer):
     if not minVer or not curVer or not maxVer:
         return False
 
-    minVer = splitVersion(re.sub(r'[^0-9.]+', '', minVer))
-    maxVer = splitVersion(re.sub(r'[^0-9.]+', '', maxVer))
-    curVer = splitVersion(re.sub(r'[^0-9.]+', '', curVer))
+    minVer = splitVersion(re.sub(r"[^0-9.]+", "", minVer))
+    maxVer = splitVersion(re.sub(r"[^0-9.]+", "", maxVer))
+    curVer = splitVersion(re.sub(r"[^0-9.]+", "", curVer))
 
     if not minVer or not curVer or not maxVer:
         return False
@@ -205,4 +221,4 @@ def isCompatible(curVer, minVer, maxVer):
     maxVer = "%04d%04d%04d" % (int(maxVer[0]), int(maxVer[1]), int(maxVer[2]))
     curVer = "%04d%04d%04d" % (int(curVer[0]), int(curVer[1]), int(curVer[2]))
 
-    return (minVer <= curVer and maxVer >= curVer)
+    return minVer <= curVer and maxVer >= curVer

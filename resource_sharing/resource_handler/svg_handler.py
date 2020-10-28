@@ -1,9 +1,9 @@
-# coding=utf-8
 from pathlib import Path
 import shutil
 import logging
 
 from qgis.core import QgsSettings
+
 try:
     from qgis.core import Qgis
 except ImportError:
@@ -12,12 +12,13 @@ except ImportError:
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.utilities import local_collection_path
 
-SVG = 'svg'
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+SVG = "svg"
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class SVGResourceHandler(BaseResourceHandler):
     """The SVG resource handler class."""
+
     IS_DISABLED = False
 
     def __init__(self, collection_id):
@@ -30,13 +31,13 @@ class SVGResourceHandler(BaseResourceHandler):
 
         Return the SVG search path as a list"""
         settings = QgsSettings()
-        search_paths_settings = settings.value('svg/searchPathsForSVG')
+        search_paths_settings = settings.value("svg/searchPathsForSVG")
         if not search_paths_settings:
             search_paths = []
         else:
             if Qgis.QGIS_VERSION_INT < 29900:
                 # QGIS 2
-                search_paths = search_paths_settings.split('|')
+                search_paths = search_paths_settings.split("|")
             else:
                 # QGIS 3
                 # Check if it is a string (single directory)
@@ -52,16 +53,16 @@ class SVGResourceHandler(BaseResourceHandler):
         """Write the list of SVG paths to settings"""
         settings = QgsSettings()
         if Qgis.QGIS_VERSION_INT < 29900:
-            settings.setValue('svg/searchPathsForSVG', '|'.join(paths))
+            settings.setValue("svg/searchPathsForSVG", "|".join(paths))
         else:
             if len(paths) == 0:
-                settings.remove('svg/searchPathsForSVG')
+                settings.remove("svg/searchPathsForSVG")
             else:
                 if len(paths) == 1:
                     svgpaths = str(paths[0])
                 else:
                     svgpaths = paths
-                settings.setValue('svg/searchPathsForSVG', svgpaths)
+                settings.setValue("svg/searchPathsForSVG", svgpaths)
 
     @classmethod
     def dir_name(cls):
@@ -83,7 +84,7 @@ class SVGResourceHandler(BaseResourceHandler):
 
         # Count the SVGs
         valid = 0
-        for filename in Path(self.resource_dir).rglob('*'):
+        for filename in Path(self.resource_dir).rglob("*"):
             if filename.suffix.lower().endswith("svg"):
                 valid += 1
         if valid >= 0:
@@ -99,7 +100,7 @@ class SVGResourceHandler(BaseResourceHandler):
         shutil.rmtree(self.resource_dir)
         # Check if there are no SVG files in the collections directory
         svgCount = 0
-        for filename in local_collection_path().rglob('*'):
+        for filename in local_collection_path().rglob("*"):
             if filename.suffix.lower() == "svg":
                 svgCount += 1
                 break

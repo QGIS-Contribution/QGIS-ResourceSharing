@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 # Put the COLLECTIONS object (dict) in the module namespace
 # (http://effbot.org/pyfaq/how-do-i-share-global-variables-across-modules.htm)

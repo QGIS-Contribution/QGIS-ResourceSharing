@@ -61,4 +61,3 @@ devzip:
 	@echo "Your plugin archive has been generated:"
 	@ls -lah ${OUTPUT}
 	@echo "${OUTPUT}"
-

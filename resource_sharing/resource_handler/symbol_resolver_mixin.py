@@ -1,8 +1,8 @@
-from pathlib import Path
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
-from qgis.PyQt.QtCore import QFileInfo, QUrl, Qt, QFile
 from qgis.core import QgsApplication
+from qgis.PyQt.QtCore import QFile, QFileInfo, QUrl
 
 from resource_sharing.utilities import path_leaf
 

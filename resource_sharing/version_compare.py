@@ -66,8 +66,8 @@ def normalizeVersion(s):
         "R",
     ]
     if not s:
-        return unicode()
-    s = unicode(s).upper()
+        return str()
+    s = str(s).upper()
     for i in prefixes:
         if s[: len(i)] == i:
             s = s.replace(i, "")

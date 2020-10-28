@@ -1,20 +1,21 @@
-import logging
 import csv
-from pathlib import Path
+import logging
 import pickle
-from qgis.PyQt.QtCore import QObject, QSettings, QTemporaryFile
+
 from qgis.core import QgsSettings
-from resource_sharing.utilities import (
-    repo_settings_group,
-    local_collection_path,
-    repositories_cache_path,
-)
-from resource_sharing.repository_handler import BaseRepositoryHandler
-from resource_sharing.network_manager import NetworkManager
+from qgis.PyQt.QtCore import QObject, QTemporaryFile
+
+from resource_sharing import config
 from resource_sharing.collection_manager import CollectionManager
 from resource_sharing.config import COLLECTION_INSTALLED_STATUS
-from resource_sharing import config
 from resource_sharing.exception import MetadataError
+from resource_sharing.network_manager import NetworkManager
+from resource_sharing.repository_handler import BaseRepositoryHandler
+from resource_sharing.utilities import (
+    local_collection_path,
+    repo_settings_group,
+    repositories_cache_path,
+)
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 
@@ -136,7 +137,7 @@ class RepositoryManager(QObject):
             # Check if the repository is already present
             repo_present = False
             for repo_name in settings.childGroups():
-                url = settings.value(repo_name + "/url", "", type=unicode)
+                url = settings.value(repo_name + "/url", "", type=str)
                 if url == self._online_directories[online_dir_name]:
                     repo_present = True
                     break
@@ -154,9 +155,9 @@ class RepositoryManager(QObject):
                 )
         for repo_name in settings.childGroups():
             self._directories[repo_name] = {}
-            url = settings.value(repo_name + "/url", "", type=unicode)
+            url = settings.value(repo_name + "/url", "", type=str)
             self._directories[repo_name]["url"] = url
-            auth_cfg = settings.value(repo_name + "/auth_cfg", "", type=unicode).strip()
+            auth_cfg = settings.value(repo_name + "/auth_cfg", "", type=str).strip()
             self._directories[repo_name]["auth_cfg"] = auth_cfg
         settings.endGroup()
 

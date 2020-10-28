@@ -1,6 +1,6 @@
 import logging
 
-from qgis.core import QgsMessageLog, Qgis
+from qgis.core import Qgis, QgsMessageLog
 
 LOGGERNAME = "QGIS Resource Sharing"
 

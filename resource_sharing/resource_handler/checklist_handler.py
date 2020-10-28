@@ -1,9 +1,8 @@
-from pathlib import Path
-import shutil
 import logging
+import shutil
+from pathlib import Path
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QDir, QSettings
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 

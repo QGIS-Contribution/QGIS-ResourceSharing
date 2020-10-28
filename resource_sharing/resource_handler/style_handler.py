@@ -1,5 +1,5 @@
-from pathlib import Path
 import logging
+from pathlib import Path
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin

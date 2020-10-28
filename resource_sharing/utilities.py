@@ -1,16 +1,21 @@
-from pathlib import Path
 import logging
 import ntpath
-from ext_libs.pathvalidate import sanitize_filename
-from qgis.PyQt.QtCore import QDir, QSettings
+from pathlib import Path
+
 from qgis.core import QgsSettings
+from qgis.PyQt.QtCore import QDir
+
+from ext_libs.pathvalidate import sanitize_filename
 
 try:
-    from qgis.core import QgsApplication, QGis as Qgis
+    from qgis.core import QGis as Qgis
+    from qgis.core import QgsApplication
 except ImportError:
     from qgis.core import QgsApplication, Qgis
-from resource_sharing import config
+
 import jinja2
+
+from resource_sharing import config
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 
@@ -161,7 +166,7 @@ def qgis_version():
     :returns: QGIS Version where 30400 represents QGIS 3.4 etc.
     :rtype: int
     """
-    version = unicode(Qgis.QGIS_VERSION_INT)
+    version = str(Qgis.QGIS_VERSION_INT)
     version = int(version)
     return version
 

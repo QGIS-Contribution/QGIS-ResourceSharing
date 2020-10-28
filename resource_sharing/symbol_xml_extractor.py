@@ -1,10 +1,14 @@
-import os
 import logging
 
-from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import (
+    QgsPalLayerSettings,
+    QgsProject,
+    QgsReadWriteContext,
+    QgsSymbolLayerUtils,
+    QgsTextFormat,
+)
 from qgis.PyQt.QtCore import QFile, QIODevice
-from qgis.core import QgsSymbolLayerUtils, QgsReadWriteContext, QgsProject
-from qgis.core import QgsPalLayerSettings, QgsTextFormat
+from qgis.PyQt.QtXml import QDomDocument
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 

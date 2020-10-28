@@ -2,7 +2,7 @@ from pathlib import Path
 import shutil
 import logging
 
-from qgis.core import QgsApplication, Qgis
+from qgis.core import QgsApplication
 
 # Worth a try? Should probably be present if the Processing R
 # Provider plugin is installed.
@@ -77,9 +77,9 @@ class RScriptHandler(BaseResourceHandler):
         if r_provider is not None:
             try:
                 r_provider.refreshAlgorithms()
-            except Error as e:
+            except Exception as err:
                 LOGGER.error(
-                    "Exception when refreshing after adding" " R scripts:\n" + str(e)
+                    "Exception when refreshing after adding" " R scripts:\n" + str(err)
                 )
 
     def default_rscripts_folder(self):

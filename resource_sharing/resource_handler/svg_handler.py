@@ -1,6 +1,6 @@
-from pathlib import Path
-import shutil
 import logging
+import shutil
+from pathlib import Path
 
 from qgis.core import QgsSettings
 

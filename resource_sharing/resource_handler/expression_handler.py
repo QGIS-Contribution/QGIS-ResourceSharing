@@ -1,31 +1,22 @@
-from pathlib import Path
 import json
 import logging
+from pathlib import Path
 
 from qgis.core import QgsSettings
 
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
-
 from resource_sharing.resource_handler.base import BaseResourceHandler
-from resource_sharing.utilities import (
-    user_expressions_group,
-    repo_settings_group,
-    qgis_version,
-)
+from resource_sharing.utilities import user_expressions_group
 
 hasExprBuilder = False
 # try:
 #     from qgis.core import QgsExpressions
 
-try:
-    from qgis.gui import QgsExpressionBuilderWidget
-except ImportError:
-    hasExprBuilder = False
-else:
-    hasExprBuilder = True
+# try:
+#     from qgis.gui import QgsExpressionBuilderWidget
+# except ImportError:
+#     hasExprBuilder = False
+# else:
+#     hasExprBuilder = True
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 EXPRESSIONS = "expressions"
@@ -80,9 +71,9 @@ class ExpressionHandler(BaseResourceHandler):
                 expr_help = expr["description"]
                 settings.setValue(expr_name + "/expression", expr_value)
                 settings.setValue(expr_name + "/helpText", expr_help)
-                aftervalue = settings.value(
-                    expr_name + "/expression", "", type=unicode
-                ).strip()
+                # aftervalue = settings.value(
+                #     expr_name + "/expression", "", type=unicode
+                # ).strip()
             valid += 1
         settings.endGroup()
         if valid >= 0:

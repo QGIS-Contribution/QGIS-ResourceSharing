@@ -1,9 +1,7 @@
-from pathlib import Path
-
 from six import add_metaclass
 
-from resource_sharing.utilities import local_collection_path
 from resource_sharing import config
+from resource_sharing.utilities import local_collection_path
 
 
 class ResourceHandlerMeta(type):

@@ -1,11 +1,11 @@
-from pathlib import Path
-import shutil
 import logging
+import shutil
+from pathlib import Path
 
 from processing.script import ScriptUtils
-from resource_sharing.resource_handler.base import BaseResourceHandler
-
 from qgis.core import QgsApplication
+
+from resource_sharing.resource_handler.base import BaseResourceHandler
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 PROCESSING = "processing"
@@ -69,8 +69,8 @@ class ProcessingScriptHandler(BaseResourceHandler):
         if script_pr is not None:
             try:
                 script_pr.refreshAlgorithms()
-            except Error as e:
-                LOGGER.error("Exception refreshing algorithms:\n" + str(e))
+            except Exception as err:
+                LOGGER.error("Exception refreshing algorithms:\n" + str(err))
 
     def scripts_folder(self):
         """Return the default processing scripts folder."""

@@ -1,7 +1,7 @@
 """This module contains the base class for the repository handlers."""
 try:
     from io import StringIO
-except ImportError as error:
+except ImportError:
     from StringIO import StringIO
 
 import logging

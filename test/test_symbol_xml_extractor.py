@@ -1,4 +1,3 @@
-# coding=utf-8
 from qgis.testing import start_app, unittest
 
 
@@ -6,24 +5,27 @@ from qgis.testing import start_app, unittest
 # QGIS 2.x: QgsRandomColorRamp
 # QGIS 3.x is QgsLimitedRandomColorRamp
 
-try: # QGIS 2.x
+try:  # QGIS 2.x
     from qgis.core import (
         QgsVectorColorBrewerColorRampV2 as QgsColorBrewerColorRamp,
         QgsVectorGradientColorRampV2 as QgsGradientColorRamp,
         QgsVectorRandomColorRampV2 as random_color_ramp,  # <-- !!!!
         QgsFillSymbolV2 as QgsFillSymbol,
         QgsLineSymbolV2 as QgsLineSymbol,
-        QgsMarkerSymbolV2 as QgsMarkerSymbol)
-except ImportError: # QGIS 3.x
+        QgsMarkerSymbolV2 as QgsMarkerSymbol,
+    )
+except ImportError:  # QGIS 3.x
     from qgis.core import (
         QgsColorBrewerColorRamp,
         QgsLimitedRandomColorRamp as random_color_ramp,  # <-- !!!!
         QgsGradientColorRamp,
         QgsFillSymbol,
         QgsLineSymbol,
-        QgsMarkerSymbol)
+        QgsMarkerSymbol,
+    )
 
 from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
+
 try:
     from .utilities import test_data_path
 except ImportError:
@@ -38,36 +40,38 @@ class TestSymbolXMLExtractor(unittest.TestCase):
     def test_parse_xml(self):
         """Test parsing the xml works correctly."""
         xml_path = test_data_path(
-            'collections', 'test_collection', 'symbol', 'various_symbols.xml')
+            "collections", "test_collection", "symbol", "various_symbols.xml"
+        )
         extractor = SymbolXMLExtractor(xml_path)
         self.assertTrue(extractor.parse_xml())
         # There are 9 symbols and 3 colorramps there
         expected_symbols = {
-            'fill_raster': QgsFillSymbol,
-            'fill_svg': QgsFillSymbol,
-            'fill_svg_line': QgsFillSymbol,
-            'line_arrow': QgsLineSymbol,
-            'line_svg_marker': QgsLineSymbol,
-            'marker_ellipse': QgsMarkerSymbol,
-            'marker_font': QgsMarkerSymbol,
-            'marker_simple': QgsMarkerSymbol,
-            'marker_svg': QgsMarkerSymbol
+            "fill_raster": QgsFillSymbol,
+            "fill_svg": QgsFillSymbol,
+            "fill_svg_line": QgsFillSymbol,
+            "line_arrow": QgsLineSymbol,
+            "line_svg_marker": QgsLineSymbol,
+            "marker_ellipse": QgsMarkerSymbol,
+            "marker_font": QgsMarkerSymbol,
+            "marker_simple": QgsMarkerSymbol,
+            "marker_svg": QgsMarkerSymbol,
         }
         self.assertEqual(len(extractor.symbols), len(expected_symbols))
         for symbol in extractor.symbols:
             self.assertTrue(
-                isinstance(symbol['symbol'], expected_symbols[symbol['name']])
+                isinstance(symbol["symbol"], expected_symbols[symbol["name"]])
             )
         expected_colorramps = {
-            'cr_colorbrewer': QgsColorBrewerColorRamp,
-            'cr_gradient': QgsGradientColorRamp,
-            'cr_random': random_color_ramp # QGIS 2.x is QgsRandomColorRamp QGIS 3.x is QgsLimitedRandomColorRamp
+            "cr_colorbrewer": QgsColorBrewerColorRamp,
+            "cr_gradient": QgsGradientColorRamp,
+            "cr_random": random_color_ramp,  # QGIS 2.x is QgsRandomColorRamp QGIS 3.x is QgsLimitedRandomColorRamp
         }
         self.assertEqual(len(extractor.colorramps), len(expected_colorramps))
         for colorramp in extractor.colorramps:
             self.assertTrue(
-                isinstance(colorramp['colorramp'],
-                           expected_colorramps[colorramp['name']])
+                isinstance(
+                    colorramp["colorramp"], expected_colorramps[colorramp["name"]]
+                )
             )
 
 

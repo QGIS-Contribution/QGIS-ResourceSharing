@@ -1,7 +1,7 @@
-# coding=utf-8
 import os
 
 from qgis.PyQt.QtCore import QUrl
+
 
 def test_data_path(*args):
     """Return the absolute path to the InaSAFE test data or directory path.
@@ -16,7 +16,7 @@ def test_data_path(*args):
 
     """
     path = os.path.dirname(__file__)
-    path = os.path.abspath(os.path.join(path, 'data'))
+    path = os.path.abspath(os.path.join(path, "data"))
     for item in args:
         path = os.path.abspath(os.path.join(path, item))
 

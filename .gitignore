@@ -53,3 +53,4 @@ ENV/
 # ext_libs/*/contrib/
 # ext_libs/*/tests/
 ext_libs/
+dev_precommit_black.log

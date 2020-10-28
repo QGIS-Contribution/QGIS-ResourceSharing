@@ -23,7 +23,7 @@ import logging
 
 from qgis.PyQt import uic
 from qgis.PyQt.Qt import QSize, QFont, QBrush, QColor
-from qgis.PyQt.QtCore import Qt, QSettings, pyqtSlot, QRegExp, QUrl, QThread
+from qgis.PyQt.QtCore import Qt, pyqtSlot, QRegExp, QUrl, QThread
 
 from qgis.PyQt.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
 

@@ -1,5 +1,4 @@
 import hashlib
-from pathlib import Path
 import shutil
 import logging
 import traceback
@@ -26,7 +25,7 @@ LOGGER = logging.getLogger("QGIS Resource Sharing")
 class CollectionInstaller(QObject):
     finished = pyqtSignal()
     aborted = pyqtSignal()
-    progress = pyqtSignal(basestring)
+    progress = pyqtSignal(str)
 
     def __init__(self, collection_manager, collection_id):
         QObject.__init__(self)

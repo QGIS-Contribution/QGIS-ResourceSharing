@@ -1,0 +1,47 @@
+name: Linter
+
+env:
+  PROJECT_FOLDER: "resource_sharing"
+  PYTHON_VERSION: 3.7
+
+on:
+  push:
+    paths:
+      - '**.py'
+  pull_request:
+    paths:
+      - '**.py'
+
+jobs:
+  flake8_py3:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install project requirements
+        run: |
+          python -m pip install -U -r requirements/base.txt
+          python -m pip install -U -r requirements/development.txt
+      # -- COMMENTED thanks to @Gustry comments
+      #     python -m pip install --no-deps -U -r requirements/embedded.txt -t ext_libs
+
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 ${{ env.PROJECT_FOLDER }} --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings.
+          flake8 ${{ env.PROJECT_FOLDER }} --count --exit-zero --statistics

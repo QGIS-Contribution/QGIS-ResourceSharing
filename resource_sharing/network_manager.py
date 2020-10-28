@@ -1,8 +1,8 @@
 import logging
 
-from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
-from qgis.PyQt.QtCore import QUrl, QCoreApplication
 from qgis.core import QgsNetworkAccessManager
+from qgis.PyQt.QtCore import QCoreApplication, QUrl
+from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest
 
 try:
     from qgis.core import QgsAuthManager

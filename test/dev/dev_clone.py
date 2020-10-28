@@ -29,9 +29,7 @@ print("CLONE WITHOUT DEPTH: %s seconds" % (time.time() - start_time))
 # WITH DEPTH
 start_time = time.time()
 repo = porcelain.clone(
-    source=git_remote_repo,
-    target=str(local_repo_dir_with_depth),
-    depth=1
+    source=git_remote_repo, target=str(local_repo_dir_with_depth), depth=1
 )
 repo.close()
 print("CLONE WITH DEPTH: %s seconds" % (time.time() - start_time))
@@ -49,8 +47,7 @@ print("PULL WITHOUT DEPTH: %s seconds" % (time.time() - start_time))
 # WITH DEPTH
 start_time = time.time()
 repo = porcelain.pull(
-    remote_location=git_remote_repo,
-    repo=str(local_repo_dir_with_depth)
+    remote_location=git_remote_repo, repo=str(local_repo_dir_with_depth)
 )
 print("PULL WITH DEPTH: %s seconds" % (time.time() - start_time))
 

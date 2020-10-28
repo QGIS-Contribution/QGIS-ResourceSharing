@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 /***************************************************************************
  QGIS Resource Sharing - A QGIS plugin
@@ -25,17 +24,16 @@ import sys
 import os
 
 # Dulwich tries to call sys.argv, but the argv module is missing in QGIS
-if not hasattr(sys, 'argv'):
+if not hasattr(sys, "argv"):
     sys.argv = []
 
 sys.path.append(os.path.dirname(__file__))
 
-PLUGIN_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__)))
+PLUGIN_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 if PLUGIN_DIR not in sys.path:
     sys.path.append(PLUGIN_DIR)
 
-EXT_LIBS_DIR = os.path.abspath(os.path.join(PLUGIN_DIR, 'ext_libs'))
+EXT_LIBS_DIR = os.path.abspath(os.path.join(PLUGIN_DIR, "ext_libs"))
 if EXT_LIBS_DIR not in sys.path:
     sys.path.append(EXT_LIBS_DIR)
 
@@ -50,7 +48,9 @@ def classFactory(iface):  # pylint: disable=invalid-name
     """
 
     from resource_sharing.custom_logging import setup_logger
+
     setup_logger()
 
     from resource_sharing.plugin import Plugin
+
     return Plugin(iface)

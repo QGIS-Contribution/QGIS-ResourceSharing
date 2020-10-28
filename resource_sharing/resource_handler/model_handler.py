@@ -1,11 +1,11 @@
-from pathlib import Path
-import shutil
 import logging
-from processing.tools.system import userFolder, mkdir
+import shutil
+from pathlib import Path
+
+from processing.tools.system import mkdir, userFolder
+from qgis.core import QgsApplication
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
-
-from qgis.core import QgsApplication
 
 MODELS_PROCESSING_FOLDER = "models"
 MODELS = "models"  # Resource Sharing collection subdirectory name
@@ -72,8 +72,8 @@ class ModelHandler(BaseResourceHandler):
         if mod_prov is not None:
             try:
                 mod_prov.refreshAlgorithms()
-            except Error as e:
-                LOGGER.error("Exception refreshing models:\n" + str(e))
+            except Exception as err:
+                LOGGER.error("Exception refreshing models:\n" + str(err))
 
     def default_models_folder(self):
         """Return the default location of the processing models folder."""

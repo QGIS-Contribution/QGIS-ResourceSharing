@@ -1,5 +1,5 @@
-from pathlib import Path
 import logging
+from pathlib import Path
 
 try:
     from qgis.core import QgsStyleV2 as QgsStyle
@@ -7,8 +7,8 @@ except ImportError:
     from qgis.core import QgsStyle
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
-from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 from resource_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin
+from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 from resource_sharing.utilities import qgis_version
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")

@@ -1,4 +1,3 @@
-# coding=utf-8
 """Dialog test.
 
 .. note:: This program is free software; you can redistribute it and/or modify
@@ -8,9 +7,9 @@
 
 """
 
-__author__ = 'akbargumbira@gmail.com'
-__date__ = '2016-05-29'
-__copyright__ = 'Copyright 2016, Akbar Gumbira'
+__author__ = "akbargumbira@gmail.com"
+__date__ = "2016-05-29"
+__copyright__ = "Copyright 2016, Akbar Gumbira"
 
 
 from qgis.testing import start_app, unittest
@@ -24,13 +23,12 @@ except ImportError:
 
 
 from resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
-from resource_sharing.config import (
-    COLLECTION_ALL_STATUS,
-    COLLECTION_INSTALLED_STATUS)
+from resource_sharing.config import COLLECTION_ALL_STATUS, COLLECTION_INSTALLED_STATUS
 
 
 class ResourceSharingDialogTest(unittest.TestCase):
     """Test dialog works."""
+
     @classmethod
     def setUpClass(cls):
         start_app()
@@ -66,20 +64,20 @@ class ResourceSharingDialogTest(unittest.TestCase):
             self.dialog.menu_list_widget.setCurrentRow(index)
             if index in [0, 1]:
                 # Tab All and installed
-                self.assertEqual(
-                    self.dialog.stacked_menu_widget.currentIndex(), 0)
+                self.assertEqual(self.dialog.stacked_menu_widget.currentIndex(), 0)
                 if index == 0:
                     self.assertEqual(
                         self.dialog.collection_proxy.accepted_status,
-                        COLLECTION_ALL_STATUS)
+                        COLLECTION_ALL_STATUS,
+                    )
                 else:
                     self.assertEqual(
                         self.dialog.collection_proxy.accepted_status,
-                        COLLECTION_INSTALLED_STATUS)
+                        COLLECTION_INSTALLED_STATUS,
+                    )
             else:
                 # Tab Settings
-                self.assertEqual(
-                    self.dialog.stacked_menu_widget.currentIndex(), 1)
+                self.assertEqual(self.dialog.stacked_menu_widget.currentIndex(), 1)
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ changelog=
          0.16.0 - GUI improvements (#138, #139, #140, #141)
                - Add button for reloading the QGIS directory of approved resources (#145 ) - thanks to @Guts
                - Fix bug in the handling of QGIS directory updates (#146)
-               - Add support for checklists (#151) - @ricardogsilva 
+               - Add support for checklists (#151) - @ricardogsilva
         0.15.1 - Fix incorrect handling of searchPathsForSVG setting (#135)
                - Handle XML parsing exceptions for QML files
         0.15.0 - Support expressions (#130). Switch to Python pathlib.

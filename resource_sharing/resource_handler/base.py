@@ -1,4 +1,3 @@
-# coding=utf-8
 from pathlib import Path
 
 from six import add_metaclass
@@ -9,8 +8,9 @@ from resource_sharing import config
 
 class ResourceHandlerMeta(type):
     """Resource handler meta class definition."""
+
     def __init__(cls, name, bases, dct):
-        if not hasattr(cls, 'registry'):
+        if not hasattr(cls, "registry"):
             # This is the base class.  Create an empty registry
             cls.registry = {}
         else:
@@ -57,8 +57,7 @@ class BaseResourceHandler(object):
     @property
     def resource_dir(self):
         """The root of the resource dir from this resource type."""
-        resource_dir = (local_collection_path(self.collection_id) /
-                        self.dir_name())
+        resource_dir = local_collection_path(self.collection_id) / self.dir_name()
         return resource_dir
 
     def install(self):

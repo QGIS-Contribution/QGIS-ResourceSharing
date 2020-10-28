@@ -1,4 +1,3 @@
-# coding=utf-8
 from pathlib import Path
 import shutil
 import logging
@@ -13,11 +12,12 @@ except ImportError:
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
 
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class FileSystemHandler(BaseRepositoryHandler):
     """Handler for file system repositories."""
+
     IS_DISABLED = False
 
     def __init__(self, url):
@@ -28,7 +28,7 @@ class FileSystemHandler(BaseRepositoryHandler):
 
     def can_handle(self):
         if not self.is_git_repository:
-            if self._parsed_url.scheme == 'file':
+            if self._parsed_url.scheme == "file":
                 return True
 
     def fetch_metadata(self):
@@ -36,14 +36,14 @@ class FileSystemHandler(BaseRepositoryHandler):
         # Check if the metadata exists
         metadata_path = Path(self._path) / self.METADATA_FILE
         if not metadata_path.exists():
-            message = 'The metadata file could not be found in the repository'
+            message = "The metadata file could not be found in the repository"
             return False, message
 
         # Read the metadata file:
-        with open(str(metadata_path), 'r') as metadata_file:
+        with open(str(metadata_path), "r") as metadata_file:
             metadata_content = metadata_file.read()
         self.metadata = metadata_content
-        message = 'Metadata successfully fetched'
+        message = "Metadata successfully fetched"
 
         return True, message
 
@@ -58,10 +58,9 @@ class FileSystemHandler(BaseRepositoryHandler):
         :type register_name: unicode
         """
         # Copy the specific downloaded collection to collections dir
-        src_dir = Path(self._path) / 'collections' / register_name
+        src_dir = Path(self._path) / "collections" / register_name
         if not src_dir.exists():
-            error_message = ('Error: The collection does not exist in the '
-                             'repository.')
+            error_message = "Error: The collection does not exist in the " "repository."
             return False, error_message
 
         dest_dir = local_collection_path(id)
@@ -73,4 +72,4 @@ class FileSystemHandler(BaseRepositoryHandler):
 
     def file_url(self, relative_path):
         file_path = Path(self._path, relative_path)
-        return urljoin('file:', pathname2url(str(file_path)))
+        return urljoin("file:", pathname2url(str(file_path)))

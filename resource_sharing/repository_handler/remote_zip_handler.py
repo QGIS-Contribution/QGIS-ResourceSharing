@@ -1,10 +1,9 @@
-# coding=utf-8
 import logging
 
 try:
-    from urlparse import urljoin   # Python 2
+    from urlparse import urljoin  # Python 2
 except ImportError:
-    from urllib.parse import urljoin   # Python 3
+    from urllib.parse import urljoin  # Python 3
 
 from zipfile import ZipFile
 
@@ -14,11 +13,12 @@ from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
 from resource_sharing.network_manager import NetworkManager
 
-LOGGER = logging.getLogger('QGIS Resource Sharing')
+LOGGER = logging.getLogger("QGIS Resource Sharing")
 
 
 class RemoteZipHandler(BaseRepositoryHandler):
     """Class to handle remote zip repository."""
+
     IS_DISABLED = False
 
     def __init__(self, url):
@@ -27,7 +27,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
 
     def can_handle(self):
         if not self.is_git_repository:
-            if self._parsed_url.scheme in ['http', 'https']:
+            if self._parsed_url.scheme in ["http", "https"]:
                 return True
         return False
 
@@ -45,7 +45,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
         :type register_name: unicode
         """
         # Download the zip first
-        collection_path = 'collections/%s.zip' % register_name
+        collection_path = "collections/%s.zip" % register_name
         network_manager = NetworkManager(self.file_url(collection_path))
         status, description = network_manager.fetch()
 

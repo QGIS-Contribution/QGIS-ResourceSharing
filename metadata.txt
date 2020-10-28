@@ -2,7 +2,7 @@
 name=QGIS Resource Sharing
 
 email=havard.tveite@nmbu.no
-author=Akbar Gumbira, Håvard Tveite
+author=Akbar Gumbira, Håvard Tveite, Julien Moura
 qgisMinimumVersion=3.0
 description=Download shared collections
 about=Search for published collections and install them for use with QGIS. Symbology (SVG, images, styles), Processing scripts, Processing models, R scripts and checklists are supported. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S).
@@ -18,7 +18,8 @@ deprecated=False
 icon=resources/icon.png
 changelog=
         0.17.0 - Improved integration of external libraries (#166)
-        0.16.0 - GUI improvements (#138, #139, #140, #141)
+	       - Imptoved development environment (#168) -thanks to @Guts
+         0.16.0 - GUI improvements (#138, #139, #140, #141)
                - Add button for reloading the QGIS directory of approved resources (#145 ) - thanks to @Guts
                - Fix bug in the handling of QGIS directory updates (#146)
                - Add support for checklists (#151) - @ricardogsilva

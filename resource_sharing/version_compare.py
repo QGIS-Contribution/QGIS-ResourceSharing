@@ -86,7 +86,7 @@ def classifyCharacter(c):
         return 2
 
 
-# ------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------
 def chopString(s):
     """ convert string to list of numbers and words """
     list_n_w = [s[0]]
@@ -100,7 +100,7 @@ def chopString(s):
     return list_n_w
 
 
-# ------------------------------------------------------------------------ #
+# ------------------------------------------------------------------------
 def compareElements(s1, s2):
     """ compare two particular elements """
     # check if the matter is easy solvable:

@@ -4,13 +4,14 @@ env:
   PROJECT_FOLDER: "resource_sharing"
   PYTHON_VERSION: 3.7
 
-on:
-  push:
-    paths:
-      - '**.py'
-  pull_request:
-    paths:
-      - '**.py'
+# because linter is a required check, it must be triggered on every push
+# on:
+#   push:
+#     paths:
+#       - '**.py'
+#   pull_request:
+#     paths:
+#       - '**.py'
 
 jobs:
   flake8_py3:

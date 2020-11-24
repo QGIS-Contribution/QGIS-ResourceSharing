@@ -1,0 +1,11 @@
+-i https://pypi.org/simple
+
+# Documentation (for devs)
+# ------------------------
+
+ghp-import>=1.0,<1.1
+recommonmark>=0.6,<0.7
+rstcheck>=3.3,<3.4
+sphinx-copybutton>=0.3,<0.4
+sphinx-markdown-tables>=0.0.15,<0.0.16
+sphinx-rtd-theme>=0.5,<0.6

@@ -139,6 +139,7 @@ you choose this option:
                 |   └── testscript.py
                 ├── rscripts
                 |   ├── firstRscript.rsx
+                |   └──firstRscript.rsx.help
                 |   ├── ...
                 |   ├── testRscript.rsx
                 |   └── testRscript.rsx.help

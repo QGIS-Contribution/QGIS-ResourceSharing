@@ -1,112 +1,77 @@
----
-layout: page
-title: "Problems and solutions"
-category: user
-date: 2016-08-13 17:11:10
-order: 5
----
+# Problems and solutions
 
-***Polluted SVG search path***
+## Polluted SVG search path
 
-If the local collection directories have changed location in
-the file system, the SVG search path may not have been updated,
+If the local collection directories have changed location in the file system, the SVG search path may not have been updated,
 and the old location will still be included in the search path.
-Old locations can be removed from the search path by editing
-*searchPathsForSVG* under ``svg`` in the QGIS settings
-(*Settings-> Options-> Advanced*), or in the QGIS3.ini file
-that is located under `QGIS` in the user QGIS folder.
 
-***Strange and/or old tag names in Style Manager***
+Old locations can be removed from the search path by editing _searchPathsForSVG_ under `svg` in the QGIS settings (_Settings-> Options-> Advanced_), or in the QGIS3.ini file that is located under `QGIS` in the user QGIS folder.
 
-Earlier versions of the plugin used non-inutitive tag names
-for grouping symbols, colormaps, labelsettings and textformats
-in the Style Manager. This has been improved in later versions.
+----
 
-When a repository is been renamed, new tag names are generated
-in Style Manager, but the old ones will remain.
+## Strange and/or old tag names in Style Manager
 
-To clean up the "mess", remove the strange / old tags by
-right-clicking on the tag name in the left part of the
-Style Manager dialogue and *Remove*.
+Earlier versions of the plugin used non-inutitive tag names for grouping symbols, colormaps, labelsettings and textformats in the Style Manager. This has been improved in later versions.
 
-Reload the collections to get missing style elements from the
-collections back in the Style Manager.
+When a repository is been renamed, new tag names are generated in Style Manager, but the old ones will remain.
 
-***Empty tags in Style Manager***
+To clean up the "mess", remove the strange / old tags by right-clicking on the tag name in the left part of the Style Manager dialogue and _Remove_.
 
-Earlier versions of the plugin may have introduced tags
-without associated elements.
-In the Style Manager right-click on the "empty" tag, and *Remove*.
+Reload the collections to get missing style elements from the collections back in the Style Manager.
 
-***Collection directories are not removed***
+----
 
-If there are subdirectories in the collections directory
-(``/.local/share/QGIS/QGIS3/profiles/default/resource_sharing/collections``
-on Ubuntu,
-``C:\Users\<user>\AppData\Roaming\QGIS\QGIS3\profiles\default\resource_sharing\collections``
-on Windows)
-that do not correspond to installed collections, you can safely
-remove them.
+## Empty tags in Style Manager
 
-***Repository directories are not removed***
+Earlier versions of the plugin may have introduced tags without associated elements.
 
-If there are subdirectories in the repositories directory
-(``/.local/share/QGIS/QGIS3/profiles/default/resource_sharing/repositories``
-on Ubuntu,
-``C:\Users\<user>\AppData\Roaming\QGIS\QGIS3\profiles\default\resource_sharing\repositories``
-on Windows)
-that do not correspond to officially approved QGIS repositories,
-you can safely remove them.
+In the Style Manager right-click on the "empty" tag, and _Remove_.
 
-***Starting with a clean sheet***
+----
 
-If everything has turned out to be a mess (might happen after
-plugin upgrades that adds new "features"), and you would like
-to remove all installed collections and clean up, you can:
+## Collection directories are not removed
 
-* Remove the ``resource_sharing`` directory in your QGIS user
-  folder
-  (``/.local/share/QGIS/QGIS3/profiles/default/QGIS``
-  on Ubuntu,
-  ``C:\Users\<user>\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS``
-  on Windows).
-  That will remove the cache, the local copies/clones of the
-  repositories and the local copies of the collections.
-* Remove ``localCollectionDir`` under ``[ResourceSharing]`` in
-  QGIS settings (*Settings-> Options-> Advanced*), or in
-  the QGIS3.ini file that is located under QGIS in the user
-  QGIS folder.
-* Remove the ``repository`` group (the group has one entry for each
-  repository and one entry for the ``online_directories``) under
-  ``[ResourceSharing]`` in QGIS settings
-  (*Settings-> Options-> Advanced*), or in the QGIS3.ini file that
-  is located under QGIS in the user QGIS folder).
-* If you have used an early version (pre 0.10.0), you may also
-  want to remove the ``~/QGIS/Resource Sharing`` directory.
-* Remove all Resource Sharing related directories from the SVG
-  search path by editing *searchPathsForSVG* under ``svg`` in
-  QGIS settings (*Settings-> Options-> Advanced*), or in
-  the QGIS3.ini file that is located under `QGIS` in the user
-  QGIS folder.
-* Reinstall the plugin
+If there are subdirectories in the collections directory (`/.local/share/QGIS/QGIS3/profiles/default/resource_sharing/collections`
+on Ubuntu, `C:\Users\<user>\AppData\Roaming\QGIS\QGIS3\profiles\default\resource_sharing\collections`
+on Windows) that do not correspond to installed collections, you can safely remove them.
 
-***Installing developing versions***
+----
 
-If you would like to test upcoming features of the plugin,
-or help fixing bugs, it is possible to download the plugin
-directly from github.
+## Repository directories are not removed
 
-The most common would be to download the *master* branch
+If there are subdirectories in the repositories directory (`/.local/share/QGIS/QGIS3/profiles/default/resource_sharing/repositories` on Ubuntu, `C:\Users\<user>\AppData\Roaming\QGIS\QGIS3\profiles\default\resource_sharing\repositories`
+on Windows) that do not correspond to officially approved QGIS repositories, you can safely remove them.
+
+----
+
+## Starting with a clean sheet
+
+If everything has turned out to be a mess (might happen after plugin upgrades that adds new "features"), and you would like to remove all installed collections and clean up, you can:
+
+- Remove the `resource_sharing` directory in your QGIS user folder (`/.local/share/QGIS/QGIS3/profiles/default/QGIS` on Ubuntu, `C:\Users\<user>\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS` on Windows). That will remove the cache, the local copies/clones of the repositories and the local copies of the collections.
+- Remove `localCollectionDir` under `[ResourceSharing]` in QGIS settings (_Settings-> Options-> Advanced_), or in the QGIS3.ini file that is located under QGIS in the user QGIS folder.
+- Remove the `repository` group (the group has one entry for each repository and one entry for the `online_directories`) under `[ResourceSharing]` in QGIS settings (_Settings-> Options-> Advanced_), or in the QGIS3.ini file that is located under QGIS in the user QGIS folder).
+- If you have used an early version (pre 0.10.0), you may also want to remove the `~/QGIS/Resource Sharing` directory.
+- Remove all Resource Sharing related directories from the SVG search path by editing _searchPathsForSVG_ under `svg` in QGIS settings (_Settings-> Options-> Advanced_), or in the QGIS3.ini file that is located under `QGIS` in the user QGIS folder.
+- Reinstall the plugin
+
+----
+
+## Installing developing versions
+
+If you would like to test upcoming features of the plugin, or help fixing bugs, it is possible to download the plugin directly from github.
+
+The most common would be to download the _master_ branch
 (*https://github.com/QGIS-Contribution/QGIS-ResourceSharing/archive/master.zip*),
 but all branches can be downloaded.
 
 1. Start a web browser and open
    *https://github.com/QGIS-Contribution/QGIS-ResourceSharing*.
 
-2. Choose the *Branch* you would like to download, click
-   the *Clone or download* button/pull-down and *Download ZIP*.
+2. Choose the _Branch_ you would like to download, click
+   the _Clone or download_ button/pull-down and _Download ZIP_.
 
-   ![Choose branch on github]({{ site.baseurl }}/assets/github-branch.png)
+   ![Choose branch on github](/assets/img/github-branch.png)
 
    Save the ZIP file.
 

@@ -28,5 +28,5 @@ After you make changes to the documentation, please make a PR to the
 
 Put images in the `assets` directory.
 To use them in your post, you reference them by writing:
-`![alt_text]({{ site.baseurl }}/assets/[the_image_path])`
+`![alt_text](/assets/img/[the_image_path])`
 (only set the _[alt_text]_ and _[the_image_path]_ parts).

@@ -1,10 +1,4 @@
----
-layout: page
-title: "What to share?"
-category: author
-date: 2016-07-22 17:06:34
-order: 2
----
+# What to share
 
 A repository contains collections to be shared.
 

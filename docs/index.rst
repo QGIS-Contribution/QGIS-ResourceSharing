@@ -1,9 +1,14 @@
----
-layout: default
-title: "Home"
----
+|title|
+=======
 
-### The QGIS Resource Sharing Plugin
+.. |date| date::
+
+:Author: |author|
+:Source code: |repo_url|
+:Package version: |version|
+:Documentation update: |date|
+
+----
 
 If you have ever wanted to share QGIS resources easily with your peers, this plugin comes to the rescue!
 
@@ -11,9 +16,9 @@ The QGIS Resource Sharing plugin allows QGIS users to share resources (symbols, 
 
 A QGIS Resource Sharing repository could be a remote GIT repository (currently Github, Gitlab and Bitbucket public repositories are supported), local file system collections, or zipped collections on the Web.
 
-![the plugin]({{ site.baseurl }}/assets/app.png)
+![the plugin](assets/img/app.png)
 
-![settings-repositories]({{ site.baseurl }}/assets/repositories.png)
+![settings-repositories](/assets/img/repositories.png)
 
 Collections are stored locally. By default, they are placed under the user's QGIS directory.
 
@@ -23,3 +28,44 @@ Git based collections are downloaded using git *clone* and updated using git *pu
 The plugin lets you update the repositories through the GUI (the *Reload repositories* button in *Settings*).
 
 The plugin was initially implemented as a Google Summer of Code project in 2016 for QGIS under the OSGeo organization by Akbar Gumbira (student), Alessandro Pasotti (mentor), Anita Graser (mentor), and with the help of Richard Duivenvoorde, Tim Sutton, and others in the QGIS community.
+
+
+
+.. toctree::
+   :caption: How to use the plugin
+   :maxdepth: 1
+
+   usage/installation
+   usage/installing-collection
+   usage/adding-repository
+   usage/plugin-configuration
+   usage/problems_and_solutions
+
+.. toctree::
+   :caption: Create your own collections
+   :maxdepth: 1
+
+   authoring/creating-repository
+   authoring/what-to-share
+   authoring/repository-structure
+   authoring/creating-metadata
+   authoring/publishing-repository
+   authoring/repository-example
+
+.. toctree::
+   :caption: Contribute to the plugin
+   :maxdepth: 1
+
+   development/contributing
+   development/environment
+   development/update_dependencies
+   development/documentation
+   development/release-workflow
+
+
+Indices and tables
+##################
+
+* :ref:`genindex`
+.. * :ref:`modindex`
+* :ref:`search`

@@ -1,10 +1,4 @@
----
-layout: page
-title: "Creating metadata"
-category: author
-date: 2016-07-25 14:58:04
-order: 4
----
+# Creating metadata
 
 In the root of the repository, there has to be a metadata file describing the repository and its collections.
 

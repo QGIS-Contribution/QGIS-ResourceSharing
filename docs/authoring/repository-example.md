@@ -1,13 +1,6 @@
----
-layout: page
-title: "Repository examples"
-category: author
-date: 2016-08-19 11:24:17
-order: 6
----
+# Gallery of examples
 
-Below is a list of repositories that you can have a look at
-when you want to create a repository:
+Below is a list of repositories that you can have a look at when you want to create a repository:
 
 - [QGIS Official Repository](https://github.com/qgis/QGIS-Resources)
 - [Richard Duivenvoorde Repository](https://github.com/rduivenvoorde/qgis-styles)

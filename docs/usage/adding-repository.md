@@ -1,30 +1,16 @@
----
-layout: page
-title: "Adding a repository"
-category: user
-date: 2016-08-11 23:11:10
-order: 3
----
+# Adding a repository
 
-The officially approved *QGIS Resource Sharing* repositories and
-their collections should be listed in the *Settings* tab when you
-have clicked the ***Reload Repositories*** button, as illustrated
-in the screenshot below.
+The officially approved *QGIS Resource Sharing* repositories and their collections should be listed in the *Settings* tab when you have clicked the ***Reload Repositories*** button, as illustrated in the screenshot below.
 
-![Repositories]({{ site.baseurl }}/assets/repositories.png)
+![Repositories](/assets/img/repositories.png)
 
-You can add other repositories by clicking the ```Add repository...```
-button and specify a *Name* for the repository (you are free to call
-it whatever you like, as long as the name is unique) and its *URL*
-(remember to use ``https`` for github and similar repositories).
-If authentication is needed to access the repository, *Add* the
-configuration.
+You can add other repositories by clicking the ```Add repository...``` button and specify a *Name* for the repository (you are free to call it whatever you like, as long as the name is unique) and its *URL* (remember to use ``https`` for github and similar repositories).
 
-![Add repository]({{ site.baseurl }}/assets/settings.png)
+If authentication is needed to access the repository, *Add* the configuration.
 
-If the repository is successfully added, you can now also see its
-collections in the ``All collections`` tab and install them from
-there.
+![Add repository](/assets/img/settings.png)
+
+If the repository is successfully added, you can now also see its collections in the ``All collections`` tab and install them from there.
 
 The table below lists the types of repositories that can be added.
 

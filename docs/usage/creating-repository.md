@@ -141,8 +141,6 @@ you choose this option:
                 |   ├── firstRscript.rsx
                 |   ├── ...
                 |   ├── testRscript.rsx
-                |   ├── firstRscript.rsx.help
-                |   ├── ...
                 |   └── testRscript.rsx.help
                 ├── style
                 |   ├── firstlayerstyle.qml

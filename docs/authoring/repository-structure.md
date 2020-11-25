@@ -6,8 +6,8 @@ date: 2016-07-22 17:04:29
 order: 3
 ---
 
-In order for the plugin to be able to read the repository correctly,
-the repository must have a specific structure.
+In order for the plugin to be able to read the repository correctly, the repository must have a specific structure.
+
 Generally the structure looks like this:
 
     Repository root
@@ -55,35 +55,28 @@ Generally the structure looks like this:
             ├── symbol (optional, containing symbol definition XML files)
             └── license file (encouraged)
 
-If the *QGIS Resource Sharing plugin* shall be able to make the
+If the _QGIS Resource Sharing plugin_ shall be able to make the
 resources available to QGIS users in a convenient way, you have
 to place them where the plugin expects to find them:
 
-* Layer style (QML) files belong in the ***style*** directory.
-
-* Processing models belong in the ***models*** directory.
-
-* Processing (Python) scripts belong in the ***processing***
+- Layer style (QML) files belong in the **_style_** directory.
+- Processing models belong in the **_models_** directory.
+- Processing (Python) scripts belong in the **_processing_**
   directory.
+- R script (for use with the Processing R plugin) belong in in the
+  **_rscripts_** directory.
 
-* R script (for use with the Processing R plugin) belong in in the
-  ***rscripts*** directory.
+- Symbol XML files belong in the **_symbol_** directory.
+  Symbol images are expected to be in the **_image_** directory and
+  symbol SVGs are expected to be in the **_svg_** directory.
 
-* Symbol XML files belong in the ***symbol*** directory.
-  Symbol images are expected to be in the ***image*** directory and
-  symbol SVGs are expected to be in the ***svg*** directory.
+- SVGs belong in the **_svg_** directory.
 
-* SVGs belong in the ***svg*** directory.
+- Images belong in the **_image_** directory.
 
-* Images belong in the ***image*** directory.
+- Expression JSON files belong in the **_expressions_** directory.
 
-* Expression JSON files belong in the ***expressions*** directory.
+- Data QA Workbench checklist JSON files belong in the
+  **_checklists_** directory.
 
-* Data QA Workbench checklist JSON files belong in the
-  ***checklists*** directory.
-
-
-Check the
-[QGIS Resources Repository](https://github.com/QGIS/QGIS-Resources) and
-[this test repository](https://github.com/QGIS-Contribution/QGIS_Test-Resources)
-for github repository examples.
+Check the [QGIS Resources Repository](https://github.com/QGIS/QGIS-Resources) and [this test repository](https://github.com/QGIS-Contribution/QGIS_Test-Resources) for GitHub repository examples.

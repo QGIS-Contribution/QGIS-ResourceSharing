@@ -139,10 +139,9 @@ you choose this option:
                 |   └── testscript.py
                 ├── rscripts
                 |   ├── firstRscript.rsx
+                |   └──firstRscript.rsx.help
                 |   ├── ...
                 |   ├── testRscript.rsx
-                |   ├── firstRscript.rsx.help
-                |   ├── ...
                 |   └── testRscript.rsx.help
                 ├── style
                 |   ├── firstlayerstyle.qml

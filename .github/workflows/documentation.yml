@@ -43,5 +43,11 @@ jobs:
     - name: Build doc using Sphinx
       run: sphinx-build -b html docs docs/_build/html
 
+    - name: Upload doc as artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: Documentation HTML build
+        path: docs/_build
+
     # - name: Deploy to GitHub Pages
     #   run: ghp-import --force --no-jekyll --push docs/_build/html

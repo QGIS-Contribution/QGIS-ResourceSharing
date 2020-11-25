@@ -1,10 +1,4 @@
----
-layout: page
-title: "Documentation"
-category: dev
-date: 2016-09-04 21:15:55
-order: 2
----
+# Documentation
 
 We are using Jekyll for the documentation (i.e this website).
 If you want to contribute to the documentation, it is available in

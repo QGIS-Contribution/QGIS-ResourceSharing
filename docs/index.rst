@@ -3,9 +3,9 @@
 
 .. |date| date::
 
-:Author: |author|
+:Authors: |author|
 :Source code: |repo_url|
-:Package version: |version|
+:Project version: |version|
 :Documentation update: |date|
 
 ----

@@ -1,10 +1,4 @@
----
-layout: page
-title: "Release workflow"
-category: dev
-date: 2016-09-04 19:32:12
-order: 3
----
+# Release workflow
 
 Releasing a new version involves an upload to plugins.qgis.org, so in
 order to complete the workflow you must have a user with sufficient

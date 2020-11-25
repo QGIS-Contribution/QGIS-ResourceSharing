@@ -10,29 +10,24 @@ import recommonmark
 import sphinx_rtd_theme  # noqa: F401 theme of Read the Docs
 from recommonmark.transform import AutoStructify
 
+# Package
+from resource_sharing import __about__
+
 # -- Build environment -----------------------------------------------------
 on_rtd = environ.get("READTHEDOCS", None) == "True"
 
 # -- Project information -----------------------------------------------------
-
-project = "Sphinx-Themes template"
-copyright = "2018, sphinx-themes.org"
-author = "sphinx-themes.org"
-
-# The short X.Y version
-version = ""
-# The full version, including alpha/beta/rc tags
-release = "1"
-
-github_doc_root = (
-    "https://github.com/QGIS-Contribution/QGIS-ResourceSharing/tree/master/doc/"
-)
+project = __about__.__title__
+author = __about__.__author__
+copyright = __about__.__copyright__
+version = release = __about__.__version__
+github_doc_root = "{}/tree/master/doc/".format(__about__.__uri_repository__)
 
 
 # replacement variables
 rst_epilog = ".. |title| replace:: %s" % project
 rst_epilog += "\n.. |author| replace:: %s" % author
-# rst_epilog += "\n.. |repo_url| replace:: %s" % __about__.__uri__
+rst_epilog += "\n.. |repo_url| replace:: %s" % __about__.__uri_repository__
 
 # -- General configuration ---------------------------------------------------
 
@@ -50,6 +45,7 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.extlinks",
     "sphinx.ext.viewcode",
     # 3rd party
     "sphinx_copybutton",
@@ -89,23 +85,23 @@ pygments_style = "sphinx"
 
 # -- Theme
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
+html_favicon = "assets/img/icon.png"
+html_logo = "assets/img/icon.png"
+html_sidebars = {
+    "**": ["globaltoc.html", "relations.html", "sourcelink.html", "searchbox.html"]
+}
+html_static_path = ["assets"]
 html_theme = "sphinx_rtd_theme"
-
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#
+# html_theme = 'rtd_qgis'
 html_theme_options = {
     # global
     "analytics_id": "UA-65219695-3",
-    "canonical_url": "",
+    "canonical_url": __about__.__uri_homepage__,
     "display_version": True,
     "logo_only": False,
     "prev_next_buttons_location": "both",
     "style_external_links": True,
-    "style_nav_header_background": "white",
+    "style_nav_header_background": "SteelBlue",
     # Toc options
     "collapse_navigation": False,
     "includehidden": False,
@@ -113,24 +109,9 @@ html_theme_options = {
     "sticky_navigation": False,
     "titles_only": False,
 }
+html_theme_path = ["./themes_custom"]
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["assets"]
-html_favicon = "assets/img/icon.png"
-
-# Custom sidebar templates, must be a dictionary that maps document names
-# to template names.
-#
-# The default sidebars (for documents that don't match any pattern) are
-# defined by theme itself.  Builtin themes are using these templates by
-# default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
-# 'searchbox.html']``.
-#
-# html_sidebars = {
-#     "**": ["globaltoc.html", "relations.html", "sourcelink.html", "searchbox.html"]
-# }
+# -- EXTENSIONS --------------------------------------------------------
 
 # Configuration for intersphinx (refer to others docs).
 intersphinx_mapping = {"python": ("https://docs.python.org/3/", None)}

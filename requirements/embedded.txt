@@ -5,5 +5,5 @@
 # -----------------------
 
 dulwich>=0.20,<0.21
-giturlparse>=0.9,<0.10
+giturlparse>=0.9,<0.11
 pathvalidate>=2.3,<2.4

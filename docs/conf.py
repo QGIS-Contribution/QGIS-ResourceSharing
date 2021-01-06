@@ -37,7 +37,7 @@ extensions = [
     "sphinx.ext.viewcode",
     # 3rd party
     "sphinx_copybutton",
-    "myst_parser"
+    "myst_parser",
 ]
 
 
@@ -75,7 +75,7 @@ pygments_dark_style = "monokai"
 html_favicon = "assets/img/icon.png"
 html_logo = "assets/img/icon.png"
 html_static_path = ["assets"]
-html_theme = 'furo'
+html_theme = "furo"
 
 # -- EXTENSIONS --------------------------------------------------------
 

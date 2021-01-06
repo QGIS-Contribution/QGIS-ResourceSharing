@@ -1,4 +1,4 @@
-name: Linter
+name: Linter 🐍
 
 env:
   PROJECT_FOLDER: "resource_sharing"
@@ -39,8 +39,6 @@ jobs:
         run: |
           python -m pip install -U -r requirements/base.txt
           python -m pip install -U -r requirements/development.txt
-      # -- COMMENTED thanks to @Gustry comments
-      #     python -m pip install --no-deps -U -r requirements/embedded.txt -t ext_libs
 
       - name: Lint with flake8
         run: |

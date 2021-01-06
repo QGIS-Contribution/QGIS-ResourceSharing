@@ -1,14 +1,8 @@
 #
 from os import environ, path
-
 import sys
 
 sys.path.insert(0, path.abspath(".."))
-
-# 3rd party
-import recommonmark
-import sphinx_rtd_theme  # noqa: F401 theme of Read the Docs
-from recommonmark.transform import AutoStructify
 
 # Package
 from resource_sharing import __about__
@@ -31,16 +25,10 @@ rst_epilog += "\n.. |repo_url| replace:: %s" % __about__.__uri_repository__
 
 # -- General configuration ---------------------------------------------------
 
-# If your documentation needs a minimal Sphinx version, state it here.
-#
-# needs_sphinx = '1.0'
-
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    # markdown
-    "recommonmark",
     # Sphinx included
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.githubpages",
@@ -49,8 +37,7 @@ extensions = [
     "sphinx.ext.viewcode",
     # 3rd party
     "sphinx_copybutton",
-    "sphinx_markdown_tables",
-    "sphinx_rtd_theme",
+    "myst_parser"
 ]
 
 
@@ -79,7 +66,7 @@ exclude_patterns = ["_build", ".venv", "Thumbs.db", ".DS_Store", "_output", "ext
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
-
+pygments_dark_style = "monokai"
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -87,45 +74,10 @@ pygments_style = "sphinx"
 
 html_favicon = "assets/img/icon.png"
 html_logo = "assets/img/icon.png"
-html_sidebars = {
-    "**": ["globaltoc.html", "relations.html", "sourcelink.html", "searchbox.html"]
-}
 html_static_path = ["assets"]
-html_theme = "sphinx_rtd_theme"
-# html_theme = 'rtd_qgis'
-html_theme_options = {
-    # global
-    "analytics_id": "UA-65219695-3",
-    "canonical_url": __about__.__uri_homepage__,
-    "display_version": True,
-    "logo_only": False,
-    "prev_next_buttons_location": "both",
-    "style_external_links": True,
-    "style_nav_header_background": "SteelBlue",
-    # Toc options
-    "collapse_navigation": False,
-    "includehidden": False,
-    "navigation_depth": 4,
-    "sticky_navigation": False,
-    "titles_only": False,
-}
-html_theme_path = ["./themes_custom"]
+html_theme = 'furo'
 
 # -- EXTENSIONS --------------------------------------------------------
 
 # Configuration for intersphinx (refer to others docs).
 intersphinx_mapping = {"python": ("https://docs.python.org/3/", None)}
-
-# launch setup
-def setup(app):
-    app.add_config_value(
-        "recommonmark_config",
-        {
-            "auto_toc_tree_section": "Contents",
-            "enable_auto_toc_tree": True,
-            "enable_eval_rst": True,
-        },
-        True,
-    )
-    app.add_transform(AutoStructify)
-    # app.connect("builder-inited", run_apidoc)

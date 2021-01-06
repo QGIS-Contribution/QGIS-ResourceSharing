@@ -44,7 +44,7 @@ jobs:
       run: sphinx-build -b html docs docs/_build/html
 
     - name: Upload doc as artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: Documentation HTML build
         path: docs/_build

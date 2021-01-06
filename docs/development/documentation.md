@@ -1,26 +1,44 @@
 # Documentation
 
-We are using Jekyll for the documentation (i.e this website).
-If you want to contribute to the documentation, it is available in
-the `gh-pages` branch (the documentation is hosted on
-[GitHub pages](https://pages.github.com/)).
+This documentation website is generated using Sphinx and deployed on [GitHub pages](https://pages.github.com/) using GitHub Actions.
 
-The documentation is divided into 3 categories: _for users_,
-_for authors_ and _for developers_.
-To update a particular page, find the markdown file in the `_posts`
-directory.
-To make a new page, run
-`bin/jekyll-page [page title] [category_code]`.
-The category codes are:
+To work on the documentation, install the related requirements:
 
-- `user` (will be placed in the **For Users** section)
-- `author` (**For authors** section)
-- `dev` (**For developers** section)
+```bash
+python -m pip install -U -r requirements/documentation.txt
+```
 
-After you make changes to the documentation, please make a PR to the
-`gh-pages` branch in the upstream repository.
+## Write
+
+The documentation is divided into 3 categories. To update a particular page, find the markdown file in the related folder:
+
+- for end-users: `docs/usage`
+- for collections authors: `docs/authoring`
+- for developers: `docs/development`
 
 Put images in the `assets` directory.
-To use them in your post, you reference them by writing:
-`![alt_text](/assets/img/[the_image_path])`
-(only set the _[alt_text]_ and _[the_image_path]_ parts).
+
+```{tip}
+To see live rendering of your documentation, you can run: `sphinx-autobuild -b html docs docs/_build/html`.
+```
+
+After you make changes to the documentation, please make a PR.
+
+## Build
+
+```bash
+# build it
+sphinx-build -b html docs docs/_build/html
+```
+
+Open `docs/_build/index.html` in a web browser.
+
+## Deploy
+
+Documentation website is hosted on GitHub Pages. Deployment takes advantage of [`ghp-import` library](https://pypi.org/project/ghp-import/). It's automatically triggered on CI but it's still possible to deploy it manually:
+
+```bash
+ghp-import --force --no-jekyll --push docs/_build/html
+```
+
+Files are uploaded to the branch `gh-pages` of the repository: <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/tree/gh-pages>.

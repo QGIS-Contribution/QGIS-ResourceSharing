@@ -2,27 +2,32 @@
 
 In the root of the repository, there has to be a metadata file describing the repository and its collections.
 
+## General
+
 The metadata file (`metadata.ini`) must have a `general` section with this information:
 
-**Name** | **Status** | **Description**
-collection | Required | Comma separated list of collection names
-(these have to match the directory names of the collections)
+| Name | Status | Description |
+| :--- | :----: | :---------- |
+| collection | Required | Comma separated list of collection names (these have to match the directory names of the collections) |
+
+## Collection
 
 For each collection, metadata are needed. The section must be named by the name defined in the general section.
 
 This is the contents of the collection section:
 
-| **Name** | **Status** | **Description** |
-| name | Required | The name of the collection |
+| Name | Status | Description |
+| :--- | :----: | :---------- |
 | author | Required | Author's name |
-| email | Optional | Author's email |
-| tags | Required | Comma separated list of tags |
 | description | Required | Additional information about the collection |
+| email | Optional | Author's email |
+| license | Optional | The license of the collection e.g GNU GPL |
+| license_file | Optional | License file (path relative to the collection root) |
+| name | Required | The name of the collection |
 | preview | Optional | Comma separated list of preview images (paths relative to the collection root) |
 | qgis_minimum_version | Optional | Minimum QGIS version. If not specified, the minimum version will be 2.0 |
 | qgis_maximum_version | Optional | Maximum QGIS version. If not specified, the maxium version will be 3.99 |
-| license | Optional | The license of the collection e.g GNU GPL |
-| license_file | Optional | License file (path relative to the collection root) |
+| tags | Required | Comma separated list of tags |
 
 This is an example of the `metadata.ini` file:
 

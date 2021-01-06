@@ -1,5 +1,7 @@
 # Installing a collection
 
+## Loading collections
+
 Now that you have the **QGIS Resource Sharing** plugin installed, you can browse available collections (from the repositories registered in the `Settings` tab) and install them in your file system, making them available to QGIS.
 
 The first time you use the plugin, there will be no collections in the `All collections` tab.
@@ -22,9 +24,7 @@ In addition, the _collection_ will be added under the _collections_ directory (`
 The directory name is composed of the collection name and the repository name (the _QGIS R script collection_ from the _QGIS Official Repository_ is located in the `resource_sharing/collections/QGIS R script collection (QGIS Official Repository)`
 directory).
 
-The collection folder will have sub-directories for the resources
-
-- as desrcibed in the <a href="../author/repository-structure.html">repository structure</a>.
+The collection folder will have sub-directories for the resources as desrcibed in the [repository structure](../authoring/repository-structure).
 
 ---
 
@@ -50,7 +50,9 @@ The first part of the tag name identifies the collection.
 
 Click on the tabs `All`, `Marker`, `Line`, `Fill`, `Color Ramp`, `Text Format` or `Label Settings` to see the items installed from the collection.
 
-### Expression (since version 0.15.0)
+### Expression
+
+> since version 0.15.0
 
 The expressions defined in the collection's expression (JSON) files are made available under _User expressions_ in the expression
 dialogue for QGIS versions 3.12 and higher.

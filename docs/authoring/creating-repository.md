@@ -4,8 +4,8 @@
 
 In order for the tools to parse the repository correctly, the repository must have a certain structure. This is what you need to do:
 
-1. Go to [this page]({{site.baseurl }}/author/repository-structure.html) to get information about the structure.
-2. Create correct metadata for the repository (consult [this page](/author/creating-metadata.html)).
+1. Go to [this page](repository-structure) to get information about the expected structure.
+2. Create correct metadata for the repository (consult [this page](creating-metadata)).
 3. When you have prepared your repository, you can check if the repository is all good by trying it using the file system handler.
 
 In the plugin, go to the `Settings` tab and add a new repository pointing to the root of the repository in your local file system. The repository URL looks like this:
@@ -14,12 +14,10 @@ In the plugin, go to the `Settings` tab and add a new repository pointing to the
 - Windows: `file://C:/home/pointing/to/repository_root`
 
 ----
+
 ## Where can you share it?
 
-These are the options for sharing: on Github, GitLab, Bitbucket (they
-need to be public repositories), Gogs (_Go Git Service_), local file
-system (if you want to share the collections with your colleagues on
-the network), or in your own server with the HTTP(S) protocol.
+These are the options for sharing: on Github, GitLab, Bitbucket (they need to be public repositories), Gogs (_Go Git Service_), local file system (if you want to share the collections with your colleagues on the network), or in your own server with the HTTP(S) protocol.
 
 ### Github, GitLab and Bitbucket
 
@@ -45,8 +43,7 @@ This is even simpler.
 
 After preparing the repository, you can use it right away.
 
-In the `Settings` tab, you add a repository with URL pointing to the repository root in your local machine (absolute path, example:
-`file:/home/user/QGIS-collections/mycollection`).
+In the `Settings` tab, you add a repository with URL pointing to the repository root in your local machine (absolute path, example: `file:/home/user/QGIS-collections/mycollection`).
 
 It's as simple as that.
 
@@ -64,7 +61,7 @@ There are some additional requirements that you need to be aware of if you choos
 
 For example, if you have a collection named `test_collection`, the collection must be present as: `http://www.mydomain.com/qgisrepository/collections/test_collection.zip`, and the structure of this zip file must be (only include directories that contain resources you would like to share):
 
-```ascii
+```txt
 test_collection.zip
 ├── checklists
 ├── expressions
@@ -77,9 +74,7 @@ test_collection.zip
 ├── symbol
 ```
 
-- Preview images that illustrates the collection should be included. If you define preview images for collection `test_collection`
-  in metadata (`preview=preview/prev1.png,prev2.png`), you have to place these preview images in the zip-file in a separate
-  directory. `preview` is the recommended name for that directory.
+- Preview images that illustrates the collection should be included. If you define preview images for collection `test_collection` in metadata (`preview=preview/prev1.png,prev2.png`), you have to place these preview images in the zip-file in a separate directory. `preview` is the recommended name for that directory.
 
 An example server directory setup for the repository `myfirstrepository` with one collection (`test_collection`) that contains resources to share in a lot of resource categories:
 

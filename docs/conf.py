@@ -1,4 +1,3 @@
-#
 from os import environ, path
 import sys
 

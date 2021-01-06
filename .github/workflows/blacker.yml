@@ -10,11 +10,19 @@ on:
     paths:
       - '**.py'
 
+env:
+  PYTHON_VERSION: 3.7
 
 jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: Get source code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
       - uses: psf/black@stable

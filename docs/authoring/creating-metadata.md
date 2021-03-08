@@ -18,7 +18,7 @@ This is the contents of the collection section:
 
 | Name | Status | Description |
 | :--- | :----: | :---------- |
-| Version | Required | The version of the collection |
+| Version | Otional | The version of the collection |
 
 Add a collection with checklists,or add checklist to an existing collection,to allow testing of checkist support in the plugin?
 | author | Required | Author's name |

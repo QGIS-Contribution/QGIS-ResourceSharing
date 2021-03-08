@@ -18,12 +18,16 @@ This is the contents of the collection section:
 
 | Name | Status | Description |
 | :--- | :----: | :---------- |
+| Version | Otional | The version of the collection |
+
+Add a collection with checklists,or add checklist to an existing collection,to allow testing of checkist support in the plugin?
 | author | Required | Author's name |
 | description | Required | Additional information about the collection |
 | email | Optional | Author's email |
 | license | Optional | The license of the collection e.g GNU GPL |
 | license_file | Optional | License file (path relative to the collection root) |
 | name | Required | The name of the collection |
+|version|
 | preview | Optional | Comma separated list of preview images (paths relative to the collection root) |
 | qgis_minimum_version | Optional | Minimum QGIS version. If not specified, the minimum version will be 2.0 |
 | qgis_maximum_version | Optional | Maximum QGIS version. If not specified, the maxium version will be 3.99 |

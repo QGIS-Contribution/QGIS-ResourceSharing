@@ -7,4 +7,4 @@ nose2>=0.9,<0.11
 pre-commit>=2.7,<2.11
 #qgis-plugin-ci>=1.8,<1.9
 rstcheck>=3.3,<3.4
-sphinx-autobuild>=2020.9,<2021
+sphinx-autobuild>=2020.9,<2022

@@ -24,6 +24,14 @@ To see live rendering of your documentation, you can run: `sphinx-autobuild -b h
 
 After you make changes to the documentation, please make a PR.
 
+## Write documentation using live render
+
+```bash
+sphinx-autobuild -b html docs/ docs/_build
+```
+
+Open <http://localhost:8000> in a web browser to see the HTML render updated when a file is saved.
+
 ## Build
 
 ```bash

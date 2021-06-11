@@ -22,7 +22,7 @@ __all__ = [
 
 # -- GLOBALS --------------------------------------------------------------------
 
-DIR_PLUGIN_ROOT = Path(__file__).parent
+DIR_PLUGIN_ROOT = Path(__file__).parent.parent
 PLG_METADATA_FILE = DIR_PLUGIN_ROOT.resolve() / "metadata.txt"
 
 

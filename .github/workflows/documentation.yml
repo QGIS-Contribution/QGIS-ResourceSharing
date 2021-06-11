@@ -1,4 +1,4 @@
-name: Doc build and deploy
+name: "📚 Documentation"
 
 on:
   push:

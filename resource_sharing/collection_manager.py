@@ -79,7 +79,7 @@ class CollectionInstaller(QObject):
 
 class CollectionManager(object):
     def __init__(self):
-        """ "Utilities class related to collection."""
+        """Utilities class related to collection."""
 
     def get_collection_id(self, register_name, repo_url):
         """Generate the collection ID."""

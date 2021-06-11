@@ -1,5 +1,13 @@
 # QGIS Resource Sharing - Documentation
 
+> **Description :** {{ description }}  
+> **Author and contributors:** {{ author }}  
+> **Plugin version:** {{ version }}  
+> **QGIS minimum version:** {{ qgis_version_min }}  
+> **QGIS maximum version:** {{ qgis_version_max }}  
+> **Source code:** {{ repo_url }}  
+> **Last documentation update:** {{ date_update }}
+
 ## Introduction
 
 ![the plugin](assets/img/app.png)

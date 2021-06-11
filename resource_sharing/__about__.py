@@ -22,11 +22,11 @@ __all__ = [
 
 # -- GLOBALS --------------------------------------------------------------------
 
-DIR_PLUGIN_ROOT = Path(__file__).parent.parent
+DIR_PLUGIN_ROOT = Path(__file__).parent
 PLG_METADATA_FILE = DIR_PLUGIN_ROOT.resolve() / "metadata.txt"
 
 
-#  -- FUNCTIONS --------------------------------------------------------------------
+# -- FUNCTIONS --------------------------------------------------------------------
 
 
 def plugin_metadata_as_dict() -> dict:
@@ -62,9 +62,7 @@ __summary__ = "{}\n{}".format(
 )
 
 __title__ = __plugin_md__.get("general").get("name")
-__title_clean__ = (
-    __plugin_md__.get("general").get("name").join(e for e in __title__ if e.isalnum())
-)
+__title_clean__ = "".join(e for e in __title__ if e.isalnum())
 
 __uri_homepage__ = __plugin_md__.get("general").get("homepage")
 __uri_repository__ = __plugin_md__.get("general").get("repository")

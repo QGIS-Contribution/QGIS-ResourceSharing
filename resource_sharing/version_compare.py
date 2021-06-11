@@ -52,7 +52,7 @@ import re
 
 
 def normalizeVersion(s):
-    """ remove possible prefix from given string and convert to uppercase """
+    """remove possible prefix from given string and convert to uppercase"""
     prefixes = [
         "VERSION",
         "VER.",
@@ -77,7 +77,7 @@ def normalizeVersion(s):
 
 # ------------------------------------------------------------------------ #
 def classifyCharacter(c):
-    """ return 0 for delimiter, 1 for digit and 2 for alphabetic character """
+    """return 0 for delimiter, 1 for digit and 2 for alphabetic character"""
     if c in [".", "-", "_", " "]:
         return 0
     if c.isdigit():
@@ -88,7 +88,7 @@ def classifyCharacter(c):
 
 # ------------------------------------------------------------------------
 def chopString(s):
-    """ convert string to list of numbers and words """
+    """convert string to list of numbers and words"""
     list_n_w = [s[0]]
     for i in range(1, len(s)):
         if classifyCharacter(s[i]) == 0:
@@ -102,7 +102,7 @@ def chopString(s):
 
 # ------------------------------------------------------------------------
 def compareElements(s1, s2):
-    """ compare two particular elements """
+    """compare two particular elements"""
     # check if the matter is easy solvable:
     if s1 == s2:
         return 0
@@ -181,7 +181,7 @@ must be 0..99
 
 
 def splitVersion(s):
-    """ split string into 2 or 3 numerical segments """
+    """split string into 2 or 3 numerical segments"""
     if not s or type(s) != str:
         return None
     versionlist = s.split(".")
@@ -196,7 +196,7 @@ def splitVersion(s):
 
 
 def isCompatible(curVer, minVer, maxVer):
-    """ Compare current QGIS version with qgisMinVersion and qgisMaxVersion """
+    """Compare current QGIS version with qgisMinVersion and qgisMaxVersion"""
 
     if not minVer or not curVer or not maxVer:
         return False

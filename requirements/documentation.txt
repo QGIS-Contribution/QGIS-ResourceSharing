@@ -1,10 +1,6 @@
--i https://pypi.org/simple
-
 # Documentation (for devs)
 # ------------------------
 
-ghp-import>=1.0,<1.1
-furo==2020.12.30b24
-myst-parser>=0.13,<0.14
+furo==2021.4.11b34
+myst-parser>=0.13,<0.15
 sphinx-copybutton>=0.3,<0.4
-sphinx-intl>=2.0,<2.1

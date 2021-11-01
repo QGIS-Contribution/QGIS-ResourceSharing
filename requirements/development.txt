@@ -4,5 +4,5 @@
 black
 flake8>=3.8,<4.1
 nose2>=0.9,<0.11
-pre-commit>=2.10,<2.15
+pre-commit>=2.10,<2.16
 sphinx-autobuild>=2020.9,<2022

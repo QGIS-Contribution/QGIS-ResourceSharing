@@ -16,7 +16,7 @@ explains how to use the plugin and how to share resources.
 
 ## Contributing
 
-Please read the [contribution guidelines](CONTRIBUTING).
+Please read the [contribution guidelines](CONTRIBUTING.md).
 
 ### Branching
 

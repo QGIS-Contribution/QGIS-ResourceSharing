@@ -1,7 +1,7 @@
 # Documentation (for devs)
 # ------------------------
 
-furo==2021.11.23
+furo==2022.2.23
 ghp-import>2.0,<2.1
 myst-parser[linkify]>=0.13,<0.16
 sphinx-autobuild==2021.3.14

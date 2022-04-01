@@ -5,5 +5,5 @@ furo==2022.3.4
 ghp-import>2.0,<2.1
 myst-parser[linkify]>=0.13,<0.18
 sphinx-autobuild==2021.3.14
-sphinx-copybutton>=0.3,<0.5
+sphinx-copybutton>=0.3,<0.6
 sphinxext-opengraph>=0.4,<0.7

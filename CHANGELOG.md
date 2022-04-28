@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 - Improved integration of external libraries (#166)
 - Improved development environment (#168) - thanks to @Guts
+- Enable translation for the plugin UI and add partial French translation
+- Use GitHub Actions to build and embed external dependencies, to package and release the plugin
+- Upgrade Bootstrap to 4.6.1
+- Remove QGIS 2 / PyQt4 imports
+- Clean up some really old-school code
 
 ## 0.16.0 - 2020-08-29
 

@@ -4,10 +4,11 @@
     Configuration for project documentation using Sphinx.
 """
 
+import sys
+from datetime import datetime
+
 # standard
 from os import environ, path
-from datetime import datetime
-import sys
 
 sys.path.insert(0, path.abspath(".."))
 

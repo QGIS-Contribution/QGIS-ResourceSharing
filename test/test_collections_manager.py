@@ -1,5 +1,5 @@
-from qgis.testing import start_app, unittest
 import nose2
+from qgis.testing import start_app, unittest
 
 from resource_sharing.collection_manager import CollectionManager
 

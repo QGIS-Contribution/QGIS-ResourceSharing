@@ -1,14 +1,14 @@
+from test.utilities import test_data_path, test_repository_url
+
 from qgis.testing import start_app, unittest
 
 from resource_sharing.repository_handler import (
     BaseRepositoryHandler,
+    BitBucketHandler,
     FileSystemHandler,
     GithubHandler,
-    BitBucketHandler,
     GogsHandler,
 )
-
-from test.utilities import test_data_path, test_repository_url
 
 
 class TestBaseHandler(unittest.TestCase):
@@ -37,15 +37,15 @@ class TestBaseHandler(unittest.TestCase):
 
         expected_collection = {
             "status": 0,
-            "description": u"The collection contains various resources for testing",
-            "tags": u"test, symbol, svg, processing",
-            "register_name": u"test_collection",
+            "description": "The collection contains various resources for testing",
+            "tags": "test, symbol, svg, processing",
+            "register_name": "test_collection",
             "repository_url": test_repository_url(),
-            "name": u"Akbar's Test Collection",
-            "author": u"Akbar Gumbira",
-            "author_email": u"akbargumbira@gmail.com",
-            "qgis_min_version": u"2.0",
-            "qgis_max_version": u"3.99",
+            "name": "Akbar's Test Collection",
+            "author": "Akbar Gumbira",
+            "author_email": "akbargumbira@gmail.com",
+            "qgis_min_version": "2.0",
+            "qgis_max_version": "3.99",
             "license": "GNU GPL",
             "license_url": "%s/collections/test_collection/LICENSE.txt"
             % test_repository_url(),

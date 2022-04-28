@@ -22,20 +22,19 @@
 import logging
 
 from qgis.PyQt import uic
-from qgis.PyQt.Qt import QSize, QFont, QBrush, QColor
-from qgis.PyQt.QtCore import Qt, pyqtSlot, QRegExp, QUrl, QThread
-
-from qgis.PyQt.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
+from qgis.PyQt.Qt import QBrush, QColor, QFont, QSize
+from qgis.PyQt.QtCore import QRegExp, Qt, QThread, QUrl, pyqtSlot
+from qgis.PyQt.QtGui import QDesktopServices, QIcon, QStandardItem, QStandardItemModel
 
 try:
     from qgis.PyQt.QtGui import (
-        QListWidgetItem,
         QDialog,
-        QTreeWidgetItem,
-        QSizePolicy,
+        QDialogButtonBox,
+        QListWidgetItem,
         QMessageBox,
         QProgressDialog,
-        QDialogButtonBox,
+        QSizePolicy,
+        QTreeWidgetItem,
     )
 except ImportError:
     from qgis.PyQt.QtWidgets import (
@@ -48,31 +47,31 @@ except ImportError:
         QDialogButtonBox,
     )
 
+from qgis.core import Qgis, QgsSettings
 from qgis.gui import QgsMessageBar
-from qgis.core import Qgis
-from qgis.core import QgsSettings
+
+from resource_sharing import config
+from resource_sharing.collection_manager import CollectionInstaller, CollectionManager
+from resource_sharing.config import COLLECTION_ALL_STATUS, COLLECTION_INSTALLED_STATUS
+from resource_sharing.gui.custom_sort_filter_proxy import (
+    COLLECTION_AUTHOR_ROLE,
+    COLLECTION_DESCRIPTION_ROLE,
+    COLLECTION_ID_ROLE,
+    COLLECTION_NAME_ROLE,
+    COLLECTION_STATUS_ROLE,
+    COLLECTION_TAGS_ROLE,
+    CustomSortFilterProxyModel,
+)
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 from resource_sharing.repository_manager import RepositoryManager
-from resource_sharing.collection_manager import CollectionManager, CollectionInstaller
 from resource_sharing.utilities import (
     SUPPORTED_RESOURCES_MAP,
-    resources_path,
-    ui_path,
-    repo_settings_group,
     local_collection_path,
     render_template,
+    repo_settings_group,
+    resources_path,
+    ui_path,
 )
-from resource_sharing.gui.custom_sort_filter_proxy import (
-    CustomSortFilterProxyModel,
-    COLLECTION_NAME_ROLE,
-    COLLECTION_DESCRIPTION_ROLE,
-    COLLECTION_AUTHOR_ROLE,
-    COLLECTION_TAGS_ROLE,
-    COLLECTION_ID_ROLE,
-    COLLECTION_STATUS_ROLE,
-)
-from resource_sharing.config import COLLECTION_ALL_STATUS, COLLECTION_INSTALLED_STATUS
-from resource_sharing import config
 
 FORM_CLASS, _ = uic.loadUiType(str(ui_path("resource_sharing_dialog_base.ui")))
 LOGGER = logging.getLogger("QGIS Resource Sharing")

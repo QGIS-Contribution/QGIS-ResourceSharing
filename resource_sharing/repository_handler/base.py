@@ -5,18 +5,17 @@ except ImportError:
     from StringIO import StringIO
 
 import logging
-
-from six import add_metaclass
-
 from configparser import ConfigParser
 from urllib.parse import urlparse
+
 from qgis.core import Qgis
+from six import add_metaclass
 
 from ext_libs.giturlparse import validate as git_validate
 from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
 from resource_sharing.exception import MetadataError
-from resource_sharing.version_compare import isCompatible
 from resource_sharing.network_manager import NetworkManager
+from resource_sharing.version_compare import isCompatible
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 

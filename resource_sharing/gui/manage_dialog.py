@@ -24,11 +24,11 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 
 try:
-    from qgis.PyQt.QtGui import QDialog, QVBoxLayout, QDialogButtonBox
+    from qgis.PyQt.QtGui import QDialog, QDialogButtonBox, QVBoxLayout
 except ImportError:
     from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QDialogButtonBox
 
-from resource_sharing.utilities import ui_path, qgis_version
+from resource_sharing.utilities import qgis_version, ui_path
 
 FORM_CLASS, _ = uic.loadUiType(str(ui_path("manage_repository.ui")))
 

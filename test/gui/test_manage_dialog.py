@@ -1,14 +1,14 @@
-from qgis.testing import start_app, unittest
 import nose2
+from qgis.testing import start_app, unittest
 
 try:
     from qgis.PyQt.QtGui import QDialogButtonBox
 except ImportError:
     from qgis.PyQt.QtWidgets import QDialogButtonBox
 
+from test.utilities import test_repository_url
 
 from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
-from test.utilities import test_repository_url
 
 
 class ManageDialogTest(unittest.TestCase):

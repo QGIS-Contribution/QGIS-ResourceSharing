@@ -1,13 +1,13 @@
-from pathlib import Path
-import shutil
 import logging
-
-from qgis.core import QgsApplication
+import shutil
+from pathlib import Path
 
 # Worth a try? Should probably be present if the Processing R
 # Provider plugin is installed.
 # from processing_r.processing.utils import RUtils
-from processing.tools.system import userFolder, mkdir
+from processing.tools.system import mkdir, userFolder
+from qgis.core import QgsApplication
+
 from resource_sharing.resource_handler.base import BaseResourceHandler
 
 RSCRIPTS_PROCESSING_FOLDER = "rscripts"  # Processing folder for R scripts

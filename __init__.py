@@ -20,8 +20,8 @@
  This script initializes the plugin, making it known to QGIS.
 """
 
-import sys
 import os
+import sys
 
 # Dulwich tries to call sys.argv, but the argv module is missing in QGIS
 if not hasattr(sys, "argv"):

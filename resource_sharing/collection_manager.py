@@ -1,23 +1,23 @@
 import hashlib
-import shutil
 import logging
+import shutil
 import traceback
 
-from qgis.PyQt.QtCore import pyqtSignal, QObject
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from resource_sharing import config
 from resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS,
     COLLECTION_NOT_INSTALLED_STATUS,
 )
+from resource_sharing.repository_handler import BaseRepositoryHandler
+from resource_sharing.resource_handler import BaseResourceHandler
 from resource_sharing.utilities import (
     SUPPORTED_RESOURCES_MAP,
     local_collection_path,
     render_template,
     resources_path,
 )
-from resource_sharing.repository_handler import BaseRepositoryHandler
-from resource_sharing.resource_handler import BaseResourceHandler
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 

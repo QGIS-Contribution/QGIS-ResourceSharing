@@ -7,9 +7,9 @@ __license__ = "GPL"
 __copyright__ = "Copyright 2012, Australia Indonesia Facility for "
 __copyright__ += "Disaster Reduction"
 
+import logging
 import os
 import unittest
-import logging
 
 try:
     from ConfigParser import ConfigParser

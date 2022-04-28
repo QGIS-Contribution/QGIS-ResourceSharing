@@ -7,6 +7,7 @@ from pathlib import Path
 from dulwich import porcelain
 from giturlparse import parse, validate
 from qgis.core import QgsApplication
+
 from resource_sharing.repository_handler.base import BaseRepositoryHandler
 from resource_sharing.utilities import local_collection_path
 

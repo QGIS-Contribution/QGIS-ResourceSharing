@@ -1,10 +1,11 @@
-from pathlib import Path
-import shutil
 import logging
+import shutil
+from pathlib import Path
 
 try:
-    from urlparse import urljoin
     from urllib import pathname2url
+
+    from urlparse import urljoin
 except ImportError:
     from urllib.parse import urljoin
     from urllib.request import pathname2url

@@ -171,10 +171,14 @@ jobs:
           name: dependencies-build
           path: ${{ env.PROJECT_FOLDER }}/ext_libs/
 
-      - name: Amend gitignore to include compiled translations and it to tracked files
+      - name: Amend gitignore to include compiled translations and add it to tracked files
         run: |
+          # include compiled translations and dependencies
           sed -i "s|^*.qm.*| |" .gitignore
-          git add ${{ env.PROJECT_FOLDER }}/resources/
+          sed -i "s|^${{ env.PROJECT_FOLDER }}/ext_libs/.*| |" .gitignore
+
+          # git add full project
+          git add ${{ env.PROJECT_FOLDER }}/
 
       - name: Get current changelog for ${VERSION}
         run: qgis-plugin-ci changelog ${GITHUB_REF/refs\/tags\//} >> release.md

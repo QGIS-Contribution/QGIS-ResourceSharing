@@ -111,7 +111,7 @@ jobs:
           path: ${{ env.PROJECT_FOLDER }}/ext_libs/
 
       - name: List files
-        run: ls -lR
+        run: tree ${{ env.PROJECT_FOLDER }}
 
       - name: Amend gitignore to include compiled translations and add it to tracked files
         run: |

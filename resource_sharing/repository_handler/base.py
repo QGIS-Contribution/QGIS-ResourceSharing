@@ -8,10 +8,10 @@ import logging
 from configparser import ConfigParser
 from urllib.parse import urlparse
 
+from ext_libs.giturlparse import validate as git_validate
 from qgis.core import Qgis
 from six import add_metaclass
 
-from ext_libs.giturlparse import validate as git_validate
 from resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
 from resource_sharing.exception import MetadataError
 from resource_sharing.network_manager import NetworkManager

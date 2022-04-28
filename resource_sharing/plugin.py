@@ -32,7 +32,7 @@ from .gui.resource_sharing_dialog import ResourceSharingDialog
 from .utilities import resources_path
 
 
-class Plugin:
+class ResourceSharingPlugin:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -61,7 +61,7 @@ class Plugin:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = ResourceSharingDialog(iface=self.iface)
+        self.dlg = ResourceSharingDialog()
 
         # Declare instance attributes
         self.actions = []

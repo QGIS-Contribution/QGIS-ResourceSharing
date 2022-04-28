@@ -3,7 +3,7 @@ from qgis.core import QgsLimitedRandomColorRamp as random_color_ramp  # <-- !!!!
 from qgis.core import QgsLineSymbol, QgsMarkerSymbol
 from qgis.testing import start_app, unittest
 
-from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
+from qgis_resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 
 try:
     from .utilities import test_data_path

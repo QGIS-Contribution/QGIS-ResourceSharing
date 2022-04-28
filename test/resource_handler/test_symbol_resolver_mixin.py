@@ -4,7 +4,7 @@ import nose2
 from qgis.PyQt.QtCore import QUrl
 from qgis.testing import start_app, unittest
 
-from resource_sharing.resource_handler.symbol_resolver_mixin import (
+from qgis_resource_sharing.resource_handler.symbol_resolver_mixin import (
     fix_xml_node,
     resolve_path,
 )

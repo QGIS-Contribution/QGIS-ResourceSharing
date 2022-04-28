@@ -2,7 +2,7 @@ from test.utilities import test_data_path, test_repository_url
 
 from qgis.testing import start_app, unittest
 
-from resource_sharing.repository_handler import (
+from qgis_resource_sharing.repository_handler import (
     BaseRepositoryHandler,
     BitBucketHandler,
     FileSystemHandler,

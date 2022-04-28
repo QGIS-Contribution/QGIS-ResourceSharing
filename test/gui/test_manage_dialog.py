@@ -4,7 +4,7 @@ import nose2
 from qgis.PyQt.QtWidgets import QDialogButtonBox
 from qgis.testing import start_app, unittest
 
-from resource_sharing.gui.manage_dialog import ManageRepositoryDialog
+from qgis_resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 
 
 class ManageDialogTest(unittest.TestCase):

@@ -12,7 +12,7 @@ from os import environ, path
 sys.path.insert(0, path.abspath(".."))
 
 # Package
-from resource_sharing import __about__
+from qgis_resource_sharing import __about__
 
 # -- Build environment -----------------------------------------------------
 on_rtd = environ.get("READTHEDOCS", None) == "True"

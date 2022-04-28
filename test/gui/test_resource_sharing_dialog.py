@@ -16,8 +16,11 @@ import nose2
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 from qgis.testing import start_app, unittest
 
-from resource_sharing.config import COLLECTION_ALL_STATUS, COLLECTION_INSTALLED_STATUS
-from resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
+from qgis_resource_sharing.config import (
+    COLLECTION_ALL_STATUS,
+    COLLECTION_INSTALLED_STATUS,
+)
+from qgis_resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
 
 
 class ResourceSharingDialogTest(unittest.TestCase):

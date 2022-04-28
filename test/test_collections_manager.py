@@ -1,7 +1,7 @@
 import nose2
 from qgis.testing import start_app, unittest
 
-from resource_sharing.collection_manager import CollectionManager
+from qgis_resource_sharing.collection_manager import CollectionManager
 
 
 class TestCollections(unittest.TestCase):

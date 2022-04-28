@@ -28,6 +28,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
+          cache-dependency-path: "requirements/documentation.txt"
 
       - name: Install dependencies
         run: |

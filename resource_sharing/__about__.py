@@ -4,11 +4,18 @@
     Metadata about the package to easily retrieve informations about it.
     See: https://packaging.python.org/guides/single-sourcing-package-version/
 """
+# ############################################################################
+# ########## Libraries #############
+# ##################################
 
+# standard library
 from configparser import ConfigParser
 from datetime import date
 from pathlib import Path
 
+# ############################################################################
+# ########## Globals ###############
+# ##################################
 __all__ = [
     "__author__",
     "__copyright__",
@@ -20,15 +27,14 @@ __all__ = [
     "__version__",
 ]
 
-# -- GLOBALS --------------------------------------------------------------------
 
-DIR_PLUGIN_ROOT = Path(__file__).parent.parent
+DIR_PLUGIN_ROOT = Path(__file__).parent
 PLG_METADATA_FILE = DIR_PLUGIN_ROOT.resolve() / "metadata.txt"
 
 
-# -- FUNCTIONS --------------------------------------------------------------------
-
-
+# ############################################################################
+# ########## Functions #############
+# ##################################
 def plugin_metadata_as_dict() -> dict:
     """Read plugin metadata.txt and returns it as a Python dict.
 
@@ -46,15 +52,20 @@ def plugin_metadata_as_dict() -> dict:
         raise IOError("Plugin metadata.txt not found at: %s" % PLG_METADATA_FILE)
 
 
-# -- VARIABLES --------------------------------------------------------------------
+# ############################################################################
+# ########## Variables #############
+# ##################################
 
 # store full metadata.txt as dict into a var
 __plugin_md__ = plugin_metadata_as_dict()
 
 __author__ = __plugin_md__.get("general").get("author")
-__copyright__ = "2016 - {0}, {1}".format(date.today().year, __author__)
+__copyright__ = "2021 - {0}, {1}".format(date.today().year, __author__)
 __email__ = __plugin_md__.get("general").get("email")
-__keywords__ = __plugin_md__.get("general").get("repository").split("tags")
+__icon_path__ = DIR_PLUGIN_ROOT.resolve() / __plugin_md__.get("general").get("icon")
+__keywords__ = [
+    t.strip() for t in __plugin_md__.get("general").get("repository").split("tags")
+]
 __license__ = "AGPL-3.0"
 __summary__ = "{}\n{}".format(
     __plugin_md__.get("general").get("description"),
@@ -84,10 +95,11 @@ if __name__ == "__main__":
     plugin_md = plugin_metadata_as_dict()
     assert isinstance(plugin_md, dict)
     assert plugin_md.get("general").get("name") == __title__
-    print("Plugin: " + __title__)
-    print("By: " + __author__)
-    print("Version: " + __version__)
-    print("Description: " + __summary__)
+    print(f"Plugin: {__title__}")
+    print(f"By: {__author__}")
+    print(f"Version: {__version__}")
+    print(f"Description: {__summary__}")
+    print(f"Icon: {__icon_path__}")
     print(
         "For: %s > QGIS > %s"
         % (
@@ -95,3 +107,4 @@ if __name__ == "__main__":
             plugin_md.get("general").get("qgismaximumversion"),
         )
     )
+    print(__title_clean__)

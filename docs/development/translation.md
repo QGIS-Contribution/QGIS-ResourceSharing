@@ -13,12 +13,12 @@ sudo apt install qttools5-dev-tools
 1. Update `.ts` files:
 
     ```bash
-    pylupdate5 -noobsolete -verbose resource_sharing/resources/i18n/plugin_translation.pro
+    pylupdate5 -noobsolete -verbose qgis_resource_sharing/resources/i18n/plugin_translation.pro
     ```
 
 2. Translate your text using QLinguist or directly into `.ts` files.
 3. Compile it:
 
     ```bash
-    lrelease resource_sharing/resources/i18n/*.ts
+    lrelease qgis_resource_sharing/resources/i18n/*.ts
     ```

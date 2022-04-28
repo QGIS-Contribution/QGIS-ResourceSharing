@@ -39,7 +39,7 @@ repos:
     rev: 4.0.1
     hooks:
       - id: flake8
-        files: ^resource_sharing/.*\.py$
+        files: ^qgis_resource_sharing/.*\.py$
         additional_dependencies: ["flake8-qgis<2"]
         args:
           [

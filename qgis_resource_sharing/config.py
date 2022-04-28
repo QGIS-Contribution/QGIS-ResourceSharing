@@ -3,7 +3,7 @@
 # (http://effbot.org/pyfaq/how-do-i-share-global-variables-across-modules.htm)
 
 Call this variable as an attribute from the config module e.g:
-    from resource_sharing import config
+    from qgis_resource_sharing import config
     print config.COLLECTIONS
 
 config.COLLECTIONS is a dict that contains metadata for the

@@ -56,6 +56,8 @@ authoring/publishing-repository
 authoring/repository-example
 ```
 
+----
+
 ```{toctree}
 ---
 caption: Contribute to the plugin

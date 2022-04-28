@@ -6,8 +6,8 @@ on:
     paths:
       - ".github/workflows/documentation.yml"
       - "docs/*/**"
-      - "resource_sharing/**/*.py"
-      - "resource_sharing/metadata.txt"
+      - "qgis_resource_sharing/**/*.py"
+      - "qgis_resource_sharing/metadata.txt"
       - "requirements/documentation.txt"
     tags:
       - "*"

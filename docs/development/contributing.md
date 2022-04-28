@@ -10,7 +10,7 @@ If contributing code, it would be nice if you check it with pep8
 and make sure that the tests are not broken by running:
 
 ```bash
-pep8 resource_sharing
+pep8 qgis_resource_sharing
 nose2-3 -s test --with-coverage
 ```
 

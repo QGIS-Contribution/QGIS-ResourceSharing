@@ -48,6 +48,6 @@ ENV/
 .venv/*
 
 # plugin QGIS
-resource_sharing/ext_libs/
+qgis_resource_sharing/ext_libs/
 *.zip
 *.qm

@@ -22,7 +22,7 @@ python -m pip install -U -r requirements/base.txt
 # install development tools
 python -m pip install -U -r requirements/development.txt
 # install external dependencies
-python -m pip install --no-deps -U -r requirements/embedded.txt -t resource_sharing/ext_libs
+python -m pip install --no-deps -U -r requirements/embedded.txt -t qgis_resource_sharing/ext_libs
 # install pre-commit to respect common development guidelines
 pre-commit install
 ```

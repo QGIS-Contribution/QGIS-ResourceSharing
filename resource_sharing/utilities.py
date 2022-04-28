@@ -2,17 +2,10 @@ import logging
 import ntpath
 from pathlib import Path
 
-from ext_libs.pathvalidate import sanitize_filename
-from qgis.core import QgsSettings
-from qgis.PyQt.QtCore import QDir
-
-try:
-    from qgis.core import QGis as Qgis
-    from qgis.core import QgsApplication
-except ImportError:
-    from qgis.core import QgsApplication, Qgis
-
 import jinja2
+from ext_libs.pathvalidate import sanitize_filename
+from qgis.core import Qgis, QgsApplication, QgsSettings
+from qgis.PyQt.QtCore import QDir
 
 from resource_sharing import config
 from resource_sharing.__about__ import DIR_PLUGIN_ROOT

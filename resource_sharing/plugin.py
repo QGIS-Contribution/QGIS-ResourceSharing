@@ -18,20 +18,19 @@
  *                                                                         *
  ***************************************************************************/
 """
+
+# standard
 from pathlib import Path
 
-from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator, qVersion
+# PyQGIS
+from qgis.core import QgsSettings
+from qgis.PyQt.QtCore import QCoreApplication, QLocale, QTranslator
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 
-try:
-    from qgis.PyQt.QtGui import QAction  # QT 4 - could be removed
-except ImportError:
-    from qgis.PyQt.QtWidgets import QAction  # QT 5
-
-from resource_sharing.__about__ import __icon_path__
-
-from .gui.resource_sharing_dialog import ResourceSharingDialog
-from .utilities import resources_path
+# package
+from resource_sharing.__about__ import DIR_PLUGIN_ROOT, __icon_path__
+from resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
 
 
 class ResourceSharingPlugin:
@@ -47,20 +46,17 @@ class ResourceSharingPlugin:
         """
         # Save the reference to the QGIS interface
         self.iface = iface
-        # initialize the plugin directory
-        self.plugin_dir = Path(__file__).parent
+
         # initialize the locale
-        locale = QSettings().value("locale/userLocale")[0:2]
-        locale_path = Path(
-            self.plugin_dir, "i18n", "QgsResourceSharing_{}.qm".format(locale)
+        locale: str = QgsSettings().value("locale/userLocale", QLocale().name())[0:2]
+        locale_path: Path = (
+            DIR_PLUGIN_ROOT / f"resources/i18n/qgis_resource_sharing_{locale}.qm"
         )
 
-        if Path(locale_path).exists():
+        if locale_path.exists():
             self.translator = QTranslator()
-            self.translator.load(locale_path)
-
-            if qVersion() > "4.3.3":
-                QCoreApplication.installTranslator(self.translator)
+            self.translator.load(str(locale_path.resolve()))
+            QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
         self.dlg = ResourceSharingDialog()

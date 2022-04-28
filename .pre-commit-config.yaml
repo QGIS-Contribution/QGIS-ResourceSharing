@@ -1,4 +1,4 @@
-exclude: ".venv|tests/dev/|tests/fixtures/|ext_libs"
+exclude: ".venv|tests/dev/|tests/fixtures/|ext_libs/"
 fail_fast: false
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -6,11 +6,13 @@ repos:
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=500"]
+      - id: check-case-conflict
       - id: check-toml
       - id: check-xml
       - id: check-yaml
       - id: detect-private-key
       - id: end-of-file-fixer
+      - id: fix-byte-order-marker
       - id: fix-encoding-pragma
         args: [--remove]
       - id: trailing-whitespace

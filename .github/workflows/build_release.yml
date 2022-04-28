@@ -64,6 +64,7 @@ jobs:
         run: |
           rm -rf `find ${{ env.PROJECT_FOLDER }} -type d -name __pycache__`
           rm -rf `find ${{ env.PROJECT_FOLDER }} -type d -name *.dist-info`
+          rm -rf `find ${{ env.PROJECT_FOLDER }}/ext_libs -type d -name docs`
           rm -rf `find ${{ env.PROJECT_FOLDER }}/ext_libs -type d -name tests`
           rm -rf `find ${{ env.PROJECT_FOLDER }}/ext_libs -type d -name test`
 

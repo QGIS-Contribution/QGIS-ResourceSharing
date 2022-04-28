@@ -135,7 +135,7 @@ jobs:
 
   # -- ONLY TAGS ----------------------------------------------------------------------
   release:
-    name: "🚀 Release on tag"
+    name: "🚀 Release"
     runs-on: ubuntu-latest
     needs: [translation, dependencies]
 
@@ -202,6 +202,5 @@ jobs:
           --github-token ${{ secrets.GITHUB_TOKEN }}
           --create-plugin-repo
           --allow-uncommitted-changes
-          --create-plugin-repo
           --osgeo-username ${{ secrets.OSGEO_USER }}
           --osgeo-password ${{ secrets.OSGEO_PASSWORD }}

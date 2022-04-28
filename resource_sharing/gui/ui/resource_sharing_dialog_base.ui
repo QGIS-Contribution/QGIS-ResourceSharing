@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>850</width>
-    <height>600</height>
+    <width>790</width>
+    <height>567</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -18,6 +18,9 @@
   </property>
   <property name="windowTitle">
    <string>QGIS Resource Sharing</string>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -496,8 +499,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>689</width>
-                   <height>537</height>
+                   <width>616</width>
+                   <height>519</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -637,7 +640,7 @@
   <customwidget>
    <class>QWebView</class>
    <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
+   <header location="global">QtWebKitWidgets/QWebView</header>
   </customwidget>
  </customwidgets>
  <resources/>

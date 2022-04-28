@@ -47,7 +47,7 @@ ENV/
 .venv*
 .venv/*
 
-# embedded libs
-ext_libs/
-dev_precommit_black.log
+# plugin QGIS
+resource_sharing/ext_libs/
 *.zip
+*.qm

@@ -16,7 +16,35 @@ repos:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
 
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.1.13
+    hooks:
+      - id: remove-tabs
+        args: ["--whitespaces-count", "4"]
+
   - repo: https://github.com/psf/black
     rev: 22.3.0
     hooks:
       - id: black
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--filter-files"]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        files: ^resource_sharing/.*\.py$
+        additional_dependencies: ["flake8-qgis<2"]
+        args:
+          [
+            "--config=setup.cfg",
+            "--select=E9,F63,F7,F82,QGS101,QGS102,QGS103,QGS104,QGS106",
+          ]
+
+ci:
+  autofix_prs: true
+  autoupdate_schedule: monthly

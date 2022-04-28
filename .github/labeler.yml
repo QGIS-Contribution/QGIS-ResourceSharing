@@ -9,3 +9,6 @@ dependencies:
 documentation:
   - docs/**/*
   - requirements/documentation.txt
+
+UI:
+  - resource_sharing/**/*.ui

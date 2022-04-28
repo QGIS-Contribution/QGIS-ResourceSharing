@@ -51,6 +51,7 @@ from qgis.core import Qgis, QgsSettings
 from qgis.gui import QgsMessageBar
 
 from resource_sharing import config
+from resource_sharing.__about__ import __title__, __version__
 from resource_sharing.collection_manager import CollectionInstaller, CollectionManager
 from resource_sharing.config import COLLECTION_ALL_STATUS, COLLECTION_INSTALLED_STATUS
 from resource_sharing.gui.custom_sort_filter_proxy import (
@@ -73,6 +74,7 @@ from resource_sharing.utilities import (
     ui_path,
 )
 
+# -- GLOBALS
 FORM_CLASS, _ = uic.loadUiType(str(ui_path("resource_sharing_dialog_base.ui")))
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 REPOSITORY_ITEM = 1000
@@ -84,7 +86,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
     TAB_INSTALLED = 1
     TAB_SETTINGS = 2
 
-    def __init__(self, parent=None, iface=None):
+    def __init__(self, parent=None):
         """Constructor.
 
         :param parent: Optional widget to use as parent
@@ -95,8 +97,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         """
         super(ResourceSharingDialog, self).__init__(parent)
         self.setupUi(self)
-        self.iface = iface
+
         # Reconfigure UI
+        self.setWindowTitle(f"{__title__} - {__version__}")
         self.setModal(True)
         self.button_edit.setEnabled(False)
         self.button_delete.setEnabled(False)

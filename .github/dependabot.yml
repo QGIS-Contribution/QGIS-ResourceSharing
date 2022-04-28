@@ -6,7 +6,7 @@ updates:
       interval: monthly
       time: "04:00"
     labels:
-    - dependencies
+      - dependencies
 
   - package-ecosystem: "github-actions"
     directory: "/"

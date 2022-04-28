@@ -7,11 +7,11 @@ env:
 # because linter is a required check, it must be triggered on every push and not filtered on paths
 on:
   push:
-    branches: [ master ]
-#     paths:
-#       - '**.py'
+    branches: [master]
+  #     paths:
+  #       - '**.py'
   pull_request:
-    branches: [ master ]
+    branches: [master]
 #     paths:
 #       - '**.py'
 

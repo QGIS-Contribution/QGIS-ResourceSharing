@@ -1,11 +1,11 @@
 ci-cd:
-    - .github/**/*.yml
-    - .travis.yml
+  - .github/**/*.yml
+  - .travis.yml
 
 dependencies:
-    - requirements/*.txt
-    - requirements.txt
+  - requirements/*.txt
+  - requirements.txt
 
 documentation:
-    - docs/**/*
-    - requirements/documentation.txt
+  - docs/**/*
+  - requirements/documentation.txt

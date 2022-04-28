@@ -7,7 +7,7 @@ icon=resources/icon.png
 tags=algorithm,checklist,collection,design,map,model,processing,Python,R,repository,resource,script,sharing,style,svg,symbol
 
 # credits and contact
-email=havard.tveite@nmbu.no
+email=dev@ingeoveritas.com
 author=Akbar Gumbira, Håvard Tveite, Julien Moura
 homepage=https://qgis-contribution.github.io/QGIS-ResourceSharing/
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/

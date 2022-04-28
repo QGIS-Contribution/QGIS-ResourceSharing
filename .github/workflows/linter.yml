@@ -1,7 +1,7 @@
 name: "🐍 Linter"
 
 env:
-  PROJECT_FOLDER: "resource_sharing"
+  PROJECT_FOLDER: "qgis_resource_sharing"
   PYTHON_VERSION: 3.7
 
 # because linter is a required check, it must be triggered on every push and not filtered on paths

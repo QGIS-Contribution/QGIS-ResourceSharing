@@ -113,12 +113,14 @@ jobs:
       - name: List files
         run: ls -lR
 
-      - name: Amend gitignore to include compiled translations and it to tracked files
+      - name: Amend gitignore to include compiled translations and add it to tracked files
         run: |
+          # include compiled translations and dependencies
           sed -i "s|^*.qm.*| |" .gitignore
           sed -i "s|^${{ env.PROJECT_FOLDER }}/ext_libs/.*| |" .gitignore
-          git add ${{ env.PROJECT_FOLDER }}/ext_libs/
-          git add ${{ env.PROJECT_FOLDER }}/resources/
+
+          # git add full project
+          git add ${{ env.PROJECT_FOLDER }}/
 
       - name: Package the latest version
         run: qgis-plugin-ci package latest --allow-uncommitted-changes

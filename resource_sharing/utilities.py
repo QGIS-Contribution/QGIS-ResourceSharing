@@ -2,10 +2,9 @@ import logging
 import ntpath
 from pathlib import Path
 
+from ext_libs.pathvalidate import sanitize_filename
 from qgis.core import QgsSettings
 from qgis.PyQt.QtCore import QDir
-
-from ext_libs.pathvalidate import sanitize_filename
 
 try:
     from qgis.core import QGis as Qgis

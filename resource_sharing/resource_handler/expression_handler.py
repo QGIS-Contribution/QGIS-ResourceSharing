@@ -8,15 +8,7 @@ from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.utilities import user_expressions_group
 
 hasExprBuilder = False
-# try:
-#     from qgis.core import QgsExpressions
 
-# try:
-#     from qgis.gui import QgsExpressionBuilderWidget
-# except ImportError:
-#     hasExprBuilder = False
-# else:
-#     hasExprBuilder = True
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 EXPRESSIONS = "expressions"

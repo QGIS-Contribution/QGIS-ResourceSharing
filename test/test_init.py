@@ -10,11 +10,7 @@ __copyright__ += "Disaster Reduction"
 import logging
 import os
 import unittest
-
-try:
-    from ConfigParser import ConfigParser
-except ImportError:
-    from configparser import ConfigParser
+from configparser import ConfigParser
 
 LOGGER = logging.getLogger("QGIS")
 

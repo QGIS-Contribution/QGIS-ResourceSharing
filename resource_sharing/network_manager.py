@@ -1,13 +1,8 @@
 import logging
 
-from qgis.core import QgsNetworkAccessManager
+from qgis.core import QgsAuthManager, QgsNetworkAccessManager
 from qgis.PyQt.QtCore import QCoreApplication, QUrl
 from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest
-
-try:
-    from qgis.core import QgsAuthManager
-except ImportError:
-    pass
 
 from resource_sharing.utilities import qgis_version
 

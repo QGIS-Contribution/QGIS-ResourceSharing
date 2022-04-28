@@ -1,25 +1,7 @@
+from qgis.core import QgsColorBrewerColorRamp, QgsFillSymbol, QgsGradientColorRamp
+from qgis.core import QgsLimitedRandomColorRamp as random_color_ramp  # <-- !!!!
+from qgis.core import QgsLineSymbol, QgsMarkerSymbol
 from qgis.testing import start_app, unittest
-
-# Note that the instance returned in the import test is
-# QGIS 2.x: QgsRandomColorRamp
-# QGIS 3.x is QgsLimitedRandomColorRamp
-
-try:  # QGIS 2.x
-    from qgis.core import QgsFillSymbolV2 as QgsFillSymbol
-    from qgis.core import QgsLineSymbolV2 as QgsLineSymbol
-    from qgis.core import QgsMarkerSymbolV2 as QgsMarkerSymbol
-    from qgis.core import QgsVectorColorBrewerColorRampV2 as QgsColorBrewerColorRamp
-    from qgis.core import QgsVectorGradientColorRampV2 as QgsGradientColorRamp
-    from qgis.core import QgsVectorRandomColorRampV2 as random_color_ramp  # <-- !!!!
-except ImportError:  # QGIS 3.x
-    from qgis.core import (
-        QgsColorBrewerColorRamp,
-        QgsLimitedRandomColorRamp as random_color_ramp,  # <-- !!!!
-        QgsGradientColorRamp,
-        QgsFillSymbol,
-        QgsLineSymbol,
-        QgsMarkerSymbol,
-    )
 
 from resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 

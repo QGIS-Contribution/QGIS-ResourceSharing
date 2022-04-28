@@ -1,11 +1,8 @@
 """This module contains the base class for the repository handlers."""
-try:
-    from io import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 import logging
 from configparser import ConfigParser
+from io import StringIO
 from urllib.parse import urlparse
 
 from ext_libs.giturlparse import validate as git_validate

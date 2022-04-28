@@ -21,34 +21,21 @@
 """
 import logging
 
+from qgis.core import Qgis, QgsSettings
+from qgis.gui import QgsMessageBar
 from qgis.PyQt import uic
 from qgis.PyQt.Qt import QBrush, QColor, QFont, QSize
 from qgis.PyQt.QtCore import QRegExp, Qt, QThread, QUrl, pyqtSlot
 from qgis.PyQt.QtGui import QDesktopServices, QIcon, QStandardItem, QStandardItemModel
-
-try:
-    from qgis.PyQt.QtGui import (
-        QDialog,
-        QDialogButtonBox,
-        QListWidgetItem,
-        QMessageBox,
-        QProgressDialog,
-        QSizePolicy,
-        QTreeWidgetItem,
-    )
-except ImportError:
-    from qgis.PyQt.QtWidgets import (
-        QListWidgetItem,
-        QDialog,
-        QTreeWidgetItem,
-        QSizePolicy,
-        QMessageBox,
-        QProgressDialog,
-        QDialogButtonBox,
-    )
-
-from qgis.core import Qgis, QgsSettings
-from qgis.gui import QgsMessageBar
+from qgis.PyQt.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QListWidgetItem,
+    QMessageBox,
+    QProgressDialog,
+    QSizePolicy,
+    QTreeWidgetItem,
+)
 
 from resource_sharing import config
 from resource_sharing.__about__ import __title__, __version__

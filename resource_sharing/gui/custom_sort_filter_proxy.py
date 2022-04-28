@@ -1,9 +1,4 @@
-from qgis.PyQt.QtCore import Qt
-
-try:
-    from qgis.PyQt.QtGui import QSortFilterProxyModel
-except ImportError:
-    from qgis.PyQt.QtCore import QSortFilterProxyModel
+from qgis.PyQt.QtCore import QSortFilterProxyModel, Qt
 
 from resource_sharing.config import COLLECTION_INSTALLED_STATUS
 

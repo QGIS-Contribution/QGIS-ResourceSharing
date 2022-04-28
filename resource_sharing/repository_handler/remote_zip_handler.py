@@ -1,10 +1,5 @@
 import logging
-
-try:
-    from urlparse import urljoin  # Python 2
-except ImportError:
-    from urllib.parse import urljoin  # Python 3
-
+from urllib.parse import urljoin  # Python 3
 from zipfile import ZipFile
 
 from qgis.PyQt.QtCore import QTemporaryFile

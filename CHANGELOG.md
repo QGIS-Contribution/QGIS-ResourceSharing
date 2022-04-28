@@ -2,12 +2,12 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## 0.17.0
+## 1.0.0-beta1 - 2022-04-28
 
 - Improved integration of external libraries (#166)
 - Improved development environment (#168) - thanks to @Guts
 
-## 0.16.0
+## 0.16.0 - 2020-08-29
 
 - GUI improvements (#138, #139, #140, #141)
 - Add button for reloading the QGIS directory of approved resources (#145)
@@ -16,21 +16,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## 0.15.1
+## 0.15.1 - 2020-05-16
 
 - Fix incorrect handling of searchPathsForSVG setting (#135)
 - Handle XML parsing exceptions for QML files\*0.15.0 - Support expressions (#130). Switch to Python pathlib.
 
 ---
 
-## 0.14.1
+## 0.14.1 - 2020-04-25
 
 - Also support QGIS 3.4 (avoid install of style labelsettings and textformatting for v. < 3.10 - #127)
 - Try another way to avoid [WinError 5] on Microsoft Windows (#103)
 
 ---
 
-## 0.14.0
+## 0.14.0 - 2020-04-23
 
 - Style import improvements (fix colorramp support, add support for label settings and text formats, clean up Style Manager tags) (#113, #114, #116, #118)
 - Change collection directory names from a hash to a more user friendly name (composition of the name of the collection and its repository) (#110)
@@ -39,13 +39,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## 0.13.1
+## 0.13.1 - 2020-04-11
 
 - Fix #44 (files removed from repository are still being installed from cache)
 
 ---
 
-## 0.13.0
+## 0.13.0 - 2020-04-10
 
 - GUI updates (#100)
 - Provide installation summary (#6)
@@ -55,8 +55,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## 0.12.0 - Make font sizes OK on HiDPI systems (#3)
+## 0.12.0 - 2020-03-28
 
+- Make font sizes OK on HiDPI systems (#3)
 - Disable editing and removal of "official" repositories in Settings (#93)
 - Avoid ResourceWarning when installing a collection (#95)
 - Stop using the collection name for naming directories (#99)
@@ -67,20 +68,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## 0.11.1
+## 0.11.1 - 2020-03-03
 
 - Reduce log level to avoid exception on missing name or URL in directory (#64)
 
 ---
 
-## 0.11.0
+## 0.11.0 - 2020-02-29
 
 - Check for missing repository name and URL in directory (#64)
 - Correct link to documentation
 
 ---
 
-## 0.10.0
+## 0.10.0 - 2020-02-26
 
 - Added support for Processing models (#42)
 - Make the plugin available from the web menu (#68)
@@ -91,38 +92,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## 0.9.0
+## 0.9.0 - 2020-02-15
 
 - Added support for R scripts (#57)
 
 ---
 
-## 0.8.0
+## 0.8.0 - 2020-02-10
 
 - Fix issue #59 (deleting repositories does not work)
 
 ---
 
-## 0.7.0
+## 0.7.0 - 2020-02-07
 
 - Flip experimental flag
 - Merge PR from havatv (issue #60 - avoid breaking on incompatible versions)
 
 ---
 
-## 0.6.0
+## 0.6.0 - 2018-12-04
 
 - Experimental version for QGIS 3
 
 ---
 
-## 0.5.2
+## 0.5.2 - 2017-11-05
 
 - Add support for gitlab and gogs repositories (PR by Salvatore Larosa - gh username: slarosa)
 
 ---
 
-## 0.5.1
+## 0.5.1 - 2016-08-31
 
 - Allow authors to add license details in the collection
 - Fixed problem in QGIS < 2.12 as a result of using the new QgsAuthManager
@@ -131,6 +132,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
-## 0.5.0
+## 0.5.0 - 2016-08-15
 
 - Wohooo first release!

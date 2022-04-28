@@ -15,6 +15,7 @@ except ImportError:
 import jinja2
 
 from resource_sharing import config
+from resource_sharing.__about__ import DIR_PLUGIN_ROOT
 
 LOGGER = logging.getLogger("QGIS Resource Sharing")
 
@@ -39,8 +40,7 @@ def resources_path(*args):
     :return: Absolute path to the resources folder.
     :rtype: Path
     """
-    path = Path(__file__).parent.parent
-    path = path / "resources"
+    path = DIR_PLUGIN_ROOT / "resources"
     for item in args:
         path = path / item
     return path
@@ -170,7 +170,7 @@ def qgis_version():
     return version
 
 
-def render_template(filename, context):
+def render_template(filename, context) -> dict:
     """Render a template with the specified filename.
     :param filename: The filename (must be in the template directory)
     :type filename: str
@@ -178,8 +178,7 @@ def render_template(filename, context):
     :param context: The context passed for the template
     :type context: dict
     """
-    path = Path(__file__).parent
-    path = Path(path).parent / "resources" / "template"
+    path = DIR_PLUGIN_ROOT / "resources" / "template"
     return (
         jinja2.Environment(loader=jinja2.FileSystemLoader(str(path)))
         .get_template(filename)

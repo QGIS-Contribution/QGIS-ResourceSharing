@@ -28,6 +28,8 @@ try:
 except ImportError:
     from qgis.PyQt.QtWidgets import QAction  # QT 5
 
+from resource_sharing.__about__ import __icon_path__
+
 from .gui.resource_sharing_dialog import ResourceSharingDialog
 from .utilities import resources_path
 
@@ -164,9 +166,8 @@ class ResourceSharingPlugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = str(resources_path("icon.png"))
         self.add_action(
-            icon_path,
+            icon_path=str(__icon_path__.resolve()),
             text=self.tr("Resource Sharing"),
             callback=self.run,
             parent=self.iface.mainWindow(),

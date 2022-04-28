@@ -16,7 +16,7 @@ Manage versions in the `requirements/embedded.txt` file, then:
 python -m pip install --no-deps -U -r requirements/embedded.txt -t ext_libs
 ```
 
-Note: even if `dulwich` depends on `certifi` and `urllib3`, we specifally install them since they are already included with QGIS.
+Note: even if `dulwich` depends on `certifi` and `urllib3`, we specifically install them since they are already included with QGIS.
 
 ## Related links
 

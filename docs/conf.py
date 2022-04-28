@@ -4,10 +4,9 @@
     Configuration for project documentation using Sphinx.
 """
 
+# standard
 import sys
 from datetime import datetime
-
-# standard
 from os import environ, path
 
 sys.path.insert(0, path.abspath(".."))
@@ -19,13 +18,11 @@ from resource_sharing import __about__
 on_rtd = environ.get("READTHEDOCS", None) == "True"
 
 # -- Project information -----------------------------------------------------
-project = __about__.__title__
 author = __about__.__author__
 copyright = __about__.__copyright__
 description = __about__.__summary__
+project = __about__.__title__
 version = release = __about__.__version__
-github_doc_root = "{}/tree/master/doc/".format(__about__.__uri_repository__)
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -34,11 +31,11 @@ github_doc_root = "{}/tree/master/doc/".format(__about__.__uri_repository__)
 # ones.
 extensions = [
     # Sphinx included
+    "sphinx.ext.autodoc",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.extlinks",
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
     # 3rd party
     "myst_parser",
     "sphinx_copybutton",
@@ -73,7 +70,6 @@ pygments_dark_style = "monokai"
 # -- Options for HTML output -------------------------------------------------
 
 # -- Theme
-
 html_favicon = "assets/img/icon.png"
 html_logo = "assets/img/icon.png"
 html_static_path = ["assets"]
@@ -94,6 +90,7 @@ myst_enable_extensions = [
     "colon_fence",
     "deflist",
     "dollarmath",
+    "html_admonition",
     "html_image",
     "linkify",
     "replacements",

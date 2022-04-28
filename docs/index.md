@@ -65,5 +65,7 @@ development/contributing
 development/environment
 development/update_dependencies
 development/documentation
+development/packaging
 development/release-workflow
+development/history
 ```

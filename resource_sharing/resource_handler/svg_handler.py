@@ -2,12 +2,7 @@ import logging
 import shutil
 from pathlib import Path
 
-from qgis.core import QgsSettings
-
-try:
-    from qgis.core import Qgis
-except ImportError:
-    from qgis.core import QGis as Qgis
+from qgis.core import Qgis, QgsSettings
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.utilities import local_collection_path

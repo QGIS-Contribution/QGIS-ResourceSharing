@@ -1,10 +1,7 @@
 import logging
 from pathlib import Path
 
-try:
-    from qgis.core import QgsStyleV2 as QgsStyle
-except ImportError:
-    from qgis.core import QgsStyle
+from qgis.core import QgsStyle
 
 from resource_sharing.resource_handler.base import BaseResourceHandler
 from resource_sharing.resource_handler.symbol_resolver_mixin import SymbolResolverMixin

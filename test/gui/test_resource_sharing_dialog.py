@@ -13,12 +13,8 @@ __copyright__ = "Copyright 2016, Akbar Gumbira"
 
 
 import nose2
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 from qgis.testing import start_app, unittest
-
-try:
-    from qgis.PyQt.QtGui import QDialog, QDialogButtonBox
-except ImportError:
-    from qgis.PyQt.QtWidgets import QDialogButtonBox, QDialog
 
 from resource_sharing.config import COLLECTION_ALL_STATUS, COLLECTION_INSTALLED_STATUS
 from resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog

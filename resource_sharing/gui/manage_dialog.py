@@ -22,11 +22,7 @@
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-
-try:
-    from qgis.PyQt.QtGui import QDialog, QDialogButtonBox, QVBoxLayout
-except ImportError:
-    from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QDialogButtonBox
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout
 
 from resource_sharing.utilities import qgis_version, ui_path
 

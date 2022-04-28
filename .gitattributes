@@ -1,0 +1,3 @@
+*.pro export-ignore
+*.ts export-ignore
+resources.qrc export-ignore

@@ -1,6 +1,5 @@
 from test.utilities import test_data_path
 
-import nose2
 from qgis.PyQt.QtCore import QUrl
 from qgis.testing import start_app, unittest
 
@@ -118,4 +117,4 @@ class TestSymbolResolverMixin(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    nose2.main()
+    unittest.main()

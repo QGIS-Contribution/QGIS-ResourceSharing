@@ -1,4 +1,3 @@
-import nose2
 from qgis.testing import start_app, unittest
 
 from qgis_resource_sharing.collection_manager import CollectionManager
@@ -22,4 +21,4 @@ class TestCollections(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    nose2.main()
+    unittest.main()

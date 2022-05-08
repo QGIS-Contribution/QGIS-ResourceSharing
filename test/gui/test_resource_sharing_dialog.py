@@ -12,7 +12,6 @@ __date__ = "2016-05-29"
 __copyright__ = "Copyright 2016, Akbar Gumbira"
 
 
-import nose2
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 from qgis.testing import start_app, unittest
 
@@ -78,4 +77,4 @@ class ResourceSharingDialogTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    nose2.main()
+    unittest.main()

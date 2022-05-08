@@ -1,5 +1,3 @@
-from test.utilities import test_data_path
-
 from qgis.PyQt.QtCore import QUrl
 from qgis.testing import start_app, unittest
 
@@ -7,6 +5,7 @@ from qgis_resource_sharing.resource_handler.symbol_resolver_mixin import (
     fix_xml_node,
     resolve_path,
 )
+from tests.utilities import test_data_path
 
 
 class TestSymbolResolverMixin(unittest.TestCase):

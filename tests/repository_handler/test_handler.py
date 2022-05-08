@@ -1,5 +1,3 @@
-from test.utilities import test_data_path, test_repository_url
-
 from qgis.testing import start_app, unittest
 
 from qgis_resource_sharing.repository_handler import (
@@ -9,6 +7,7 @@ from qgis_resource_sharing.repository_handler import (
     GithubHandler,
     GogsHandler,
 )
+from tests.utilities import test_data_path, test_repository_url
 
 
 class TestBaseHandler(unittest.TestCase):

@@ -12,6 +12,7 @@
 
 # standard library
 import unittest
+from configparser import ConfigParser
 from pathlib import Path
 
 # 3rd party
@@ -69,6 +70,39 @@ class TestPluginMetadata(unittest.TestCase):
             float(__about__.__plugin_md__.get("general").get("qgisminimumversion")),
             float(__about__.__plugin_md__.get("general").get("qgismaximumversion")),
         )
+
+    def test_required_metadata(self):
+        """Test that the plugin __init__ will validate on plugins.qgis.org."""
+
+        required_metadata: list = [
+            "about",
+            "author",
+            "description",
+            "email",
+            "name",
+            "qgisMinimumVersion",
+            "repository",
+            "version",
+        ]
+
+        # check file exists
+        metatadata_path: Path = (
+            Path(__file__).parent.parent.parent / "qgis_resource_sharing/metadata.txt"
+        )
+        self.assertTrue(metatadata_path.is_file())
+
+        # load
+        config = ConfigParser()
+        config.optionxform = str
+        config.read(metatadata_path, encoding="UTF-8")
+
+        # check section
+        self.assertTrue(config.has_section("general"))
+        section = config.options("general")
+
+        # check required metadata
+        for md in required_metadata:
+            self.assertIn(md, section)
 
     def test_version_semver(self):
         """Test if version comply with semantic versioning."""

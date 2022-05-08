@@ -38,13 +38,13 @@ python -m unittest tests.unit.test_plg_metadata.TestPluginMetadata.test_version_
 Build the image:
 
 ```bash
-docker build --pull --rm -f "tests/tests_qgis.dockerfile" -t qgis_LTS:plugin_tester .
+docker build --pull --rm -f "tests/tests_qgis.dockerfile" -t qgis_lts:plugin_tester .
 ```
 
 Run tests:
 
 ```bash
-docker run -v "$(pwd):/tmp/plugin" qgis_LTS:plugin_tester python3 -m pytest
+docker run -v "$(pwd):/tmp/plugin" qgis_lts:plugin_tester python3 -m pytest
 ```
 
 Please note that will use the root rights on some folders.

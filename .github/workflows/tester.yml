@@ -58,6 +58,9 @@ jobs:
       - name: Print QGIS version
         run: qgis --version
 
+      - name: Setup plugin
+        run: qgis_setup.sh "QGIS Resource Sharing"
+
       - name: Install Python requirements
         run: |
           python3 -m pip install -U pip setuptools wheel

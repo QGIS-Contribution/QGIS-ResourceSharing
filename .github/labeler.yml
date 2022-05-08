@@ -12,3 +12,4 @@ documentation:
 
 UI:
   - qgis_resource_sharing/**/*.ui
+  - qgis_resource_sharing/gui/**/*

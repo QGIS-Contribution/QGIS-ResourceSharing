@@ -65,6 +65,7 @@ maxdepth: 1
 ---
 development/contributing
 development/environment
+development/testing
 development/update_dependencies
 development/documentation
 development/packaging

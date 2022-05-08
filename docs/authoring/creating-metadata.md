@@ -16,19 +16,19 @@ For each collection, metadata are needed. The section must be named by the name 
 
 This is the contents of the collection section:
 
-| Name                 |  Status  | Description                                                                    |
-| :------------------- | :------: | :----------------------------------------------------------------------------- |
-| author               | Required | Author's name                                                                  |
-| description          | Required | Additional information about the collection                                    |
-| name                 | Required | The name of the collection                                                     |
-| tags                 | Required | Comma separated list of tags                                                   |
-| Version              | Optional | The version of the collection, default is 1.0                                  |
-| email                | Optional | Author's email                                                                 |
-| license              | Optional | The license of the collection e.g GNU GPL                                      |
-| license_file         | Optional | License file (path relative to the collection root)                            |
-| preview              | Optional | Comma separated list of preview images (paths relative to the collection root) |
-| qgis_minimum_version | Optional | Minimum QGIS version. If not specified, the minimum version will be 2.0        |
-| qgis_maximum_version | Optional | Maximum QGIS version. If not specified, the maxium version will be 3.99        |
+| Name                 |    Status    | Description                                                                    |
+| :------------------- | :----------: | :----------------------------------------------------------------------------- |
+| **author**           | **Required** | Author's name                                                                  |
+| **description**      | **Required** | Additional information about the collection                                    |
+| email                |   Optional   | Author's email                                                                 |
+| license              |   Optional   | The license of the collection e.g GNU GPL                                      |
+| license_file         |   Optional   | License file (path relative to the collection root)                            |
+| **name**             | **Required** | The name of the collection                                                     |
+| preview              |   Optional   | Comma separated list of preview images (paths relative to the collection root) |
+| qgis_minimum_version |   Optional   | Minimum QGIS version. If not specified, the minimum version will be 2.0        |
+| qgis_maximum_version |   Optional   | Maximum QGIS version. If not specified, the maxium version will be 3.99        |
+| **tags**             | **Required** | Comma separated list of tags                                                   |
+| Version              |   Optional   | The version of the collection, default is 1.0                                  |
 
 This is an example of the `metadata.ini` file:
 

@@ -23,8 +23,12 @@
         "--verbose"
     ],
     "python.linting.pylintEnabled": false,
+    // Tests
+    "python.testing.pytestArgs": [],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
     // Git
     "git.enableCommitSigning": true,
     // Extensions
-    "autoDocstring.docstringFormat": "sphinx"
+    "autoDocstring.docstringFormat": "sphinx",
 }

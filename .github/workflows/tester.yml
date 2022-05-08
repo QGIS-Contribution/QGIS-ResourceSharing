@@ -48,6 +48,7 @@ jobs:
       image: qgis/qgis:release-3_22
       env:
         DISPLAY: ":99"
+        PYTHONPATH: "/usr/share/qgis/python/plugins:/usr/share/qgis/python:."
       options: -v ${{ github.workspace }}:/tests_directory
 
     steps:

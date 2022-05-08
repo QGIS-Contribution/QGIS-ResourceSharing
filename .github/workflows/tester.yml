@@ -36,7 +36,7 @@ jobs:
           python -m pip install -U -r requirements/testing.txt
 
       - name: Run Unit tests
-        run: pytest tests/unit/
+        run: pytest -p no:qgis tests/unit/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
@@ -60,7 +60,7 @@ jobs:
       - name: Install Python requirements
         run: |
           python3 -m pip install -U pip setuptools wheel
-          python3 -m pip install --no-deps -U -r requirements/embedded.txt -t RoofClassify/embedded_external_libs
+          python3 -m pip install --no-deps -U -r requirements/embedded.txt -t ${{ env.PROJECT_FOLDER }}/embedded_external_libs
           python3 -m pip install -U -r requirements/testing.txt
 
       - name: Run Unit tests

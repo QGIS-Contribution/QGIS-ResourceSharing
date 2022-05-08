@@ -33,6 +33,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
+junit/
 
 # Sphinx documentation
 docs/_build/

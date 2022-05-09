@@ -47,9 +47,13 @@ jobs:
     container:
       image: qgis/qgis:release-3_22
       env:
+        CI: true
         DISPLAY: ":99"
+        MUTE_LOGS: true
+        NO_MODALS: 1
         PYTHONPATH: "/usr/share/qgis/python/plugins:/usr/share/qgis/python:."
-      options: -v ${{ github.workspace }}:/tests_directory
+        WITH_PYTHON_PEP: false
+      options: -v /tmp/.X11-unix:/tmp/.X11-unix -v ${{ github.workspace }}:/tests_directory
 
     steps:
       - name: Get source code
@@ -58,8 +62,8 @@ jobs:
       - name: Print QGIS version
         run: qgis --version
 
-      # - name: Setup plugin
-      #   run: qgis_setup.sh "QGIS Resource Sharing"
+      - name: Setup plugin
+        run: qgis_setup.sh qgis_resource_sharing
 
       - name: Install Python requirements
         run: |
@@ -68,7 +72,7 @@ jobs:
           python3 -m pip install -U -r requirements/testing.txt
 
       - name: Run Unit tests
-        run: pytest tests/qgis/
+        run: python3 -m pytest tests/qgis/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2

@@ -48,7 +48,8 @@ jobs:
       image: qgis/qgis:release-3_22
       env:
         CI: true
-        DISPLAY: ":99"
+        # DISPLAY: ":99"
+        DISPLAY: ${DISPLAY}
         MUTE_LOGS: true
         NO_MODALS: 1
         PYTHONPATH: "/usr/share/qgis/python/plugins:/usr/share/qgis/python:."
@@ -72,7 +73,9 @@ jobs:
           python3 -m pip install -U -r requirements/testing.txt
 
       - name: Run Unit tests
-        run: python3 -m pytest tests/qgis/
+        run: |
+          Xvfb :1 &
+          python3 -m pytest tests/qgis/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2

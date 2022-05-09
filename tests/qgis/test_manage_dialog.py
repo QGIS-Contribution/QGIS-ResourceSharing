@@ -2,7 +2,7 @@ from qgis.PyQt.QtWidgets import QDialogButtonBox
 from qgis.testing import start_app, unittest
 
 from qgis_resource_sharing.gui.manage_dialog import ManageRepositoryDialog
-from tests.utilities import test_repository_url
+from tests.qgis.utilities import test_repository_url
 
 
 class ManageDialogTest(unittest.TestCase):

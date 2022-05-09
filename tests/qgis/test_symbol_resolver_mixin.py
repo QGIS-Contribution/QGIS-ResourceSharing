@@ -5,7 +5,7 @@ from qgis_resource_sharing.resource_handler.symbol_resolver_mixin import (
     fix_xml_node,
     resolve_path,
 )
-from tests.utilities import test_data_path
+from tests.qgis.utilities import test_data_path
 
 
 class TestSymbolResolverMixin(unittest.TestCase):

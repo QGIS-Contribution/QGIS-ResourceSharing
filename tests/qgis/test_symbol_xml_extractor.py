@@ -8,7 +8,7 @@ from qgis_resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 try:
     from .utilities import test_data_path
 except ImportError:
-    from tests.utilities import test_data_path
+    from tests.qgis.utilities import test_data_path
 
 
 class TestSymbolXMLExtractor(unittest.TestCase):

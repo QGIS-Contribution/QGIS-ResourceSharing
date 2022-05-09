@@ -48,8 +48,7 @@ jobs:
       image: qgis/qgis:release-3_22
       env:
         CI: true
-        # DISPLAY: ":99"
-        DISPLAY: ${DISPLAY}
+        DISPLAY: ":1"
         MUTE_LOGS: true
         NO_MODALS: 1
         PYTHONPATH: "/usr/share/qgis/python/plugins:/usr/share/qgis/python:."

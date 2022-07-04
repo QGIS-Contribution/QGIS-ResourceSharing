@@ -2,7 +2,7 @@ exclude: ".venv|tests/dev/|tests/fixtures/|ext_libs/"
 fail_fast: false
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.2.0
+    rev: v4.3.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=500"]
@@ -25,7 +25,7 @@ repos:
         args: ["--whitespaces-count", "4"]
 
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 22.6.0
     hooks:
       - id: black
 

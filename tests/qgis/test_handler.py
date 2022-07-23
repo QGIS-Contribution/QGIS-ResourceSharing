@@ -1,61 +1,12 @@
 from qgis.testing import start_app, unittest
 
 from qgis_resource_sharing.repository_handler import (
-    BaseRepositoryHandler,
     BitBucketHandler,
     FileSystemHandler,
     GithubHandler,
     GogsHandler,
 )
 from tests.qgis.utilities import test_data_path, test_repository_url
-
-
-class TestBaseHandler(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        start_app()
-
-    def setUp(self):
-        self.base_handler = BaseRepositoryHandler(test_repository_url())
-        self.fs_handler = FileSystemHandler(test_repository_url())
-
-    def test_get_handler(self):
-        handler = self.base_handler.get_handler(test_repository_url())
-        self.assertEqual(handler.__class__.__name__, "FileSystemHandler")
-
-    def test_is_git_repository(self):
-        self.assertEqual(self.fs_handler.is_git_repository, False)
-
-    def test_parse_metadata(self):
-        """Testing parsing the metadata."""
-        result, _ = self.fs_handler.fetch_metadata()
-        self.assertTrue(result)
-        collections = self.fs_handler.parse_metadata()
-        # There's only 1 collection defined there
-        self.assertEqual(len(collections), 1)
-
-        expected_collection = {
-            "status": 0,
-            "description": "The collection contains various resources for testing",
-            "tags": "test, symbol, svg, processing",
-            "register_name": "test_collection",
-            "repository_url": test_repository_url(),
-            "name": "Akbar's Test Collection",
-            "author": "Akbar Gumbira",
-            "author_email": "akbargumbira@gmail.com",
-            "qgis_min_version": "2.0",
-            "qgis_max_version": "3.99",
-            "license": "GNU GPL",
-            "license_url": "%s/collections/test_collection/LICENSE.txt"
-            % test_repository_url(),
-            "preview": [
-                "%s/collections/test_collection/preview/prev_1.png"
-                % test_repository_url(),
-                "%s/collections/test_collection/preview/prev_2.png"
-                % test_repository_url(),
-            ],
-        }
-        self.assertDictEqual(collections[0], expected_collection)
 
 
 class TestFileSystemHandler(unittest.TestCase):

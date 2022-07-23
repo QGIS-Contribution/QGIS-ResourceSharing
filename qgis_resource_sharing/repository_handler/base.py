@@ -228,20 +228,20 @@ class BaseRepositoryHandler(object):
                 raise MetadataError("Error parsing metadata: %s" % e)
 
             collection_dict = {
-                "register_name": collection,
                 "author": author,
                 "author_email": email,
-                "repository_url": self.url,
-                "repository_name": "",
-                "status": COLLECTION_NOT_INSTALLED_STATUS,
-                "name": name,
-                "tags": tags,
                 "description": description,
-                "qgis_min_version": qgis_min_version,
-                "qgis_max_version": qgis_max_version,
-                "preview": preview_list,
                 "license": license_str,
                 "license_url": license_url,
+                "name": name,
+                "preview": preview_list,
+                "qgis_max_version": qgis_max_version,
+                "qgis_min_version": qgis_min_version,
+                "register_name": collection,
+                "repository_name": "",
+                "repository_url": self.url,
+                "status": COLLECTION_NOT_INSTALLED_STATUS,
+                "tags": tags,
             }
             collections.append(collection_dict)
 

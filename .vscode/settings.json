@@ -1,7 +1,11 @@
 {
     // Editor
     "editor.bracketPairColorization.enabled": true,
-    "editor.guides.bracketPairs":"active",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "editor.guides.bracketPairs": "active",
+    "editor.formatOnSave": true,
     "editor.rulers": [
         88
     ],
@@ -26,5 +30,9 @@
     // Git
     "git.enableCommitSigning": true,
     // Extensions
-    "autoDocstring.docstringFormat": "sphinx"
+    "autoDocstring.docstringFormat": "sphinx",
+    "autoDocstring.guessTypes": true,
+    "yaml.schemas": {
+        "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+    }
 }

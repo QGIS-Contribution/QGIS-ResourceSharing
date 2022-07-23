@@ -1,11 +1,13 @@
 #! python3  # noqa E265
 
 """
-    Base class for unit tests on QGIS.
+    Test repository base handler.
+
+    From unittest: `python -m unittest tests.qgis.test_handler_base.TestBaseHandler`
 """
 
 # PyQGIS
-from qgis.testing import start_app
+from qgis.testing import start_app, unittest
 
 # Plugin
 from qgis_resource_sharing.repository_handler import (

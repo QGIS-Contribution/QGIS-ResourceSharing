@@ -3,6 +3,7 @@
 import logging
 from configparser import ConfigParser
 from io import StringIO
+from typing import Dict, List
 from urllib.parse import urlparse
 
 from ext_libs.giturlparse import validate as git_validate
@@ -127,11 +128,11 @@ class BaseRepositoryHandler(object):
             self.metadata = bytes(network_manager.content).decode("utf8")
         return status, fetcherror
 
-    def parse_metadata(self):
+    def parse_metadata(self) -> List[Dict]:
         """Parse str metadata to collection dict.
 
         :return: collections
-        :rtype: (dict)
+        :rtype: List[Dict]
         """
         if not self.metadata:
             msg = "The metadata content is None"

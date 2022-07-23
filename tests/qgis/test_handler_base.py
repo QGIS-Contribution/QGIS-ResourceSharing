@@ -5,18 +5,16 @@
 """
 
 # PyQGIS
+from qgis.testing import start_app
 
-from qgis.testing import start_app, unittest
-
+# Plugin
 from qgis_resource_sharing.repository_handler import (
     BaseRepositoryHandler,
     FileSystemHandler,
 )
+
+# Tests suite
 from tests.qgis.base import BaseTestPlugin
-
-# from tests.qgis.utilities import test_data_path, test_repository_url
-
-# print(test_data_path("metadata.ini"))
 
 
 class TestBaseHandler(BaseTestPlugin):

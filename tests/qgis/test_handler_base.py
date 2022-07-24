@@ -3,7 +3,7 @@
 """
     Test repository base handler.
 
-    From unittest: `python -m unittest tests.qgis.test_handler_base.TestBaseHandler`
+    From unittest: `python -m unittest tests.qgis.test_handler_base`
 """
 
 # PyQGIS

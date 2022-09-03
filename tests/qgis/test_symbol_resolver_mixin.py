@@ -21,7 +21,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
     def setUpClass(cls):
         start_app()
         cls.collection_path = test_data_path(
-            "reposityory_dummy", "collections", "test_collection"
+            "repository_dummy", "collections", "test_collection"
         )
 
     def _to_str(self, buffer):
@@ -124,9 +124,11 @@ class TestSymbolResolverMixin(unittest.TestCase):
 
     def test_resolve_path_search_paths(self):
         """Test resolving the path works correctly."""
-        search_paths = []
-
-        search_paths = [test_data_path("collections", "test_collection", "preview")]
+        search_paths = [
+            test_data_path(
+                "dummy_repository", "collections", "test_collection", "preview"
+            )
+        ]
         img_path = "prev_1.png"
         fixed_path = resolve_path(img_path, self.collection_path, search_paths)
         expected_path = test_data_path(

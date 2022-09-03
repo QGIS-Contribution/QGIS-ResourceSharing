@@ -1,3 +1,4 @@
+import logging
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -6,12 +7,14 @@ from qgis.PyQt.QtCore import QFile, QFileInfo, QUrl
 
 from qgis_resource_sharing.utilities import path_leaf
 
+LOGGER = logging.getLogger("QGIS Resource Sharing")
+
 
 class SymbolResolverMixin(object):
     """Mixin for Resources Handlers that need to resolve SVG
     and image symbol paths."""
 
-    def resolve_dependency(self, xml_path):
+    def resolve_dependency(self, xml_path: str):
         """Modify the XML and resolve dependencies.
 
         Update paths to downloaded symbol so that the paths
@@ -24,6 +27,11 @@ class SymbolResolverMixin(object):
         :param xml_path: The path to the XML style file.
         :type xml_path: str
         """
+        if Path(xml_path).is_file():
+            self._xml_path: str = xml_path
+        else:
+            LOGGER.warning(f"Symbol XML filepath doesn't exists: {xml_path}")
+
         with open(xml_path, "rb") as xml_file:
             symbol_xml = xml_file.read()
 

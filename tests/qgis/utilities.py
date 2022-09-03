@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from qgis.PyQt.QtCore import QUrl
 
@@ -15,15 +16,19 @@ def test_data_path(*args):
     :rtype: str
 
     """
-    path = os.path.dirname(__file__)
-    path = os.path.abspath(os.path.join(path, "data"))
+    # get fixtures data folder path
+    fixtures_data_dir = Path(__file__).parent.parent / "fixtures"
+    if not fixtures_data_dir.exists():
+        raise FileNotFoundError(fixtures_data_dir)
+    # build absolute path for asked files
     for item in args:
-        path = os.path.abspath(os.path.join(path, item))
 
-    return path
+        fixtures_data_dir = os.path.abspath(os.path.join(fixtures_data_dir, item))
+
+    return fixtures_data_dir
 
 
-def test_repository_url():
+def test_repository_url() -> str:
     """Return the test repository URL on file system.
 
     :return: The test repository URL string

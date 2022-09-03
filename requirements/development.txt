@@ -6,5 +6,5 @@ flake8>=3.8,<4.1
 flake8-builtins>=1.5,<1.6
 flake8-isort>=4.0,<4.3
 flake8-qgis>=1,<1.1
-nose2>=0.9,<0.12
+nose2>=0.9,<0.13
 pre-commit>=2.17,<2.21

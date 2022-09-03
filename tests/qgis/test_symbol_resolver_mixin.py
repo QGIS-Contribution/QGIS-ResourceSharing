@@ -48,7 +48,9 @@ class TestSymbolResolverMixin(unittest.TestCase):
                 </layer>
             </symbol>
         """
-        collection_path = test_data_path("collections", "test_collection")
+        collection_path = test_data_path(
+            "repository_dummy", "collections", "test_collection"
+        )
         fixed_xml = self._to_str(fix_xml_node(symbol_xml, collection_path, []))
         expected_xml = """<symbol alpha="1" clip_to_extent="1" name="fill_raster" type="fill">
                 <layer class="RasterFill" locked="0" pass="0">

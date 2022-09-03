@@ -90,17 +90,19 @@ class TestSymbolResolverMixin(unittest.TestCase):
         )
         self.assertEqual(fixed_path, img_path)
 
-    def test_resolve_path(self):
-        """Test resolving the path works correctly."""
+    def test_resolve_path_http_url(self):
+        """Test resolving the path for an HTTP URL."""
         search_paths = []
-
-        # Test case 3:  http url
         img_path = "http://qgis.org/test/image.svg"
         img_url = QUrl(img_path)
         fixed_path = resolve_path(
             img_url.toString(), self.collection_path, search_paths
         )
         self.assertEqual(fixed_path, img_path)
+
+    def test_resolve_path_local_collection_svg(self):
+        """Test resolving the path works correctly."""
+        search_paths = []
 
         # Test case 4: checking in the svg local collection path
         img_path = "/you/would/not/find/this/charizard.svg"
@@ -110,7 +112,9 @@ class TestSymbolResolverMixin(unittest.TestCase):
         )
         self.assertEqual(fixed_path, expected_path)
 
-        # Test case 5: checking in the image local collection path
+    def test_resolve_path_local_collection_image(self):
+        """Test resolving the path checking in the image local collection path."""
+        search_paths = []
         img_path = "/you/would/not/find/this/pikachu.png"
         fixed_path = resolve_path(img_path, self.collection_path, search_paths)
         expected_path = test_data_path(
@@ -118,7 +122,10 @@ class TestSymbolResolverMixin(unittest.TestCase):
         )
         self.assertEqual(fixed_path, expected_path)
 
-        # Test case 6: checking in the search paths
+    def test_resolve_path_search_paths(self):
+        """Test resolving the path works correctly."""
+        search_paths = []
+
         search_paths = [test_data_path("collections", "test_collection", "preview")]
         img_path = "prev_1.png"
         fixed_path = resolve_path(img_path, self.collection_path, search_paths)
@@ -131,7 +138,10 @@ class TestSymbolResolverMixin(unittest.TestCase):
         )
         self.assertEqual(fixed_path, expected_path)
 
-        # Test case 7: not finding anywhere (return the original path)
+    def test_resolve_path_not_found(self):
+        """Test resolving the path not finding anywhere (return the original path)."""
+        search_paths = []
+
         img_path = "/you/would/not/find/this/anywhere.png"
         fixed_path = resolve_path(img_path, self.collection_path, search_paths)
         self.assertEqual(fixed_path, img_path)

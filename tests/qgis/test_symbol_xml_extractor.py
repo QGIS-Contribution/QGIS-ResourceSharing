@@ -1,3 +1,11 @@
+#! python3  # noqa E265
+
+"""
+    Test symbol collections extractor.
+
+    From unittest: `python -m unittest tests.qgis.test_symbol_xml_extractor`
+"""
+
 from qgis.core import QgsColorBrewerColorRamp, QgsFillSymbol, QgsGradientColorRamp
 from qgis.core import QgsLimitedRandomColorRamp as random_color_ramp  # <-- !!!!
 from qgis.core import QgsLineSymbol, QgsMarkerSymbol
@@ -19,7 +27,11 @@ class TestSymbolXMLExtractor(unittest.TestCase):
     def test_parse_xml(self):
         """Test parsing the xml works correctly."""
         xml_path = test_data_path(
-            "collections", "test_collection", "symbol", "various_symbols.xml"
+            "repository_dummy",
+            "collections",
+            "test_collection",
+            "symbol",
+            "various_symbols.xml",
         )
         extractor = SymbolXMLExtractor(xml_path)
         self.assertTrue(extractor.parse_xml())

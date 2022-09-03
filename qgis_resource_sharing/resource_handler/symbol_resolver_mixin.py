@@ -68,7 +68,7 @@ def fix_xml_node(xml, collection_path, search_paths):
     return ET.tostring(root)
 
 
-def resolve_path(path, collection_path, search_paths):
+def resolve_path(path: str, collection_path: str, search_paths: []):
     """Try to resolve the SVG and image paths.
 
     This is the procedure:
@@ -85,7 +85,7 @@ def resolve_path(path, collection_path, search_paths):
     :type collection_path: str
 
     :param search_paths: List of paths to search for images/SVGs.
-    :type search_paths: str
+    :type search_paths: list
     """
     # It might be a complete local file system path
     if QFile(path).exists():

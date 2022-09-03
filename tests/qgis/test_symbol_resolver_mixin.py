@@ -126,7 +126,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
         """Test resolving the path works correctly."""
         search_paths = [
             test_data_path(
-                "dummy_repository", "collections", "test_collection", "preview"
+                "repository_dummy", "collections", "test_collection", "preview"
             )
         ]
         img_path = "prev_1.png"

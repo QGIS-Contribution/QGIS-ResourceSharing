@@ -34,4 +34,7 @@ def test_repository_url() -> str:
     :return: The test repository URL string
     :rtype: str
     """
-    return QUrl.fromLocalFile(test_data_path()).toString()
+    test_fixtures_path = test_data_path()
+    if isinstance(test_fixtures_path, Path):
+        test_fixtures_path = str(test_fixtures_path.resolve())
+    return QUrl.fromLocalFile(test_fixtures_path).toString()

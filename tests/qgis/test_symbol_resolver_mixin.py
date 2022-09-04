@@ -36,8 +36,8 @@ class TestSymbolResolverMixin(unittest.TestCase):
     def test_fix_xml_node(self):
         """Test if fixing xml node works."""
         symbol_xml = """
-            <symbol alpha="1" clip_to_extent="1" type="fill" name="fill_raster">
-                <layer pass="0" class="RasterFill" locked="0">
+            <symbol alpha="1" clip_to_extent="1" name="fill_raster" type="fill">
+                <layer class="RasterFill" locked="0" pass="0">
                     <prop k="alpha" v="1"/>
                     <prop k="angle" v="0"/>
                     <prop k="coordinate_mode" v="0"/>
@@ -55,6 +55,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
             "repository_dummy", "collections", "test_collection"
         )
         fixed_xml = self._to_str(fix_xml_node(symbol_xml, collection_path, []))
+        print(fixed_xml)
         expected_xml = """
             <symbol alpha="1" clip_to_extent="1" name="fill_raster" type="fill">
                 <layer class="RasterFill" locked="0" pass="0">
@@ -74,7 +75,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
             test_data_path()
         )
 
-        self.assertEqual(fixed_xml, expected_xml)
+        self.assertEqual(fixed_xml.strip(), expected_xml.strip())
 
     def test_resolve_path_local(self):
         """Test resolving the path works correctly."""

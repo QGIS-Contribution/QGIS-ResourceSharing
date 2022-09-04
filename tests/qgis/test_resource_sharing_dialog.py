@@ -22,6 +22,7 @@ from qgis_resource_sharing.config import (
 from qgis_resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
 
 
+@unittest.skip("To refacto later.")
 class ResourceSharingDialogTest(unittest.TestCase):
     """Test dialog works."""
 
@@ -37,7 +38,6 @@ class ResourceSharingDialogTest(unittest.TestCase):
         """Runs after each test."""
         self.dialog = None
 
-    @unittest.skip("No please.")
     def test_dialog_help(self):
         """Test we can click Help."""
         button = self.dialog.button_box.button(QDialogButtonBox.Help)

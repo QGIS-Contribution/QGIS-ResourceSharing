@@ -52,12 +52,13 @@ class TestSymbolResolverMixin(unittest.TestCase):
             "repository_dummy", "collections", "test_collection"
         )
         fixed_xml = self._to_str(fix_xml_node(symbol_xml, collection_path, []))
-        expected_xml = """<symbol alpha="1" clip_to_extent="1" name="fill_raster" type="fill">
+        expected_xml = """
+            <symbol alpha="1" clip_to_extent="1" name="fill_raster" type="fill">
                 <layer class="RasterFill" locked="0" pass="0">
                     <prop k="alpha" v="1" />
                     <prop k="angle" v="0" />
                     <prop k="coordinate_mode" v="0" />
-                    <prop k="imageFile" v="{0}/collections/test_collection/image/pikachu.png" />
+                    <prop k="imageFile" v="{0}/repository_dummy/collections/test_collection/image/pikachu.png" />
                     <prop k="offset" v="0,0" />
                     <prop k="offset_map_unit_scale" v="0,0,0,0,0,0" />
                     <prop k="offset_unit" v="MM" />
@@ -65,7 +66,8 @@ class TestSymbolResolverMixin(unittest.TestCase):
                     <prop k="width_map_unit_scale" v="0,0,0,0,0,0" />
                     <prop k="width_unit" v="Pixel" />
                 </layer>
-            </symbol>""".format(
+            </symbol>
+        """.format(
             test_data_path()
         )
 

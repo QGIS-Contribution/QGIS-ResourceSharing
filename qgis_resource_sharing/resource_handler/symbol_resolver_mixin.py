@@ -43,7 +43,7 @@ class SymbolResolverMixin(object):
             xml_file.write(updated_xml)
 
 
-def fix_xml_node(xml, collection_path, search_paths):
+def fix_xml_node(xml: str, collection_path: str, search_paths: list):
     """Loop through the XML nodes to resolve the SVG and image paths.
 
     :param xml: The XML string of the symbol (or full XML symbol definition)
@@ -54,7 +54,7 @@ def fix_xml_node(xml, collection_path, search_paths):
     :type collection_path: str
 
     :param search_paths: List of paths to search for images/SVGs.
-    :type search_paths: str
+    :type search_paths: list
     """
     root = ET.fromstring(xml)
     svg_marker_nodes = root.findall(".//layer/prop[@k='name']")

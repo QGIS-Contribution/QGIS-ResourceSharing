@@ -17,6 +17,9 @@ from tests.qgis.utilities import test_data_path
 
 
 class TestSymbolResolverMixin(unittest.TestCase):
+
+    maxDiff = None
+
     @classmethod
     def setUpClass(cls):
         start_app()

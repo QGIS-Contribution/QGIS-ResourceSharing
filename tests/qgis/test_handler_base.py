@@ -7,7 +7,7 @@
 """
 
 # PyQGIS
-from qgis.testing import start_app, unittest
+from qgis.testing import unittest
 
 # Plugin
 from qgis_resource_sharing.repository_handler import (
@@ -22,7 +22,8 @@ from tests.qgis.base import BaseTestPlugin
 class TestBaseHandler(BaseTestPlugin):
     @classmethod
     def setUpClass(cls):
-        start_app()
+
+        pass
 
     def setUp(self):
         self.base_handler = BaseRepositoryHandler(self.get_sample_repository_url())

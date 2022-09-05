@@ -2,8 +2,6 @@
     Test plugin initialization
 """
 
-from pytest_qgis import qgis_iface
-
 from qgis_resource_sharing import classFactory
 
 

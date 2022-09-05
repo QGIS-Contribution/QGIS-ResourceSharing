@@ -7,7 +7,7 @@
 """
 
 from qgis.PyQt.QtCore import QUrl
-from qgis.testing import start_app, unittest
+from qgis.testing import unittest
 
 from qgis_resource_sharing.resource_handler.symbol_resolver_mixin import (
     fix_xml_node,
@@ -22,7 +22,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        start_app()
+
         cls.collection_path = test_data_path(
             "repository_dummy", "collections", "test_collection"
         )

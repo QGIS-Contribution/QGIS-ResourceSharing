@@ -1,5 +1,5 @@
 from qgis.PyQt.QtWidgets import QDialogButtonBox
-from qgis.testing import start_app, unittest
+from qgis.testing import unittest
 
 from qgis_resource_sharing.gui.manage_dialog import ManageRepositoryDialog
 from tests.qgis.utilities import test_repository_url
@@ -10,7 +10,8 @@ class ManageDialogTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        start_app()
+
+        pass
 
     def setUp(self):
         """Runs before each test."""

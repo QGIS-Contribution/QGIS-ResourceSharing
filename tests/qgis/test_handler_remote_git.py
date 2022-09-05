@@ -7,7 +7,7 @@
 """
 
 # PyQGIS
-from qgis.testing import start_app, unittest
+from qgis.testing import unittest
 
 from qgis_resource_sharing.repository_handler import (
     BitBucketHandler,
@@ -19,7 +19,8 @@ from qgis_resource_sharing.repository_handler import (
 class TestRemoteGitHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        start_app()
+
+        pass
 
     def setUp(self):
         self.valid_github_https = (

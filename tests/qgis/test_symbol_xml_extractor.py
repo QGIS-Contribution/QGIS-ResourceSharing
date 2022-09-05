@@ -9,7 +9,7 @@
 from qgis.core import QgsColorBrewerColorRamp, QgsFillSymbol, QgsGradientColorRamp
 from qgis.core import QgsLimitedRandomColorRamp as random_color_ramp  # <-- !!!!
 from qgis.core import QgsLineSymbol, QgsMarkerSymbol
-from qgis.testing import start_app, unittest
+from qgis.testing import unittest
 
 from qgis_resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 
@@ -22,7 +22,8 @@ except ImportError:
 class TestSymbolXMLExtractor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        start_app()
+
+        pass
 
     def test_parse_xml(self):
         """Test parsing the xml works correctly."""

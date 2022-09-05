@@ -7,7 +7,7 @@
 """
 
 # PyQGIS
-from qgis.testing import start_app, unittest
+from qgis.testing import unittest
 
 # Plugin
 from qgis_resource_sharing.repository_handler import FileSystemHandler
@@ -19,7 +19,8 @@ from tests.qgis.base import BaseTestPlugin
 class TestFileSystemHandler(BaseTestPlugin):
     @classmethod
     def setUpClass(cls):
-        start_app()
+
+        pass
 
     def setUp(self):
         self.fs_handler = FileSystemHandler(self.get_sample_repository_url())

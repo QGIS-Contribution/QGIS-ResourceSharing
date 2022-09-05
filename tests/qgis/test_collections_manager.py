@@ -21,7 +21,7 @@ from qgis_resource_sharing.collection_manager import CollectionManager
 class TestCollections(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # start_app()
+
         pass
 
     def test_get_collection_id(self):

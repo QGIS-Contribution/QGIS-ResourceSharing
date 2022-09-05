@@ -150,9 +150,16 @@ class RepositoryManager(QObject):
                     LOGGER.warning(nameWarn)
                     break
             if not repo_present:
-                self.add_directory(
-                    online_dir_name, self._online_directories[online_dir_name]
-                )
+                try:
+                    self.add_directory(
+                        online_dir_name, self._online_directories[online_dir_name]
+                    )
+                except Exception as exc:
+                    LOGGER.error(
+                        f"Error occured adding '{online_dir_name}' repository. Trace: {exc}"
+                    )
+                    continue
+
         for repo_name in settings.childGroups():
             self._directories[repo_name] = {}
             url = settings.value(repo_name + "/url", "", type=str)

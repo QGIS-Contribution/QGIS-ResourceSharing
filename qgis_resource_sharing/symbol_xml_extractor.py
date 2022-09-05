@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from qgis.core import (
     QgsPalLayerSettings,
@@ -16,19 +17,22 @@ LOGGER = logging.getLogger("QGIS Resource Sharing")
 class SymbolXMLExtractor(object):
     """Parses the given file and returns the symbols and colorramps"""
 
-    def __init__(self, xml_path):
+    def __init__(self, xml_path: str):
         """Constructor of the class.
 
         :param xml_path: The path to the symbol xml
         :type xml_path: str
         """
-        self._xml_path = xml_path
+        if Path(xml_path).is_file():
+            self._xml_path: str = xml_path
+        else:
+            LOGGER.warning(f"Symbol XML filepath doesn't exists: {xml_path}")
         self._symbols = []
         self._colorramps = []
         # Parse the xml to get the symbols and colorramps
         self.parse_xml()
 
-    def parse_xml(self):
+    def parse_xml(self) -> bool:
         """Parse the xml file. Returns false if there is failure."""
         xml_file = QFile(self._xml_path)
         if not xml_file.open(QIODevice.ReadOnly):

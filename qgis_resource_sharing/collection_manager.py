@@ -129,7 +129,7 @@ class CollectionManager(object):
         :rtype: dict
         """
         installed_collections = {}
-        for id, collection in config.COLLECTIONS.items():
+        for collection_id, collection in config.COLLECTIONS.items():
             if collection["status"] != COLLECTION_INSTALLED_STATUS:
                 continue
 
@@ -137,7 +137,7 @@ class CollectionManager(object):
                 if collection["repository_url"] != repo_url:
                     continue
 
-            installed_collections[id] = collection
+            installed_collections[collection_id] = collection
 
         return installed_collections
 

@@ -1,10 +1,8 @@
-from test.utilities import test_repository_url
-
-import nose2
 from qgis.PyQt.QtWidgets import QDialogButtonBox
-from qgis.testing import start_app, unittest
+from qgis.testing import unittest
 
 from qgis_resource_sharing.gui.manage_dialog import ManageRepositoryDialog
+from tests.qgis.utilities import test_repository_url
 
 
 class ManageDialogTest(unittest.TestCase):
@@ -12,7 +10,8 @@ class ManageDialogTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        start_app()
+
+        pass
 
     def setUp(self):
         """Runs before each test."""
@@ -35,4 +34,4 @@ class ManageDialogTest(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    nose2.main()
+    unittest.main()

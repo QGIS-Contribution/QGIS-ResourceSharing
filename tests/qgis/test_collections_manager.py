@@ -1,13 +1,28 @@
-import nose2
-from qgis.testing import start_app, unittest
+#! python3  # noqa E265
 
+"""
+    Usage from the repo root folder:
+
+    .. code-block:: bash
+
+        # for whole tests
+        python -m unittest tests.qgis.test_collections_manager
+        # for specific test
+        python -m unittest tests.qgis.test_collections_manager.TestCollections.test_get_collection_id
+"""
+
+# PyQGIS
+from qgis.testing import unittest
+
+# plugin
 from qgis_resource_sharing.collection_manager import CollectionManager
 
 
 class TestCollections(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        start_app()
+
+        pass
 
     def test_get_collection_id(self):
         """Testing get_collection_id."""
@@ -22,4 +37,4 @@ class TestCollections(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    nose2.main()
+    unittest.main()

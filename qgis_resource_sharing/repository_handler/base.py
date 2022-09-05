@@ -3,6 +3,7 @@
 import logging
 from configparser import ConfigParser
 from io import StringIO
+from typing import Dict, List
 from urllib.parse import urlparse
 
 from ext_libs.giturlparse import validate as git_validate
@@ -127,11 +128,11 @@ class BaseRepositoryHandler(object):
             self.metadata = bytes(network_manager.content).decode("utf8")
         return status, fetcherror
 
-    def parse_metadata(self):
+    def parse_metadata(self) -> List[Dict]:
         """Parse str metadata to collection dict.
 
         :return: collections
-        :rtype: (dict)
+        :rtype: List[Dict]
         """
         if not self.metadata:
             msg = "The metadata content is None"
@@ -227,20 +228,20 @@ class BaseRepositoryHandler(object):
                 raise MetadataError("Error parsing metadata: %s" % e)
 
             collection_dict = {
-                "register_name": collection,
                 "author": author,
                 "author_email": email,
-                "repository_url": self.url,
-                "repository_name": "",
-                "status": COLLECTION_NOT_INSTALLED_STATUS,
-                "name": name,
-                "tags": tags,
                 "description": description,
-                "qgis_min_version": qgis_min_version,
-                "qgis_max_version": qgis_max_version,
-                "preview": preview_list,
                 "license": license_str,
                 "license_url": license_url,
+                "name": name,
+                "preview": preview_list,
+                "qgis_max_version": qgis_max_version,
+                "qgis_min_version": qgis_min_version,
+                "register_name": collection,
+                "repository_name": "",
+                "repository_url": self.url,
+                "status": COLLECTION_NOT_INSTALLED_STATUS,
+                "tags": tags,
             }
             collections.append(collection_dict)
 

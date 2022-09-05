@@ -2,6 +2,13 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## 1.0.0 - 2022-09-05
+
+- Tests have been refactored to use GitHub Actions and restoring code coverage
+- Handle case where one of default repositories is unreachable
+- Minor bug fixes spotted during tests refactoring
+- See 1.0.0-beta1 release notes for complete changes since the last stable version
+
 ## 1.0.0-beta1 - 2022-04-28
 
 - Improved integration of external libraries (#166)
@@ -133,7 +140,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Allow authors to add license details in the collection
 - Fixed problem in QGIS < 2.12 as a result of using the new QgsAuthManager
 - Change the behavior of updating and removing directory in settings (This fixed #34)
-- Use the new official QGIS resource repository (https://github.com/qgis/QGIS-Resources)
+- Use the new official QGIS resource repository (<https://github.com/qgis/QGIS-Resources>)
 
 ---
 

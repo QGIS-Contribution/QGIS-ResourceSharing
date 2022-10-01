@@ -1,4 +1,4 @@
 # Packaging
 # ---------
 
-qgis-plugin-ci>=2.3,<2.4
+qgis-plugin-ci>=2.3,<2.6

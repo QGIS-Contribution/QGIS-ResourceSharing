@@ -4,7 +4,7 @@ about=Search for published collections and install them for use with QGIS. Symbo
 description=Download shared collections
 category=Web
 icon=resources/icon.png
-tags=algorithm,checklist,collection,design,map,model,processing,Python,R,repository,resource,script,sharing,style,svg,symbol
+tags=algorithm,checklist,collection,design,map,model,processing,Python,R,repository,resources,script,sharing,style,svg,symbol
 
 # credits and contact
 email=dev@ingeoveritas.com

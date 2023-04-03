@@ -19,7 +19,6 @@ from qgis_resource_sharing.repository_handler import (
 class TestRemoteGitHandler(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-
         pass
 
     def setUp(self):

@@ -22,7 +22,6 @@ except ImportError:
 class TestSymbolXMLExtractor(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-
         pass
 
     def test_parse_xml(self):

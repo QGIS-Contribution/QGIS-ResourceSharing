@@ -1,39 +1,44 @@
-name: "🐍 Linter"
+name: "✅ Linter"
 
 env:
   PROJECT_FOLDER: "qgis_resource_sharing"
-  PYTHON_VERSION: 3.7
+  PYTHON_VERSION: 3.9
 
 # because linter is a required check, it must be triggered on every push and not filtered on paths
 on:
   push:
     branches: [master]
-  #     paths:
-  #       - '**.py'
+    paths:
+      - "**.py"
+      - .github/workflows/linter.yml
+
   pull_request:
     branches: [master]
-#     paths:
-#       - '**.py'
+    paths:
+      - "**.py"
+      - .github/workflows/linter.yml
 
 jobs:
-  flake8:
+  lint-py:
+    name: Python 🐍
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Get source code
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
           cache-dependency-path: "requirements/development.txt"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install project requirements
         run: |
-          python -m pip install -U -r requirements/base.txt
-          python -m pip install -U -r requirements/development.txt
+          python -m pip install -U pip setuptools wheel
+          python -m pip install -U requirements/development.txt
 
       - name: Lint with flake8
         run: |

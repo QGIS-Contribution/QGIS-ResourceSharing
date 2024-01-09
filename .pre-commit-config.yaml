@@ -7,7 +7,6 @@ repos:
       - id: check-added-large-files
         args: ["--maxkb=500"]
       - id: check-case-conflict
-      - id: check-toml
       - id: check-xml
       - id: check-yaml
       - id: detect-private-key
@@ -24,10 +23,17 @@ repos:
       - id: remove-tabs
         args: ["--whitespaces-count", "4"]
 
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: "v0.1.11"
+    hooks:
+      - id: ruff
+        args: ["--fix-only", "--target-version=py39"]
+
   - repo: https://github.com/psf/black
     rev: 23.12.1
     hooks:
       - id: black
+        args: ["--target-version=py39"]
 
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
@@ -36,7 +42,7 @@ repos:
         args: ["--profile", "black", "--filter-files"]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
       - id: flake8
         files: ^qgis_resource_sharing/.*\.py$

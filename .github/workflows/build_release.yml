@@ -27,7 +27,7 @@ jobs:
       - name: Install system requirements
         run: |
           sudo apt update
-          sudo apt install qt5-default qttools5-dev-tools
+          sudo apt install qt5-qmake qttools5-dev-tools
 
       - name: Update translations
         run: lupdate -noobsolete -verbose ${{ env.PROJECT_FOLDER }}/resources/i18n/plugin_translation.pro
@@ -199,8 +199,8 @@ jobs:
         run: >-
           qgis-plugin-ci
           release ${GITHUB_REF/refs\/tags\//}
-          --github-token ${{ secrets.GITHUB_TOKEN }}
-          --create-plugin-repo
           --allow-uncommitted-changes
+          --create-plugin-repo
+          --github-token ${{ secrets.GITHUB_TOKEN }}
           --osgeo-username ${{ secrets.OSGEO_USER }}
           --osgeo-password ${{ secrets.OSGEO_PASSWORD }}

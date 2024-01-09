@@ -1,41 +1,41 @@
 {
     // Editor
     "editor.bracketPairColorization.enabled": true,
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": true
-    },
     "editor.guides.bracketPairs": "active",
     "editor.formatOnSave": true,
-    "editor.rulers": [
-        88
-    ],
-    "editor.wordWrapColumn": 88,
     "files.associations": {
         "./requirements/*.txt": "pip-requirements",
-        "metadata.txt": "ini"
+        "metadata.txt": "ini",
+        "**/*.ts": "xml",
+        "**/*.ui": "xml"
     },
-    // Formatter
-    "python.formatting.provider": "black",
-    "python.formatting.blackArgs": [
-        "--target-version=py39"
-    ],
-    // Linter
-    "python.linting.enabled": true,
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Args": [
-        "--config=setup.cfg",
-        "--verbose"
-    ],
-    "python.linting.pylintEnabled": false,
+    // Python
+    "python.analysis.autoFormatStrings": true,
+    "python.analysis.typeCheckingMode": "basic",
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.terminal.activateEnvironment": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.rulers": [
+            88
+        ],
+        "editor.wordWrapColumn": 88,
+    },
     // Tests
     "python.testing.pytestArgs": [],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    // Git
-    "git.enableCommitSigning": true,
     // Extensions
     "autoDocstring.docstringFormat": "sphinx",
     "autoDocstring.guessTypes": true,
+    "flake8.args": [
+        "--config=setup.cfg",
+        "--verbose"
+    ],
     "yaml.schemas": {
         "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
     }

@@ -1,9 +1,9 @@
 # Documentation (for devs)
 # ------------------------
 
-furo==2022.*
+furo>=2023.*
 ghp-import>2.0,<2.2
-myst-parser[linkify]>=0.16,<2.1
-sphinx-autobuild==2021.*
+myst-parser[linkify]>=2
+sphinx-autobuild>=2021.*
 sphinx-copybutton>=0.3,<1
-sphinxext-opengraph>=0.4,<0.8
+sphinxext-opengraph>=0.7

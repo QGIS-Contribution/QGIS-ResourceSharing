@@ -22,12 +22,12 @@ jobs:
 
     steps:
       - name: Get source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install system requirements
         run: |
           sudo apt update
-          sudo apt install qt5-default qttools5-dev-tools
+          sudo apt install qt5-qmake qttools5-dev-tools
 
       - name: Update translations
         run: lupdate -noobsolete -verbose ${{ env.PROJECT_FOLDER }}/resources/i18n/plugin_translation.pro
@@ -35,7 +35,7 @@ jobs:
       - name: Compile translations
         run: lrelease ${{ env.PROJECT_FOLDER }}/resources/i18n/*.ts
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: translations-build
           path: ${{ env.PROJECT_FOLDER }}/**/*.qm
@@ -47,10 +47,10 @@ jobs:
 
     steps:
       - name: Get source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
@@ -70,7 +70,7 @@ jobs:
           rm -rf `find ${{ env.PROJECT_FOLDER }}/ext_libs -type d -name tests`
           rm -rf `find ${{ env.PROJECT_FOLDER }}/ext_libs -type d -name test`
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dependencies-build
           path: ${{ env.PROJECT_FOLDER }}/ext_libs/
@@ -86,10 +86,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
@@ -101,13 +101,13 @@ jobs:
           python -m pip install -U -r requirements/packaging.txt
 
       - name: Download translations
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: translations-build
           path: ${{ env.PROJECT_FOLDER }}
 
       - name: Download dependencies
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: dependencies-build
           path: ${{ env.PROJECT_FOLDER }}/ext_libs/
@@ -127,7 +127,7 @@ jobs:
       - name: Package the latest version
         run: qgis-plugin-ci package latest --allow-uncommitted-changes
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PROJECT_FOLDER }}-latest
           path: ${{ env.PROJECT_FOLDER }}.*.zip
@@ -147,10 +147,10 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
@@ -162,13 +162,13 @@ jobs:
           python -m pip install -U -r requirements/packaging.txt
 
       - name: Download translations
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: translations-build
           path: ${{ env.PROJECT_FOLDER }}
 
       - name: Download dependencies
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: dependencies-build
           path: ${{ env.PROJECT_FOLDER }}/ext_libs/
@@ -199,8 +199,8 @@ jobs:
         run: >-
           qgis-plugin-ci
           release ${GITHUB_REF/refs\/tags\//}
-          --github-token ${{ secrets.GITHUB_TOKEN }}
-          --create-plugin-repo
           --allow-uncommitted-changes
+          --create-plugin-repo
+          --github-token ${{ secrets.GITHUB_TOKEN }}
           --osgeo-username ${{ secrets.OSGEO_USER }}
           --osgeo-password ${{ secrets.OSGEO_PASSWORD }}

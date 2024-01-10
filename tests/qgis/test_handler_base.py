@@ -22,7 +22,6 @@ from tests.qgis.base import BaseTestPlugin
 class TestBaseHandler(BaseTestPlugin):
     @classmethod
     def setUpClass(cls):
-
         pass
 
     def setUp(self):

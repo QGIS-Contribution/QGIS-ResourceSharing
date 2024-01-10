@@ -1,0 +1,37 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Upgrade dependencies - Development",
+            "type": "shell",
+            "osx": {
+                "command": "${config:python.pythonPath} -m pip install -U -r requirements/development.txt"
+            },
+            "windows": {
+                "command": "${config:python.pythonPath} -m pip install -U -r requirements/development.txt"
+            },
+            "linux": {
+                "command": "${config:python.pythonPath} -m pip install -U -r requirements/development.txt"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Translation Update",
+            "type": "shell",
+            "linux": {
+                "command": "pylupdate5 -verbose qgis_resource_sharing/resources/i18n/plugin_translation.pro"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Translation Compile",
+            "type": "shell",
+            "linux": {
+                "command": "lrelease qgis_resource_sharing/resources/i18n/*.ts "
+            },
+            "problemMatcher": []
+        }
+    ]
+}

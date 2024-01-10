@@ -19,7 +19,6 @@ from tests.qgis.base import BaseTestPlugin
 class TestFileSystemHandler(BaseTestPlugin):
     @classmethod
     def setUpClass(cls):
-
         pass
 
     def setUp(self):

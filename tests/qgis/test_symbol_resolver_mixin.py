@@ -17,12 +17,10 @@ from tests.qgis.utilities import test_data_path
 
 
 class TestSymbolResolverMixin(unittest.TestCase):
-
     maxDiff = None
 
     @classmethod
     def setUpClass(cls):
-
         cls.collection_path = test_data_path(
             "repository_dummy", "collections", "test_collection"
         )

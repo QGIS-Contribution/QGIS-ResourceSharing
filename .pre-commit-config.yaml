@@ -2,12 +2,11 @@ exclude: ".venv|tests/dev/|tests/fixtures/|ext_libs/"
 fail_fast: false
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=500"]
       - id: check-case-conflict
-      - id: check-toml
       - id: check-xml
       - id: check-yaml
       - id: detect-private-key
@@ -19,24 +18,31 @@ repos:
         args: [--markdown-linebreak-ext=md]
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.3.1
+    rev: v1.5.4
     hooks:
       - id: remove-tabs
         args: ["--whitespaces-count", "4"]
 
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: "v0.1.11"
+    hooks:
+      - id: ruff
+        args: ["--fix-only", "--target-version=py39"]
+
   - repo: https://github.com/psf/black
-    rev: 22.12.0
+    rev: 23.12.1
     hooks:
       - id: black
+        args: ["--target-version=py39"]
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.11.4
+    rev: 5.13.2
     hooks:
       - id: isort
         args: ["--profile", "black", "--filter-files"]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+    rev: 7.0.0
     hooks:
       - id: flake8
         files: ^qgis_resource_sharing/.*\.py$

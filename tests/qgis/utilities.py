@@ -22,7 +22,6 @@ def test_data_path(*args):
         raise FileNotFoundError(fixtures_data_dir)
     # build absolute path for asked files
     for item in args:
-
         fixtures_data_dir = os.path.abspath(os.path.join(fixtures_data_dir, item))
 
     return fixtures_data_dir

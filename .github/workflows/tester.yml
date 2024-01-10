@@ -5,11 +5,15 @@ on:
     branches: [master]
     paths:
       - "**.py"
+      - .github/workflows/tester.yml
+      - requirements/embedded.txt
 
   pull_request:
     branches: [master]
     paths:
       - "**.py"
+      - .github/workflows/tester.yml
+      - requirements/embedded.txt
 
 env:
   PROJECT_FOLDER: "qgis_resource_sharing"

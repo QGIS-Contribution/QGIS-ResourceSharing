@@ -24,7 +24,7 @@ class RepositoryManager(QObject):
     """Class to handle repositories."""
 
     DIRECTORY_URL = (
-        "https://raw.githubusercontent.com/qgis/" "QGIS-Resources/master/directory.csv"
+        "https://raw.githubusercontent.com/qgis/QGIS-Resources/master/directory.csv"
     )
 
     def __init__(self):

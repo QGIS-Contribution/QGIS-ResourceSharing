@@ -2,7 +2,6 @@
 # ------------------------
 
 furo>=2023.*
-ghp-import>2.0,<2.2
 myst-parser[linkify]>=2
 sphinx-autobuild>=2021.*
 sphinx-copybutton>=0.3,<1

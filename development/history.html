@@ -1,0 +1,532 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="CHANGELOG" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://qgis-contribution.github.io/QGIS-ResourceSharing/development/history.html" />
+<meta property="og:site_name" content="QGIS Resource Sharing" />
+<meta property="og:description" content="The format is based on Keep a Changelog, and this project adheres to Semantic Versioning. 1.1.0-beta1 - 2024-01-19: Bugs fixes 🐛: fix: CI fails because of broken Qt ppa by @Guts in https://github.c..." />
+<meta property="og:image" content="https://qgis-contribution.github.io/QGIS-ResourceSharing/_images/collection_preview.png" />
+<meta property="og:image:alt" content="QGIS Resource Sharing" />
+<meta name="description" content="The format is based on Keep a Changelog, and this project adheres to Semantic Versioning. 1.1.0-beta1 - 2024-01-19: Bugs fixes 🐛: fix: CI fails because of broken Qt ppa by @Guts in https://github.c..." />
+<meta name='twitter:card' content='summary_large_image'>
+<meta property="twitter:description" content="Download shared collections
+Search for published collections and install them for use with QGIS. Symbology (SVG, images, styles), Processing scripts, Processing models, R scripts and checklists are supported. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S)." />
+<meta property="twitter:image" content="https://qgis-contribution.github.io/QGIS-ResourceSharing/_images/collection_preview.png" />
+<meta property="twitter:title" content="QGIS Resource Sharing" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Release workflow" href="release-workflow.html" />
+
+    <link rel="shortcut icon" href="../_static/icon.png"/><!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>CHANGELOG - QGIS Resource Sharing 1.1.0-beta1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">QGIS Resource Sharing 1.1.0-beta1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/icon.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">QGIS Resource Sharing 1.1.0-beta1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">How to use the plugin</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installing the plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/installing-collection.html">Installing a collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/adding-repository.html">Adding a repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/plugin-configuration.html">Plugin configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/problems_and_solutions.html">Problems and solutions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Create your own collections</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../authoring/what-to-share.html">What to share</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authoring/creating-repository.html">Creating a repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authoring/repository-structure.html">Repository structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authoring/creating-metadata.html">Creating metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authoring/publishing-repository.html">Publishing your repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authoring/repository-example.html">Gallery of examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribute to the plugin</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">Development environment setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="update_dependencies.html">Dependencies upgrade workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="packaging.html">Packaging and deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-workflow.html">Release workflow</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">CHANGELOG</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section class="tex2jax_ignore mathjax_ignore" id="changelog">
+<h1>CHANGELOG<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h1>
+<p>The format is based on <a class="reference external" href="https://keepachangelog.com/">Keep a Changelog</a>, and this project adheres to <a class="reference external" href="https://semver.org/">Semantic Versioning</a>.</p>
+<section id="beta1-2024-01-19">
+<h2>1.1.0-beta1 - 2024-01-19<a class="headerlink" href="#beta1-2024-01-19" title="Link to this heading">#</a></h2>
+<section id="bugs-fixes">
+<h3>Bugs fixes 🐛<a class="headerlink" href="#bugs-fixes" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>fix: CI fails because of broken Qt ppa by &#64;Guts in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/303">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/303</a></p></li>
+<li><p>CI: fix minimum python version by &#64;Guts in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/306">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/306</a></p></li>
+</ul>
+</section>
+<section id="tooling">
+<h3>Tooling 🔧<a class="headerlink" href="#tooling" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>tooling: bump dev dependencies and update git hooks by &#64;Guts in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/301">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/301</a></p></li>
+<li><p>tooling: update VS Code configuration by &#64;Guts in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/302">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/302</a></p></li>
+<li><p>ci: run tests against embedded requirements changes by &#64;Guts in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/315">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/315</a></p></li>
+<li><p>ci: run tests against testing deps changes by &#64;Guts in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/318">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/318</a></p></li>
+</ul>
+</section>
+<section id="other-changes">
+<h3>Other Changes<a class="headerlink" href="#other-changes" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Update metadata.txt about tags by &#64;Gustry in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/279">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/279</a></p></li>
+<li><p>packaging: pin qgis-plugin-ci version by &#64;Guts in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/319">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/319</a></p></li>
+</ul>
+</section>
+<section id="new-contributors">
+<h3>New Contributors<a class="headerlink" href="#new-contributors" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>&#64;Gustry made their first contribution in <a class="reference external" href="https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/279">https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/279</a></p></li>
+</ul>
+</section>
+</section>
+<section id="id1">
+<h2>1.0.0 - 2022-09-05<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Tests have been refactored to use GitHub Actions and restoring code coverage</p></li>
+<li><p>Handle case where one of default repositories is unreachable</p></li>
+<li><p>Minor bug fixes spotted during tests refactoring</p></li>
+<li><p>See 1.0.0-beta1 release notes for complete changes since the last stable version</p></li>
+</ul>
+</section>
+<section id="beta1-2022-04-28">
+<h2>1.0.0-beta1 - 2022-04-28<a class="headerlink" href="#beta1-2022-04-28" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Improved integration of external libraries (#166)</p></li>
+<li><p>Improved development environment (#168) - thanks to &#64;Guts</p></li>
+<li><p>Enable translation for the plugin UI and add partial French translation</p></li>
+<li><p>Use GitHub Actions to build and embed external dependencies, to package and release the plugin</p></li>
+<li><p>Upgrade Bootstrap to 4.6.1</p></li>
+<li><p>Remove QGIS 2 / PyQt4 imports</p></li>
+<li><p>Clean up some really old-school code</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>0.16.0 - 2020-08-29<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>GUI improvements (#138, #139, #140, #141)</p></li>
+<li><p>Add button for reloading the QGIS directory of approved resources (#145)</p></li>
+<li><p>Fix bug in the handling of QGIS directory updates (#146)</p></li>
+<li><p>Add support for checklists (#151) - &#64;ricardogsilva</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id3">
+<h2>0.15.1 - 2020-05-16<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Fix incorrect handling of searchPathsForSVG setting (#135)</p></li>
+<li><p>Handle XML parsing exceptions for QML files*0.15.0 - Support expressions (#130). Switch to Python pathlib.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id4">
+<h2>0.14.1 - 2020-04-25<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Also support QGIS 3.4 (avoid install of style labelsettings and textformatting for v. &lt; 3.10 - #127)</p></li>
+<li><p>Try another way to avoid [WinError 5] on Microsoft Windows (#103)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id5">
+<h2>0.14.0 - 2020-04-23<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Style import improvements (fix colorramp support, add support for label settings and text formats, clean up Style Manager tags) (#113, #114, #116, #118)</p></li>
+<li><p>Change collection directory names from a hash to a more user friendly name (composition of the name of the collection and its repository) (#110)</p></li>
+<li><p>Preserve the installed collections when renaming a repository (#121)</p></li>
+<li><p>Documentation updates (#105, #109, #113)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id6">
+<h2>0.13.1 - 2020-04-11<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Fix #44 (files removed from repository are still being installed from cache)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id7">
+<h2>0.13.0 - 2020-04-10<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>GUI updates (#100)</p></li>
+<li><p>Provide installation summary (#6)</p></li>
+<li><p>Avoid (parent) tag with no members in QGIS 3 style documents (#101)</p></li>
+<li><p>Fix reloading problems ([WinError 5]) with Microsoft Windows (#103)</p></li>
+<li><p>Other minor issues (#104)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id8">
+<h2>0.12.0 - 2020-03-28<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Make font sizes OK on HiDPI systems (#3)</p></li>
+<li><p>Disable editing and removal of “official” repositories in Settings (#93)</p></li>
+<li><p>Avoid ResourceWarning when installing a collection (#95)</p></li>
+<li><p>Stop using the collection name for naming directories (#99)</p></li>
+<li><p>Fixed parsing metadata issue - byte decoding (#41)</p></li>
+<li><p>Update dulwich to v0.19.15</p></li>
+<li><p>Update of bootstrap to v4.4.1</p></li>
+<li><p>Update jquery to v3.4.1</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id9">
+<h2>0.11.1 - 2020-03-03<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Reduce log level to avoid exception on missing name or URL in directory (#64)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id10">
+<h2>0.11.0 - 2020-02-29<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Check for missing repository name and URL in directory (#64)</p></li>
+<li><p>Correct link to documentation</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id11">
+<h2>0.10.0 - 2020-02-26<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Added support for Processing models (#42)</p></li>
+<li><p>Make the plugin available from the web menu (#68)</p></li>
+<li><p>Fixing log message levels (#71)</p></li>
+<li><p>Add the action to the toolbar (#70)</p></li>
+<li><p>Avoid breaking when collections with incompatible QGIS versions are encountered (#60)</p></li>
+<li><p>Avoid [WinErr 32] (#80)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id12">
+<h2>0.9.0 - 2020-02-15<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Added support for R scripts (#57)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id13">
+<h2>0.8.0 - 2020-02-10<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Fix issue #59 (deleting repositories does not work)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id14">
+<h2>0.7.0 - 2020-02-07<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Flip experimental flag</p></li>
+<li><p>Merge PR from havatv (issue #60 - avoid breaking on incompatible versions)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id15">
+<h2>0.6.0 - 2018-12-04<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Experimental version for QGIS 3</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id16">
+<h2>0.5.2 - 2017-11-05<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Add support for gitlab and gogs repositories (PR by Salvatore Larosa - gh username: slarosa)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id17">
+<h2>0.5.1 - 2016-08-31<a class="headerlink" href="#id17" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Allow authors to add license details in the collection</p></li>
+<li><p>Fixed problem in QGIS &lt; 2.12 as a result of using the new QgsAuthManager</p></li>
+<li><p>Change the behavior of updating and removing directory in settings (This fixed #34)</p></li>
+<li><p>Use the new official QGIS resource repository (<a class="reference external" href="https://github.com/qgis/QGIS-Resources">https://github.com/qgis/QGIS-Resources</a>)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="id18">
+<h2>0.5.0 - 2016-08-15<a class="headerlink" href="#id18" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Wohooo first release!</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="release-workflow.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Release workflow</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021 - 2024, Akbar Gumbira, Håvard Tveite, Julien Moura
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">CHANGELOG</a><ul>
+<li><a class="reference internal" href="#beta1-2024-01-19">1.1.0-beta1 - 2024-01-19</a><ul>
+<li><a class="reference internal" href="#bugs-fixes">Bugs fixes 🐛</a></li>
+<li><a class="reference internal" href="#tooling">Tooling 🔧</a></li>
+<li><a class="reference internal" href="#other-changes">Other Changes</a></li>
+<li><a class="reference internal" href="#new-contributors">New Contributors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">1.0.0 - 2022-09-05</a></li>
+<li><a class="reference internal" href="#beta1-2022-04-28">1.0.0-beta1 - 2022-04-28</a></li>
+<li><a class="reference internal" href="#id2">0.16.0 - 2020-08-29</a></li>
+<li><a class="reference internal" href="#id3">0.15.1 - 2020-05-16</a></li>
+<li><a class="reference internal" href="#id4">0.14.1 - 2020-04-25</a></li>
+<li><a class="reference internal" href="#id5">0.14.0 - 2020-04-23</a></li>
+<li><a class="reference internal" href="#id6">0.13.1 - 2020-04-11</a></li>
+<li><a class="reference internal" href="#id7">0.13.0 - 2020-04-10</a></li>
+<li><a class="reference internal" href="#id8">0.12.0 - 2020-03-28</a></li>
+<li><a class="reference internal" href="#id9">0.11.1 - 2020-03-03</a></li>
+<li><a class="reference internal" href="#id10">0.11.0 - 2020-02-29</a></li>
+<li><a class="reference internal" href="#id11">0.10.0 - 2020-02-26</a></li>
+<li><a class="reference internal" href="#id12">0.9.0 - 2020-02-15</a></li>
+<li><a class="reference internal" href="#id13">0.8.0 - 2020-02-10</a></li>
+<li><a class="reference internal" href="#id14">0.7.0 - 2020-02-07</a></li>
+<li><a class="reference internal" href="#id15">0.6.0 - 2018-12-04</a></li>
+<li><a class="reference internal" href="#id16">0.5.2 - 2017-11-05</a></li>
+<li><a class="reference internal" href="#id17">0.5.1 - 2016-08-31</a></li>
+<li><a class="reference internal" href="#id18">0.5.0 - 2016-08-15</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=efb028a0"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

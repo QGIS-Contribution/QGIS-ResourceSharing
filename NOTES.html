@@ -1,0 +1,547 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Implementation addendum" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://qgis-contribution.github.io/QGIS-ResourceSharing/NOTES.html" />
+<meta property="og:site_name" content="QGIS Resource Sharing" />
+<meta property="og:description" content="R script support (9 Februar 2020): R scripts that are placed in: in a resource sharing repository will be imported into the default R script folder rscripts, that is located in the QGIS Processing ..." />
+<meta property="og:image" content="https://qgis-contribution.github.io/QGIS-ResourceSharing/_images/collection_preview.png" />
+<meta property="og:image:alt" content="QGIS Resource Sharing" />
+<meta name="description" content="R script support (9 Februar 2020): R scripts that are placed in: in a resource sharing repository will be imported into the default R script folder rscripts, that is located in the QGIS Processing ..." />
+<meta name='twitter:card' content='summary_large_image'>
+<meta property="twitter:description" content="Download shared collections
+Search for published collections and install them for use with QGIS. Symbology (SVG, images, styles), Processing scripts, Processing models, R scripts and checklists are supported. There are several options for repositories: Github, Bitbucket, local file system and HTTP(S)." />
+<meta property="twitter:image" content="https://qgis-contribution.github.io/QGIS-ResourceSharing/_images/collection_preview.png" />
+<meta property="twitter:title" content="QGIS Resource Sharing" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
+
+    <link rel="shortcut icon" href="_static/icon.png"/><!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>Implementation addendum - QGIS Resource Sharing 1.1.0-beta1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">QGIS Resource Sharing 1.1.0-beta1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/icon.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">QGIS Resource Sharing 1.1.0-beta1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">How to use the plugin</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/installation.html">Installing the plugin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/installing-collection.html">Installing a collection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/adding-repository.html">Adding a repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/plugin-configuration.html">Plugin configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/problems_and_solutions.html">Problems and solutions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Create your own collections</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="authoring/what-to-share.html">What to share</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authoring/creating-repository.html">Creating a repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authoring/repository-structure.html">Repository structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authoring/creating-metadata.html">Creating metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authoring/publishing-repository.html">Publishing your repository</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authoring/repository-example.html">Gallery of examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contribute to the plugin</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="development/contributing.html">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/environment.html">Development environment setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/testing.html">Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/update_dependencies.html">Dependencies upgrade workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/packaging.html">Packaging and deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/release-workflow.html">Release workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/history.html">CHANGELOG</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="implementation-addendum">
+<h1>Implementation addendum<a class="headerlink" href="#implementation-addendum" title="Link to this heading">#</a></h1>
+<section id="r-script-support-9-februar-2020">
+<h2>R script support (9 Februar 2020)<a class="headerlink" href="#r-script-support-9-februar-2020" title="Link to this heading">#</a></h2>
+<p>R scripts that are placed in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">collections</span><span class="o">/&lt;</span><span class="n">collections</span> <span class="n">registry</span> <span class="nb">id</span><span class="o">&gt;/</span><span class="n">rscripts</span>
+</pre></div>
+</div>
+<p>in a resource sharing repository will be imported into the default
+R script folder <code class="docutils literal notranslate"><span class="pre">rscripts</span></code>, that is located in the QGIS Processing
+user folder (<code class="docutils literal notranslate"><span class="pre">.local/share/QGIS/QGIS3/profile/default/processing</span></code> on Ubuntu).
+If that directory is in the Proccessing R Provider
+<code class="docutils literal notranslate"><span class="pre">R</span> <span class="pre">scripts</span> <span class="pre">folder</span></code> path, the scripts will become available
+in the Processing Toolbox under <code class="docutils literal notranslate"><span class="pre">R</span></code> (if the <em>Processing R Provider</em>
+plugin is installed and configured).</p>
+<p>The “QGIS Resources Sharing Repository” (<a class="reference external" href="https://github.com/qgis/QGIS-Resources">https://github.com/qgis/QGIS-Resources</a>)
+contains the QGIS 2 online R scripts. The collection has the id <code class="docutils literal notranslate"><span class="pre">qgis_rscripts</span></code>,
+and the name is <em>QGIS R script collection</em>. It can be used for testing and as
+a “template” for creating new R script collections.</p>
+</section>
+<section id="conversation-ale-akbar-from-15-07-2016">
+<h2>Conversation Ale-Akbar from 15/07/2016<a class="headerlink" href="#conversation-ale-akbar-from-15-07-2016" title="Link to this heading">#</a></h2>
+<p>We need an independent function (no qgis imports!) to check the XML before we import it,
+we need to check for wrong SVG or images paths (or whatever other paths could be in there).</p>
+<p>The same or similar function could maybe be useful to import or export projects.</p>
+<p>The idea is that we can re-use the same function when the user wants to create
+a collection before she exports/share it.</p>
+<p>The function should be able to fix the paths (relative!) and to optionally copy
+the SVGs/images in the right place before exporting/sharing.</p>
+<p>Pseudo code:</p>
+<dl>
+<dt>def fix_collection(collection_path, xml, default_search_paths=[], additional_search_paths=[], copy=False):</dt><dd><p>“””/home/ale/Collection 1 (2303210392103921039)
+&lt;xml …. ?&gt;
+~/ale/.qgis2/svg
+~/ale/.qgis2/svg
+~/ale/.qgis2/svg
+“””
+for each path inside xml</p>
+<blockquote>
+<div><p>find the SVG or the IMAGE in default search path
+find the SVG or the IMAGE in additional search path
+if found:</p>
+<blockquote>
+<div><dl>
+<dt>if path is wrong:</dt><dd><dl class="simple">
+<dt>if copy:</dt><dd><p>copy SVGs to collection in the right place</p>
+</dd>
+</dl>
+<p>fix path</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>else:</dt><dd><p>add to error list</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>return fixed_xml, errors_warnings</p>
+</dd>
+</dl>
+<p># Call as
+fixed_xml = fix_collection(‘/collection_path (0231232131)/’, ‘&lt;xml ….&gt;’, [QgsApplication.instance().pkgDataPath() + ‘/svg/’, QgsApplication.instance().qgisSettingsDirPath() + ‘/svg/’], [‘/svg1/’, ‘/svg2’])</p>
+</section>
+<section id="conversation-ale-akbar-from-11-07-2016">
+<h2>Conversation Ale-Akbar from 11/07/2016<a class="headerlink" href="#conversation-ale-akbar-from-11-07-2016" title="Link to this heading">#</a></h2>
+<p>We discussed again how to import SVGs and symbols and some problems:</p>
+<ol class="arabic simple">
+<li><p>what to do with SVG paths stored in styles or symbols XMLs when they contain wrong relative paths</p></li>
+<li><p>how to deal with duplicated symbol names</p></li>
+<li><p>how to import symbols XML and group them at the same time</p></li>
+</ol>
+<ol class="arabic simple">
+<li><p>we decided to do some post-import processing with the XMLs to rewrite the wrong
+paths to add the name (with hash) of the collection, so that the rewrite will be, for example:</p></li>
+</ol>
+<p>from:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">prop</span> <span class="n">k</span><span class="o">=</span><span class="s2">&quot;name&quot;</span> <span class="n">v</span><span class="o">=</span><span class="s2">&quot;../../my_svg_path/svg/transport_fuel.svg&quot;</span><span class="o">/&gt;</span>
+</pre></div>
+</div>
+<p>to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">prop</span> <span class="n">k</span><span class="o">=</span><span class="s2">&quot;name&quot;</span> <span class="n">v</span><span class="o">=</span><span class="s2">&quot;Collection 1 (6d38d61abd52a05495dfd3189b04)/svg/transport_fuel.svg&quot;</span><span class="o">/&gt;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Akbar had the good idea of adding the collection hash to all symbol names, this
+will avoid name collisions and solve the 3. at the same time because we could
+easily group the symbols querying for the hash in the name</p></li>
+</ol>
+</section>
+<section id="conversation-ale-akbar-from-08-07-2016">
+<h2>Conversation Ale-Akbar from 08/07/2016<a class="headerlink" href="#conversation-ale-akbar-from-08-07-2016" title="Link to this heading">#</a></h2>
+<p>We discussed again how to import SVGs and symbols:</p>
+</section>
+</section>
+<section id="svgs">
+<h1>SVGs<a class="headerlink" href="#svgs" title="Link to this heading">#</a></h1>
+<p>Now saved in <a href="#id1"><span class="problematic" id="id2">``</span></a>/home/user/.qgis2/symbology_sharing/collections/6d38d61abd52a05495dfd3189b04900a3cc73c36/svg/`</p>
+<p>Problem: in the GUI SVG selector tree all collections appear under “User Symbols”
+Solution: move all the symbology sharing related collections outside <cite>.qgis2</cite> (in the parent folder)</p>
+<p>Problem: in the GUI SVG selector tree all collections appear with the hash <cite>6d38d61abd52a05495dfd3189b04900a3cc73c36</cite>
+Solution: the only purpose of the hash is to avoid collection name collisions, we can change the folder name to be the name of the collection followed by the hash in brackets, like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/home/ale/.qgis2/symbology_sharing
+├── collections
+│   ├── King&#39;s Landing (6d38d61abd52a05495dfd3189b04900a3cc73c36)
+│   │   ├── colorramp
+│   │   │   └── rainbows.xml
+│   │   ├── image
+│   │   │   └── QGis_Logo.png
+│   │   ├── license
+│   │   ├── preview
+│   │   │   ├── osm_spatialite_googlemaps_lines.qml.png
+│   │   │   └── osm_spatialite_googlemaps.png
+│   │   ├── style
+│   │   │   ├── osm_spatialite_googlemaps_lines.qml
+│   │   │   ├── osm_spatialite_googlemaps_multipolygon.qml
+│   │   │   └── osm_spatialite_googlemaps_places.qml
+│   │   ├── svg
+│   │   │   └── Blank_shield.svg
+│   │   └── symbol
+│   │       ├── osm_symbols.xml
+│   │       ├── symbol_collection_svg.xml
+│   │       ├── symbol_qgisdefault_svg.xml
+│   │       └── symbol_rasterimagefill.xml
+│   └── Westeros (ed86f2b4406dbd2c9afce1da12436836a89d3a5b)
+│       └── license
+</pre></div>
+</div>
+</section>
+<section id="symbols">
+<h1>Symbols<a class="headerlink" href="#symbols" title="Link to this heading">#</a></h1>
+<p>Problem: The symbol import from XML GUI in QGIS does not seem to work!</p>
+<p>TODO:
+* check if the bug is reported in the hub
+* try to make a python test case using the API
+* try to fix it</p>
+<p>Problem: symbols names must be unique</p>
+<p>TODO:
+* check why it is like that (ask to qgis-dev list and Martin and Nyall)
+* what if the constraint is removed upstream?
+* what if the symbol search is done first using the name <strong>and</strong> the group and then (if nothing was found) by using the name alone?
+* other option: ask the user what to do (rename the imported || rename the old one || overwrite the old one)</p>
+<section id="conversation-ale-akbar-from-01-07-2016">
+<h2>Conversation Ale-Akbar from 01/07/2016<a class="headerlink" href="#conversation-ale-akbar-from-01-07-2016" title="Link to this heading">#</a></h2>
+<p>We discussed how to import SVGs and symbols:</p>
+</section>
+</section>
+<section id="id3">
+<h1>SVGs<a class="headerlink" href="#id3" title="Link to this heading">#</a></h1>
+<p>Add the SVG path to the settings as QgsApplication does</p>
+<p>QString myPaths = settings.value( “svg/searchPathsForSVG”, QDir::homePath() ).toString();</p>
+</section>
+<section id="id4">
+<h1>Symbols<a class="headerlink" href="#id4" title="Link to this heading">#</a></h1>
+<p>Using the API provided by QgsStyleV2 for:</p>
+<ol class="arabic simple">
+<li><p>tag all symbols with the collection id</p></li>
+<li><p>create a group with the name of the collection and place all symbols inside (check for other groups with the same name and add a suffix if needed)</p></li>
+<li><p>place all symbols in the group</p></li>
+</ol>
+</section>
+<section id="collection-removal">
+<h1>Collection removal<a class="headerlink" href="#collection-removal" title="Link to this heading">#</a></h1>
+<ol class="arabic simple">
+<li><p>remove the path from SVG paths setting</p></li>
+<li><p>remove all tagged symbols</p></li>
+<li><p>find the empty group starting with the same name of the collection and delete it</p></li>
+</ol>
+<section id="conversation-ale-akbar-from-24-06-2016">
+<h2>Conversation Ale-Akbar from 24/06/2016<a class="headerlink" href="#conversation-ale-akbar-from-24-06-2016" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://github.com/akbargumbira/qgis_symbology_sharing/blob/master/symbology_sharing/repository_manager.py#L12">https://github.com/akbargumbira/qgis_symbology_sharing/blob/master/symbology_sharing/repository_manager.py#L12</a></p>
+<p>Shouldn’t this be a DIRECTORY of repositories? It’s better to rename this to DIRECTORY
+to avoid confusion with the actual REPOSITORIES</p>
+<p>In my mind, we have 3 objects:</p>
+<dl class="simple">
+<dt>DIRECTORY of repositories, a list of URLs where to fetch metadata.ini for the repos</dt><dd><p>this is the same as plugins.xml for plugin manager</p>
+</dd>
+</dl>
+<p>REPOSITORY, a set of collections, described by metadata.ini
+COLLECTION, a set of QGIS resources</p>
+<p>Example repository DIRECTORY file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">anitagraser</span><span class="o">/</span><span class="n">QGIS</span><span class="o">-</span><span class="n">style</span><span class="o">-</span><span class="n">repo</span><span class="o">-</span><span class="n">dummy</span><span class="o">.</span><span class="n">git</span> <span class="c1"># Official repo</span>
+<span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">qgis</span><span class="o">/</span><span class="n">QGIS</span><span class="o">.</span><span class="n">git</span> <span class="c1"># My Amazing repo</span>
+<span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">repo1</span> <span class="c1"># Repository title</span>
+<span class="n">ftp</span><span class="p">:</span><span class="o">//</span><span class="n">ftp</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">cmo</span><span class="o">/</span><span class="n">repo1</span>  <span class="c1"># Title of this FTP repo</span>
+<span class="n">scp</span><span class="p">:</span><span class="o">//</span><span class="n">user</span><span class="nd">@server</span><span class="p">:</span><span class="o">/</span><span class="n">fany_repo</span> <span class="c1"># SSH repo</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Or, CSV:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">anitagraser</span><span class="o">/</span><span class="n">QGIS</span><span class="o">-</span><span class="n">style</span><span class="o">-</span><span class="n">repo</span><span class="o">-</span><span class="n">dummy</span><span class="o">.</span><span class="n">git</span><span class="p">,</span><span class="n">Official</span> <span class="n">repository</span>
+<span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">repo1</span><span class="p">,</span><span class="n">Repository</span> <span class="n">title</span>
+</pre></div>
+</div>
+<p>Example metadata.ini:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">general</span><span class="p">]</span>
+<span class="n">author</span><span class="o">=</span><span class="n">Anita</span> <span class="n">Graser</span>
+<span class="n">email</span><span class="o">=</span><span class="n">anitagraser</span><span class="nd">@gmx</span><span class="o">.</span><span class="n">at</span>
+<span class="n">collections</span><span class="o">=</span><span class="n">collection_1</span><span class="p">,</span> <span class="n">collection_2</span>
+
+<span class="p">[</span><span class="n">collection_1</span><span class="p">]</span>
+<span class="n">name</span><span class="o">=</span><span class="n">OSM</span> <span class="n">Spatialite</span> <span class="n">Googlemaps</span>
+<span class="n">tags</span><span class="o">=</span><span class="n">osm</span><span class="p">,</span> <span class="n">spatialite</span><span class="p">,</span> <span class="n">google</span> <span class="n">maps</span><span class="p">,</span> <span class="n">roads</span>
+<span class="n">description</span><span class="o">=</span><span class="n">The</span> <span class="n">collection</span> <span class="n">contains</span> <span class="n">a</span> <span class="n">complete</span> <span class="n">resources</span> <span class="n">to</span> <span class="n">create</span> <span class="n">a</span> <span class="n">coherent</span> <span class="nb">map</span> <span class="n">that</span> <span class="n">looks</span> <span class="n">similar</span> <span class="n">to</span> <span class="n">the</span> <span class="n">old</span> <span class="n">Google</span> <span class="n">Maps</span> <span class="n">style</span> <span class="kn">from</span> <span class="nn">OSM</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">SpatiaLite</span> <span class="n">database</span>
+<span class="n">qgis_minimum_version</span><span class="o">=</span><span class="mf">2.0</span>
+<span class="n">qgis_maximum_version</span><span class="o">=</span><span class="mf">2.99</span>
+
+<span class="p">[</span><span class="n">collection_2</span><span class="p">]</span>
+<span class="n">name</span><span class="o">=</span><span class="n">OSM</span> <span class="n">Spatialite</span> <span class="n">Googlemaps</span> <span class="mi">2</span>
+<span class="n">tags</span><span class="o">=</span><span class="n">osm</span><span class="p">,</span> <span class="n">spatialite</span><span class="p">,</span> <span class="n">google</span> <span class="n">maps</span><span class="p">,</span> <span class="n">roads</span>
+<span class="n">description</span><span class="o">=</span><span class="n">The</span> <span class="n">collection</span> <span class="mi">2</span> <span class="n">contains</span> <span class="n">a</span> <span class="n">complete</span> <span class="n">resources</span> <span class="n">to</span> <span class="n">create</span> <span class="n">a</span> <span class="n">coherent</span> <span class="nb">map</span> <span class="n">that</span> <span class="n">looks</span> <span class="n">similar</span> <span class="n">to</span> <span class="n">the</span> <span class="n">old</span> <span class="n">Google</span> <span class="n">Maps</span> <span class="n">style</span> <span class="kn">from</span> <span class="nn">OSM</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">SpatiaLite</span> <span class="n">database</span>
+<span class="n">qgis_minimum_version</span><span class="o">=</span><span class="mf">2.0</span>
+<span class="n">qgis_maximum_version</span><span class="o">=</span><span class="mf">2.99</span>
+</pre></div>
+</div>
+<p>Let’s recap:</p>
+<ol class="arabic simple">
+<li><p>the QGIS user launch the plugins</p></li>
+<li><p>the plugin enters DISCOVERY phase: fetches the DIRECTORY to get a list of REPOSITORIES</p></li>
+<li><p>the plugin loops through the REPOSITORIES and fetches metadata.ini</p></li>
+<li><p>the plugin handle updates for installed collections [TODO]</p></li>
+<li><p>the plugin is ready for COLLECTIONs browsing/installing etc.</p></li>
+</ol>
+<p>steps 2-4 are done automatically if a flag is set in the settings (default True).</p>
+<p>This process is somewhat similar to what happens for QGIS plugin manager.</p>
+<p>Notes:
+1. DIRECTORY of repos, store a list of remote repos with their protocol, if an handler for that</p>
+<blockquote>
+<div><p>protocol does <strong>not</strong> exists we warn the user and skip that repo</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>every time we access the network we do it through QgsNetworkAccessManager (<a class="reference external" href="https://qgis.org/api/classQgsNetworkAccessManager.html">https://qgis.org/api/classQgsNetworkAccessManager.html</a>)
+in order to use credentials stored in QGIS auth DB</p></li>
+<li><p>if a new repo appears in the DIRECTORY file we should ask the user if
+he wants to add id (default = “Add all new repos”), low priority:
+just add them all at this time</p></li>
+<li><p>low priority: we could store the name in the DIRECTORY of repos, by
+using csv or a # separator or whatever you think is best</p></li>
+</ol>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021 - 2024, Akbar Gumbira, Håvard Tveite, Julien Moura
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Implementation addendum</a><ul>
+<li><a class="reference internal" href="#r-script-support-9-februar-2020">R script support (9 Februar 2020)</a></li>
+<li><a class="reference internal" href="#conversation-ale-akbar-from-15-07-2016">Conversation Ale-Akbar from 15/07/2016</a></li>
+<li><a class="reference internal" href="#conversation-ale-akbar-from-11-07-2016">Conversation Ale-Akbar from 11/07/2016</a></li>
+<li><a class="reference internal" href="#conversation-ale-akbar-from-08-07-2016">Conversation Ale-Akbar from 08/07/2016</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#svgs">SVGs</a></li>
+<li><a class="reference internal" href="#symbols">Symbols</a><ul>
+<li><a class="reference internal" href="#conversation-ale-akbar-from-01-07-2016">Conversation Ale-Akbar from 01/07/2016</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">SVGs</a></li>
+<li><a class="reference internal" href="#id4">Symbols</a></li>
+<li><a class="reference internal" href="#collection-removal">Collection removal</a><ul>
+<li><a class="reference internal" href="#conversation-ale-akbar-from-24-06-2016">Conversation Ale-Akbar from 24/06/2016</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=efb028a0"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

@@ -62,7 +62,6 @@ from qgis_resource_sharing.repository_manager import RepositoryManager
 from qgis_resource_sharing.utilities import (
     SUPPORTED_RESOURCES_MAP,
     local_collection_path,
-    render_template,
     repo_settings_group,
     resources_path,
     ui_path,
@@ -202,14 +201,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     "Installed collections are emphasized (in <b>bold</b>)."
                 )
 
-            context = {
-                "resources_path": str(resources_path()),
-                "title": title,
-                "description": description,
-            }
-            self.web_view_details.setHtml(
-                render_template("tab_description.html", context)
-            )
+            label_text = (f"<h1>{title}</h1>{description}")
+            self.label_description.setText(label_text)
+            self.label_description.setVisible(True)
+            self.web_view_details.setVisible(False)
             self.stacked_menu_widget.setCurrentIndex(0)
 
     def add_repository(self):
@@ -725,6 +720,8 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
     def show_collection_metadata(self, id):
         """Show the collection metadata given the ID."""
         html = self.collection_manager.get_html(id)
+        self.label_description.setVisible(False)
+        self.web_view_details.setVisible(True)
         self.web_view_details.setHtml(html)
 
     def reject(self):

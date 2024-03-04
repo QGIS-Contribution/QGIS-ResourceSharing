@@ -766,8 +766,12 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         search = QRegExp(text, Qt.CaseInsensitive, QRegExp.RegExp)
         self.collection_proxy.setFilterRegExp(search)
 
-    def show_collection_metadata(self, collection_id):
-        """Show the collection metadata given the ID."""
+    def show_collection_metadata(self, collection_id: str) -> None:
+        """Show the collection metadata given the ID.
+
+        :param collection_id: The id of the collection
+        :type collection_id: str
+        """
         html = self.collection_manager.get_html(collection_id)
         self.label_description.setVisible(False)
         self.web_view_details.setVisible(True)

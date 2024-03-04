@@ -396,6 +396,25 @@
                       <string>about:blank</string>
                      </url>
                     </property>
+                    <property name="visible">
+                      <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_description">
+                    <property name="alignment">
+                     <set>Qt::AlignLeading|Qt::AlignTop</set>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="indent">
+                     <number>5</number>
+                    </property>
                    </widget>
                   </item>
                  </layout>

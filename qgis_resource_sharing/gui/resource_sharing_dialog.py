@@ -219,10 +219,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     "Installed collections are emphasized (in <b>bold</b>)."
                 )
 
-            label_text = (f"<h1>{title}</h1>{description}")
+            label_text = f"<h1>{title}</h1>{description}"
             self.label_description.setText(label_text)
             self.label_description.setVisible(True)
-            self.web_view_details.setVisible(False)
+            self.resource_details_scroll_area.setVisible(False)
             self.stacked_menu_widget.setCurrentIndex(0)
 
     def add_repository(self):
@@ -594,7 +594,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     self.button_install.setText(self.tr("Install"))
                     self.button_open.setEnabled(False)
                     self.button_uninstall.setEnabled(False)
-                # Update the web_view_details frame
+                # Update the resource_details frame
                 self.show_collection_metadata(current_coll_id)
             else:
                 self.button_install.setEnabled(False)
@@ -772,10 +772,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         :param collection_id: The id of the collection
         :type collection_id: str
         """
-        html = self.collection_manager.get_html(collection_id)
         self.label_description.setVisible(False)
-        self.web_view_details.setVisible(True)
-        self.web_view_details.setHtml(html)
+        self.resource_details_scroll_area.setVisible(True)
+        self.resource_details.set_content(collection_id)
 
     def reject(self):
         """Slot called when the dialog is closed."""

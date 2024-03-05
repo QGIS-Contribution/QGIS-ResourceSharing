@@ -2,6 +2,7 @@ import hashlib
 import logging
 import shutil
 import traceback
+from typing import Dict
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
@@ -88,8 +89,9 @@ class CollectionManager(object):
         hex_dig = hash_object.hexdigest()
         return hex_dig
 
-    def get_html(self, collection_id):
-        """Return the details of a collection as HTML, given its id.
+    def get_resource_status(self, collection_id: str) -> str:
+        """Return the status (installed, not installed) of a collection
+        as HTML, given its id.
 
         :param collection_id: The id of the collection
         :type collection_id: str
@@ -110,12 +112,31 @@ class CollectionManager(object):
         if config.COLLECTIONS[collection_id]["status"] != COLLECTION_INSTALLED_STATUS:
             html = "<i>Unknown before installation</i>"
 
-        config.COLLECTIONS[collection_id]["resources_html"] = html
+        return html
+
+    def get_html(self, collection_id: str) -> dict:
+        """Return the details of a collection as HTML, given its id.
+
+        :param collection_id: The id of the collection
+        :type collection_id: str
+        """
+        resource_html = self.get_resource_status(collection_id)
+        config.COLLECTIONS[collection_id]["resources_html"] = resource_html
         context = {
             "resources_path": str(resources_path()),
             "collection": config.COLLECTIONS[collection_id],
         }
         return render_template("collection_details.html", context)
+
+    def get_collection(self, collection_id: str) -> Dict[str, str]:
+        """Return the details of a collection, given its id.
+
+        :param collection_id: The id of the collection
+        :type collection_id: str
+        """
+        resource_html = self.get_resource_status(collection_id)
+        config.COLLECTIONS[collection_id]["resources_html"] = resource_html
+        return config.COLLECTIONS[collection_id]
 
     def get_installed_collections(self, repo_url=None):
         """Get all installed collections for a given repository URL.

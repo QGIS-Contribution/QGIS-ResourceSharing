@@ -378,27 +378,36 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QWebView" name="web_view_details">
+                   <widget class="QScrollArea" name="resource_details_scroll_area">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>400</width>
-                      <height>0</height>
-                     </size>
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
                     </property>
-                    <property name="url">
-                     <url>
-                      <string>about:blank</string>
-                     </url>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
                     </property>
                     <property name="visible">
                       <bool>false</bool>
                     </property>
+                    <widget class="QgsResourceSharingDetails" name="resource_details">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>400</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </widget>
                    </widget>
                   </item>
                   <item>
@@ -663,9 +672,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QWebView</class>
+   <class>QgsScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>qgis.gui</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsResourceSharingDetails</class>
    <extends>QWidget</extends>
-   <header location="global">QtWebKitWidgets/QWebView</header>
+   <header>qgis_resource_sharing.gui.resource_sharing_details</header>
   </customwidget>
  </customwidgets>
  <resources/>

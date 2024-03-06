@@ -642,25 +642,25 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         """Reload the collections model with the current collections."""
         self.collections_model.clear()
         installed_collections = self.collection_manager.get_installed_collections()
-        for id in config.COLLECTIONS:
-            collection_name = config.COLLECTIONS[id]["name"]
-            collection_author = config.COLLECTIONS[id]["author"]
-            collection_tags = config.COLLECTIONS[id]["tags"]
-            collection_description = config.COLLECTIONS[id]["description"]
-            collection_status = config.COLLECTIONS[id]["status"]
+        for collection_id in config.COLLECTIONS:
+            collection_name = config.COLLECTIONS[collection_id]["name"]
+            collection_author = config.COLLECTIONS[collection_id]["author"]
+            collection_tags = config.COLLECTIONS[collection_id]["tags"]
+            collection_description = config.COLLECTIONS[collection_id]["description"]
+            collection_status = config.COLLECTIONS[collection_id]["status"]
             repository_name = ""
-            if "repository_name" in config.COLLECTIONS[id].keys():
-                repository_name = config.COLLECTIONS[id]["repository_name"]
+            if "repository_name" in config.COLLECTIONS[collection_id].keys():
+                repository_name = config.COLLECTIONS[collection_id]["repository_name"]
             item = QStandardItem(collection_name + " (" + repository_name + ")")
             item.setEditable(False)
-            item.setData(id, COLLECTION_ID_ROLE)
+            item.setData(collection_id, COLLECTION_ID_ROLE)
             item.setData(collection_name, COLLECTION_NAME_ROLE)
             item.setData(collection_description, COLLECTION_DESCRIPTION_ROLE)
             item.setData(collection_author, COLLECTION_AUTHOR_ROLE)
             item.setData(collection_tags, COLLECTION_TAGS_ROLE)
             item.setData(collection_status, COLLECTION_STATUS_ROLE)
             # Make installed collections stand out
-            if installed_collections and id in installed_collections.keys():
+            if installed_collections and collection_id in installed_collections.keys():
                 collectionFont = QFont()
                 collectionFont.setWeight(60)
                 item.setFont(collectionFont)
@@ -722,9 +722,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         search = QRegExp(text, Qt.CaseInsensitive, QRegExp.RegExp)
         self.collection_proxy.setFilterRegExp(search)
 
-    def show_collection_metadata(self, id):
+    def show_collection_metadata(self, collection_id):
         """Show the collection metadata given the ID."""
-        html = self.collection_manager.get_html(id)
+        html = self.collection_manager.get_html(collection_id)
         self.web_view_details.setHtml(html)
 
     def reject(self):

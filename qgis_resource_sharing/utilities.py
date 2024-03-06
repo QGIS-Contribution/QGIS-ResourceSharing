@@ -2,7 +2,6 @@ import logging
 import ntpath
 from pathlib import Path
 
-import jinja2
 from ext_libs.pathvalidate import sanitize_filename
 from qgis.core import Qgis, QgsApplication, QgsSettings
 from qgis.PyQt.QtCore import QDir
@@ -161,19 +160,3 @@ def qgis_version():
     version = str(Qgis.QGIS_VERSION_INT)
     version = int(version)
     return version
-
-
-def render_template(filename, context) -> dict:
-    """Render a template with the specified filename.
-    :param filename: The filename (must be in the template directory)
-    :type filename: str
-
-    :param context: The context passed for the template
-    :type context: dict
-    """
-    path = DIR_PLUGIN_ROOT / "resources" / "template"
-    return (
-        jinja2.Environment(loader=jinja2.FileSystemLoader(str(path)))
-        .get_template(filename)
-        .render(context)
-    )

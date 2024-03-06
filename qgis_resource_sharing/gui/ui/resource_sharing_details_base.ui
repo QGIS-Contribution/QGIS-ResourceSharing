@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QgsResourceSharingDetails</class>
+ <widget class="QWidget" name="QgsResourceSharingDetails">
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="titleLabel">
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="resourceTable">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" colspan="2">
+       <widget class="Line" name="topLine">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:lightgray;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="descriptionLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Description</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignTop</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-weight:bold;padding: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="descriptionContent">
+        <property name="styleSheet">
+         <string notr="true">padding: 5px 20px;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="Line" name="descriptionLine">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:lightgray;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="tagsLabel">
+        <property name="text">
+         <string>Tags</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignTop</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-weight:bold;padding: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="tagsContent">
+        <property name="styleSheet">
+         <string notr="true">padding: 5px 20px;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="Line" name="tagsLine">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:lightgray;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="resourcesLabel">
+        <property name="text">
+         <string>Resources</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignTop</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-weight:bold;padding: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="resourcesContent">
+        <property name="styleSheet">
+         <string notr="true">padding: 5px 20px;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <widget class="Line" name="resourcesLine">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:lightgray;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="previewsLabel">
+        <property name="text">
+         <string>Previews</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignTop</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-weight:bold;padding: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QWidget" name="previewsContent">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+        <property name="styleSheet">
+         <string notr="true">padding: 5px 20px;</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayoutPreview">
+        </layout>
+       </widget>
+      </item>
+      <item row="8" column="0" colspan="2">
+       <widget class="Line" name="previewsLine">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:lightgray;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="urlLabel">
+        <property name="text">
+         <string>URL</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignTop</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-weight:bold;padding: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QLabel" name="urlContent">
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="textInteractionFlags">
+          <set>Qt::TextBrowserInteraction</set>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">padding: 5px 20px;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0" colspan="2">
+       <widget class="Line" name="urlLine">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:lightgray;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QLabel" name="licenseLabel">
+        <property name="text">
+         <string>License</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignTop</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-weight:bold;padding: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="1">
+       <widget class="QLabel" name="licenseContent">
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="textInteractionFlags">
+          <set>Qt::TextBrowserInteraction</set>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">padding: 5px 20px;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="0" colspan="2">
+       <widget class="Line" name="licenseLine">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:lightgray;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="0">
+       <widget class="QLabel" name="authorLabel">
+        <property name="text">
+         <string>Author</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignTop</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-weight:bold;padding: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="1">
+       <widget class="QLabel" name="authorContent">
+        <property name="styleSheet">
+         <string notr="true">padding: 5px 20px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="0" colspan="2">
+       <widget class="Line" name="authorLine">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color:lightgray;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="0">
+       <widget class="QLabel" name="emailLabel">
+        <property name="text">
+         <string>E-mail</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignTop</set>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font-weight:bold;padding: 5px 0px;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="1">
+       <widget class="QLabel" name="emailContent">
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="textInteractionFlags">
+          <set>Qt::TextBrowserInteraction</set>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">padding: 5px 20px;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+</ui>

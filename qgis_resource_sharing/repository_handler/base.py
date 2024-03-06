@@ -10,7 +10,7 @@ from ext_libs.giturlparse import validate as git_validate
 from qgis.core import Qgis
 from six import add_metaclass
 
-from qgis_resource_sharing.config import COLLECTION_NOT_INSTALLED_STATUS
+from qgis_resource_sharing.config import CollectionStatus
 from qgis_resource_sharing.exception import MetadataError
 from qgis_resource_sharing.network_manager import NetworkManager
 from qgis_resource_sharing.version_compare import isCompatible
@@ -240,7 +240,7 @@ class BaseRepositoryHandler(object):
                 "register_name": collection,
                 "repository_name": "",
                 "repository_url": self.url,
-                "status": COLLECTION_NOT_INSTALLED_STATUS,
+                "status": CollectionStatus.NOT_INSTALLED,
                 "tags": tags,
             }
             collections.append(collection_dict)

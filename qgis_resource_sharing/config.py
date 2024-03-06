@@ -1,3 +1,5 @@
+from enum import IntEnum
+
 """
 # Put the COLLECTIONS object (dict) in the module namespace
 # (http://effbot.org/pyfaq/how-do-i-share-global-variables-across-modules.htm)
@@ -15,7 +17,7 @@ collections. It has this structure:
             'author_email': email,
             'repository_url': self.url,
             'repository_name': <the name of the repository>,
-            'status': COLLECTION_NOT_INSTALLED_STATUS,
+            'status': CollectionStatus.NOT_INSTALLED,
             'name': parser.get(collection, 'name'),
             'tags': parser.get(collection, 'tags'),
             'description': parser.get(collection, 'description'),
@@ -35,8 +37,13 @@ collections. It has this structure:
     }
 """
 
-COLLECTION_NOT_INSTALLED_STATUS = 0
-COLLECTION_INSTALLED_STATUS = 1
-COLLECTION_ALL_STATUS = 2
+
+class CollectionStatus(IntEnum):
+    """Describe the status of a collection"""
+
+    NOT_INSTALLED = 0
+    INSTALLED = 1
+    ALL = 2
+
 
 COLLECTIONS = {}

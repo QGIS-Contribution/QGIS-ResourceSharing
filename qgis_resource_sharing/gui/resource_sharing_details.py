@@ -29,7 +29,7 @@ from qgis.PyQt.QtNetwork import QNetworkAccessManager, QNetworkReply, QNetworkRe
 from qgis.PyQt.QtWidgets import QLabel, QWidget
 
 from qgis_resource_sharing.collection_manager import CollectionManager
-from qgis_resource_sharing.config import COLLECTION_INSTALLED_STATUS
+from qgis_resource_sharing.config import CollectionStatus
 from qgis_resource_sharing.utilities import ui_path
 
 # -- GLOBALS
@@ -79,7 +79,7 @@ class QgsResourceSharingDetails(QWidget, FORM_CLASS):
         self.tagsContent.setText(collection["tags"])
 
         # resources
-        show_resources_html = collection["status"] == COLLECTION_INSTALLED_STATUS
+        show_resources_html = collection["status"] == CollectionStatus.INSTALLED
         self.resourcesLabel.setVisible(show_resources_html)
         self.resourcesContent.setVisible(show_resources_html)
         self.resourcesContent.setText(collection["resources_html"])

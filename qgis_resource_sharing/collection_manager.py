@@ -8,10 +8,7 @@ from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from qgis_resource_sharing import config
 from qgis_resource_sharing.__about__ import __title__
-from qgis_resource_sharing.config import (
-    COLLECTION_INSTALLED_STATUS,
-    COLLECTION_NOT_INSTALLED_STATUS,
-)
+from qgis_resource_sharing.config import CollectionStatus
 from qgis_resource_sharing.repository_handler import BaseRepositoryHandler
 from qgis_resource_sharing.resource_handler import BaseResourceHandler
 from qgis_resource_sharing.utilities import (
@@ -106,7 +103,7 @@ class CollectionManager(object):
         html = html + ".<br><i>Reinstall</i> to update"
         if resource_types == 0:
             html = "<i>No standard resources found</i>."
-        if config.COLLECTIONS[collection_id]["status"] != COLLECTION_INSTALLED_STATUS:
+        if config.COLLECTIONS[collection_id]["status"] != CollectionStatus.INSTALLED:
             html = "<i>Unknown before installation</i>"
 
         config.COLLECTIONS[collection_id]["resources_html"] = html
@@ -126,7 +123,7 @@ class CollectionManager(object):
         """
         installed_collections = {}
         for collection_id, collection in config.COLLECTIONS.items():
-            if collection["status"] != COLLECTION_INSTALLED_STATUS:
+            if collection["status"] != CollectionStatus.INSTALLED:
                 continue
 
             if repo_url:
@@ -167,7 +164,7 @@ class CollectionManager(object):
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.install()
 
-        config.COLLECTIONS[collection_id]["status"] = COLLECTION_INSTALLED_STATUS
+        config.COLLECTIONS[collection_id]["status"] = CollectionStatus.INSTALLED
 
     def uninstall(self, collection_id):
         """Uninstall the collection.
@@ -185,7 +182,7 @@ class CollectionManager(object):
         if collection_dir.exists():
             shutil.rmtree(str(collection_dir))
 
-        config.COLLECTIONS[collection_id]["status"] = COLLECTION_NOT_INSTALLED_STATUS
+        config.COLLECTIONS[collection_id]["status"] = CollectionStatus.NOT_INSTALLED
 
         # Should items from other installed collections be reinstalled
         # "automatically"?

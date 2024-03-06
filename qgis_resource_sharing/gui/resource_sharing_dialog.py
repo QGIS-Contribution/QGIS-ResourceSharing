@@ -44,10 +44,7 @@ from qgis_resource_sharing.collection_manager import (
     CollectionInstaller,
     CollectionManager,
 )
-from qgis_resource_sharing.config import (
-    COLLECTION_ALL_STATUS,
-    COLLECTION_INSTALLED_STATUS,
-)
+from qgis_resource_sharing.config import CollectionStatus
 from qgis_resource_sharing.gui.custom_sort_filter_proxy import (
     COLLECTION_AUTHOR_ROLE,
     COLLECTION_DESCRIPTION_ROLE,
@@ -202,7 +199,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             # Not settings, must be Collections (all or installed)
             if index == 1:
                 # Installed collections
-                self.collection_proxy.accepted_status = COLLECTION_INSTALLED_STATUS
+                self.collection_proxy.accepted_status = CollectionStatus.INSTALLED
                 # Set the web view
                 title = self.tr("Installed collections")
                 description = self.tr(
@@ -210,7 +207,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 )
             else:
                 # All collections (0)
-                self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
+                self.collection_proxy.accepted_status = CollectionStatus.ALL
                 # Set the web view
                 title = self.tr("All collections")
                 description = self.tr(
@@ -578,7 +575,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self._sel_coll_id = current_coll_id
                 # Update buttons
                 status = config.COLLECTIONS[current_coll_id]["status"]
-                if status == COLLECTION_INSTALLED_STATUS:
+                if status == CollectionStatus.INSTALLED:
                     self.button_install.setEnabled(True)
                     self.button_install.setIcon(
                         QgsApplication.getThemeIcon("mActionRefresh.svg")
@@ -741,7 +738,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self._sel_coll_id = collection_id
             # Enable / disable buttons
             status = config.COLLECTIONS[self._sel_coll_id]["status"]
-            is_installed = status == COLLECTION_INSTALLED_STATUS
+            is_installed = status == CollectionStatus.INSTALLED
             if is_installed:
                 self.button_install.setEnabled(True)
                 self.button_install.setIcon(

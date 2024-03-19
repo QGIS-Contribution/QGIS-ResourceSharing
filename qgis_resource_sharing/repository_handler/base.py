@@ -247,11 +247,11 @@ class BaseRepositoryHandler(object):
 
         return collections
 
-    def download_collection(self, id, register_name):
+    def download_collection(self, collection_id, register_name):
         """Download a collection given its ID.
 
-        :param id: The ID of the collection.
-        :type id: str
+        :param collection_id: The ID of the collection.
+        :type collection_id: str
 
         :param register_name: The register name of the collection (the
             section name of the collection)

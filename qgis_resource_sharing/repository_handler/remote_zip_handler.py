@@ -26,14 +26,14 @@ class RemoteZipHandler(BaseRepositoryHandler):
                 return True
         return False
 
-    def download_collection(self, id, register_name):
+    def download_collection(self, collection_id, register_name):
         """Download a collection given its ID.
 
         For zip collection, we will download the zip, and extract the
         collection to collections dir.
 
-        :param id: The ID of the collection.
-        :type id: str
+        :param collection_id: The ID of the collection.
+        :type collection_id: str
 
         :param register_name: The register name of the collection (the
             section name of the collection)
@@ -54,7 +54,7 @@ class RemoteZipHandler(BaseRepositoryHandler):
             zip_file.close()
 
         zf = ZipFile(zip_file.fileName())
-        zf.extractall(path=local_collection_path(id))
+        zf.extractall(path=local_collection_path(collection_id))
         return True, None
 
     def file_url(self, relative_path):

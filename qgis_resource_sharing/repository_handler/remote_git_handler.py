@@ -81,15 +81,15 @@ class RemoteGitHandler(BaseRepositoryHandler):
     def git_repository(self):
         return self._git_repository
 
-    def download_collection(self, id: str, register_name: str) -> tuple:
+    def download_collection(self, collection_id: str, register_name: str) -> tuple:
         """Download a collection given its ID.
 
         For remote git repositories, we will clone the repository (or
         pull if the repo is already cloned), and copy the collection to
         the collections directory.
 
-        :param id: The ID of the collection.
-        :type id: str
+        :param collection_id: The ID of the collection.
+        :type collection_id: str
         :param register_name: The register name of the collection (the
             section name of the collection)
         :type register_name: unicode
@@ -186,7 +186,7 @@ class RemoteGitHandler(BaseRepositoryHandler):
             error_message = "Error: The collection does not exist in the repository."
             return False, error_message
 
-        dest_dir = local_collection_path(id)
+        dest_dir = local_collection_path(collection_id)
         if dest_dir.exists():
             # Remove the existing collection directory
             shutil.rmtree(str(dest_dir))

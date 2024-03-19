@@ -42,11 +42,11 @@ class FileSystemHandler(BaseRepositoryHandler):
 
         return True, message
 
-    def download_collection(self, id, register_name):
+    def download_collection(self, collection_id, register_name):
         """Download a collection given its ID.
 
-        :param id: The ID of the collection.
-        :type id: str
+        :param collection_id: The ID of the collection.
+        :type collection_id: str
 
         :param register_name: The register name of the collection (the
             section name of the collection)
@@ -58,7 +58,7 @@ class FileSystemHandler(BaseRepositoryHandler):
             error_message = "Error: The collection does not exist in the " "repository."
             return False, error_message
 
-        dest_dir = local_collection_path(id)
+        dest_dir = local_collection_path(collection_id)
         if dest_dir.exists():
             shutil.rmtree(str(dest_dir))
         shutil.copytree(str(src_dir), str(dest_dir))

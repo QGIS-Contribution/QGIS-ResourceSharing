@@ -1,12 +1,13 @@
 import logging
 from pathlib import Path
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.resource_handler.base import BaseResourceHandler
 from qgis_resource_sharing.resource_handler.symbol_resolver_mixin import (
     SymbolResolverMixin,
 )
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 STYLE = "style"
 
 

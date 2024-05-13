@@ -5,11 +5,12 @@ from pathlib import Path
 from processing.tools.system import mkdir, userFolder
 from qgis.core import QgsApplication
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.resource_handler.base import BaseResourceHandler
 
 MODELS_PROCESSING_FOLDER = "models"
 MODELS = "models"  # Resource Sharing collection subdirectory name
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class ModelHandler(BaseResourceHandler):

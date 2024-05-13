@@ -5,9 +5,10 @@ from pathlib import Path
 from processing.script import ScriptUtils
 from qgis.core import QgsApplication
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.resource_handler.base import BaseResourceHandler
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 PROCESSING = "processing"
 
 

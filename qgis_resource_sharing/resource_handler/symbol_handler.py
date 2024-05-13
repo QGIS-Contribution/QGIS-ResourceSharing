@@ -3,6 +3,7 @@ from pathlib import Path
 
 from qgis.core import QgsStyle
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.resource_handler.base import BaseResourceHandler
 from qgis_resource_sharing.resource_handler.symbol_resolver_mixin import (
     SymbolResolverMixin,
@@ -10,7 +11,7 @@ from qgis_resource_sharing.resource_handler.symbol_resolver_mixin import (
 from qgis_resource_sharing.symbol_xml_extractor import SymbolXMLExtractor
 from qgis_resource_sharing.utilities import qgis_version
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 SYMBOL = "symbol"
 
 

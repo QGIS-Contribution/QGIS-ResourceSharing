@@ -4,11 +4,12 @@ from pathlib import Path
 
 from qgis.core import Qgis, QgsSettings
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.resource_handler.base import BaseResourceHandler
 from qgis_resource_sharing.utilities import local_collection_path
 
 SVG = "svg"
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class SVGResourceHandler(BaseResourceHandler):

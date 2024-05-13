@@ -8,9 +8,9 @@ from qgis.core import Qgis, QgsApplication, QgsSettings
 from qgis.PyQt.QtCore import QDir
 
 from qgis_resource_sharing import config
-from qgis_resource_sharing.__about__ import DIR_PLUGIN_ROOT
+from qgis_resource_sharing.__about__ import DIR_PLUGIN_ROOT, __title__
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 SUPPORTED_RESOURCES_MAP = {
     "svg": "SVG",

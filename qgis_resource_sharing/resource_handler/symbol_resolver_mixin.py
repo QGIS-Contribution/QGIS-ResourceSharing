@@ -5,9 +5,10 @@ from pathlib import Path
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QFile, QFileInfo, QUrl
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.utilities import path_leaf
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class SymbolResolverMixin(object):

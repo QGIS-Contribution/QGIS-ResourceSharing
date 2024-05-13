@@ -6,6 +6,7 @@ import traceback
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from qgis_resource_sharing import config
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.config import (
     COLLECTION_INSTALLED_STATUS,
     COLLECTION_NOT_INSTALLED_STATUS,
@@ -19,7 +20,7 @@ from qgis_resource_sharing.utilities import (
     resources_path,
 )
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class CollectionInstaller(QObject):

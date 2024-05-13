@@ -4,9 +4,10 @@ from qgis.core import QgsAuthManager, QgsNetworkAccessManager
 from qgis.PyQt.QtCore import QCoreApplication, QUrl
 from qgis.PyQt.QtNetwork import QNetworkReply, QNetworkRequest
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.utilities import qgis_version
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class NetworkManager(object):

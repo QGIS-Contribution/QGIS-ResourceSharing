@@ -11,7 +11,9 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QFile, QIODevice
 from qgis.PyQt.QtXml import QDomDocument
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+from qgis_resource_sharing.__about__ import __title__
+
+LOGGER = logging.getLogger(__title__)
 
 
 class SymbolXMLExtractor(object):

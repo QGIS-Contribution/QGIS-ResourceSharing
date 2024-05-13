@@ -4,13 +4,14 @@ from pathlib import Path
 
 from qgis.core import QgsSettings
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.resource_handler.base import BaseResourceHandler
 from qgis_resource_sharing.utilities import user_expressions_group
 
 hasExprBuilder = False
 
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 EXPRESSIONS = "expressions"
 
 

@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 * Do not use reserved keyword id as a function parameter by @ptitjano in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/326>
 * refacto: use plugin title from metadata to name the logger by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/334>
 * improve(ui): complete i18n and add some icons by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/335>
+* fix(ci): fix translation build by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/337>
 
 ### Tooling 🔧
 
@@ -22,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 * ci: run tests against embedded requirements changes by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/315>
 * ci: run tests against testing deps changes by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/318>
 * docs: use new GitHub Pages workflow instead of gh-pages branch by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/320>
+* CI: fix release job by replacing unmaintained actions by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/338>
 
 ### Other Changes
 

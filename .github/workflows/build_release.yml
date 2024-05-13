@@ -29,6 +29,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
+          cache-dependency-path: "requirements/translation.txt"
 
       - name: Install system requirements
         run: |

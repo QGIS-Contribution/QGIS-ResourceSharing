@@ -58,6 +58,7 @@ class TestPluginMetadata(unittest.TestCase):
         self.assertLessEqual(len(__about__.__title_clean__), len(__about__.__title__))
 
         # QGIS versions
+        # QGIS versions
         self.assertIsInstance(
             __about__.__plugin_md__.get("general").get("qgisminimumversion"), str
         )
@@ -66,10 +67,13 @@ class TestPluginMetadata(unittest.TestCase):
             __about__.__plugin_md__.get("general").get("qgismaximumversion"), str
         )
 
-        self.assertLessEqual(
-            float(__about__.__plugin_md__.get("general").get("qgisminimumversion")),
-            float(__about__.__plugin_md__.get("general").get("qgismaximumversion")),
+        min_version_parsed = parse(
+            __about__.__plugin_md__.get("general").get("qgisminimumversion")
         )
+        max_version_parsed = parse(
+            __about__.__plugin_md__.get("general").get("qgismaximumversion")
+        )
+        self.assertLessEqual(min_version_parsed, max_version_parsed)
 
     def test_required_metadata(self):
         """Test that the plugin __init__ will validate on plugins.qgis.org."""

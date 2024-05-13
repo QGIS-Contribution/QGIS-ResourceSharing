@@ -17,6 +17,6 @@ tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues/
 version=1.1.0
 qgisMinimumVersion=3.22
 qgisMaximumVersion=3.34.5
-experimental=True
+experimental=False
 deprecated=False
 changelog=

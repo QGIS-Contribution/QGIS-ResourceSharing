@@ -24,13 +24,20 @@ jobs:
       - name: Get source code
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
       - name: Install system requirements
         run: |
           sudo apt update
           sudo apt install qt5-qmake qttools5-dev-tools
+          python3 -m pip install -U pyqt5-tools
 
       - name: Update translations
-        run: lupdate -noobsolete -verbose ${{ env.PROJECT_FOLDER }}/resources/i18n/plugin_translation.pro
+        run: pylupdate5 -noobsolete -verbose ${{ env.PROJECT_FOLDER }}/resources/i18n/plugin_translation.pro
 
       - name: Compile translations
         run: lrelease ${{ env.PROJECT_FOLDER }}/resources/i18n/*.ts

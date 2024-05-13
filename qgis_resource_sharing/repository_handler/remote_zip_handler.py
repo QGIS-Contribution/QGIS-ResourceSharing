@@ -4,11 +4,12 @@ from zipfile import ZipFile
 
 from qgis.PyQt.QtCore import QTemporaryFile
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.network_manager import NetworkManager
 from qgis_resource_sharing.repository_handler.base import BaseRepositoryHandler
 from qgis_resource_sharing.utilities import local_collection_path
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class RemoteZipHandler(BaseRepositoryHandler):

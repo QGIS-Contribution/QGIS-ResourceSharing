@@ -4,10 +4,11 @@ from pathlib import Path
 from urllib.parse import urljoin
 from urllib.request import pathname2url
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.repository_handler.base import BaseRepositoryHandler
 from qgis_resource_sharing.utilities import local_collection_path
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class FileSystemHandler(BaseRepositoryHandler):

@@ -4,11 +4,12 @@ from pathlib import Path
 
 from qgis.core import QgsApplication
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.resource_handler.base import BaseResourceHandler
 
 CHECKLISTS_FOLDER = "checklists"
 CHECKLISTS = "checklists"  # Resource Sharing collection subdirectory name
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class ChecklistHandler(BaseResourceHandler):

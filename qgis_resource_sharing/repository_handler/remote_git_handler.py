@@ -8,10 +8,11 @@ from dulwich import porcelain
 from giturlparse import parse, validate
 from qgis.core import QgsApplication
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.repository_handler.base import BaseRepositoryHandler
 from qgis_resource_sharing.utilities import local_collection_path
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class writeOut:

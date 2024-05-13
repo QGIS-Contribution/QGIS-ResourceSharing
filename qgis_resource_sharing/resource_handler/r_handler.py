@@ -8,11 +8,12 @@ from pathlib import Path
 from processing.tools.system import mkdir, userFolder
 from qgis.core import QgsApplication
 
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.resource_handler.base import BaseResourceHandler
 
 RSCRIPTS_PROCESSING_FOLDER = "rscripts"  # Processing folder for R scripts
 RSCRIPTS_FOLDER = "rscripts"  # Collection subfolder name
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class RScriptHandler(BaseResourceHandler):

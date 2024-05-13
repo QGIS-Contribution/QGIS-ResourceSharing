@@ -6,6 +6,7 @@ from qgis.core import QgsSettings
 from qgis.PyQt.QtCore import QObject, QTemporaryFile
 
 from qgis_resource_sharing import config
+from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.collection_manager import CollectionManager
 from qgis_resource_sharing.config import COLLECTION_INSTALLED_STATUS
 from qgis_resource_sharing.exception import MetadataError
@@ -17,7 +18,7 @@ from qgis_resource_sharing.utilities import (
     repositories_cache_path,
 )
 
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 
 
 class RepositoryManager(QObject):

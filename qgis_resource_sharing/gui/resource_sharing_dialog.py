@@ -70,7 +70,7 @@ from qgis_resource_sharing.utilities import (
 
 # -- GLOBALS
 FORM_CLASS, _ = uic.loadUiType(str(ui_path("resource_sharing_dialog_base.ui")))
-LOGGER = logging.getLogger("QGIS Resource Sharing")
+LOGGER = logging.getLogger(__title__)
 REPOSITORY_ITEM = 1000
 COLLECTION_ITEM = 2000
 

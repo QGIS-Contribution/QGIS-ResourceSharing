@@ -29,7 +29,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 # package
-from qgis_resource_sharing.__about__ import DIR_PLUGIN_ROOT, __icon_path__
+from qgis_resource_sharing.__about__ import DIR_PLUGIN_ROOT, __icon_path__, __title__
 from qgis_resource_sharing.gui.resource_sharing_dialog import ResourceSharingDialog
 
 
@@ -63,10 +63,10 @@ class ResourceSharingPlugin:
 
         # Declare instance attributes
         self.actions = []
-        self.menuName = self.tr("&Resource Sharing")
+        self.menuName = __title__
         # TODO: We may let the user set this up
         self.toolbar = self.iface.addToolBar(self.menuName)
-        self.toolbar.setObjectName("Resource Sharing")
+        self.toolbar.setObjectName(__title__)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):

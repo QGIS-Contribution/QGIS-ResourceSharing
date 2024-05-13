@@ -2,6 +2,19 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR">
 <context>
+    <name>CollectionInstaller</name>
+    <message>
+        <location filename="../../collection_manager.py" line="40"/>
+        <source>Downloading the collection...</source>
+        <translation>Téléchargement de la collection...</translation>
+    </message>
+    <message>
+        <location filename="../../collection_manager.py" line="62"/>
+        <source>Installing the collection...</source>
+        <translation>Installation de la collection...</translation>
+    </message>
+</context>
+<context>
     <name>ManageRepositoryDialog</name>
     <message>
         <location filename="../../gui/ui/manage_repository.ui" line="14"/>
@@ -34,7 +47,7 @@
         <translation>Authentification</translation>
     </message>
     <message>
-        <location filename="../../gui/manage_dialog.py" line="71"/>
+        <location filename="../../gui/manage_dialog.py" line="67"/>
         <source>Select Authentication</source>
         <translation>Sélectionner l&apos;authentification</translation>
     </message>
@@ -130,120 +143,157 @@
 <context>
     <name>ResourceSharingDialog</name>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="117"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="198"/>
         <source>All collections</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="128"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="190"/>
         <source>Installed collections</source>
-        <translation type="unfinished"></translation>
+        <translation>Installées</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="137"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="131"/>
         <source>Settings</source>
         <translation>Gérer les entrepôts</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="196"/>
-        <source>Installed Collections</source>
-        <translation>Collections installées</translation>
-    </message>
-    <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="197"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="191"/>
         <source>On the left you see the list of all the installed collections.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sur la gauche, vous pouvez sélectionner la liste de toutes les collections installées.</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="204"/>
-        <source>All Collections</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="205"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="199"/>
         <source>On the left you see a list of all the collections that are available from the registered repositories.&lt;br&gt; Installed collections are emphasized (in &lt;b&gt;bold&lt;/b&gt;).</source>
-        <translation type="unfinished"></translation>
+        <translation>Sur la gauche, la liste des collections disponibles dans les entrepôt répertoriés. &amp;lt;br&amp;gt;Les collections installées localement sont en &amp;lt;b&amp;gt;gras&amp;lt;/b&amp;gt;.</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="302"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="298"/>
         <source>Unable to add another repository with the same URL!</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ajouter un entrepôt avec la même URL !</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="309"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="305"/>
         <source>Repositories must have unique names!</source>
-        <translation type="unfinished"></translation>
+        <translation>Les entrepôts doivent avoir des noms uniques !</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="252"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="246"/>
         <source>Repository was successfully added</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;ajout de l&apos;entrepôt a réussi</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="256"/>
-        <source>Unable to add repository: %s</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../gui/resource_sharing_dialog.py" line="250"/>
+        <source>Unable to add repository: {}</source>
+        <translation>Impossible d&apos;ajouter l&apos;entrepôt : {}</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="437"/>
-        <source>%s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="283"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="279"/>
         <source>You can not edit the official repositories!</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous ne pouvez pas modifier les entrepôts officiels !</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="327"/>
-        <source>Repository is successfully updated</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../gui/resource_sharing_dialog.py" line="329"/>
+        <source>Unable to edit repository: </source>
+        <translation>Impossible d&apos;éditer l&apos;entrepôt : </translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="331"/>
-        <source>Unable to edit repository: %s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="356"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="354"/>
         <source>You can not remove official repositories!</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous ne pouvez pas supprimer les entrepôts officiels !</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="360"/>
+        <location filename="../../gui/resource_sharing_dialog.py" line="358"/>
         <source>Are you sure you want to remove the following repository?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous sûr/e de vouloir supprimer l&apos;entrepôt suivant ?</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="365"/>
-        <source>QGIS Resource Sharing</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../gui/resource_sharing_dialog.py" line="435"/>
+        <source>Unable to reload</source>
+        <translation>Impossible de recharger</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="323"/>
+        <source>Repository has been successfully updated.</source>
+        <translation>Mise à jour de l&apos;entrepôt réussie.</translation>
     </message>
     <message>
         <location filename="../../gui/resource_sharing_dialog.py" line="425"/>
-        <source>Repository %s is successfully reloaded</source>
-        <translation type="unfinished"></translation>
+        <source>Repository {} has been successfully reloaded.</source>
+        <translation>L&apos;entrepôt {} a été rechargé.</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="431"/>
-        <source>Unable to reload %s: %s</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../gui/resource_sharing_dialog.py" line="316"/>
+        <source>Fetching repository&apos;s metadata</source>
+        <translation>Récupération des métadonnées de l&apos;entrepôt</translation>
     </message>
     <message>
-        <location filename="../../gui/resource_sharing_dialog.py" line="757"/>
-        <source>Resource Sharing</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../gui/resource_sharing_dialog.py" line="378"/>
+        <source>You have installed collections from this repository. Please uninstall them first.</source>
+        <translation>Vous avez installé des collections liées à cet entrepôt. Veuillez les désinstaller avant de supprimer l&apos;entrepôt.</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="395"/>
+        <source>Reloading the official QGIS resource directory</source>
+        <translation>Rechargement du dossier des ressources officielles de QGIS</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="404"/>
+        <source>On-line directory reloaded</source>
+        <translation>Dossier en ligne rechargé</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="415"/>
+        <source>Reloading all repositories</source>
+        <translation>Rechargement de tous les entrepôts</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="451"/>
+        <source>Starting installation...</source>
+        <translation>Démarrage de l&apos;installation...</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="478"/>
+        <source>was successfully installed, containing:
+</source>
+        <translation>a été installé, contenant :
+</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="724"/>
+        <source>Reinstall</source>
+        <translation>Réinstaller</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="512"/>
+        <source>Cancelling installation...</source>
+        <translation>Annulation de l&apos;installation...</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="531"/>
+        <source>Could not uninstall collection </source>
+        <translation>Impossible d&apos;installer la collection </translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="538"/>
+        <source>The collection was successfully uninstalled!</source>
+        <translation>La collection a été désinstallée !</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="729"/>
+        <source>Install</source>
+        <translation>Installer</translation>
+    </message>
+    <message>
+        <location filename="../../gui/resource_sharing_dialog.py" line="641"/>
+        <source> (installed)</source>
+        <translation> (installée)</translation>
     </message>
 </context>
 <context>
     <name>ResourceSharingPlugin</name>
     <message>
-        <location filename="../../plugin.py" line="68"/>
-        <source>&amp;Resource Sharing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../plugin.py" line="168"/>
+        <location filename="../../plugin.py" line="165"/>
         <source>Resource Sharing</source>
         <translation>Ressources partagées</translation>
     </message>

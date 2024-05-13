@@ -1,15 +1,36 @@
 ci-cd:
-  - .github/**/*.yml
-  - .travis.yml
+  - changed-files:
+      - any-glob-to-any-file: .github/**
 
 dependencies:
-  - requirements/*.txt
-  - requirements.txt
+  - changed-files:
+      - any-glob-to-any-file:
+          - requirements/*.txt
+          - requirements.txt
 
 documentation:
-  - docs/**/*
-  - requirements/documentation.txt
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/**
+          - requirements/documentation.txt
+
+enhancement:
+  - head-branch: ["^feature", "feature", "^improve", "improve"]
+
+packaging:
+  - head-branch: ["^packaging", "packaging"]
+
+tooling:
+  - head-branch: ["^tooling", "tooling"]
+  - changed-files:
+      - any-glob-to-any-file:
+          - codecov.yml
+          - .pre-commit-config.yaml
+          - sonar-project.properties
 
 UI:
-  - qgis_resource_sharing/**/*.ui
-  - qgis_resource_sharing/gui/**/*
+  - head-branch: ["^ui", "ui"]
+  - changed-files:
+      - any-glob-to-any-file:
+          - qgis_resource_sharing/**/*.ui
+          - qgis_resource_sharing/gui/**

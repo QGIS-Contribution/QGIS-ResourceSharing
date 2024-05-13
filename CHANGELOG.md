@@ -2,6 +2,39 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## 1.1.0 - 2024-05-13
+
+### Bugs fixes 🐛
+
+* fix: CI fails because of broken Qt ppa by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/303>
+* CI: fix minimum python version by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/306>
+
+### Features and enhancements 🎉
+
+* Do not use reserved keyword id as a function parameter by @ptitjano in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/326>
+* refacto: use plugin title from metadata to name the logger by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/334>
+* improve(ui): complete i18n and add some icons by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/335>
+
+### Tooling 🔧
+
+* tooling: bump dev dependencies and update git hooks by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/301>
+* tooling: update VS Code configuration by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/302>
+* ci: run tests against embedded requirements changes by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/315>
+* ci: run tests against testing deps changes by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/318>
+* docs: use new GitHub Pages workflow instead of gh-pages branch by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/320>
+
+### Other Changes
+
+* Update metadata.txt about tags by @Gustry in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/279>
+* packaging: pin qgis-plugin-ci version by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/319>
+* chore(deps): replace semver with packaging by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/333>
+* update(packaging): set QGIS maximum version  by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/336>
+
+### New Contributors
+
+* @Gustry made their first contribution in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/279>
+* @ptitjano made their first contribution in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/326>
+
 ## 1.1.0-beta1 - 2024-01-19
 
 ### Bugs fixes 🐛

@@ -37,7 +37,7 @@ class CollectionInstaller(QObject):
         self.killed = False
 
     def run(self):
-        self.progress.emit("Downloading the collection...")
+        self.progress.emit(self.tr("Downloading the collection..."))
 
         # We can't kill the process here, so let us finish it even if
         # the user cancels the download process
@@ -59,7 +59,7 @@ class CollectionInstaller(QObject):
 
         # Downloading is fine, It is not killed, let us install it
         if not self.killed:
-            self.progress.emit("Installing the collection...")
+            self.progress.emit(self.tr("Installing the collection..."))
             try:
                 self._collection_manager.install(self._collection_id)
             except Exception as e:

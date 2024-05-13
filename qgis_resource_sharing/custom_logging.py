@@ -2,7 +2,9 @@ import logging
 
 from qgis.core import Qgis, QgsMessageLog
 
-LOGGERNAME = "QGIS Resource Sharing"
+from qgis_resource_sharing.__about__ import __title__
+
+LOGGERNAME = __title__
 
 
 def setup_logger():

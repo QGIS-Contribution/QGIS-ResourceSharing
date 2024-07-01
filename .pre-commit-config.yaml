@@ -24,7 +24,7 @@ repos:
         args: ["--whitespaces-count", "4"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.4.7"
+    rev: "v0.5.0"
     hooks:
       - id: ruff
         args: ["--fix-only", "--target-version=py39"]
@@ -42,7 +42,7 @@ repos:
         args: ["--profile", "black", "--filter-files"]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.1.0
     hooks:
       - id: flake8
         files: ^qgis_resource_sharing/.*\.py$

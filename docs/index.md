@@ -18,7 +18,7 @@ The QGIS Resource Sharing plugin allows QGIS users to share resources (symbols, 
 
 A QGIS Resource Sharing repository could be a remote GIT repository (currently Github, Gitlab and Bitbucket public repositories are supported), local file system collections, or zipped collections on the Web.
 
-![settings-repositories](/assets/img/repositories.png)
+![settings-repositories](assets/img/repositories.png)
 
 Collections are stored locally. By default, they are placed under the user's QGIS directory.
 

@@ -8,7 +8,7 @@ from qgis.PyQt.QtCore import QObject, QTemporaryFile
 from qgis_resource_sharing import config
 from qgis_resource_sharing.__about__ import __title__
 from qgis_resource_sharing.collection_manager import CollectionManager
-from qgis_resource_sharing.config import COLLECTION_INSTALLED_STATUS
+from qgis_resource_sharing.config import CollectionStatus
 from qgis_resource_sharing.exception import MetadataError
 from qgis_resource_sharing.network_manager import NetworkManager
 from qgis_resource_sharing.repository_handler import BaseRepositoryHandler
@@ -49,7 +49,7 @@ class RepositoryManager(QObject):
                 'author': author,
                 'author_email': email,
                 'repository_url': self.url,
-                'status': COLLECTION_NOT_INSTALLED_STATUS,
+                'status': CollectionStatus.NOT_INSTALLED,
                 'name': parser.get(collection, 'name'),
                 'tags': parser.get(collection, 'tags'),
                 'description': parser.get(collection, 'description'),
@@ -277,7 +277,7 @@ class RepositoryManager(QObject):
                 # Get all the installed collections from the old repository
                 installed_old_collections = []
                 for old_collection in old_collections:
-                    if old_collection["status"] == COLLECTION_INSTALLED_STATUS:
+                    if old_collection["status"] == CollectionStatus.INSTALLED:
                         installed_old_collections.append(old_collection)
                 # Handling installed collections
                 # An old collection that is present in the new location
@@ -302,7 +302,7 @@ class RepositoryManager(QObject):
                             is_present = True
                             if old_url == new_url:
                                 # Set the status to installed
-                                n_coll["status"] = COLLECTION_INSTALLED_STATUS
+                                n_coll["status"] = CollectionStatus.INSTALLED
                                 # Keep the collection statistics
                                 for key in installed_collection.keys():
                                     if key in [
@@ -383,7 +383,7 @@ class RepositoryManager(QObject):
                 # Check the file system to see if the collection exists.
                 # If not, also uninstall its resources
                 current_status = config.COLLECTIONS[collection_id]["status"]
-                if current_status == COLLECTION_INSTALLED_STATUS:
+                if current_status == CollectionStatus.INSTALLED:
                     if not collection_path.exists():
                         # Uninstall the collection
                         self._collections_manager.uninstall(collection_id)

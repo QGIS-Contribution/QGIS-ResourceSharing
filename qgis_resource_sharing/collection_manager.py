@@ -2,22 +2,18 @@ import hashlib
 import logging
 import shutil
 import traceback
+from typing import Dict
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from qgis_resource_sharing import config
 from qgis_resource_sharing.__about__ import __title__
-from qgis_resource_sharing.config import (
-    COLLECTION_INSTALLED_STATUS,
-    COLLECTION_NOT_INSTALLED_STATUS,
-)
+from qgis_resource_sharing.config import CollectionStatus
 from qgis_resource_sharing.repository_handler import BaseRepositoryHandler
 from qgis_resource_sharing.resource_handler import BaseResourceHandler
 from qgis_resource_sharing.utilities import (
     SUPPORTED_RESOURCES_MAP,
     local_collection_path,
-    render_template,
-    resources_path,
 )
 
 LOGGER = logging.getLogger(__title__)
@@ -88,8 +84,8 @@ class CollectionManager(object):
         hex_dig = hash_object.hexdigest()
         return hex_dig
 
-    def get_html(self, collection_id):
-        """Return the details of a collection as HTML, given its id.
+    def get_collection(self, collection_id: str) -> Dict[str, str]:
+        """Return the details of a collection, given its id.
 
         :param collection_id: The id of the collection
         :type collection_id: str
@@ -107,15 +103,11 @@ class CollectionManager(object):
         html = html + ".<br><i>Reinstall</i> to update"
         if resource_types == 0:
             html = "<i>No standard resources found</i>."
-        if config.COLLECTIONS[collection_id]["status"] != COLLECTION_INSTALLED_STATUS:
+        if config.COLLECTIONS[collection_id]["status"] != CollectionStatus.INSTALLED:
             html = "<i>Unknown before installation</i>"
 
         config.COLLECTIONS[collection_id]["resources_html"] = html
-        context = {
-            "resources_path": str(resources_path()),
-            "collection": config.COLLECTIONS[collection_id],
-        }
-        return render_template("collection_details.html", context)
+        return config.COLLECTIONS[collection_id]
 
     def get_installed_collections(self, repo_url=None):
         """Get all installed collections for a given repository URL.
@@ -131,7 +123,7 @@ class CollectionManager(object):
         """
         installed_collections = {}
         for collection_id, collection in config.COLLECTIONS.items():
-            if collection["status"] != COLLECTION_INSTALLED_STATUS:
+            if collection["status"] != CollectionStatus.INSTALLED:
                 continue
 
             if repo_url:
@@ -172,7 +164,7 @@ class CollectionManager(object):
             resource_handler_instance = resource_handler(collection_id)
             resource_handler_instance.install()
 
-        config.COLLECTIONS[collection_id]["status"] = COLLECTION_INSTALLED_STATUS
+        config.COLLECTIONS[collection_id]["status"] = CollectionStatus.INSTALLED
 
     def uninstall(self, collection_id):
         """Uninstall the collection.
@@ -190,7 +182,7 @@ class CollectionManager(object):
         if collection_dir.exists():
             shutil.rmtree(str(collection_dir))
 
-        config.COLLECTIONS[collection_id]["status"] = COLLECTION_NOT_INSTALLED_STATUS
+        config.COLLECTIONS[collection_id]["status"] = CollectionStatus.NOT_INSTALLED
 
         # Should items from other installed collections be reinstalled
         # "automatically"?

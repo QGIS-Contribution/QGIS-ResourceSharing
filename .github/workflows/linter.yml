@@ -2,18 +2,20 @@ name: "✅ Linter"
 
 env:
   PROJECT_FOLDER: "qgis_resource_sharing"
-  PYTHON_VERSION: 3.9
+  PYTHON_VERSION: "3.12"
 
 # because linter is a required check, it must be triggered on every push and not filtered on paths
 on:
   push:
-    branches: [master]
+    branches:
+      - master
     paths:
       - "**.py"
       - .github/workflows/linter.yml
 
   pull_request:
-    branches: [master]
+    branches:
+      - master
     paths:
       - "**.py"
       - .github/workflows/linter.yml

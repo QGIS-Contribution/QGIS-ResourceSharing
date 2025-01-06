@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## 1.1.1 - 2025-01-06
+
+* last version compatible with Python 3.9 since a breaking change has been introduced during the LTR cycle of the QGIS 3.34 (Python 3.12 starting from QGIS 3.34.6)
+* Replace QWebViews by native Qt widgets by @ptitjano in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/325>
+
 ## 1.1.0 - 2024-05-13
 
 ### Bugs fixes 🐛

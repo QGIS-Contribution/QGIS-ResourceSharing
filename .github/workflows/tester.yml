@@ -2,7 +2,8 @@ name: "🎳 Tester"
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
     paths:
       - "**.py"
       - .github/workflows/tester.yml
@@ -10,7 +11,8 @@ on:
       - requirements/testing.txt
 
   pull_request:
-    branches: [master]
+    branches:
+      - master
     paths:
       - "**.py"
       - .github/workflows/tester.yml
@@ -19,7 +21,7 @@ on:
 
 env:
   PROJECT_FOLDER: "qgis_resource_sharing"
-  PYTHON_VERSION: 3.9
+  PYTHON_VERSION: "3.12"
 
 jobs:
   tests-unit:

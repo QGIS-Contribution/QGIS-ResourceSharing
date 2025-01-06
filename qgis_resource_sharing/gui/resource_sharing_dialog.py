@@ -44,10 +44,7 @@ from qgis_resource_sharing.collection_manager import (
     CollectionInstaller,
     CollectionManager,
 )
-from qgis_resource_sharing.config import (
-    COLLECTION_ALL_STATUS,
-    COLLECTION_INSTALLED_STATUS,
-)
+from qgis_resource_sharing.config import CollectionStatus
 from qgis_resource_sharing.gui.custom_sort_filter_proxy import (
     COLLECTION_AUTHOR_ROLE,
     COLLECTION_DESCRIPTION_ROLE,
@@ -62,7 +59,6 @@ from qgis_resource_sharing.repository_manager import RepositoryManager
 from qgis_resource_sharing.utilities import (
     SUPPORTED_RESOURCES_MAP,
     local_collection_path,
-    render_template,
     repo_settings_group,
     resources_path,
     ui_path,
@@ -203,7 +199,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             # Not settings, must be Collections (all or installed)
             if index == 1:
                 # Installed collections
-                self.collection_proxy.accepted_status = COLLECTION_INSTALLED_STATUS
+                self.collection_proxy.accepted_status = CollectionStatus.INSTALLED
                 # Set the web view
                 title = self.tr("Installed collections")
                 description = self.tr(
@@ -211,7 +207,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 )
             else:
                 # All collections (0)
-                self.collection_proxy.accepted_status = COLLECTION_ALL_STATUS
+                self.collection_proxy.accepted_status = CollectionStatus.ALL
                 # Set the web view
                 title = self.tr("All collections")
                 description = self.tr(
@@ -220,14 +216,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     "Installed collections are emphasized (in <b>bold</b>)."
                 )
 
-            context = {
-                "resources_path": str(resources_path()),
-                "title": title,
-                "description": description,
-            }
-            self.web_view_details.setHtml(
-                render_template("tab_description.html", context)
-            )
+            label_text = f"<h1>{title}</h1>{description}"
+            self.label_description.setText(label_text)
+            self.label_description.setVisible(True)
+            self.resource_details_scroll_area.setVisible(False)
             self.stacked_menu_widget.setCurrentIndex(0)
 
     def add_repository(self):
@@ -583,7 +575,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self._sel_coll_id = current_coll_id
                 # Update buttons
                 status = config.COLLECTIONS[current_coll_id]["status"]
-                if status == COLLECTION_INSTALLED_STATUS:
+                if status == CollectionStatus.INSTALLED:
                     self.button_install.setEnabled(True)
                     self.button_install.setIcon(
                         QgsApplication.getThemeIcon("mActionRefresh.svg")
@@ -599,7 +591,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     self.button_install.setText(self.tr("Install"))
                     self.button_open.setEnabled(False)
                     self.button_uninstall.setEnabled(False)
-                # Update the web_view_details frame
+                # Update the resource_details frame
                 self.show_collection_metadata(current_coll_id)
             else:
                 self.button_install.setEnabled(False)
@@ -746,7 +738,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
             self._sel_coll_id = collection_id
             # Enable / disable buttons
             status = config.COLLECTIONS[self._sel_coll_id]["status"]
-            is_installed = status == COLLECTION_INSTALLED_STATUS
+            is_installed = status == CollectionStatus.INSTALLED
             if is_installed:
                 self.button_install.setEnabled(True)
                 self.button_install.setIcon(
@@ -771,10 +763,15 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         search = QRegExp(text, Qt.CaseInsensitive, QRegExp.RegExp)
         self.collection_proxy.setFilterRegExp(search)
 
-    def show_collection_metadata(self, collection_id):
-        """Show the collection metadata given the ID."""
-        html = self.collection_manager.get_html(collection_id)
-        self.web_view_details.setHtml(html)
+    def show_collection_metadata(self, collection_id: str) -> None:
+        """Show the collection metadata given the ID.
+
+        :param collection_id: The id of the collection
+        :type collection_id: str
+        """
+        self.label_description.setVisible(False)
+        self.resource_details_scroll_area.setVisible(True)
+        self.resource_details.set_content(collection_id)
 
     def reject(self):
         """Slot called when the dialog is closed."""

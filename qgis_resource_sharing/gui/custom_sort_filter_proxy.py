@@ -1,6 +1,6 @@
 from qgis.PyQt.QtCore import QSortFilterProxyModel, Qt
 
-from qgis_resource_sharing.config import COLLECTION_INSTALLED_STATUS
+from qgis_resource_sharing.config import CollectionStatus
 
 COLLECTION_NAME_ROLE = Qt.UserRole + 1
 COLLECTION_DESCRIPTION_ROLE = Qt.UserRole + 2
@@ -54,10 +54,10 @@ class CustomSortFilterProxyModel(QSortFilterProxyModel):
             >= 0
         )
 
-        if self.accepted_status == COLLECTION_INSTALLED_STATUS:
+        if self.accepted_status == CollectionStatus.INSTALLED:
             # For installed collection status
             collection_status = self.sourceModel().data(index, COLLECTION_STATUS_ROLE)
-            status = collection_status == COLLECTION_INSTALLED_STATUS
+            status = collection_status == CollectionStatus.INSTALLED
         else:
             status = True
 

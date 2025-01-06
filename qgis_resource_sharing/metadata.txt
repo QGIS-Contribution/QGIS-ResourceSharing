@@ -20,3 +20,9 @@ qgisMaximumVersion=3.99
 experimental=False
 deprecated=False
 changelog=
+
+[oslandia]
+funders=Oslandia
+screenshot=docs/assets/img/collection_preview.png
+issue_to_be_funded=
+blog_link=

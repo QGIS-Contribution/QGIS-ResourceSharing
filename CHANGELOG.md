@@ -2,6 +2,14 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## 1.2.0 - 2025-01-06
+
+* version compatible with QGIS >= 3.34.6
+* update(ci): rm reference to set-output by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/351>
+* update(ci): use Python 3.12 to fit QGIS shipped version by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/339>
+* update(packaging): bump minimal QGIS version to 3.34.6 by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/353>
+* update(metadata): add Oslandia section to credit as funder of 2024 enhancement by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/354>
+
 ## 1.1.1 - 2025-01-06
 
 * last version compatible with Python 3.9 since a breaking change has been introduced during the LTR cycle of the QGIS 3.34 (Python 3.12 starting from QGIS 3.34.6)

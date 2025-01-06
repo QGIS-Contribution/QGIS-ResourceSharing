@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 * last version compatible with Python 3.9 since a breaking change has been introduced during the LTR cycle of the QGIS 3.34 (Python 3.12 starting from QGIS 3.34.6)
 * Replace QWebViews by native Qt widgets by @ptitjano in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/325>
+* fix(deps): comply with strict rules of pip markers by @Guts in <https://github.com/QGIS-Contribution/QGIS-ResourceSharing/pull/350>
+* fix(ci): fix qgis-plugin-ci's configuration (`project_slug`)
 
 ## 1.1.0 - 2024-05-13
 

@@ -1,9 +1,9 @@
 #! python3  # noqa E265
 
 """
-    Test repository handler for Git remote.
+Test repository handler for Git remote.
 
-    From unittest: `python -m unittest tests.qgis.test_handler_remote_git`
+From unittest: `python -m unittest tests.qgis.test_handler_remote_git`
 """
 
 # PyQGIS

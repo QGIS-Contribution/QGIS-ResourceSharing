@@ -1,7 +1,7 @@
 #! python3  # noqa E265
 
 """
-    Base class for unit tests on QGIS.
+Base class for unit tests on QGIS.
 """
 
 # standard library

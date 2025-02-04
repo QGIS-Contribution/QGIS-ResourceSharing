@@ -1,14 +1,14 @@
 #! python3  # noqa E265
 
 """
-    Usage from the repo root folder:
+Usage from the repo root folder:
 
-    .. code-block:: bash
+.. code-block:: bash
 
-        # for whole tests
-        python -m unittest tests.qgis.test_collections_manager
-        # for specific test
-        python -m unittest tests.qgis.test_collections_manager.TestCollections.test_get_collection_id
+    # for whole tests
+    python -m unittest tests.qgis.test_collections_manager
+    # for specific test
+    python -m unittest tests.qgis.test_collections_manager.TestCollections.test_get_collection_id
 """
 
 # PyQGIS

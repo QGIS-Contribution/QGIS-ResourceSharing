@@ -1,9 +1,9 @@
 #! python3  # noqa E265
 
 """
-    Test repository base handler.
+Test repository base handler.
 
-    From unittest: `python -m unittest tests.qgis.test_handler_base`
+From unittest: `python -m unittest tests.qgis.test_handler_base`
 """
 
 # PyQGIS

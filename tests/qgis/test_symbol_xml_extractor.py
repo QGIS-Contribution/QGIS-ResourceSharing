@@ -1,9 +1,9 @@
 #! python3  # noqa E265
 
 """
-    Test symbol collections extractor.
+Test symbol collections extractor.
 
-    From unittest: `python -m unittest tests.qgis.test_symbol_xml_extractor`
+From unittest: `python -m unittest tests.qgis.test_symbol_xml_extractor`
 """
 
 from qgis.core import QgsColorBrewerColorRamp, QgsFillSymbol, QgsGradientColorRamp

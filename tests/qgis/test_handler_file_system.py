@@ -1,9 +1,9 @@
 #! python3  # noqa E265
 
 """
-    Test repository file system handler.
+Test repository file system handler.
 
-    From unittest: `python -m unittest tests.qgis.test_handler_file_system`
+From unittest: `python -m unittest tests.qgis.test_handler_file_system`
 """
 
 # PyQGIS

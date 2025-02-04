@@ -1,5 +1,5 @@
 """
-    Test plugin initialization
+Test plugin initialization
 """
 
 from qgis_resource_sharing import classFactory

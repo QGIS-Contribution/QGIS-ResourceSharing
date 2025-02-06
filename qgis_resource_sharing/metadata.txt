@@ -8,7 +8,7 @@ tags=algorithm,checklist,collection,design,map,model,processing,Python,R,reposit
 
 # credits and contact
 email=dev@ingeoveritas.com
-author=Akbar Gumbira, Håvard Tveite, Julien Moura (Oslandia), Jean Fleder (Oslandia)
+author=Akbar Gumbira, Håvard Tveite, Julien Moura (Oslandia), Jean Felder (Oslandia)
 homepage=https://qgis-contribution.github.io/QGIS-ResourceSharing/
 repository=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/
 tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues/

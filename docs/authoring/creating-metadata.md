@@ -6,9 +6,9 @@ In the root of the repository, there has to be a metadata file describing the re
 
 The metadata file (`metadata.ini`) must have a `general` section with this information:
 
-| Name       |  Status  | Description                                                                                           |
-| :--------- | :------: | :---------------------------------------------------------------------------------------------------- |
-| collection | Required | Comma separated list of collection names (these have to match the directory names of the collections) |
+| Name        |  Status  | Description                                                                                           |
+| :---------- | :------: | :---------------------------------------------------------------------------------------------------- |
+| collections | Required | Comma separated list of collection names (these have to match the directory names of the collections) |
 
 ## Collection
 

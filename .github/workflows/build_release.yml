@@ -47,7 +47,7 @@ jobs:
       - name: Compile translations
         run: lrelease ${{ env.PROJECT_FOLDER }}/resources/i18n/*.ts
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: translations-build
           path: ${{ env.PROJECT_FOLDER }}/**/*.qm
@@ -82,7 +82,7 @@ jobs:
           rm -rf `find ${{ env.PROJECT_FOLDER }}/ext_libs -type d -name tests`
           rm -rf `find ${{ env.PROJECT_FOLDER }}/ext_libs -type d -name test`
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: dependencies-build
           path: ${{ env.PROJECT_FOLDER }}/ext_libs/
@@ -141,7 +141,7 @@ jobs:
       - name: Package the latest version
         run: qgis-plugin-ci package latest --allow-uncommitted-changes
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ env.PROJECT_FOLDER }}-latest
           path: ${{ env.PROJECT_FOLDER }}.*.zip

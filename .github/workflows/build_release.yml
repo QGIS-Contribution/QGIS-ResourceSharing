@@ -115,13 +115,13 @@ jobs:
           python -m pip install -U -r requirements/packaging.txt
 
       - name: Download translations
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: translations-build
           path: ${{ env.PROJECT_FOLDER }}
 
       - name: Download dependencies
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: dependencies-build
           path: ${{ env.PROJECT_FOLDER }}/ext_libs/
@@ -174,13 +174,13 @@ jobs:
           python -m pip install -U -r requirements/packaging.txt
 
       - name: Download translations
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: translations-build
           path: ${{ env.PROJECT_FOLDER }}
 
       - name: Download dependencies
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: dependencies-build
           path: ${{ env.PROJECT_FOLDER }}/ext_libs/

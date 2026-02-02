@@ -69,9 +69,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
                     <prop k="width_unit" v="Pixel" />
                 </layer>
             </symbol>
-        """.format(
-            test_data_path()
-        )
+        """.format(test_data_path())
 
         self.assertEqual(fixed_xml.strip(), expected_xml.strip())
 

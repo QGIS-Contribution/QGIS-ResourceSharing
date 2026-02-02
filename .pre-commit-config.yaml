@@ -2,7 +2,7 @@ exclude: ".venv|tests/dev/|tests/fixtures/|ext_libs/"
 fail_fast: false
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
         args:
@@ -21,7 +21,7 @@ repos:
           - --markdown-linebreak-ext=md
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5
+    rev: v1.5.6
     hooks:
       - id: remove-tabs
         args:
@@ -29,22 +29,22 @@ repos:
           - "4"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.9.4"
+    rev: "v0.14.14"
     hooks:
       - id: ruff
         args:
           - --fix-only
           - --target-version=py312
 
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 26.1.0
     hooks:
       - id: black
         args:
           - --target-version=py312
 
   - repo: https://github.com/pycqa/isort
-    rev: 6.0.0
+    rev: 7.0.0
     hooks:
       - id: isort
         args:
@@ -53,7 +53,7 @@ repos:
           - --filter-files
 
   - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
+    rev: 7.3.0
     hooks:
       - id: flake8
         files: ^qgis_resource_sharing/.*\.py$

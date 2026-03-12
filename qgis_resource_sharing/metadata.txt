@@ -5,6 +5,7 @@ description=Download shared collections
 category=Web
 icon=resources/icon.png
 tags=algorithm,checklist,collection,design,map,model,processing,Python,R,repository,resources,script,sharing,style,svg,symbol
+supportsQt6=True
 
 # credits and contact
 email=dev@ingeoveritas.com
@@ -16,7 +17,7 @@ tracker=https://github.com/QGIS-Contribution/QGIS-ResourceSharing/issues/
 # versioning
 version=1.3.0-DEV
 qgisMinimumVersion=3.34.6
-qgisMaximumVersion=3.99
+qgisMaximumVersion=4.99
 experimental=False
 deprecated=False
 changelog=

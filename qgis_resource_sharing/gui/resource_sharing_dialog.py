@@ -25,9 +25,16 @@ import logging
 from qgis.core import Qgis, QgsApplication, QgsSettings
 from qgis.gui import QgsMessageBar
 from qgis.PyQt import uic
-from qgis.PyQt.Qt import QBrush, QColor, QFont, QSize
-from qgis.PyQt.QtCore import QRegExp, Qt, QThread, QUrl, pyqtSlot
-from qgis.PyQt.QtGui import QDesktopServices, QIcon, QStandardItem, QStandardItemModel
+from qgis.PyQt.QtCore import QRegularExpression, QSize, Qt, QThread, QUrl, pyqtSlot
+from qgis.PyQt.QtGui import (
+    QBrush,
+    QColor,
+    QDesktopServices,
+    QFont,
+    QIcon,
+    QStandardItem,
+    QStandardItemModel,
+)
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -111,7 +118,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         # All collections
         icon_all = QIcon()
         icon_all.addFile(
-            str(resources_path("img", "plugin.svg")), QSize(), QIcon.Normal, QIcon.Off
+            str(resources_path("img", "plugin.svg")),
+            QSize(),
+            QIcon.Mode.Normal,
+            QIcon.State.Off,
         )
         item_all = QListWidgetItem()
         item_all.setIcon(icon_all)
@@ -121,29 +131,34 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         icon_installed.addFile(
             str(resources_path("img", "plugin-installed.svg")),
             QSize(),
-            QIcon.Normal,
-            QIcon.Off,
+            QIcon.Mode.Normal,
+            QIcon.State.Off,
         )
         item_installed = QListWidgetItem()
         item_installed.setIcon(icon_installed)
         item_installed.setText(self.tr("Installed collections"))
-        item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        item_all.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
         # Settings / repositories
         icon_settings = QIcon()
         icon_settings.addFile(
-            str(resources_path("img", "settings.svg")), QSize(), QIcon.Normal, QIcon.Off
+            str(resources_path("img", "settings.svg")),
+            QSize(),
+            QIcon.Mode.Normal,
+            QIcon.State.Off,
         )
         item_settings = QListWidgetItem()
         item_settings.setIcon(icon_settings)
         item_settings.setText(self.tr("Settings"))
-        item_all.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        item_all.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
         # Add the items to the list widget
         self.menu_list_widget.addItem(item_all)
         self.menu_list_widget.addItem(item_installed)
         self.menu_list_widget.addItem(item_settings)
         # Init the message bar
         self.message_bar = QgsMessageBar(self)
-        self.message_bar.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.message_bar.setSizePolicy(
+            QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed
+        )
         self.vlayoutRightColumn.insertWidget(0, self.message_bar)
         # Progress dialog for long running processes
         self.progress_dialog = None
@@ -152,7 +167,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.collection_manager = CollectionManager()
         # Collections list view
         self.collections_model = QStandardItemModel(0, 1)
-        self.collections_model.sort(0, Qt.AscendingOrder)
+        self.collections_model.sort(0, Qt.SortOrder.AscendingOrder)
         self.collection_proxy = CustomSortFilterProxyModel(self)
         self.collection_proxy.setSourceModel(self.collections_model)
         self.list_view_collections.setModel(self.collection_proxy)
@@ -179,7 +194,9 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         self.button_install.clicked.connect(self.install_collection)
         self.button_open.clicked.connect(self.open_collection)
         self.button_uninstall.clicked.connect(self.uninstall_collection)
-        self.button_box.button(QDialogButtonBox.Help).clicked.connect(self.open_help)
+        self.button_box.button(QDialogButtonBox.StandardButton.Help).clicked.connect(
+            self.open_help
+        )
         # Populate the repositories widget and collections list view
         self.populate_repositories_widget()
         self.reload_collections_model()
@@ -225,7 +242,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
     def add_repository(self):
         """Open add repository dialog."""
         dlg = ManageRepositoryDialog(self)
-        if not dlg.exec_():
+        if not dlg.exec():
             return
         for repoName, repo in self.repository_manager.directories.items():
             if dlg.line_edit_url.text().strip() == repo["url"]:
@@ -296,7 +313,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         dlg.line_edit_auth_id.setText(
             self.repository_manager.directories[repo_name]["auth_cfg"]
         )
-        if not dlg.exec_():
+        if not dlg.exec():
             return
         # Check if the changed URL is already present and that
         # the new repository name is unique
@@ -373,10 +390,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self,
                 __title__,
                 warning,
-                QMessageBox.Yes,
-                QMessageBox.No,
+                QMessageBox.StandardButton.Yes,
+                QMessageBox.StandardButton.No,
             )
-            == QMessageBox.No
+            == QMessageBox.StandardButton.No
         ):
             return
 
@@ -627,7 +644,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         repo_Font = QFont()
         repo_with_installed_Font = QFont()
         repo_with_installed_Font.setWeight(60)
-        collection_brush = QBrush(Qt.darkGray)
+        collection_brush = QBrush(Qt.GlobalColor.darkGray)
         installed_collection_brush = QBrush(QColor(60, 25, 10))
         for repo_name in self.repository_manager.directories:
             url = self.repository_manager.directories[repo_name]["url"]
@@ -652,7 +669,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     collectionItem = QTreeWidgetItem(item, COLLECTION_ITEM)
                     brush = collection_brush
                     collectionFont = QFont()
-                    collectionFont.setStyle(QFont.StyleItalic)
+                    collectionFont.setStyle(QFont.Style.StyleItalic)
                     collitemtext = coll_name
                     if (
                         installed_collections
@@ -671,7 +688,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                     collectionItem.setText(1, coll_tags)
         self.tree_repositories.resizeColumnToContents(0)
         self.tree_repositories.resizeColumnToContents(1)
-        self.tree_repositories.sortItems(1, Qt.AscendingOrder)
+        self.tree_repositories.sortItems(1, Qt.SortOrder.AscendingOrder)
 
     def reload_collections_model(self):
         """Reload the collections model with the current collections."""
@@ -700,7 +717,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 collectionFont.setWeight(60)
                 item.setFont(collectionFont)
             self.collections_model.appendRow(item)
-        self.collections_model.sort(0, Qt.AscendingOrder)
+        self.collections_model.sort(0, Qt.SortOrder.AscendingOrder)
 
     def on_tree_repositories_itemSelectionChanged(self):
         """Slot for the itemSelectionChanged signal of tree_repositories."""
@@ -760,8 +777,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
 
     @pyqtSlot(str)
     def filter_collections(self, text):
-        search = QRegExp(text, Qt.CaseInsensitive, QRegExp.RegExp)
-        self.collection_proxy.setFilterRegExp(search)
+        search = QRegularExpression(
+            text, QRegularExpression.PatternOption.CaseInsensitiveOption
+        )
+        self.collection_proxy.setFilterRegularExpression(search)
 
     def show_collection_metadata(self, collection_id: str) -> None:
         """Show the collection metadata given the ID.

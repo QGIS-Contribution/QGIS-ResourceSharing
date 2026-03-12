@@ -2,12 +2,12 @@ from qgis.PyQt.QtCore import QSortFilterProxyModel, Qt
 
 from qgis_resource_sharing.config import CollectionStatus
 
-COLLECTION_NAME_ROLE = Qt.UserRole + 1
-COLLECTION_DESCRIPTION_ROLE = Qt.UserRole + 2
-COLLECTION_AUTHOR_ROLE = Qt.UserRole + 3
-COLLECTION_TAGS_ROLE = Qt.UserRole + 4
-COLLECTION_ID_ROLE = Qt.UserRole + 5
-COLLECTION_STATUS_ROLE = Qt.UserRole + 6
+COLLECTION_NAME_ROLE = Qt.ItemDataRole.UserRole + 1
+COLLECTION_DESCRIPTION_ROLE = Qt.ItemDataRole.UserRole + 2
+COLLECTION_AUTHOR_ROLE = Qt.ItemDataRole.UserRole + 3
+COLLECTION_TAGS_ROLE = Qt.ItemDataRole.UserRole + 4
+COLLECTION_ID_ROLE = Qt.ItemDataRole.UserRole + 5
+COLLECTION_STATUS_ROLE = Qt.ItemDataRole.UserRole + 6
 
 
 class CustomSortFilterProxyModel(QSortFilterProxyModel):

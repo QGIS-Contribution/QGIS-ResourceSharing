@@ -35,7 +35,7 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
         super(ManageRepositoryDialog, self).__init__(parent)
         self.setupUi(self)
         self.line_edit_url.setText("https://")
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
         self.line_edit_name.textChanged.connect(self.form_changed)
         self.line_edit_url.textChanged.connect(self.form_changed)
         self.button_add_auth.clicked.connect(self.add_authentication)
@@ -56,7 +56,7 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
         is_enabled = (
             len(self.line_edit_name.text()) > 0 and len(self.line_edit_url.text()) > 0
         )
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(is_enabled)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(is_enabled)
 
     def add_authentication(self):
         """Slot for when the add auth button is clicked."""
@@ -73,7 +73,10 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
             layout.addWidget(acs)
 
             button_box = QDialogButtonBox(
-                QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal, dlg
+                QDialogButtonBox.StandardButton.Ok
+                | QDialogButtonBox.StandardButton.Cancel,
+                Qt.Horizontal,
+                dlg,
             )
             layout.addWidget(button_box)
             button_box.accepted.connect(dlg.accept)
@@ -81,6 +84,6 @@ class ManageRepositoryDialog(QDialog, FORM_CLASS):
 
             dlg.setLayout(layout)
             dlg.setWindowModality(Qt.WindowModal)
-            if dlg.exec_():
+            if dlg.exec():
                 self.line_edit_auth_id.setText(acs.configId())
             del dlg

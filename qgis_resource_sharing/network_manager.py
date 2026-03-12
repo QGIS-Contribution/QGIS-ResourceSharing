@@ -45,7 +45,8 @@ class NetworkManager(object):
 
         request = QNetworkRequest(QUrl(self._url))
         request.setAttribute(
-            QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork
+            QNetworkRequest.Attribute.CacheLoadControlAttribute,
+            QNetworkRequest.CacheLoadControl.AlwaysNetwork,
         )
 
         if self._auth_cfg and qgis_version() >= 21200:
@@ -62,7 +63,7 @@ class NetworkManager(object):
 
         # Finished
         description = None
-        if self._reply.error() != QNetworkReply.NoError:
+        if self._reply.error() != QNetworkReply.NetworkError.NoError:
             status = False
             description = self._reply.errorString()
         else:

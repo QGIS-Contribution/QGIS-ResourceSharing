@@ -195,7 +195,7 @@ jobs:
           git add ${{ env.PROJECT_FOLDER }}/
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           fail_on_unmatched_files: true
           generate_release_notes: true

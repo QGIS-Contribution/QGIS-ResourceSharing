@@ -1,4 +1,4 @@
-#! python3  # noqa E265
+#! python3
 
 """
 Usage from the repo root folder:

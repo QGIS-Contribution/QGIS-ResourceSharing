@@ -32,7 +32,7 @@ FORM_CLASS, _ = uic.loadUiType(str(ui_path("manage_repository.ui")))
 class ManageRepositoryDialog(QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """Create the dialog and configure the UI."""
-        super(ManageRepositoryDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
         self.line_edit_url.setText("https://")
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)

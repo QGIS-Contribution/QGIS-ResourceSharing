@@ -66,7 +66,7 @@ def normalizeVersion(s):
         "R",
     ]
     if not s:
-        return str()
+        return ""
     s = str(s).upper()
     for i in prefixes:
         if s[: len(i)] == i:
@@ -153,8 +153,7 @@ def compareVersions(a, b):
     v2 = chopString(b)
     # set the shorter string as a base
     shorter = len(v1)
-    if shorter > len(v2):
-        shorter = len(v2)
+    shorter = min(shorter, len(v2))
     # try to determine within the common length
     for i in range(shorter):
         if compareElements(v1[i], v2[i]):

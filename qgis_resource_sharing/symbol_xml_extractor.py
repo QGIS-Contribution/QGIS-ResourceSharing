@@ -16,7 +16,7 @@ from qgis_resource_sharing.__about__ import __title__
 LOGGER = logging.getLogger(__title__)
 
 
-class SymbolXMLExtractor(object):
+class SymbolXMLExtractor:
     """Parses the given file and returns the symbols and colorramps"""
 
     def __init__(self, xml_path: str):

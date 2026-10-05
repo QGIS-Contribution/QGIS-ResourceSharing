@@ -3,7 +3,6 @@
 import logging
 from configparser import ConfigParser
 from io import StringIO
-from typing import Dict, List
 from urllib.parse import urlparse
 
 from ext_libs.giturlparse import validate as git_validate
@@ -33,11 +32,11 @@ class RepositoryHandlerMeta(type):
                 interface_id = name.lower()
                 cls.registry[interface_id] = cls
 
-        super(RepositoryHandlerMeta, cls).__init__(name, bases, dct)
+        super().__init__(name, bases, dct)
 
 
 @add_metaclass(RepositoryHandlerMeta)
-class BaseRepositoryHandler(object):
+class BaseRepositoryHandler:
     """Abstract class of handler."""
 
     METADATA_FILE = "metadata.ini"
@@ -129,7 +128,7 @@ class BaseRepositoryHandler(object):
             self.metadata = bytes(network_manager.content).decode("utf8")
         return status, fetcherror
 
-    def parse_metadata(self) -> List[Dict]:
+    def parse_metadata(self) -> list[dict]:
         """Parse str metadata to collection dict.
 
         :return: collections

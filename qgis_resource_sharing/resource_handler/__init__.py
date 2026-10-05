@@ -1,4 +1,4 @@
-#! python3  # noqa: E265
+#! python3
 
 from .base import BaseResourceHandler  # noqa: F401
 from .checklist_handler import ChecklistHandler  # noqa: F401

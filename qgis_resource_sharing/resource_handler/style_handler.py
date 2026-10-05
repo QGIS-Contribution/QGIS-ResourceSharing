@@ -59,4 +59,3 @@ class StyleResourceHandler(BaseResourceHandler, SymbolResolverMixin):
     def uninstall(self):
         """Uninstall the style."""
         # Styles are not installed, so do nothing.
-        pass

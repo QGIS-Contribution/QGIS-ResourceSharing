@@ -1,4 +1,4 @@
-#! python3  # noqa E265
+#! python3
 
 """
 Test symbol collections extractor.
@@ -54,13 +54,13 @@ class TestSymbolResolverMixin(unittest.TestCase):
         )
         fixed_xml = self._to_str(fix_xml_node(symbol_xml, collection_path, []))
         print(fixed_xml)
-        expected_xml = """
+        expected_xml = f"""
             <symbol alpha="1" clip_to_extent="1" name="fill_raster" type="fill">
                 <layer class="RasterFill" locked="0" pass="0">
                     <prop k="alpha" v="1" />
                     <prop k="angle" v="0" />
                     <prop k="coordinate_mode" v="0" />
-                    <prop k="imageFile" v="{0}/repository_dummy/collections/test_collection/image/pikachu.png" />
+                    <prop k="imageFile" v="{test_data_path()}/repository_dummy/collections/test_collection/image/pikachu.png" />
                     <prop k="offset" v="0,0" />
                     <prop k="offset_map_unit_scale" v="0,0,0,0,0,0" />
                     <prop k="offset_unit" v="MM" />
@@ -69,9 +69,7 @@ class TestSymbolResolverMixin(unittest.TestCase):
                     <prop k="width_unit" v="Pixel" />
                 </layer>
             </symbol>
-        """.format(
-            test_data_path()
-        )
+        """
 
         self.assertEqual(fixed_xml.strip(), expected_xml.strip())
 

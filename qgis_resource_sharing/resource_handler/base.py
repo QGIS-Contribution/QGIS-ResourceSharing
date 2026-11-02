@@ -18,11 +18,11 @@ class ResourceHandlerMeta(type):
                 interface_id = name.lower()
                 cls.registry[interface_id] = cls
 
-        super(ResourceHandlerMeta, cls).__init__(name, bases, dct)
+        super().__init__(name, bases, dct)
 
 
 @add_metaclass(ResourceHandlerMeta)
-class BaseResourceHandler(object):
+class BaseResourceHandler:
     """Abstract class of handler."""
 
     IS_DISABLED = True

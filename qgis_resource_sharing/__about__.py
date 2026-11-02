@@ -1,9 +1,10 @@
-#! python3  # noqa: E265
+#! python3
 
 """
 Metadata about the package to easily retrieve informations about it.
 See: https://packaging.python.org/guides/single-sourcing-package-version/
 """
+
 # ############################################################################
 # ########## Libraries #############
 # ##################################
@@ -49,7 +50,7 @@ def plugin_metadata_as_dict() -> dict:
         config.read(PLG_METADATA_FILE.resolve(), encoding="UTF-8")
         return {s: dict(config.items(s)) for s in config.sections()}
     else:
-        raise IOError("Plugin metadata.txt not found at: %s" % PLG_METADATA_FILE)
+        raise OSError("Plugin metadata.txt not found at: %s" % PLG_METADATA_FILE)
 
 
 # ############################################################################
@@ -60,7 +61,7 @@ def plugin_metadata_as_dict() -> dict:
 __plugin_md__ = plugin_metadata_as_dict()
 
 __author__ = __plugin_md__.get("general").get("author")
-__copyright__ = "2021 - {0}, {1}".format(date.today().year, __author__)
+__copyright__ = f"2021 - {date.today().year}, {__author__}"
 __email__ = __plugin_md__.get("general").get("email")
 __icon_path__ = DIR_PLUGIN_ROOT.resolve() / __plugin_md__.get("general").get("icon")
 __keywords__ = [

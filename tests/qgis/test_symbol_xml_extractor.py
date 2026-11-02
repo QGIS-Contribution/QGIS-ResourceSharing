@@ -1,4 +1,4 @@
-#! python3  # noqa E265
+#! python3
 
 """
 Test symbol collections extractor.
@@ -6,9 +6,14 @@ Test symbol collections extractor.
 From unittest: `python -m unittest tests.qgis.test_symbol_xml_extractor`
 """
 
-from qgis.core import QgsColorBrewerColorRamp, QgsFillSymbol, QgsGradientColorRamp
+from qgis.core import (
+    QgsColorBrewerColorRamp,
+    QgsFillSymbol,
+    QgsGradientColorRamp,
+    QgsLineSymbol,
+    QgsMarkerSymbol,
+)
 from qgis.core import QgsLimitedRandomColorRamp as random_color_ramp  # <-- !!!!
-from qgis.core import QgsLineSymbol, QgsMarkerSymbol
 from qgis.testing import unittest
 
 from qgis_resource_sharing.symbol_xml_extractor import SymbolXMLExtractor

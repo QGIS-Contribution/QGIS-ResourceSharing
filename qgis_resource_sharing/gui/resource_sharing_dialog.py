@@ -85,7 +85,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
         :param iface: An instance of QGisInterface
         :type iface: QGisInterface
         """
-        super(ResourceSharingDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         # Reconfigure UI
@@ -258,7 +258,7 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 )
             else:
                 self.message_bar.pushMessage(
-                    self.tr("Unable to add repository: {}".format(adderror)),
+                    self.tr(f"Unable to add repository: {adderror}"),
                     Qgis.Warning,
                     5,
                 )
@@ -365,9 +365,10 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 self.tr("You can not remove official repositories!"), Qgis.Warning, 5
             )
             return
-        warning = self.tr(
-            "Are you sure you want to remove the following repository?"
-        ) + "\n{}".format(repo_name)
+        warning = (
+            self.tr("Are you sure you want to remove the following repository?")
+            + f"\n{repo_name}"
+        )
         if (
             QMessageBox.warning(
                 self,
@@ -434,17 +435,14 @@ class ResourceSharingDialog(QDialog, FORM_CLASS):
                 if status:
                     self.message_bar.pushMessage(
                         self.tr(
-                            "Repository {} has been successfully reloaded.".format(
-                                repo_name
-                            )
+                            f"Repository {repo_name} has been successfully reloaded."
                         ),
                         Qgis.Info,
                         5,
                     )
                 else:
                     self.message_bar.pushMessage(
-                        self.tr("Unable to reload")
-                        + " {}: {}".format(repo_name, reloaderror),
+                        self.tr("Unable to reload") + f" {repo_name}: {reloaderror}",
                         Qgis.Warning,
                         5,
                     )

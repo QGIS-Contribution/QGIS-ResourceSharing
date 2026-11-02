@@ -11,7 +11,7 @@ from qgis_resource_sharing.utilities import path_leaf
 LOGGER = logging.getLogger(__title__)
 
 
-class SymbolResolverMixin(object):
+class SymbolResolverMixin:
     """Mixin for Resources Handlers that need to resolve SVG
     and image symbol paths."""
 

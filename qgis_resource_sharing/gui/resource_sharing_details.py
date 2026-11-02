@@ -20,7 +20,6 @@
 """
 
 import logging
-from typing import List, Optional
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QUrl
@@ -40,19 +39,19 @@ LOGGER = logging.getLogger("QGIS Resource Sharing")
 class QgsResourceSharingDetails(QWidget, FORM_CLASS):
     """Widget to display the details of a collection as a grid"""
 
-    def __init__(self, parent: Optional[QWidget] = None) -> None:
+    def __init__(self, parent: QWidget | None = None) -> None:
         """Constructor.
 
         :param parent: Optional widget to use as parent
         :type parent: QWidget
         """
-        super(QgsResourceSharingDetails, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         self._collection_manager = CollectionManager()
         self._network_manager = QNetworkAccessManager(self)
         self._network_manager.finished.connect(self._on_request_response)
-        self._network_replies: List[QNetworkReply] = []
+        self._network_replies: list[QNetworkReply] = []
 
     def set_content(self, collection_id: str) -> None:
         """Return the details of a collection as HTML, given its id.

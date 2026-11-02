@@ -2,7 +2,6 @@ import hashlib
 import logging
 import shutil
 import traceback
-from typing import Dict
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
@@ -74,7 +73,7 @@ class CollectionInstaller(QObject):
         self.killed = True
 
 
-class CollectionManager(object):
+class CollectionManager:
     def __init__(self):
         """Utilities class related to collection."""
 
@@ -84,7 +83,7 @@ class CollectionManager(object):
         hex_dig = hash_object.hexdigest()
         return hex_dig
 
-    def get_collection(self, collection_id: str) -> Dict[str, str]:
+    def get_collection(self, collection_id: str) -> dict[str, str]:
         """Return the details of a collection, given its id.
 
         :param collection_id: The id of the collection

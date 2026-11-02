@@ -10,7 +10,7 @@ from qgis_resource_sharing.utilities import qgis_version
 LOGGER = logging.getLogger(__title__)
 
 
-class NetworkManager(object):
+class NetworkManager:
     """Class to get the content of a file with a given URL."""
 
     def __init__(self, url, auth_cfg=None):

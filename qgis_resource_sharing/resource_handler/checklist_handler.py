@@ -41,7 +41,7 @@ class ChecklistHandler(BaseResourceHandler):
                 shutil.copy(item, self.checklists_directory / Path(item).name)
                 valid += 1
             except OSError as exc:
-                LOGGER.error(f"Could not copy checklist {item!r}:\n{str(exc)}")
+                LOGGER.error(f"Could not copy checklist {item!r}:\n{exc!s}")
         if valid > 0:
             self.collection[CHECKLISTS] = valid
 

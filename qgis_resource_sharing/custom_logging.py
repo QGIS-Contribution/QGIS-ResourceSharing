@@ -42,9 +42,7 @@ class QgisLogger(logging.Handler):
         # Mapping CRITICAL to Qgis.Critical and ERROR to Qgis.Warning:
         if record.levelno == logging.CRITICAL:
             qgislevel = Qgis.Critical
-        elif record.levelno == logging.ERROR:
-            qgislevel = Qgis.Warning
-        elif record.levelno == logging.WARNING:
+        elif record.levelno == logging.ERROR or record.levelno == logging.WARNING:
             qgislevel = Qgis.Warning
 
         QgsMessageLog.logMessage(record.getMessage(), LOGGERNAME, level=qgislevel)
